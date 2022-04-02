@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">FLowMVISample</string>
+    <string name="error">An error occurred</string>
+    <string name="to_basic_activity">Go to basic activity</string>
+    <string name="counter_text">Counter: %d (click me!)</string>
+    <string name="title_activity_basic">BasicActivity</string>
+    <string name="started_processing">Started processing your intent</string>
+    <string name="finished_processing">Finished processing intent</string>
+</resources>
