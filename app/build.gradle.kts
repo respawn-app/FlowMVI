@@ -43,8 +43,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":compose"))
-    implementation(project(":android"))
+    implementation(project(":android-compose"))
+    implementation(project(":android-view"))
 
     implementation("io.insert-koin:koin-core:3.1.5")
     implementation("io.insert-koin:koin-android:3.1.5")

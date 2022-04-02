@@ -14,8 +14,8 @@ Choose your ~~fighter~~ dependency:
 ```kotlin
 val flowVersion = /* look at the widget */
 implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
-implementation("com.github.Nek-12.FlowMVI:compose:${flowVersion}") //For Jetpack Compose Android projects
-implementation("com.github.Nek-12.FlowMVI:android:${flowVersion}") //For View-based Android projects
+implementation("com.github.Nek-12.FlowMVI:android-compose:${flowVersion}") //For Jetpack Compose Android projects
+implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For View-based Android projects
 ```
 
 ## Core:

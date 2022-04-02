@@ -13,5 +13,5 @@ android {
 dependencies {
     implementation("androidx.compose.ui:ui:${Versions.compose}")
     implementation("androidx.compose.foundation:foundation:${Versions.compose}")
-    api(project(":core"))
+    api(project(":android"))
 }

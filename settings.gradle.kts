@@ -1,4 +1,5 @@
 include(":app")
 include(":core")
 include(":android")
-include(":compose")
+include(":android-compose")
+include(":android-view")
