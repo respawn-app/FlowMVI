@@ -1,7 +1,10 @@
 package com.nek12.flowMVI
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 val <S : MVIState> MVIProvider<S, *, *>.currentState: S get() = states.value
 
@@ -29,6 +32,22 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore<S, I, A>.subscr
 /**
  * Execute [block] if current state is [T] else just return [currentState].
  */
-inline fun <reified T : S, reified S : MVIState> MVIProvider<S, *, *>.withState(block: T.() -> T): S {
+inline fun <reified T : S, reified S : MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S {
     return (currentState as? T)?.let(block) ?: currentState
+}
+
+inline fun <S : MVIState> MVIStore<S, *, *>.launchForState(
+    scope: CoroutineScope,
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    crossinline recover: suspend CoroutineScope.(Exception) -> S = { throw it },
+    crossinline block: suspend CoroutineScope.() -> S,
+) = scope.launch(context, start) {
+    set(
+        try {
+            block()
+        } catch (e: Exception) {
+            recover(e)
+        }
+    )
 }

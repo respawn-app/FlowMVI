@@ -49,6 +49,7 @@ android {
         prefab = false
         renderScript = false
         mlModelBinding = false
+        resValues = false
     }
 }
 dependencies {

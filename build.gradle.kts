@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.1.1"
+rootProject.version = "0.1.2"
 
 buildscript {
 

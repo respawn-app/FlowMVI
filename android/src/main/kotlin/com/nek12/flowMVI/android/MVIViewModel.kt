@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nek12.flowMVI.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class for you to implement.
@@ -47,17 +49,11 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction> : ViewMo
      * Launch a coroutine that emits a new state. It is advisable to [recover] from any errors
      */
     protected fun launchForState(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
         recover: suspend CoroutineScope.(Exception) -> S = { this@MVIViewModel.recover(it) },
         call: suspend CoroutineScope.() -> S,
-    ) = viewModelScope.launch {
-        set(
-            try {
-                call()
-            } catch (e: Exception) {
-                recover(e)
-            }
-        )
-    }
+    ) = store.launchForState(viewModelScope, context, start, recover, call)
 
     /**
      * For use with operators such as [onEach]. A shorthand for [launchIn] (viewModelScope)
