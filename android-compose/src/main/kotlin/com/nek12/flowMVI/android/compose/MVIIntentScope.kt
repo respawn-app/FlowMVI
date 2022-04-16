@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.Lifecycle
 import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
@@ -14,10 +15,10 @@ import com.nek12.flowMVI.MVIState
 import kotlinx.coroutines.CoroutineScope
 import kotlin.experimental.ExperimentalTypeInference
 
-@Stable
 /**
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
+@Stable
 interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
@@ -34,27 +35,33 @@ interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
 
 @Composable
 fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberScope(
-    vm: MVIProvider<S, I, A>,
-): Lazy<MVIIntentScope<I, A>> = remember(vm) { lazy { MVIIntentScopeImpl(vm) } }
+    provider: MVIProvider<S, I, A>,
+    lifecycleState: Lifecycle.State,
+): MVIIntentScope<I, A> = remember(provider, lifecycleState) {
+    MVIIntentScopeImpl(provider, lifecycleState)
+}
 
 private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
     private val provider: MVIProvider<*, I, A>,
+    private val lifecycleState: Lifecycle.State,
 ) : MVIIntentScope<I, A> {
 
     override fun send(intent: I) = provider.send(intent)
 
     @Composable
     override fun consume(consumer: suspend CoroutineScope.(A) -> Unit) {
-        provider.consume(consumer)
+        provider.consume(lifecycleState, consumer)
     }
 }
 
 @Composable
-inline fun <A : MVIAction> MVIProvider<*, *, A>.consume(
-    crossinline consumer: suspend CoroutineScope.(action: A) -> Unit,
+fun <A : MVIAction> MVIProvider<*, *, A>.consume(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    consumer: suspend CoroutineScope.(action: A) -> Unit,
 ) {
-    LaunchedEffect(this) {
-        actions.collect {
+    val lifecycleFlow = rememberLifecycleFlow(actions, lifecycleState)
+    LaunchedEffect(lifecycleFlow) {
+        lifecycleFlow.collect {
             consumer(it)
         }
     }
