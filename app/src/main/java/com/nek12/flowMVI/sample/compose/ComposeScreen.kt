@@ -24,6 +24,7 @@ import com.nek12.flowMVI.sample.compose.ComposeIntent.ClickedToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeState.DisplayingContent
 import com.nek12.flowMVI.sample.compose.ComposeState.Loading
 import com.nek12.flowMVI.sample.view.BasicActivity
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -42,9 +43,12 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
             is GoToBasicActivity -> context.startActivity(
                 Intent(context, BasicActivity::class.java)
             )
-            is ShowSnackbar -> scaffoldState.snackbarHostState.showSnackbar(
-                message = context.getString(action.res)
-            )  //suspends consume()
+            is ShowSnackbar -> launch { //snackbar suspends consume(), we do not want to block action consumption here
+                //so we'll launch a new coroutine
+                scaffoldState.snackbarHostState.showSnackbar(
+                    message = context.getString(action.res)
+                )
+            }
         }
     }
 

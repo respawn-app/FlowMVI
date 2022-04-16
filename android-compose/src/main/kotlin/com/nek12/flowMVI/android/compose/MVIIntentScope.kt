@@ -12,7 +12,6 @@ import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlin.experimental.ExperimentalTypeInference
 
 @Stable
@@ -56,9 +55,7 @@ inline fun <A : MVIAction> MVIProvider<*, *, A>.consume(
 ) {
     LaunchedEffect(this) {
         actions.collect {
-            launch {
-                consumer(it)
-            }
+            consumer(it)
         }
     }
 }
