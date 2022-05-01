@@ -4,7 +4,6 @@ package com.nek12.flowMVI.android.compose
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
@@ -19,7 +18,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
+interface MVIIntentScope<in I: MVIIntent, out A: MVIAction> {
 
     /**
      * Send a new intent for the provider you used in [MVIComposable] {
@@ -34,17 +33,17 @@ interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
 }
 
 @Composable
-fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberScope(
+fun <S: MVIState, I: MVIIntent, A: MVIAction> rememberScope(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State,
 ): MVIIntentScope<I, A> = remember(provider, lifecycleState) {
     MVIIntentScopeImpl(provider, lifecycleState)
 }
 
-private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
+private class MVIIntentScopeImpl<in I: MVIIntent, out A: MVIAction>(
     private val provider: MVIProvider<*, I, A>,
     private val lifecycleState: Lifecycle.State,
-) : MVIIntentScope<I, A> {
+): MVIIntentScope<I, A> {
 
     override fun send(intent: I) = provider.send(intent)
 
@@ -55,17 +54,10 @@ private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
 }
 
 @Composable
-fun <A : MVIAction> MVIProvider<*, *, A>.consume(
+fun <A: MVIAction> MVIProvider<*, *, A>.consume(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     consumer: suspend CoroutineScope.(action: A) -> Unit,
-) {
-    val lifecycleFlow = rememberLifecycleFlow(actions, lifecycleState)
-    LaunchedEffect(lifecycleFlow) {
-        lifecycleFlow.collect {
-            consumer(it)
-        }
-    }
-}
+) = actions.collectOnLifecycle(lifecycleState, consumer)
 
 /**
  * An empty scope for testing and preview purposes. [MVIIntentScope.send] and [MVIIntentScope.consume] do nothing
@@ -73,11 +65,11 @@ fun <A : MVIAction> MVIProvider<*, *, A>.consume(
 @Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalTypeInference::class)
 @Composable
-fun <T : MVIIntent, A : MVIAction> EmptyScope(
+fun <T: MVIIntent, A: MVIAction> EmptyScope(
     @BuilderInference call: @Composable MVIIntentScope<T, A>.() -> Unit,
 ) = call(EmptyScopeImpl as MVIIntentScope<T, A>)
 
-private object EmptyScopeImpl : MVIIntentScope<MVIIntent, MVIAction> {
+private object EmptyScopeImpl: MVIIntentScope<MVIIntent, MVIAction> {
 
     override fun send(intent: MVIIntent) = Unit
 
