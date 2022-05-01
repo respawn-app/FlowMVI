@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.1.3"
+rootProject.version = "0.1.4"
 
 buildscript {
 
@@ -23,6 +23,13 @@ allprojects {
         google()
         maven { url = uri("https://jitpack.io") }
         mavenCentral()
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "11"
+            freeCompilerArgs += listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xcontext-receivers")
+        }
     }
 }
 

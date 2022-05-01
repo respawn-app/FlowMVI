@@ -2,7 +2,14 @@ package com.nek12.flowMVI.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nek12.flowMVI.*
+import com.nek12.flowMVI.MVIAction
+import com.nek12.flowMVI.MVIIntent
+import com.nek12.flowMVI.MVIProvider
+import com.nek12.flowMVI.MVIState
+import com.nek12.flowMVI.MVIStore
+import com.nek12.flowMVI.MVIView
+import com.nek12.flowMVI.currentState
+import com.nek12.flowMVI.launchForState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +28,13 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @See MVIStore
  * @See MVIView
  */
-abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction> : ViewModel(), MVIProvider<S, I, A> {
+abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(), MVIProvider<S, I, A> {
+
+    protected abstract val initialState: S
+    protected abstract suspend fun reduce(intent: I): S
+
+    protected open fun recover(from: Exception): S = throw from
+    protected val currentState: S get() = store.currentState
 
     private val store: MVIStore<S, I, A> by lazy {
         MVIStore(
@@ -32,12 +45,6 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction> : ViewMo
         )
     }
 
-    protected abstract val initialState: S
-    protected abstract suspend fun reduce(intent: I): S
-
-    protected open fun recover(from: Exception): S = throw from
-
-    protected val currentState: S get() = store.currentState
 
     override val actions get() = store.actions
     override val states: StateFlow<S> = store.states
@@ -56,14 +63,12 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction> : ViewMo
     ) = store.launchForState(viewModelScope, context, start, recover, call)
 
     /**
-     * For use with operators such as [onEach]. A shorthand for [launchIn] (viewModelScope)
-     */
-    protected fun <T> Flow<T>.consume() = launchIn(viewModelScope)
-
-    /**
      * Execute [block] if current state is [T] else just return [currentState].
      */
-    protected inline fun <reified T : S> withState(block: T.() -> S): S {
+    protected inline fun <reified T: S> withState(block: T.() -> S): S {
         return (currentState as? T)?.let(block) ?: currentState
     }
 }
+
+context(ViewModel)
+fun <T> Flow<T>.consume() = launchIn(viewModelScope)

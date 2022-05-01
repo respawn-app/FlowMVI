@@ -35,9 +35,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 
     sourceSets.all {
         java.srcDir("src/$name/kotlin")
