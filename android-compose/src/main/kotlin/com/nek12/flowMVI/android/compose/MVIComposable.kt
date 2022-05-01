@@ -13,7 +13,7 @@ import com.nek12.flowMVI.MVIState
  * @param provider an MVIProvider (usually a viewModel) that handles this screen's logic
  * @param content the actual screen content. Will be recomposed each time you receive a new state
  */
-inline fun <S : MVIState, I : MVIIntent, A : MVIAction, reified VM : MVIProvider<S, I, A>> MVIComposable(
+inline fun <S: MVIState, I: MVIIntent, A: MVIAction, reified VM: MVIProvider<S, I, A>> MVIComposable(
     provider: VM,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline content: @Composable MVIIntentScope<I, A>.(state: S) -> Unit,

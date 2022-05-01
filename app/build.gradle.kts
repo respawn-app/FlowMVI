@@ -6,30 +6,30 @@ android {
     compileSdk = 32
 
     defaultConfig {
-        applicationId =  "com.nek12.flowMVI.sample"
+        applicationId = "com.nek12.flowMVI.sample"
         minSdk = 26
-        targetSdk =  32
-        versionCode =  1
-        versionName =  "1.0"
+        targetSdk = 32
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled =  false
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility  = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = "11"
     }
     buildFeatures {
-        compose  = true
+        compose = true
         viewBinding = true
     }
     composeOptions {

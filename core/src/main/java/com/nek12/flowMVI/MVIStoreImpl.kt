@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
+fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
     scope: CoroutineScope,
     initialState: S,
     /**
@@ -22,12 +22,12 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     reduce: suspend (I) -> S
 ): MVIStore<S, I, A> = MVIStoreImpl(scope, initialState, recover, reduce)
 
-private class MVIStoreImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+private class MVIStoreImpl<S: MVIState, in I: MVIIntent, A: MVIAction>(
     private val scope: CoroutineScope,
     initialState: S,
     private val recover: (e: Exception) -> S,
     private val reduce: suspend (I) -> S,
-) : MVIStore<S, I, A> {
+): MVIStore<S, I, A> {
 
     private val _states = MutableStateFlow(initialState)
     private val _actions = Channel<A>(Channel.BUFFERED, DROP_OLDEST)

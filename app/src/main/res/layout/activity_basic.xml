@@ -18,10 +18,10 @@
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/counter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/counter"
         app:layout_constraintTop_toBottomOf="@+id/fab" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

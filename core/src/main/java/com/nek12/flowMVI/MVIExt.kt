@@ -6,16 +6,16 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-val <S : MVIState> MVIProvider<S, *, *>.currentState: S get() = states.value
+val <S: MVIState> MVIProvider<S, *, *>.currentState: S get() = states.value
 
-fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscribe(
+fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
 ) {
     scope.launch { provider.states.collect { render(it) } }
     scope.launch { provider.actions.collect { consume(it) } }
 }
 
-inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore<S, I, A>.subscribe(
+inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore<S, I, A>.subscribe(
     scope: CoroutineScope,
     crossinline consume: (A) -> Unit,
     crossinline render: (S) -> Unit,
@@ -32,11 +32,11 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore<S, I, A>.subscr
 /**
  * Execute [block] if current state is [T] else just return [currentState].
  */
-inline fun <reified T : S, reified S : MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S {
+inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S {
     return (currentState as? T)?.let(block) ?: currentState
 }
 
-inline fun <S : MVIState> MVIStore<S, *, *>.launchForState(
+inline fun <S: MVIState> MVIStore<S, *, *>.launchForState(
     scope: CoroutineScope,
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,

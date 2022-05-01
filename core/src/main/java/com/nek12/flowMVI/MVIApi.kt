@@ -22,7 +22,7 @@ interface MVIAction
 /**
  * Some entity (usually store or a viewmodel) that __provides__ the business logic for the [MVIView].
  */
-interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
+interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
 
     /**
      * Called when ui-event happens in the view that produces an [intent].
@@ -45,7 +45,7 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
  * A store can function independently of any framework entities or be a part of the view model.
  */
-interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
+interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I, A> {
 
     /**
      * Set a new state directly, thread-safely and synchronously.
@@ -70,7 +70,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
  * a way to [render] the new state, and a way to [consume] side-effects.
  * @see MVIProvider
  */
-interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> {
+interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
 
     /**
      * Provider, usually a view model, for this view's state and actions.

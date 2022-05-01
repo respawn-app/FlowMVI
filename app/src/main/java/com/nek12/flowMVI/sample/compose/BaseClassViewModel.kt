@@ -14,7 +14,7 @@ import kotlin.random.Random
 /**
  * See also NoBaseClassViewModel
  */
-class BaseClassViewModel : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>() {
+class BaseClassViewModel: MVIViewModel<ComposeState, ComposeIntent, ComposeAction>() {
 
     override val initialState get() = Loading
 

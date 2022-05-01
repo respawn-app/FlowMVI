@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.nek12.flowMVI.MVIStore
 import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.view.BasicActivityAction.ShowSnackbar
-import com.nek12.flowMVI.sample.view.BasicActivityIntent.*
+import com.nek12.flowMVI.sample.view.BasicActivityIntent.ClickedFab
 import com.nek12.flowMVI.sample.view.BasicActivityState.DisplayingContent
 import com.nek12.flowMVI.withState
 import kotlinx.coroutines.delay
 
 //See also BaseClassViewModel
-class NoBaseClassViewModel : ViewModel() { //if you don't want to extens MVIViewModel(), use composition instead
+class NoBaseClassViewModel: ViewModel() { //if you don't want to extens MVIViewModel(), use composition instead
 
     //implement MVIProvider, or just expose store if you want
     val store = MVIStore<BasicActivityState, BasicActivityIntent, BasicActivityAction>(
