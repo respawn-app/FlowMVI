@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.1.4"
+rootProject.version = "0.1.5"
 
 buildscript {
 
@@ -28,7 +28,7 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             jvmTarget = "11"
-            freeCompilerArgs += listOf("-Xopt-in=kotlin.RequiresOptIn", "-Xjvm-default=all", "-Xcontext-receivers")
+            freeCompilerArgs += listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all")
         }
     }
 }

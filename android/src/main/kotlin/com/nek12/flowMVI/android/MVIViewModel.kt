@@ -52,6 +52,8 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
     protected fun send(action: A) = store.send(action)
     protected fun set(state: S) = store.set(state)
 
+    fun <T> Flow<T>.consume() = launchIn(viewModelScope)
+
     /**
      * Launch a coroutine that emits a new state. It is advisable to [recover] from any errors
      */
@@ -69,6 +71,3 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
         return (currentState as? T)?.let(block) ?: currentState
     }
 }
-
-context(ViewModel)
-fun <T> Flow<T>.consume() = launchIn(viewModelScope)
