@@ -32,16 +32,15 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore<S, I, A>.subscribe
 /**
  * Execute [block] if current state is [T] else just return [currentState].
  */
-inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S {
-    return (currentState as? T)?.let(block) ?: currentState
-}
+inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S =
+    (currentState as? T)?.let(block) ?: currentState
 
-inline fun <S: MVIState> MVIStore<S, *, *>.launchForState(
+fun <S: MVIState> MVIStore<S, *, *>.launchForState(
     scope: CoroutineScope,
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
-    crossinline recover: suspend CoroutineScope.(Exception) -> S = { throw it },
-    crossinline block: suspend CoroutineScope.() -> S,
+    recover: suspend CoroutineScope.(Exception) -> S = { throw it },
+    block: suspend CoroutineScope.() -> S,
 ) = scope.launch(context, start) {
     set(
         try {

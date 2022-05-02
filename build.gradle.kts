@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.1.5"
+rootProject.version = "0.1.6"
 
 buildscript {
 
@@ -28,7 +28,12 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             jvmTarget = "11"
-            freeCompilerArgs += listOf("-opt-in=kotlin.RequiresOptIn", "-Xjvm-default=all")
+            freeCompilerArgs += listOf(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
+                "-P", //TODO: Remove once support 1.6.21
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+            )
         }
     }
 }
