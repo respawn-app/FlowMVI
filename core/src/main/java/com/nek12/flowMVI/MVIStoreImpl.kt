@@ -1,8 +1,8 @@
 package com.nek12.flowMVI
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -30,17 +30,22 @@ private class MVIStoreImpl<S: MVIState, in I: MVIIntent, A: MVIAction>(
 ): MVIStore<S, I, A> {
 
     private val _states = MutableStateFlow(initialState)
-    private val _actions = Channel<A>(Channel.BUFFERED, DROP_OLDEST)
+
+    private val _actions = MutableSharedFlow<A>(
+        replay = 0,
+        extraBufferCapacity = DEFAULT_BUFFER_CAPACITY,
+        onBufferOverflow = DROP_OLDEST
+    )
 
     override val states: StateFlow<S> = _states.asStateFlow()
-    override val actions: Flow<A> = _actions.receiveAsFlow()
+    override val actions: Flow<A> = _actions.asSharedFlow()
 
     override fun set(state: S) {
         _states.tryEmit(state) //will always succeed
     }
 
     override fun send(action: A) {
-        _actions.trySend(action) //will always succeed
+        _actions.tryEmit(action) //will always succeed
     }
 
     override fun send(intent: I) {
@@ -48,10 +53,17 @@ private class MVIStoreImpl<S: MVIState, in I: MVIIntent, A: MVIAction>(
             set(
                 try {
                     reduce(intent)
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     recover(e)
                 }
             )
         }
+    }
+
+    companion object {
+
+        private const val DEFAULT_BUFFER_CAPACITY = 64
     }
 }

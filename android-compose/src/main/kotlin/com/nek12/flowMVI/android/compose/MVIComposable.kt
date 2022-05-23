@@ -11,6 +11,7 @@ import com.nek12.flowMVI.MVIState
 @Composable
 /**
  * @param provider an MVIProvider (usually a viewModel) that handles this screen's logic
+ * @param lifecycleState the minimum lifecycle state, in which the activity must be to receive actions/states
  * @param content the actual screen content. Will be recomposed each time you receive a new state
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, VM: MVIProvider<S, I, A>> MVIComposable(

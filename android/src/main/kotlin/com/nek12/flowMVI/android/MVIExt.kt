@@ -12,7 +12,10 @@ import com.nek12.flowMVI.MVIView
 import kotlinx.coroutines.launch
 
 /**
- * Call this when you are using a component with defined lifecycle i.e. LifecycleService
+ *  Subscribe to the [provider] lifecycle-aware.
+ *  @param consume called on each new action. Implement action handling here.
+ *  @param render called each time the state changes. Render state here.
+ *  @param lifecycleState the minimum lifecycle state the activity must be in to receive updates.
  *  @see repeatOnLifecycle
  */
 inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
@@ -36,7 +39,8 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
 }
 
 /**
- * Call this whenever the lifecycle is first ready to accept new events
+ * Subscribe to the provider lifecycle-aware.
+ * @param lifecycleState the minimum lifecycle state the activity must be in to receive updates.
  * @see repeatOnLifecycle
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(

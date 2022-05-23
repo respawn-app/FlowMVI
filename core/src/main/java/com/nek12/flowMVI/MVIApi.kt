@@ -5,17 +5,19 @@ import kotlinx.coroutines.flow.StateFlow
 
 /**
  * The state of the view / consumer.
- * The state must be comparable (most likely a data class)
+ * The state must be comparable and immutable (most likely a data class)
  */
 interface MVIState
 
 /**
  * User interaction or other events that happen in the view.
+ * Must be immutable.
  */
 interface MVIIntent
 
 /**
  * A side-effect of processing an [MVIIntent], send by ViewModel / Store.
+ * Must be immutable.
  */
 interface MVIAction
 
@@ -36,14 +38,15 @@ interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
 
     /**
      * A flow of side-effects to be handled by the [MVIView],
-     * that require framework dependencies or are reflected in the ui.
+     * usually resulting in one-time events happening in the view.
+     * actions are distributed to all subscribers equally.
      */
     val actions: Flow<A>
 }
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
- * A store can function independently of any framework entities or be a part of the view model.
+ * A store can function independently of any framework entities.
  */
 interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I, A> {
 
@@ -53,11 +56,10 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
     fun set(state: S)
 
     /**
-     * Send a new UI side-effect to be processed by the **first** view that consumes it, only **once**.
-     * Actions not consumed will await in the queue of [Channel.BUFFERED] capacity.
+     * Send a new UI side-effect to be processed by **ALL** subscribers, each only **once**.
+     * Actions not consumed will await in the queue with max capacity of 64.
      * Actions that make the capacity overflow will be dropped, starting with the oldest.
-     * Actions will be distributed to consumers in a fan-out fashion (although it is not recommended to get yourself
-     * into such situations, it is allowed for some corner-cases).
+     * Actions will be distributed to consumers in an equal fashion, which means each subscriber will receive an action.
      * @See MVIProvider
      */
     fun send(action: A)
@@ -73,24 +75,27 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
 interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
 
     /**
-     * Provider, usually a view model, for this view's state and actions.
+     * Provider, an object that handles business logic.
      */
     val provider: MVIProvider<S, I, A>
 
     /**
-     * Call this when any user interaction or other event occurs that needs business logic processing.
+     * Send an intent for the [provider] to process e.g. a user click.
      */
     fun send(intent: I) = provider.send(intent)
 
     /**
-     * Render a new [state]. This function will be called each time [provider] updates the state value.
+     * Render a new [state].
+     * This function will be called each time [provider] updates the state value.
      * This function should be idempotent and should not [send] any intents.
      */
     fun render(state: S)
 
     /**
-     * Consume a one-time side-effect emitted by [provider]. This function is called each time a side-effect arrives.
+     * Consume a one-time side-effect emitted by [provider].
+     * This function is called each time a side-effect arrives.
      * This function should not [send] intents directly.
+     * Each consumer will receive a copy of the [action].
      */
     fun consume(action: A)
 }

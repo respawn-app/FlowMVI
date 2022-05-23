@@ -33,7 +33,7 @@ interface MVIIntentScope<in I: MVIIntent, out A: MVIAction> {
 }
 
 @Composable
-fun <S: MVIState, I: MVIIntent, A: MVIAction> rememberScope(
+internal fun <S: MVIState, I: MVIIntent, A: MVIAction> rememberScope(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State,
 ): MVIIntentScope<I, A> = remember(provider, lifecycleState) {
