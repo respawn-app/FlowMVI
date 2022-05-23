@@ -44,21 +44,23 @@ private class MVIStoreImpl<S: MVIState, in I: MVIIntent, A: MVIAction>(
         _states.tryEmit(state) //will always succeed
     }
 
-    override fun send(action: A) {
-        _actions.tryEmit(action) //will always succeed
+    override fun send(vararg actions: A) {
+        actions.forEach { _actions.tryEmit(it) } //will always succeed
     }
 
-    override fun send(intent: I) {
+    override fun send(vararg intents: I) {
         scope.launch {
-            set(
-                try {
-                    reduce(intent)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    recover(e)
-                }
-            )
+            intents.forEach {
+                set(
+                    try {
+                        reduce(it)
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        recover(e)
+                    }
+                )
+            }
         }
     }
 

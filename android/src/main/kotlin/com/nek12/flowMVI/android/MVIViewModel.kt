@@ -48,7 +48,7 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
 
     override val actions get() = store.actions
     override val states: StateFlow<S> get() = store.states
-    override fun send(intent: I) = store.send(intent)
+    override fun send(vararg intents: I) = store.send(*intents)
 
     protected open fun send(action: A) = store.send(action)
     protected open fun set(state: S) = store.set(state)
