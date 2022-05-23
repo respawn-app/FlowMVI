@@ -1,3 +1,7 @@
+plugins {
+    id("com.nek12.android-library")
+}
+
 android {
     buildFeatures {
         compose = true

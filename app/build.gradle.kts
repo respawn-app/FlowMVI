@@ -1,4 +1,5 @@
 plugins {
+    id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
 
@@ -46,18 +47,17 @@ dependencies {
     implementation(project(":android-compose"))
     implementation(project(":android-view"))
 
-    implementation("io.insert-koin:koin-core:3.1.5")
-    implementation("io.insert-koin:koin-android:3.1.5")
-    implementation("io.insert-koin:koin-androidx-compose:3.1.5")
+    implementation("io.insert-koin:koin-core:${Versions.koin}")
+    implementation("io.insert-koin:koin-android:${Versions.koin}")
+    implementation("io.insert-koin:koin-androidx-compose:${Versions.koin}")
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.compose.ui:ui:${Versions.compose}")
     implementation("androidx.compose.material:material:${Versions.compose}")
     implementation("androidx.compose.ui:ui-tooling-preview:${Versions.compose}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
-    implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("com.google.android.material:material:1.5.0")
-    implementation("androidx.appcompat:appcompat:1.4.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}")
+    implementation("androidx.activity:activity-compose:${Versions.activityCompose}")
+    implementation("com.google.android.material:material:${Versions.material}")
 
     testImplementation("junit:junit:${Versions.junit}")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

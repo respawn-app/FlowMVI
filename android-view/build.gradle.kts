@@ -1,5 +1,9 @@
+plugins {
+    id("com.nek12.android-library")
+}
+
 dependencies {
     api(project(":android"))
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
-    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.fragment:fragment-ktx:${Versions.fragment}")
+    implementation("androidx.activity:activity-ktx:$${Versions.activity}")
 }
