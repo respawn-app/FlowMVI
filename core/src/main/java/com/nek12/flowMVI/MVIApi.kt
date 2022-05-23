@@ -29,7 +29,7 @@ interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
     /**
      * Called when ui-event happens in the view that produces an [intent].
      */
-    fun send(vararg intents: I)
+    fun send(intent: I)
 
     /**
      * A flow of UI states to be handled by the [MVIView].
@@ -62,7 +62,7 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
      * Actions will be distributed to consumers in an equal fashion, which means each subscriber will receive an action.
      * @See MVIProvider
      */
-    fun send(vararg actions: A)
+    fun send(action: A)
 }
 
 
@@ -81,9 +81,8 @@ interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
 
     /**
      * Send an intent for the [provider] to process e.g. a user click.
-     * **Multiple intents will be processed sequentially.**
      */
-    fun send(vararg intents: I) = provider.send(*intents)
+    fun send(intent: I) = provider.send(intent)
 
     /**
      * Render a new [state].
