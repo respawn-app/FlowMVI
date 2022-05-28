@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.2.0"
+rootProject.version = "0.2.1"
 
 buildscript {
     repositories {
@@ -33,6 +33,7 @@ allprojects {
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
+                "-opt-in=kotlin.experimental.ExperimentalTypeInference",
             )
         }
     }

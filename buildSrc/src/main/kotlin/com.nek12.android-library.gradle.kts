@@ -6,7 +6,6 @@ plugins {
 
 android {
     compileSdk = 32
-    buildToolsVersion = "32.0.0"
 
     defaultConfig {
         minSdk = 22
@@ -35,11 +34,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-
-    sourceSets.all {
-        java.srcDir("src/$name/kotlin")
-    }
-
     buildFeatures {
         aidl = false
         buildConfig = false
@@ -49,6 +43,7 @@ android {
         resValues = false
     }
 }
+
 dependencies {
     testImplementation("junit:junit:${Versions.junit}")
     androidTestImplementation("androidx.test:runner:1.4.0")

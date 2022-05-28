@@ -40,10 +40,10 @@ class BaseClassViewModel: MVIViewModel<ComposeState, ComposeIntent, ComposeActio
         // For example, not all buttons may be visible at all times
         // For this, you only handle this intent in the state declared as type parameter of withState,
         // otherwise the function just returns currentState
-        ClickedCounter -> withState<DisplayingContent> { //this -> DisplayingContent
+        ClickedCounter -> withState<DisplayingContent> {  //this -> DisplayingContent
 
             //Launch a new coroutine that will set the state later
-            incrementCounter(current = this.counter)
+            incrementCounter(current = counter)
 
             //Immediately return Loading state
             Loading //^withState
@@ -59,7 +59,7 @@ class BaseClassViewModel: MVIViewModel<ComposeState, ComposeIntent, ComposeActio
     }
 
     private fun incrementCounter(current: Int) = launchForState {
-        delay(1000L) //simulate long processing
+        delay(1000L)
 
         if (Random.nextBoolean()) {
             //will be propagated to the recover() handler above, or you can supply your own

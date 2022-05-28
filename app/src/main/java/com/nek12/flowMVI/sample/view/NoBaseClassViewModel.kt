@@ -11,7 +11,7 @@ import com.nek12.flowMVI.withState
 import kotlinx.coroutines.delay
 
 //See also BaseClassViewModel
-class NoBaseClassViewModel: ViewModel() { //if you don't want to extens MVIViewModel(), use composition instead
+class NoBaseClassViewModel: ViewModel() { //if you don't want to extend MVIViewModel(), use composition instead
 
     //implement MVIProvider, or just expose store if you want
     val store = MVIStore<BasicActivityState, BasicActivityIntent, BasicActivityAction>(

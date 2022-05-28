@@ -12,7 +12,6 @@ import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import kotlinx.coroutines.CoroutineScope
-import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
@@ -36,9 +35,7 @@ interface MVIIntentScope<in I: MVIIntent, out A: MVIAction> {
 internal fun <S: MVIState, I: MVIIntent, A: MVIAction> rememberScope(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State,
-): MVIIntentScope<I, A> = remember(provider, lifecycleState) {
-    MVIIntentScopeImpl(provider, lifecycleState)
-}
+): MVIIntentScope<I, A> = remember(provider, lifecycleState) { MVIIntentScopeImpl(provider, lifecycleState) }
 
 private class MVIIntentScopeImpl<in I: MVIIntent, out A: MVIAction>(
     private val provider: MVIProvider<*, I, A>,
@@ -63,7 +60,6 @@ fun <A: MVIAction> MVIProvider<*, *, A>.consume(
  * An empty scope for testing and preview purposes. [MVIIntentScope.send] and [MVIIntentScope.consume] do nothing
  */
 @Suppress("UNCHECKED_CAST")
-@OptIn(ExperimentalTypeInference::class)
 @Composable
 fun <T: MVIIntent, A: MVIAction> EmptyScope(
     @BuilderInference call: @Composable MVIIntentScope<T, A>.() -> Unit,

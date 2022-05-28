@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-val <S: MVIState> MVIProvider<S, *, *>.currentState: S get() = states.value
+val <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.currentState: S get() = states.value
 
 /**
  * Subscribe to the store.
@@ -16,17 +16,19 @@ val <S: MVIState> MVIProvider<S, *, *>.currentState: S get() = states.value
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
-) {
-    scope.launch { provider.states.collect { render(it) } }
-    scope.launch { provider.actions.collect { consume(it) } }
-}
+) = subscribe(provider, scope)
+
+fun <S: MVIState, I: MVIIntent, A: MVIAction> MVISubscriber<S, A>.subscribe(
+    provider: MVIProvider<S, I, A>,
+    scope: CoroutineScope
+) = provider.subscribe(scope, ::consume, ::render)
 
 /**
  * Subscribe to the store.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  * You may want to look into lifecycle-aware functions suiting your use case.
  */
-inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore<S, I, A>.subscribe(
+inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,
     crossinline consume: (A) -> Unit,
     crossinline render: (S) -> Unit,
@@ -43,8 +45,9 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore<S, I, A>.subscribe
 /**
  * Execute [block] if current state is [T] else just return [currentState].
  */
-inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(block: T.() -> S): S =
-    (currentState as? T)?.let(block) ?: currentState
+inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(
+    block: T.() -> S
+): S = (currentState as? T)?.let(block) ?: currentState
 
 /**
  * Launch a new coroutine, that will attempt to set a new state that resulted in [block] execution.

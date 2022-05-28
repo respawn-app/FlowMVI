@@ -8,6 +8,7 @@ import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
+import com.nek12.flowMVI.MVISubscriber
 import com.nek12.flowMVI.MVIView
 import kotlinx.coroutines.launch
 
@@ -44,5 +45,10 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
  * @see repeatOnLifecycle
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
+    provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-) where T: LifecycleOwner, T: MVIView<S, I, A> = subscribe(provider, ::consume, ::render, lifecycleState)
+) where T: LifecycleOwner, T: MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
+
+fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+) where T: LifecycleOwner, T: MVIView<S, I, A> = subscribe(provider, lifecycleState)

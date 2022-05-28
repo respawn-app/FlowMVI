@@ -72,7 +72,7 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
  * a way to [render] the new state, and a way to [consume] side-effects.
  * @see MVIProvider
  */
-interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
+interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> : MVISubscriber<S, A> {
 
     /**
      * Provider, an object that handles business logic.
@@ -83,6 +83,10 @@ interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
      * Send an intent for the [provider] to process e.g. a user click.
      */
     fun send(intent: I) = provider.send(intent)
+
+}
+
+interface MVISubscriber<in S: MVIState, in A: MVIAction> {
 
     /**
      * Render a new [state].
@@ -98,4 +102,5 @@ interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> {
      * Each consumer will receive a copy of the [action].
      */
     fun consume(action: A)
+
 }

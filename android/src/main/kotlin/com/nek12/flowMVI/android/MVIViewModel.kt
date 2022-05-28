@@ -34,9 +34,9 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
     protected abstract suspend fun reduce(intent: I): S
 
     protected open fun recover(from: Exception): S = throw from
-    protected val currentState: S get() = store.currentState
+    protected val currentState: S get() = states.value
 
-    private val store: MVIStore<S, I, A> by lazy {
+    protected open val store: MVIStore<S, I, A> by lazy {
         MVIStore(
             viewModelScope,
             initialState,
@@ -45,7 +45,6 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
         )
     }
 
-
     override val actions get() = store.actions
     override val states: StateFlow<S> get() = store.states
     override fun send(intent: I) = store.send(intent)
@@ -53,7 +52,7 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
     protected open fun send(action: A) = store.send(action)
     protected open fun set(state: S) = store.set(state)
 
-    fun <T> Flow<T>.consume() = launchIn(viewModelScope)
+    protected fun <T> Flow<T>.consume() = launchIn(viewModelScope)
 
     /**
      * Launch a coroutine that emits a new state. It is advisable to [recover] from any errors
