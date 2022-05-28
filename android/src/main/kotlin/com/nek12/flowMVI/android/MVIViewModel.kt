@@ -15,6 +15,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -53,6 +55,12 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
     protected open fun set(state: S) = store.set(state)
 
     protected fun <T> Flow<T>.consume() = launchIn(viewModelScope)
+
+    protected fun <T> Flow<T>.recover() = catchExceptions { set(recover(it)) }
+
+    protected fun <T> Flow<T>.setOnEmpty(state: S) = onEmpty { set(state) }
+
+    protected fun Flow<S>.setEach() = onEach { set(it) }
 
     /**
      * Launch a coroutine that emits a new state. It is advisable to [recover] from any errors
