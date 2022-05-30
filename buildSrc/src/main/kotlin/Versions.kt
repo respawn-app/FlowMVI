@@ -4,7 +4,7 @@ object Versions {
     const val lifecycle = "2.5.0-rc01"
     const val gradle = "7.2.0"
     const val kotlin = "1.6.21" //update in buildSrc too
-    const val coroutines = "1.6.1"
+    const val coroutines = "1.6.2"
     const val ksp = "1.0.5"
     const val material = "1.6.0"
     const val compose = "1.2.0-beta02"

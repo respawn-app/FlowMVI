@@ -3,7 +3,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.2.1"
+rootProject.version = "0.2.2"
 
 buildscript {
     repositories {
@@ -42,13 +42,4 @@ allprojects {
 subprojects {
     group = rootProject.group
     version = rootProject.version
-}
-
-kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
-    }
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
 }

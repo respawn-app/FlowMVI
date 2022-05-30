@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         minSdk = 22
-        targetSdk = 31
+        targetSdk = 32
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         consumerProguardFiles("consumer-rules.pro")
@@ -22,10 +22,10 @@ android {
                 project.name
             )
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // proguardFiles(
+            //     getDefaultProguardFile("proguard-android-optimize.txt"),
+            //     "proguard-rules.pro"
+            // )
         }
     }
 
@@ -41,6 +41,15 @@ android {
         renderScript = false
         mlModelBinding = false
         resValues = false
+    }
+
+    kotlin {
+        sourceSets.main {
+            kotlin.srcDir("build/generated/ksp/main/kotlin")
+        }
+        sourceSets.test {
+            kotlin.srcDir("build/generated/ksp/test/kotlin")
+        }
     }
 }
 
