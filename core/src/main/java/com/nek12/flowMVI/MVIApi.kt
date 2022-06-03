@@ -104,3 +104,36 @@ interface MVISubscriber<in S: MVIState, in A: MVIAction> {
     fun consume(action: A)
 
 }
+
+/**
+ * An enum representing how [MVIAction] sharing will be handled in the [MVIStore].
+ * There are 3 possible behaviors, which will be different depending on the use-case.
+ * When in doubt, use the default one, and change if you have issues only.
+ * @see MVIStore
+ */
+enum class ActionShareBehavior {
+
+    /**
+     * Actions will be distributed to all subscribers equally. Each subscriber will receive a reference to a single
+     * instance of the action that was sent from any provider. Use when you want to have multiple subscribers
+     * that each consume actions. Be aware that, however, if there's at least one subscriber, they will consume an
+     * action entirely (i.e. other subscribers won't receive it when they "return" if they weren't present at the
+     * time of emission).
+     */
+    SHARE,
+
+    /**
+     * Fan-out behavior means that multiple subscribers are allowed,
+     * and each action will be distributed to one subscriber at a time.
+     * If there are multiple subscribers, only one of them will handle the action,
+     * and **the order is unspecified**.
+     *
+     */
+    DISTRIBUTE,
+
+    /**
+     * Restricts the count of subscribers to 1. Attempting to subscribe to a store that already has a subscriber
+     * will result in an exception.
+     */
+    RESTRICT
+}

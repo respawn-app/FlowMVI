@@ -40,10 +40,10 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
 
     protected open val store: MVIStore<S, I, A> by lazy {
         MVIStore(
-            viewModelScope,
-            initialState,
-            ::recover,
-            ::reduce
+            scope = viewModelScope,
+            initialState = initialState,
+            recover = ::recover,
+            reduce = ::reduce
         )
     }
 
