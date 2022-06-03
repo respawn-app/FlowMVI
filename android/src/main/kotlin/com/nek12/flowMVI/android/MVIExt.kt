@@ -26,6 +26,8 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ) = lifecycleScope.launch {
 
+    //using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
+
     launch {
         repeatOnLifecycle(lifecycleState) {
             provider.states.collect { render(it) }

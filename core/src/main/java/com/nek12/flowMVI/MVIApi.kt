@@ -1,5 +1,6 @@
 package com.nek12.flowMVI
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -63,6 +64,12 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
      * @See MVIProvider
      */
     fun send(action: A)
+
+    /**
+     * Launches store intent processing in a new coroutine on parent thread.
+     * Intents are processed as long as parent scope is active
+     */
+    fun launch(scope: CoroutineScope)
 }
 
 

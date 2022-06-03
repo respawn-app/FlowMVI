@@ -36,6 +36,8 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
     initialState: S,
 ): ViewModel(), MVIProvider<S, I, A> {
 
+    private var isLaunched: Boolean = false
+
     /**
      * [reduce] will be launched in parallel, on main thread, for each intent that comes from the view.
      * To change thread, use [kotlinx.coroutines.withContext].
@@ -44,12 +46,14 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
 
     protected open fun recover(from: Exception): S = throw from
 
-    protected open val store: MVIStore<S, I, A> = MVIStore(
-        scope = viewModelScope,
+    /**
+     * Overriding this field, don't forget to call [MVIStore.launch] yourself.
+     */
+    protected open val store: MVIStore<S, I, A> = MVIStore<S, I, A>(
         initialState = initialState,
         recover = ::recover,
         reduce = ::reduce
-    )
+    ).apply { launch(viewModelScope) }
 
     override val actions get() = store.actions
     override val states: StateFlow<S> get() = store.states

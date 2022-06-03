@@ -10,8 +10,10 @@ import com.nek12.flowMVI.MVIState
 sealed class ComposeState: MVIState {
 
     object Loading: ComposeState()
+    object Empty: ComposeState()
     data class DisplayingContent(
         val counter: Int,
+        val timer: Int,
     ): ComposeState()
 }
 

@@ -15,10 +15,14 @@ class NoBaseClassViewModel: ViewModel() { //if you don't want to extend MVIViewM
 
     //implement MVIProvider, or just expose store if you want
     val store = MVIStore<BasicActivityState, BasicActivityIntent, BasicActivityAction>(
-        scope = viewModelScope,
         initialState = DisplayingContent(0),
         reduce = ::reduce
     )
+
+    init {
+        //Don't forget to launch store intent processing
+        store.launch(viewModelScope)
+    }
 
     private suspend fun reduce(intent: BasicActivityIntent): BasicActivityState {
         when (intent) {

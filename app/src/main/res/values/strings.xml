@@ -6,4 +6,6 @@
     <string name="title_activity_basic">BasicActivity</string>
     <string name="started_processing">Started processing your intent</string>
     <string name="finished_processing">Finished processing intent</string>
+    <string name="timer_template">Timer value: %d</string>
+    <string name="compose_screen_empty">Oops! Nothing here</string>
 </resources>

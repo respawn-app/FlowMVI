@@ -5,7 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
@@ -17,15 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.nek12.flowMVI.android.compose.EmptyScope
 import com.nek12.flowMVI.android.compose.MVIComposable
 import com.nek12.flowMVI.android.compose.MVIIntentScope
 import com.nek12.flowMVI.sample.R
+import com.nek12.flowMVI.sample.R.string
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeAction.ShowSnackbar
 import com.nek12.flowMVI.sample.compose.ComposeIntent.ClickedCounter
 import com.nek12.flowMVI.sample.compose.ComposeIntent.ClickedToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeState.DisplayingContent
+import com.nek12.flowMVI.sample.compose.ComposeState.Empty
 import com.nek12.flowMVI.sample.compose.ComposeState.Loading
 import com.nek12.flowMVI.sample.view.BasicActivity
 import kotlinx.coroutines.launch
@@ -74,18 +80,27 @@ fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: Com
                     Arrangement.SpaceAround,
                     Alignment.CenterHorizontally,
                 ) {
-                    Text(
-                        stringResource(id = R.string.counter_text, state.counter),
-                        Modifier.clickable { send(ClickedCounter) } //send() is available in MVIIntentScope
-                    )
+                    Column {
+                        Text(
+                            stringResource(id = string.counter_text, state.counter),
+                            Modifier.clickable { send(ClickedCounter) } //send() is available in MVIIntentScope
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            stringResource(id = string.timer_template, state.timer),
+                        )
+                    }
 
                     Button(onClick = { send(ClickedToBasicActivity) }) {
-                        Text(stringResource(id = R.string.to_basic_activity))
+                        Text(stringResource(id = string.to_basic_activity))
                     }
                 }
             }
             Loading -> {
                 CircularProgressIndicator()
+            }
+            Empty -> {
+                Text(stringResource(string.compose_screen_empty))
             }
         }
     }
@@ -95,6 +110,6 @@ fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: Com
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true)
 private fun ComposeScreenPreview() {
     EmptyScope { //Use this helper function to preview functions that use MVIIntentScope
-        ComposeScreenContent(state = DisplayingContent(15))
+        ComposeScreenContent(state = DisplayingContent(15, 0))
     }
 }
