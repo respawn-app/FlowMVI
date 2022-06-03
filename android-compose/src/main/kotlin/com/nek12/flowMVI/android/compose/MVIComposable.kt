@@ -1,6 +1,7 @@
 package com.nek12.flowMVI.android.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import com.nek12.flowMVI.MVIAction

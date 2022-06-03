@@ -54,7 +54,7 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
     }
 
     override fun launch(scope: CoroutineScope) {
-        require(!isLaunched.getAndSet(true)) { "Store has already been launched" }
+        require(!isLaunched.getAndSet(true)) { "Store is already launched" }
 
         scope.launch {
             while (isActive) {
@@ -68,6 +68,8 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
                     }
                 )
             }
+        }.invokeOnCompletion {
+            isLaunched.set(false)
         }
     }
 

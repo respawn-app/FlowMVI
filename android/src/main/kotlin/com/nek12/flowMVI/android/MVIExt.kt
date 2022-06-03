@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
  *  Subscribe to the [provider] lifecycle-aware.
  *  @param consume called on each new action. Implement action handling here.
  *  @param render called each time the state changes. Render state here.
- *  @param lifecycleState the minimum lifecycle state the activity must be in to receive updates.
+ *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
 inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
@@ -43,7 +43,7 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
 
 /**
  * Subscribe to the provider lifecycle-aware.
- * @param lifecycleState the minimum lifecycle state the activity must be in to receive updates.
+ * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
@@ -51,6 +51,11 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ) where T: LifecycleOwner, T: MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
 
+/**
+ * Subscribe to the provider lifecycle-aware.
+ * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ * @see repeatOnLifecycle
+ */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ) where T: LifecycleOwner, T: MVIView<S, I, A> = subscribe(provider, lifecycleState)

@@ -2,6 +2,7 @@ package com.nek12.flowMVI.android.view
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
@@ -10,8 +11,12 @@ import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIView
 import com.nek12.flowMVI.android.subscribe
 
+
 /**
- * Call this in onViewCreated()
+ *  Subscribe to the [provider] lifecycle-aware. Call this in [Fragment.onViewCreated]
+ *  @param consume called on each new action. Implement action handling here.
+ *  @param render called each time the state changes. Render state here.
+ *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
 inline fun <S: MVIState, I: MVIIntent, A: MVIAction> Fragment.subscribe(
@@ -22,7 +27,8 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> Fragment.subscribe(
 ) = viewLifecycleOwner.subscribe(provider, consume, render, lifecycleState)
 
 /**
- * Call this in onViewCreated()
+ *  Subscribe to the provider lifecycle-aware. Call this in [Fragment.onViewCreated]
+ *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(

@@ -23,11 +23,12 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class for you to implement.
+ * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class.
  * Do not try to expose public functions in this view model, MVI doesn't work this way. The only functions you
- * should expose are those in [MVIProvider], and that's it, everything else happens through intents and actions.
- * You can inject this view model into [MVIView.provider] field
- * If you want to have error handling for [reduce], implement [recover] (default implementation throws immediately)
+ * should expose are those in [MVIProvider], everything else happens through intents and actions.
+ * You can inject this view model into the [MVIView.provider] field
+ * If you want to add error handling for [reduce], override [recover] (default implementation throws immediately)
+ * @param initialState the state to set when creating the view model.
  * @See MVIStore
  * @See MVIView
  * @See MVIProvider

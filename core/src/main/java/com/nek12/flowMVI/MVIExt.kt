@@ -12,7 +12,6 @@ val <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.currentState:
 /**
  * Subscribe to the store.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
- * You may want to look into lifecycle-aware functions suiting your use case.
  */
 fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
@@ -26,7 +25,6 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction> MVISubscriber<S, A>.subscribe(
 /**
  * Subscribe to the store.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
- * You may want to look into lifecycle-aware functions suiting your use case.
  */
 inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,

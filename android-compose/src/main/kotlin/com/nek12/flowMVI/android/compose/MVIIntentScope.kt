@@ -53,11 +53,12 @@ private class MVIIntentScopeImpl<in I: MVIIntent, out A: MVIAction>(
 @Composable
 fun <A: MVIAction> MVIProvider<*, *, A>.consume(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    consumer: suspend CoroutineScope.(action: A) -> Unit,
-) = actions.collectOnLifecycle(lifecycleState, consumer)
+    onAction: suspend CoroutineScope.(action: A) -> Unit,
+) = actions.collectOnLifecycle(lifecycleState, onAction)
 
 /**
- * An empty scope for testing and preview purposes. [MVIIntentScope.send] and [MVIIntentScope.consume] do nothing
+ * A no-op scope for testing and preview purposes.
+ * [MVIIntentScope.send] and [MVIIntentScope.consume] do nothing
  */
 @Suppress("UNCHECKED_CAST")
 @Composable

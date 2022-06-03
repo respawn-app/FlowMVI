@@ -11,24 +11,26 @@ import kotlinx.coroutines.flow.StateFlow
 interface MVIState
 
 /**
- * User interaction or other events that happen in the view.
+ * User interaction or other event that happens in the UI layer.
  * Must be immutable.
  */
 interface MVIIntent
 
 /**
- * A side-effect of processing an [MVIIntent], send by ViewModel / Store.
+ * A single, one-shot, side-effect of processing an [MVIIntent], sent by [MVIProvider].
+ * Consumed in the ui-layer as a one-time action
  * Must be immutable.
  */
 interface MVIAction
 
 /**
- * Some entity (usually store or a viewmodel) that __provides__ the business logic for the [MVIView].
+ * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states]
  */
 interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
 
     /**
-     * Called when ui-event happens in the view that produces an [intent].
+     * Called when a UI event happens that produces an [intent].
+     * @See MVIIntent
      */
     fun send(intent: I)
 
@@ -38,16 +40,16 @@ interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
     val states: StateFlow<S>
 
     /**
-     * A flow of side-effects to be handled by the [MVIView],
-     * usually resulting in one-time events happening in the view.
-     * actions are distributed to all subscribers equally.
+     * A flow of [MVIAction]s to be handled by the [MVIView],
+     * usually resulting in one-shot, idempotent events.
+     * How actions are distributed depends on [ActionShareBehavior].
      */
     val actions: Flow<A>
 }
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
- * A store can function independently of any framework entities.
+ * A store functions independently of any subscribers.
  */
 interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I, A> {
 
@@ -57,17 +59,19 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
     fun set(state: S)
 
     /**
-     * Send a new UI side-effect to be processed by **ALL** subscribers, each only **once**.
-     * Actions not consumed will await in the queue with max capacity of 64.
+     * Send a new UI side-effect to be processed by subscribers, only once.
+     * Actions not consumed will await in the queue with max capacity of 64 by default.
      * Actions that make the capacity overflow will be dropped, starting with the oldest.
-     * Actions will be distributed to consumers in an equal fashion, which means each subscriber will receive an action.
+     * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
      */
     fun send(action: A)
 
     /**
      * Launches store intent processing in a new coroutine on parent thread.
-     * Intents are processed as long as parent scope is active
+     * Intents are processed as long as parent scope is active.
+     * launching store collection when it is already launched will result in an exception.
+     * Although not advised, store can experimentally be launched multiple times.
      */
     fun launch(scope: CoroutineScope)
 }
@@ -83,6 +87,7 @@ interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> : MVISubscriber<S,
 
     /**
      * Provider, an object that handles business logic.
+     * @See MVIProvider
      */
     val provider: MVIProvider<S, I, A>
 
@@ -97,16 +102,15 @@ interface MVISubscriber<in S: MVIState, in A: MVIAction> {
 
     /**
      * Render a new [state].
-     * This function will be called each time [provider] updates the state value.
-     * This function should be idempotent and should not [send] any intents.
+     * This function will be called each time a new state is received
+     * This function should be idempotent and should not send any intents or cause side-effects.
      */
     fun render(state: S)
 
     /**
-     * Consume a one-time side-effect emitted by [provider].
-     * This function is called each time a side-effect arrives.
-     * This function should not [send] intents directly.
-     * Each consumer will receive a copy of the [action].
+     * Consume a one-time side-effect emitted by [MVIProvider].
+     * This function is called each time an [MVIAction] arrives.
+     * This function should be idempotent, should not send intents or cause side-effects.
      */
     fun consume(action: A)
 
@@ -131,16 +135,17 @@ enum class ActionShareBehavior {
 
     /**
      * Fan-out behavior means that multiple subscribers are allowed,
-     * and each action will be distributed to one subscriber at a time.
-     * If there are multiple subscribers, only one of them will handle the action,
+     * and each action will be distributed to one subscriber.
+     * If there are multiple subscribers, only one of them will handle an instance of an action,
      * and **the order is unspecified**.
      *
      */
     DISTRIBUTE,
 
     /**
-     * Restricts the count of subscribers to 1. Attempting to subscribe to a store that already has a subscriber
-     * will result in an exception.
+     * Restricts the count of subscribers to 1.
+     * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
+     * In other words, you will be required to create a new store for each call of [subscribe].
      */
     RESTRICT
 }
