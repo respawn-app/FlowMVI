@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.catch
 /**
  * Catches exceptions only, rethrowing any throwables
  */
-inline fun <T> Flow<T>.catchExceptions(crossinline block: (Exception) -> Unit) =
-    catch { (it as? Exception)?.let(block) ?: throw it }
+inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend (Exception) -> Unit) =
+    catch { throwable -> (throwable as? Exception)?.let { block(it) } ?: throw throwable }

@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.nek12.flowMVI.android
 
 import androidx.lifecycle.ViewModel
@@ -22,30 +24,32 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class for you to implement.
- * Override [initialState] and [reduce] and you're good to go.
  * Do not try to expose public functions in this view model, MVI doesn't work this way. The only functions you
- * will expose are those in [MVIProvider], and that's it, everything else happens inside the [MVIViewModel]
+ * should expose are those in [MVIProvider], and that's it, everything else happens through intents and actions.
  * You can inject this view model into [MVIView.provider] field
  * If you want to have error handling for [reduce], implement [recover] (default implementation throws immediately)
  * @See MVIStore
  * @See MVIView
+ * @See MVIProvider
  */
-abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(), MVIProvider<S, I, A> {
+abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
+    initialState: S,
+): ViewModel(), MVIProvider<S, I, A> {
 
-    protected abstract val initialState: S
+    /**
+     * [reduce] will be launched in parallel, on main thread, for each intent that comes from the view.
+     * To change thread, use [kotlinx.coroutines.withContext].
+     */
     protected abstract suspend fun reduce(intent: I): S
 
     protected open fun recover(from: Exception): S = throw from
-    protected val currentState: S get() = states.value
 
-    protected open val store: MVIStore<S, I, A> by lazy {
-        MVIStore(
-            scope = viewModelScope,
-            initialState = initialState,
-            recover = ::recover,
-            reduce = ::reduce
-        )
-    }
+    protected open val store: MVIStore<S, I, A> = MVIStore(
+        scope = viewModelScope,
+        initialState = initialState,
+        recover = ::recover,
+        reduce = ::reduce
+    )
 
     override val actions get() = store.actions
     override val states: StateFlow<S> get() = store.states
@@ -54,16 +58,29 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>: ViewModel(
     protected open fun send(action: A) = store.send(action)
     protected open fun set(state: S) = store.set(state)
 
+    /**
+     * Shorthand for [Flow.launchIn] in viewModelScope
+     */
     protected fun <T> Flow<T>.consume() = launchIn(viewModelScope)
 
+    /**
+     * Uses [recover] to reduce exceptions occurring in the flow to states.
+     * Shorthand for [kotlinx.coroutines.flow.catch]
+     */
     protected fun <T> Flow<T>.recover() = catchExceptions { set(recover(it)) }
 
-    protected fun <T> Flow<T>.setOnEmpty(state: S) = onEmpty { set(state) }
+    /**
+     * Sets this state when flow completes without emitting any values.
+     */
+    protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { set(state) }
 
+    /**
+     * For a flow of states (usually mapped using [kotlinx.coroutines.flow.map]), sends each state to the subscriber.
+     */
     protected fun Flow<S>.setEach() = onEach { set(it) }
 
     /**
-     * Launch a coroutine that emits a new state. It is advisable to [recover] from any errors
+     * Launches a coroutine that emits a new state. It is advisable to [recover] from any errors
      */
     protected fun launchForState(
         context: CoroutineContext = EmptyCoroutineContext,
