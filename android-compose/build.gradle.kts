@@ -3,6 +3,8 @@ plugins {
 }
 
 android {
+    namespace = "${rootProject.group}.android.compose"
+
     buildFeatures {
         compose = true
     }

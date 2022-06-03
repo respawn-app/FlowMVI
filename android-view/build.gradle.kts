@@ -2,6 +2,10 @@ plugins {
     id("com.nek12.android-library")
 }
 
+android {
+    namespace = "${rootProject.group}.android.view"
+}
+
 dependencies {
     api(project(":android"))
     implementation("androidx.fragment:fragment-ktx:${Versions.fragment}")
