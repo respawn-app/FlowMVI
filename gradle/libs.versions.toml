@@ -61,6 +61,7 @@ compose-foundation = { group = "androidx.compose.foundation", name = "foundation
 compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose" }
 compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
 compose-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+compose-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
 
 [bundles]
 unittest = [

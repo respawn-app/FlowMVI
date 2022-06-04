@@ -12,11 +12,9 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-
 compileKotlin.kotlinOptions {
     jvmTarget = "11"
 }
-
 
 publishing {
     publications {
@@ -31,4 +29,6 @@ publishing {
 
 dependencies {
     implementation(libs.kotlin.coroutines)
+
+    testImplementation(libs.bundles.unittest)
 }

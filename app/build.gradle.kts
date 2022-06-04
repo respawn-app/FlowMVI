@@ -54,8 +54,9 @@ dependencies {
 
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
-
     implementation(libs.compose.material)
+    implementation(libs.compose.activity)
+
     implementation(libs.compose.preview)
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.viewmodel)

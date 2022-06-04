@@ -8,7 +8,7 @@ This is an MVI implementation based on coroutines with a few main goals:
 
 ## Let's get started:
 
-Choose your ~~fighter~~ dependency:  
+Choose your dependency:  
 [![](https://jitpack.io/v/Nek-12/FlowMVI.svg)](https://jitpack.io/#Nek-12/FlowMVI)
 
 ```kotlin

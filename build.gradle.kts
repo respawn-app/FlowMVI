@@ -40,6 +40,10 @@ allprojects {
         }
     }
 
+    tasks.withType<JavaCompile> {
+        targetCompatibility = "11"
+    }
+
     detekt {
         source = objects.fileCollection().from(
             io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_SRC_DIR_JAVA,
