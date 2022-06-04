@@ -10,14 +10,15 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.compose
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
         useLiveLiterals = true
     }
 }
 
 
 dependencies {
-    implementation("androidx.compose.ui:ui:${Versions.compose}")
-    implementation("androidx.compose.foundation:foundation:${Versions.compose}")
     api(project(":android"))
+
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
 }

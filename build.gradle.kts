@@ -1,5 +1,6 @@
 plugins {
     `kotlin-dsl`
+    alias(libs.plugins.detekt)
 }
 
 rootProject.group = "com.nek12.flowMVI"
@@ -12,9 +13,9 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath ("com.github.ben-manes:gradle-versions-plugin:${Versions.versionsPlugin}")
-        classpath("com.android.tools.build:gradle:${Versions.gradle}")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}")
+        classpath(libs.gradle.versions)
+        classpath(libs.android.gradle)
+        classpath(libs.kotlin.gradle)
     }
 }
 
@@ -26,6 +27,7 @@ allprojects {
     }
 
     apply(plugin = "com.github.ben-manes.versions")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
@@ -37,9 +39,69 @@ allprojects {
             )
         }
     }
+
+    detekt {
+        source = objects.fileCollection().from(
+            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_SRC_DIR_JAVA,
+            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_TEST_SRC_DIR_JAVA,
+            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_SRC_DIR_KOTLIN,
+            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_TEST_SRC_DIR_KOTLIN,
+        )
+        buildUponDefaultConfig = true
+        // baseline = file("$rootDir/config/detekt/baseline.xml")
+    }
+
+    dependencies {
+        detektPlugins(rootProject.libs.detekt.formatting)
+    }
+
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        jvmTarget = "1.8"
+        reports {
+            xml.required.set(false)
+            html.required.set(true)
+            txt.required.set(true)
+            sarif.required.set(false)
+        }
+    }
+    tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+        jvmTarget = "1.8"
+    }
 }
 
 subprojects {
     group = rootProject.group
     version = rootProject.version
+}
+
+tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektFormat") {
+    description = "Formats whole project."
+    parallel = true
+    disableDefaultRuleSets = true
+    buildUponDefaultConfig = true
+    autoCorrect = true
+    setSource(file(projectDir))
+    config.setFrom(File(rootDir, "detekt.yml"))
+    include("**/*.kt", "**/*.kts")
+    exclude("**/resources/**", "**/build/**", "**/.idea/**")
+    reports {
+        xml.required.set(false)
+        html.required.set(false)
+        txt.required.set(false)
+    }
+}
+
+tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
+    description = "Runs the whole project at once."
+    parallel = true
+    buildUponDefaultConfig = true
+    setSource(file(projectDir))
+    config.setFrom(File(rootDir, "detekt.yml"))
+    include("**/*.kt", "**/*.kts")
+    exclude("**/resources/**", "**/build/**", "**/.idea/**")
+    reports {
+        xml.required.set(false)
+        html.required.set(false)
+        txt.required.set(false)
+    }
 }

@@ -8,6 +8,6 @@ android {
 
 dependencies {
     api(project(":android"))
-    implementation("androidx.fragment:fragment-ktx:${Versions.fragment}")
-    implementation("androidx.activity:activity-ktx:$${Versions.activity}")
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.activity)
 }

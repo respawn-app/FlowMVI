@@ -9,6 +9,7 @@ import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -57,7 +58,7 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
         require(!isLaunched.getAndSet(true)) { "Store is already launched" }
 
         scope.launch {
-            while (isActive) {
+            while (this.isActive) {
                 set(
                     try {
                         reduce(intents.receive())

@@ -1,0 +1,80 @@
+[versions]
+gradleAndroid = "7.2.0"
+kotlin = "1.6.21"
+koin = "3.2.0"
+detekt = "1.20.0"
+coroutines = "1.6.2"
+lifecycle = "2.5.0-rc01"
+flowExt = "0.3.0"
+core-ktx = "1.9.0-alpha04"
+compose = "1.2.0-beta02"
+kotest = "5.3.0"
+mockk = "1.12.4"
+turbine = "0.8.0"
+junit = "4.13.2"
+activity = "1.6.0-alpha03"
+material = "1.6.0"
+fragment = "1.5.0-rc01"
+
+detektFormattingPlugin = "1.20.0"
+versionsPlugin = "0.42.0"
+
+[libraries]
+android-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "gradleAndroid" }
+kotlin-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektFormattingPlugin" }
+gradle-versions = { group = "com.github.ben-manes", name = "gradle-versions-plugin", version.ref = "versionsPlugin" }
+
+#core kotlin
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+flowext = { group = "io.github.hoc081098", name = "FlowExt-jvm", version.ref = "flowExt" }
+
+# androidx
+lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-activity = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity" }
+androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-fragment = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment" }
+
+#test
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" } # for kotest
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotest-junit = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+mockk-jvm = { group = "io.mockk", name = "mockk-agent-jvm", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
+#di
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin" }
+koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
+#compose
+compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
+compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
+compose-material = { group = "androidx.compose.material", name = "material", version.ref = "compose" }
+compose-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
+compose-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+
+[bundles]
+unittest = [
+    "kotest-junit",
+    "kotest-assertions",
+    "kotest-property",
+    "koin-test",
+    "mockk",
+    "mockk-jvm",
+    "kotlin-reflect"
+]
+koin = ["koin-core", "koin-android"]
+
+
+[plugins]
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }

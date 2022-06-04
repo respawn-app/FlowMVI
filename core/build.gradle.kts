@@ -30,7 +30,5 @@ publishing {
 }
 
 dependencies {
-    testImplementation("junit:junit:${Versions.junit}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}")
-
+    implementation(libs.kotlin.coroutines)
 }
