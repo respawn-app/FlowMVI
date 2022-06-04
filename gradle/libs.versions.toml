@@ -1,5 +1,5 @@
 [versions]
-gradleAndroid = "7.2.0"
+gradleAndroid = "7.2.1"
 kotlin = "1.6.21"
 koin = "3.2.0"
 detekt = "1.20.0"
