@@ -6,13 +6,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.flowWithLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -52,6 +56,12 @@ fun <T> Flow<T>.collectOnLifecycle(
 ) {
     val lifecycleFlow = rememberLifecycleFlow(this, lifecycleState)
     LaunchedEffect(lifecycleFlow) {
-        lifecycleFlow.collect { consumer(it) }
+        // see [LifecycleOwner.subscribe] in :android for reasoning
+        withContext(Dispatchers.Main.immediate) {
+            lifecycleFlow.collect {
+                consumer(it)
+            }
+        }
     }
+
 }

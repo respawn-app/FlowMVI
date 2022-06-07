@@ -8,6 +8,7 @@ import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 /**
@@ -23,7 +24,8 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction, VM: MVIProvider<S, I, A>> MVICompo
 
     val scope = rememberScope(provider, lifecycleState)
 
-    val state by provider.states.collectAsStateOnLifecycle(lifecycleState = lifecycleState)
+    // see [LifecycleOwner.subscribe] in :android for reasoning behind the dispatcher
+    val state by provider.states.collectAsStateOnLifecycle(Dispatchers.Main.immediate, lifecycleState)
 
     content(scope, state)
 }
