@@ -790,3 +790,16 @@ style:
     excludeImports:
       - 'java.util.*'
       - 'kotlinx.android.synthetic.*'
+compose:
+  ReusedModifierInstance:
+    active: true
+  UnnecessaryEventHandlerParameter:
+    active: true
+  ComposableEventParameterNaming:
+    active: true
+  ModifierHeightWithText:
+    active: true
+  ModifierParameterPosition:
+    active: true
+  PublicComposablePreview:
+    active: true
