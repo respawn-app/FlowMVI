@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 internal class SharedStore<S: MVIState, in I: MVIIntent, A: MVIAction>(
     initialState: S,
-    recover: (e: Exception) -> S,
-    reduce: suspend (I) -> S,
+    recover: MVIStore<S, I, A>.(e: Exception) -> S,
+    reduce: suspend MVIStore<S, I, A>.(I) -> S,
 ): Store<S, I, A>(initialState, recover, reduce) {
 
     private val _actions = MutableSharedFlow<A>(

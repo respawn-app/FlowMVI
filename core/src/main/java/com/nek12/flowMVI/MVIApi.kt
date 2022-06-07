@@ -1,6 +1,7 @@
 package com.nek12.flowMVI
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -73,7 +74,7 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
      * launching store collection when it is already launched will result in an exception.
      * Although not advised, store can experimentally be launched multiple times.
      */
-    fun launch(scope: CoroutineScope)
+    fun launch(scope: CoroutineScope): Job
 }
 
 

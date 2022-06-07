@@ -52,8 +52,8 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
      */
     protected open val store: MVIStore<S, I, A> = MVIStore<S, I, A>(
         initialState = initialState,
-        recover = ::recover,
-        reduce = ::reduce
+        recover = { recover(it) },
+        reduce = { reduce(it) },
     ).apply { launch(viewModelScope) }
 
     override val actions get() = store.actions

@@ -5,6 +5,7 @@ import com.nek12.flowMVI.ActionShareBehavior.RESTRICT
 import com.nek12.flowMVI.ActionShareBehavior.SHARE
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.coroutines.channels.Channel
@@ -26,12 +27,12 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
      *
      *  **Default implementation rethrows the exception**
      */
-    recover: (e: Exception) -> S = { throw it },
+    @BuilderInference recover: MVIStore<S, I, A>.(e: Exception) -> S = { throw it },
     /**
      * Reduce view's intent to a new ui state.
      * Use [send] for sending side-effects for the view to handle.
      */
-    reduce: suspend (I) -> S
+    @BuilderInference reduce: suspend MVIStore<S, I, A>.(I) -> S
 ): MVIStore<S, I, A> = when (behavior) {
     SHARE -> SharedStore(initialState, recover, reduce)
     DISTRIBUTE -> DistributingStore(initialState, recover, reduce)
@@ -40,8 +41,8 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
 
 internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
     initialState: S,
-    private val recover: (e: Exception) -> S,
-    private val reduce: suspend (I) -> S,
+    @BuilderInference private val recover: MVIStore<S, I, A>.(e: Exception) -> S,
+    @BuilderInference private val reduce: suspend MVIStore<S, I, A>.(I) -> S,
 ): MVIStore<S, I, A> {
 
     private val _states = MutableStateFlow(initialState)
@@ -54,10 +55,10 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
         _states.value = state
     }
 
-    override fun launch(scope: CoroutineScope) {
+    override fun launch(scope: CoroutineScope): Job {
         require(!isLaunched.getAndSet(true)) { "Store is already launched" }
 
-        scope.launch {
+        return scope.launch {
             while (this.isActive) {
                 set(
                     try {
@@ -69,8 +70,8 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
                     }
                 )
             }
-        }.invokeOnCompletion {
-            isLaunched.set(false)
+        }.apply {
+            invokeOnCompletion { isLaunched.set(false) }
         }
     }
 

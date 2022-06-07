@@ -30,12 +30,13 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.subscr
     scope: CoroutineScope,
     crossinline consume: (A) -> Unit,
     crossinline render: (S) -> Unit,
-) {
-    scope.launch {
+) = scope.launch {
+
+    launch {
         actions.collect { consume(it) }
     }
 
-    scope.launch {
+    launch {
         states.collect { render(it) }
     }
 }

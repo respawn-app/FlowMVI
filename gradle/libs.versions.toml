@@ -71,7 +71,8 @@ unittest = [
     "koin-test",
     "mockk",
     "mockk-jvm",
-    "kotlin-reflect"
+    "kotlin-reflect",
+    "turbine"
 ]
 koin = ["koin-core", "koin-android"]
 
