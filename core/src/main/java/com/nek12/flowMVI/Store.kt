@@ -6,7 +6,6 @@ import com.nek12.flowMVI.ActionShareBehavior.SHARE
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -59,7 +58,7 @@ internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
         require(!isLaunched.getAndSet(true)) { "Store is already launched" }
 
         return scope.launch {
-            while (this.isActive) {
+            while (isActive) {
                 set(
                     try {
                         reduce(intents.receive())

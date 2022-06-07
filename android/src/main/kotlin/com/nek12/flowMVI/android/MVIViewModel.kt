@@ -24,9 +24,9 @@ import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class.
- * Do not try to expose public functions in this view model, MVI doesn't work this way. The only functions you
- * should expose are those in [MVIProvider], everything else happens through intents and actions.
- * You can inject this view model into the [MVIView.provider] field
+ * Only functions of the [MVIProvider] are made public, everything else happens through intents and actions.
+ * Exposing other public functions / streams is discouraged.
+ * You can inject this view model into the [MVIView.provider] field.
  * If you want to add error handling for [reduce], override [recover] (default implementation throws immediately)
  * @param initialState the state to set when creating the view model.
  * @See MVIStore
@@ -37,11 +37,10 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
     initialState: S,
 ): ViewModel(), MVIProvider<S, I, A> {
 
-    private var isLaunched: Boolean = false
-
     /**
-     * [reduce] will be launched in parallel, on main thread, for each intent that comes from the view.
-     * To change thread, use [kotlinx.coroutines.withContext].
+     * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
+     * Intents will be processed in the order they come in.
+     * Change the thread as needed
      */
     protected abstract suspend fun reduce(intent: I): S
 
