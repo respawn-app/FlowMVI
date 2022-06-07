@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flow
 class CounterRepo {
     fun getCounter() = flow {
         var counter = 0
-        while(true) {
+        while (true) {
             delay(1000)
             emit(counter++)
         }

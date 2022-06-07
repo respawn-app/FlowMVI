@@ -27,7 +27,7 @@ interface MVIAction
 /**
  * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states]
  */
-interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
+interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Called when a UI event happens that produces an [intent].
@@ -52,7 +52,7 @@ interface MVIProvider<out S: MVIState, in I: MVIIntent, out A: MVIAction> {
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
  * A store functions independently of any subscribers.
  */
-interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I, A> {
+interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
 
     /**
      * Set a new state directly, thread-safely and synchronously.
@@ -77,14 +77,13 @@ interface MVIStore<S: MVIState, in I: MVIIntent, A: MVIAction>: MVIProvider<S, I
     fun launch(scope: CoroutineScope): Job
 }
 
-
 /**
  * A [consume]r of [MVIProvider]'s events that has certain state [S].
  * Each view needs a provider, a way to [send] intents to it,
  * a way to [render] the new state, and a way to [consume] side-effects.
  * @see MVIProvider
  */
-interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> : MVISubscriber<S, A> {
+interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
 
     /**
      * Provider, an object that handles business logic.
@@ -96,10 +95,9 @@ interface MVIView<S: MVIState, in I: MVIIntent, A: MVIAction> : MVISubscriber<S,
      * Send an intent for the [provider] to process e.g. a user click.
      */
     fun send(intent: I) = provider.send(intent)
-
 }
 
-interface MVISubscriber<in S: MVIState, in A: MVIAction> {
+interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 
     /**
      * Render a new [state].
@@ -114,7 +112,6 @@ interface MVISubscriber<in S: MVIState, in A: MVIAction> {
      * This function should be idempotent, should not send intents or cause side-effects.
      */
     fun consume(action: A)
-
 }
 
 /**

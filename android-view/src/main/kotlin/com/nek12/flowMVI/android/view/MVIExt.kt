@@ -11,7 +11,6 @@ import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIView
 import com.nek12.flowMVI.android.subscribe
 
-
 /**
  *  Subscribe to the [provider] lifecycle-aware. Call this in [Fragment.onViewCreated]
  *  @param consume called on each new action. Implement action handling here.
@@ -19,7 +18,7 @@ import com.nek12.flowMVI.android.subscribe
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
-inline fun <S: MVIState, I: MVIIntent, A: MVIAction> Fragment.subscribe(
+inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
     provider: MVIProvider<S, I, A>,
     crossinline consume: (action: A) -> Unit,
     crossinline render: (state: S) -> Unit,
@@ -31,6 +30,6 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> Fragment.subscribe(
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
-fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
+fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-) where T: Fragment, T: MVIView<S, I, A> = viewLifecycleOwner.subscribe(provider, ::consume, ::render, lifecycleState)
+) where T : Fragment, T : MVIView<S, I, A> = viewLifecycleOwner.subscribe(provider, ::consume, ::render, lifecycleState)

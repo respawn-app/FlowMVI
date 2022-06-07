@@ -1,0 +1,58 @@
+name: CI
+
+on:
+#  push:
+#    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Make files executable
+        run: chmod +x ./gradlew && chmod +x ./scripts/checksum.sh
+
+      - name: Generate cache key
+        run: ./scripts/checksum.sh checksum.txt
+
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" > local.properties
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches/modules-*
+            ~/.gradle/caches/jars-*
+            ~/.gradle/caches/build-cache-*
+          key: gradle-${{ hashFiles('checksum.txt') }}
+
+      #      - name: Lint
+      #        run: ./gradlew lintDebug --stacktrace
+
+      - name: Run detekt
+        run: ./gradlew detektAll
+
+      - name: Build debug
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Build release
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Unit tests
+        run: ./gradlew test --stacktrace

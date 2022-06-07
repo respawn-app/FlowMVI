@@ -18,17 +18,12 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runCurrent
 import util.launched
 
-
 @OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
-class StoreTest: FreeSpec({
+class StoreTest : FreeSpec({
     coroutineTestScope = true
     blockingTest = true
     concurrency = 1
@@ -74,10 +69,9 @@ class StoreTest: FreeSpec({
         }
         "and 2 subscribers" - {
 
-
             "and action type is RESTRICT" - {
                 "then throws" {
-                    //ensure scope is enclosed, otherwise exception will be thrown outside of assertion
+                    // ensure scope is enclosed, otherwise exception will be thrown outside of assertion
                     shouldThrowAny {
                         coroutineScope {
                             TestStore(Some, RESTRICT, reduce = reduce).launched(this@coroutineScope) {
@@ -91,7 +85,7 @@ class StoreTest: FreeSpec({
             }
 
             "and action type is DISTRIBUTE" - {
-                //todo: figure out what does kotest do wrong with the scope, that the subs don't work
+                // todo: figure out what does kotest do wrong with the scope, that the subs don't work
                 val scope = TestScope(testCoroutineScheduler)
                 val sub1 = mockk<MVISubscriber<TestState, TestAction>>()
                 val sub2 = mockk<MVISubscriber<TestState, TestAction>>()
@@ -104,7 +98,6 @@ class StoreTest: FreeSpec({
                         "then one subscriber received action only" {
                             coVerify(exactly = 1) { sub1.consume(TestAction.Some) }
                             coVerify(exactly = 0) { sub2.consume(TestAction.Some) }
-
                         }
                         // "then all subscribers updated state" {
                         //     coVerify(exactly = 1) { sub1.render(ofType<SomeData>()) }
@@ -124,7 +117,7 @@ class StoreTest: FreeSpec({
                     "and intent received" - {
                         send(TestIntent.Some)
                         "then all subscribers received an action" {
-                            //todo: works, but because of scope does not arrive properly
+                            // todo: works, but because of scope does not arrive properly
                             // coVerify(exactly = 1) { sub1.consume(TestAction.Some) }
                             // coVerify(exactly = 1) { sub2.consume(TestAction.Some) }
                         }

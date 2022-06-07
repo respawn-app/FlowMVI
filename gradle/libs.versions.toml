@@ -2,7 +2,7 @@
 gradleAndroid = "7.2.1"
 kotlin = "1.6.21"
 koin = "3.2.0"
-detekt = "1.20.0"
+detekt = "1.21.0-RC1"
 coroutines = "1.6.2"
 lifecycle = "2.5.0-rc01"
 flowExt = "0.3.0"
@@ -17,12 +17,14 @@ material = "1.6.0"
 fragment = "1.5.0-rc01"
 
 detektFormattingPlugin = "1.20.0"
+composeDetektPlugin = "1.0.1"
 versionsPlugin = "0.42.0"
 
 [libraries]
 android-gradle = { group = "com.android.tools.build", name = "gradle", version.ref = "gradleAndroid" }
 kotlin-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detektFormattingPlugin" }
+detekt-compose = { group = "ru.kode", name = "detekt-rules-compose", version.ref = "composeDetektPlugin" }
 gradle-versions = { group = "com.github.ben-manes", name = "gradle-versions-plugin", version.ref = "versionsPlugin" }
 
 #core kotlin
