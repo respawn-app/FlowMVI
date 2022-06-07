@@ -10,7 +10,9 @@ import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVISubscriber
 import com.nek12.flowMVI.MVIView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  *  Subscribe to the [provider] lifecycle-aware.
@@ -28,15 +30,19 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
 
     //using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
 
-    launch {
-        repeatOnLifecycle(lifecycleState) {
-            provider.states.collect { render(it) }
+    //https://github.com/Kotlin/kotlinx.coroutines/issues/2886
+    //TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
+    withContext(Dispatchers.Main.immediate) {
+        launch {
+            repeatOnLifecycle(lifecycleState) {
+                provider.states.collect { render(it) }
+            }
         }
-    }
 
-    launch {
-        repeatOnLifecycle(lifecycleState) {
-            provider.actions.collect { consume(it) }
+        launch {
+            repeatOnLifecycle(lifecycleState) {
+                provider.actions.collect { consume(it) }
+            }
         }
     }
 }
