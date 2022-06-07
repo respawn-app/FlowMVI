@@ -52,11 +52,12 @@ allprojects {
             io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_TEST_SRC_DIR_KOTLIN,
         )
         buildUponDefaultConfig = true
-        // baseline = file("$rootDir/config/detekt/baseline.xml")
     }
 
     dependencies {
+        //use rootProject as subprojects libs are ambiguous
         detektPlugins(rootProject.libs.detekt.formatting)
+        detektPlugins(rootProject.libs.detekt.compose)
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
