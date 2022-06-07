@@ -31,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
  * @param content the actual screen content. Will be recomposed each time a new state is received.
  */
 @Composable
-fun <S: MVIState, I: MVIIntent, A: MVIAction, VM: MVIProvider<S, I, A>> MVIComposable(
+fun <S : MVIState, I : MVIIntent, A : MVIAction, VM : MVIProvider<S, I, A>> MVIComposable(
     provider: VM,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     content: @Composable MVIIntentScope<I, A>.(state: S) -> Unit,

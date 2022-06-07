@@ -1,8 +1,7 @@
-@file:SuppressLint("ComposableNaming")
+@file:Suppress("ComposableNaming", "ComposableEventParameterNaming")
 
 package com.nek12.flowMVI.android.compose
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -17,7 +16,7 @@ import kotlinx.coroutines.CoroutineScope
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-interface MVIIntentScope<in I: MVIIntent, out A: MVIAction> {
+interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Send a new intent for the provider you used in [MVIComposable] {
@@ -32,15 +31,15 @@ interface MVIIntentScope<in I: MVIIntent, out A: MVIAction> {
 }
 
 @Composable
-internal fun <S: MVIState, I: MVIIntent, A: MVIAction> rememberScope(
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberScope(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State,
 ): MVIIntentScope<I, A> = remember(provider, lifecycleState) { MVIIntentScopeImpl(provider, lifecycleState) }
 
-private class MVIIntentScopeImpl<in I: MVIIntent, out A: MVIAction>(
+private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
     private val provider: MVIProvider<*, I, A>,
     private val lifecycleState: Lifecycle.State,
-): MVIIntentScope<I, A> {
+) : MVIIntentScope<I, A> {
 
     override fun send(intent: I) = provider.send(intent)
 
@@ -51,7 +50,7 @@ private class MVIIntentScopeImpl<in I: MVIIntent, out A: MVIAction>(
 }
 
 @Composable
-fun <A: MVIAction> MVIProvider<*, *, A>.consume(
+fun <A : MVIAction> MVIProvider<*, *, A>.consume(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     onAction: suspend CoroutineScope.(action: A) -> Unit,
 ) = actions.collectOnLifecycle(lifecycleState, onAction)
@@ -62,11 +61,11 @@ fun <A: MVIAction> MVIProvider<*, *, A>.consume(
  */
 @Suppress("UNCHECKED_CAST")
 @Composable
-fun <T: MVIIntent, A: MVIAction> EmptyScope(
+fun <T : MVIIntent, A : MVIAction> EmptyScope(
     @BuilderInference call: @Composable MVIIntentScope<T, A>.() -> Unit,
 ) = call(EmptyScopeImpl as MVIIntentScope<T, A>)
 
-private object EmptyScopeImpl: MVIIntentScope<MVIIntent, MVIAction> {
+private object EmptyScopeImpl : MVIIntentScope<MVIIntent, MVIAction> {
 
     override fun send(intent: MVIIntent) = Unit
 

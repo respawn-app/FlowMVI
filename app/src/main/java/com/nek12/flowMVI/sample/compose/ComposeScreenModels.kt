@@ -7,26 +7,26 @@ import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIState
 
 @Stable
-sealed class ComposeState: MVIState {
+sealed class ComposeState : MVIState {
 
-    object Loading: ComposeState()
-    object Empty: ComposeState()
+    object Loading : ComposeState()
+    object Empty : ComposeState()
     data class DisplayingContent(
         val counter: Int,
         val timer: Int,
-    ): ComposeState()
+    ) : ComposeState()
 }
 
 @Stable
-sealed class ComposeIntent: MVIIntent {
+sealed class ComposeIntent : MVIIntent {
 
-    object ClickedCounter: ComposeIntent()
-    object ClickedToBasicActivity: ComposeIntent()
+    object ClickedCounter : ComposeIntent()
+    object ClickedToBasicActivity : ComposeIntent()
 }
 
 @Stable
-sealed class ComposeAction: MVIAction {
+sealed class ComposeAction : MVIAction {
 
-    object GoToBasicActivity: ComposeAction()
-    data class ShowSnackbar(@StringRes val res: Int): ComposeAction()
+    object GoToBasicActivity : ComposeAction()
+    data class ShowSnackbar(@StringRes val res: Int) : ComposeAction()
 }

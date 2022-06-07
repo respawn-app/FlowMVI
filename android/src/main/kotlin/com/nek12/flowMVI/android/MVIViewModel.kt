@@ -33,9 +33,9 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @See MVIView
  * @See MVIProvider
  */
-abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
+abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
-): ViewModel(), MVIProvider<S, I, A> {
+) : ViewModel(), MVIProvider<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -96,7 +96,7 @@ abstract class MVIViewModel<S: MVIState, I: MVIIntent, A: MVIAction>(
     /**
      * Execute [block] if current state is [T] else just return [currentState].
      */
-    protected inline fun <reified T: S> withState(block: T.() -> S): S {
+    protected inline fun <reified T : S> withState(block: T.() -> S): S {
         return (currentState as? T)?.let(block) ?: currentState
     }
 }

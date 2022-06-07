@@ -7,20 +7,19 @@ import com.nek12.flowMVI.MVISubscriber
 import com.nek12.flowMVI.subscribe
 import kotlinx.coroutines.CoroutineScope
 
-class TestSubscriber<S: MVIState, A: MVIAction>(
+class TestSubscriber<S : MVIState, A : MVIAction>(
     val render: (S) -> Unit = {},
     val consume: (A) -> Unit = {},
-): MVISubscriber<S, A> {
+) : MVISubscriber<S, A> {
 
     var counter = 0
-    private set
+        private set
 
     private val _states = mutableListOf<S>()
     val states: List<S> get() = _states
 
     private val _actions = mutableListOf<A>()
     val actions: List<A> get() = _actions
-
 
     override fun render(state: S) {
         ++counter
@@ -39,11 +38,14 @@ class TestSubscriber<S: MVIState, A: MVIAction>(
         _actions.clear()
     }
 
-    suspend inline fun subscribed(provider: MVIProvider<S, *, A>, scope: CoroutineScope, test: TestSubscriber<S, A>.() -> Unit) =
-        subscribe(provider, scope).apply {
-            test()
-            cancel()
-            join()
-            reset()
-        }
+    suspend inline fun subscribed(
+        provider: MVIProvider<S, *, A>,
+        scope: CoroutineScope,
+        test: TestSubscriber<S, A>.() -> Unit
+    ) = subscribe(provider, scope).apply {
+        test()
+        cancel()
+        join()
+        reset()
+    }
 }

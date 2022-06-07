@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -24,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.nek12.flowMVI.android.compose.EmptyScope
 import com.nek12.flowMVI.android.compose.MVIComposable
 import com.nek12.flowMVI.android.compose.MVIIntentScope
-import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.R.string
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeAction.ShowSnackbar
@@ -40,21 +38,21 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state ->
 
-    //this -> MVIIntentScope with utility functions available
+    // this -> MVIIntentScope with utility functions available
 
-    val context = LocalContext.current //we can't use composable functions in consume()
+    val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
 
     consume { action ->
-        //This block is run in a new coroutine each time we consume a new actions.
-        //You can run suspending (but not blocking) code here safely
-        //consume() block will only be called when a new action is emitted (independent of recompositions)
+        // This block is run in a new coroutine each time we consume a new actions.
+        // You can run suspending (but not blocking) code here safely
+        // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
             is GoToBasicActivity -> context.startActivity(
                 Intent(context, BasicActivity::class.java)
             )
-            is ShowSnackbar -> launch { //snackbar suspends consume(), we do not want to block action consumption here
-                //so we'll launch a new coroutine
+            is ShowSnackbar -> launch { // snackbar suspends consume(), we do not want to block action consumption here
+                // so we'll launch a new coroutine
                 scaffoldState.snackbarHostState.showSnackbar(
                     message = context.getString(action.res)
                 )
@@ -83,7 +81,7 @@ fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: Com
                     Column {
                         Text(
                             stringResource(id = string.counter_text, state.counter),
-                            Modifier.clickable { send(ClickedCounter) } //send() is available in MVIIntentScope
+                            Modifier.clickable { send(ClickedCounter) } // send() is available in MVIIntentScope
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
@@ -109,7 +107,7 @@ fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: Com
 @Composable
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true)
 private fun ComposeScreenPreview() {
-    EmptyScope { //Use this helper function to preview functions that use MVIIntentScope
+    EmptyScope { // Use this helper function to preview functions that use MVIIntentScope
         ComposeScreenContent(state = DisplayingContent(15, 0))
     }
 }

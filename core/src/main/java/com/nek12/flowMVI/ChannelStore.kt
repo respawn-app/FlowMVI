@@ -5,11 +5,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
-internal sealed class ChannelStore<S: MVIState, in I: MVIIntent, A: MVIAction>(
+internal sealed class ChannelStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
     recover: MVIStore<S, I, A>.(e: Exception) -> S,
     reduce: suspend MVIStore<S, I, A>.(I) -> S,
-): Store<S, I, A>(initialState, recover, reduce) {
+) : Store<S, I, A>(initialState, recover, reduce) {
 
     protected val internalActions = Channel<A>(Channel.BUFFERED, DROP_OLDEST)
 
@@ -18,20 +18,20 @@ internal sealed class ChannelStore<S: MVIState, in I: MVIIntent, A: MVIAction>(
     }
 }
 
-internal class DistributingStore<S: MVIState, in I: MVIIntent, A: MVIAction>(
+internal class DistributingStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
     recover: MVIStore<S, I, A>.(e: Exception) -> S,
     reduce: suspend MVIStore<S, I, A>.(I) -> S,
-): ChannelStore<S, I, A>(initialState, recover, reduce) {
+) : ChannelStore<S, I, A>(initialState, recover, reduce) {
 
     override val actions = internalActions.receiveAsFlow()
 }
 
-internal class ConsumingStore<S: MVIState, I: MVIIntent, A: MVIAction>(
+internal class ConsumingStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
     recover: MVIStore<S, I, A>.(e: Exception) -> S,
     reduce: suspend MVIStore<S, I, A>.(I) -> S,
-): ChannelStore<S, I, A>(initialState, recover, reduce) {
+) : ChannelStore<S, I, A>(initialState, recover, reduce) {
 
     override val actions = internalActions.consumeAsFlow()
 }

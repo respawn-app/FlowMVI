@@ -7,17 +7,17 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-val <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.currentState: S get() = states.value
+val <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.currentState: S get() = states.value
 
 /**
  * Subscribe to the store.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
-fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIView<S, I, A>.subscribe(
+fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
 ) = subscribe(provider, scope)
 
-fun <S: MVIState, I: MVIIntent, A: MVIAction> MVISubscriber<S, A>.subscribe(
+fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subscribe(
     provider: MVIProvider<S, I, A>,
     scope: CoroutineScope
 ) = provider.subscribe(scope, ::consume, ::render)
@@ -26,7 +26,7 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction> MVISubscriber<S, A>.subscribe(
  * Subscribe to the store.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
-inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.subscribe(
+inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,
     crossinline consume: (A) -> Unit,
     crossinline render: (S) -> Unit,
@@ -44,7 +44,7 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIProvider<S, I, A>.subscr
 /**
  * Execute [block] if current state is [T] else just return [currentState].
  */
-inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(
+inline fun <reified T : S, reified S : MVIState> MVIProvider<S, *, *>.withState(
     block: T.() -> S
 ): S = (currentState as? T)?.let(block) ?: currentState
 
@@ -52,7 +52,7 @@ inline fun <reified T: S, reified S: MVIState> MVIProvider<S, *, *>.withState(
  * Launch a new coroutine, that will attempt to set a new state that resulted in [block] execution.
  * In case of exception being thrown, [recover] will be executed in an attempt to recover from it.
  */
-fun <S: MVIState> MVIStore<S, *, *>.launchForState(
+fun <S : MVIState> MVIStore<S, *, *>.launchForState(
     scope: CoroutineScope,
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,

@@ -4,7 +4,7 @@ import android.app.Application
 import com.nek12.flowMVI.sample.di.appModule
 import org.koin.core.context.startKoin
 
-class MVIApplication: Application() {
+class MVIApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()

@@ -1,12 +1,10 @@
 package com.nek12.flowMVI.android.compose
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -15,12 +13,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-//credits: https://proandroiddev.com/how-to-collect-flows-lifecycle-aware-in-jetpack-compose-babd53582d0b
+// credits: https://proandroiddev.com/how-to-collect-flows-lifecycle-aware-in-jetpack-compose-babd53582d0b
 
 @Composable
 fun <T> rememberLifecycleFlow(
@@ -32,7 +29,7 @@ fun <T> rememberLifecycleFlow(
 }
 
 @Composable
-fun <T: R, R> Flow<T>.collectAsStateOnLifecycle(
+fun <T : R, R> Flow<T>.collectAsStateOnLifecycle(
     initial: R,
     context: CoroutineContext = EmptyCoroutineContext,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
@@ -49,7 +46,7 @@ fun <T> StateFlow<T>.collectAsStateOnLifecycle(
 ): State<T> = collectAsStateOnLifecycle(value, context, lifecycleState)
 
 @Composable
-@SuppressLint("ComposableNaming")
+@Suppress("ComposableEventParameterNaming")
 fun <T> Flow<T>.collectOnLifecycle(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     consumer: suspend CoroutineScope.(T) -> Unit,
@@ -63,5 +60,4 @@ fun <T> Flow<T>.collectOnLifecycle(
             }
         }
     }
-
 }

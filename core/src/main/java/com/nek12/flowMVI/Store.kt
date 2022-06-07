@@ -8,13 +8,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Suppress("FunctionName")
-fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
+fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     initialState: S,
     /**
      * A behavior to be applied when sharing actions
@@ -38,11 +40,11 @@ fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
     RESTRICT -> ConsumingStore(initialState, recover, reduce)
 }
 
-internal abstract class Store<S: MVIState, in I: MVIIntent, A: MVIAction>(
+internal abstract class Store<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
     @BuilderInference private val recover: MVIStore<S, I, A>.(e: Exception) -> S,
     @BuilderInference private val reduce: suspend MVIStore<S, I, A>.(I) -> S,
-): MVIStore<S, I, A> {
+) : MVIStore<S, I, A> {
 
     private val _states = MutableStateFlow(initialState)
     override val states: StateFlow<S> = _states.asStateFlow()

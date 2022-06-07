@@ -14,11 +14,10 @@ import com.nek12.flowMVI.sample.view.BasicActivityAction as Action
 import com.nek12.flowMVI.sample.view.BasicActivityIntent as Intent
 import com.nek12.flowMVI.sample.view.BasicActivityState as State
 
+// See also BaseClassViewModel
+class NoBaseClassViewModel : ViewModel() { // if you don't want to extend MVIViewModel(), use composition instead
 
-//See also BaseClassViewModel
-class NoBaseClassViewModel: ViewModel() { //if you don't want to extend MVIViewModel(), use composition instead
-
-    //implement MVIProvider, or just expose store if you want
+    // implement MVIProvider, or just expose store if you want
     val store = MVIStore<State, Intent, Action>(
         initialState = DisplayingContent(0),
         reduce = { reduce(it) },
@@ -26,7 +25,7 @@ class NoBaseClassViewModel: ViewModel() { //if you don't want to extend MVIViewM
     )
 
     init {
-        //Don't forget to launch store intent processing
+        // Don't forget to launch store intent processing
         store.launch(viewModelScope)
     }
 
@@ -49,5 +48,4 @@ class NoBaseClassViewModel: ViewModel() { //if you don't want to extend MVIViewM
             copy(counter = counter + 1)
         }
     }
-
 }

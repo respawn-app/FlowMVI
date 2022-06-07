@@ -21,17 +21,17 @@ import kotlinx.coroutines.withContext
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
-inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
+inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe(
     provider: MVIProvider<S, I, A>,
     crossinline consume: (action: A) -> Unit,
     crossinline render: (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ) = lifecycleScope.launch {
 
-    //using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
+    // using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
 
-    //https://github.com/Kotlin/kotlinx.coroutines/issues/2886
-    //TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
+    // https://github.com/Kotlin/kotlinx.coroutines/issues/2886
+    // TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
     withContext(Dispatchers.Main.immediate) {
         launch {
             repeatOnLifecycle(lifecycleState) {
@@ -52,16 +52,16 @@ inline fun <S: MVIState, I: MVIIntent, A: MVIAction> LifecycleOwner.subscribe(
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
-fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
+fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-) where T: LifecycleOwner, T: MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
+) where T : LifecycleOwner, T : MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
 
 /**
  * Subscribe to the provider lifecycle-aware.
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
-fun <S: MVIState, I: MVIIntent, A: MVIAction, T> T.subscribe(
+fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-) where T: LifecycleOwner, T: MVIView<S, I, A> = subscribe(provider, lifecycleState)
+) where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(provider, lifecycleState)
