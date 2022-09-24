@@ -22,11 +22,11 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.yield
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal abstract class BaseStore<S: MVIState, in I: MVIIntent, A: MVIAction>(
+internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
     @BuilderInference private val recover: MVIStoreScope<S, I, A>.(e: Exception) -> S,
     @BuilderInference private val reduce: suspend MVIStoreScope<S, I, A>.(I) -> S,
-): MVIStore<S, I, A> {
+) : MVIStore<S, I, A> {
 
     private val _states = MutableStateFlow(initialState)
     override val states: StateFlow<S> = _states.asStateFlow()

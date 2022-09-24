@@ -1,3 +1,5 @@
+@file:Suppress("Filename")
+
 package com.nek12.flowMVI.android.view
 
 import androidx.fragment.app.Fragment

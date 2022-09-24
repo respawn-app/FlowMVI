@@ -1,3 +1,5 @@
+@file:Suppress("Filename")
+
 package com.nek12.flowMVI.sample.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme

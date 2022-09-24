@@ -11,7 +11,8 @@ import com.nek12.flowMVI.sample.view.BasicActivityIntent.ClickedFab
 import com.nek12.flowMVI.sample.view.BasicActivityState.DisplayingContent
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class BasicActivity : ComponentActivity(),
+class BasicActivity :
+    ComponentActivity(),
     // Or use lambdas when calling subscribe()
     MVIView<BasicActivityState, BasicActivityIntent, BasicActivityAction> {
 

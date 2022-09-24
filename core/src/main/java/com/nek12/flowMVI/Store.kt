@@ -10,7 +10,7 @@ import com.nek12.flowMVI.store.SharedStore
 const val DEFAULT_ACTION_BUFFER_SIZE = 64
 
 @Suppress("FunctionName")
-fun <S: MVIState, I: MVIIntent, A: MVIAction> MVIStore(
+fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     initialState: S,
     /**
      * A behavior to be applied when sharing actions
