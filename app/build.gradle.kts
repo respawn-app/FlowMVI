@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
-    compileSdk = 32
+    namespace = "com.nek12.flowMVI.sample"
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.nek12.flowMVI.sample"
         minSdk = 26
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -35,7 +36,7 @@ android {
         viewBinding = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     packagingOptions {
         resources {

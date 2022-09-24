@@ -77,6 +77,8 @@ allprojects {
                 freeCompilerArgs = freeCompilerArgs + listOf(
                     "-opt-in=kotlin.RequiresOptIn",
                     "-Xjvm-default=all",
+                    "-opt-in=kotlin.experimental.ExperimentalTypeInference",
+                    "-Xbackend-threads=0", // parallel IR compilation
                 )
             }
         }
