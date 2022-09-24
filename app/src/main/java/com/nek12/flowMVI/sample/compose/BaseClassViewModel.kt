@@ -11,7 +11,9 @@ import com.nek12.flowMVI.sample.compose.ComposeState.DisplayingContent
 import com.nek12.flowMVI.sample.compose.ComposeState.Empty
 import com.nek12.flowMVI.sample.compose.ComposeState.Loading
 import com.nek12.flowMVI.sample.repo.CounterRepo
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlin.random.Random
 
@@ -33,17 +35,18 @@ class BaseClassViewModel(
         incrementCounter(-1)
 
         repo.getCounter()
-            .recover() // recover from exceptions
             .onEmpty(Empty) // set a new state if the flow is empty
             .map(::timerToState) // map values to states
             .setEach() // set mapped states
+            .recover() // recover from exceptions
+            .flowOn(Dispatchers.Default) // create states out of the main thread
             .consume() // launch in view model scope
     }
 
-    // Will be when reduce() throws an exception
+    // Will be called when reduce or any child coroutine throws an exception
     override fun recover(from: Exception): ComposeState {
         send(ShowSnackbar(R.string.error))
-        return DisplayingContent(0, (currentState as? DisplayingContent)?.timer ?: 0)
+        return DisplayingContent(0, 0)
     }
 
     // Will be called each time a subscriber sends a new Intent in a separate coroutine
@@ -56,7 +59,7 @@ class BaseClassViewModel(
         is ClickedCounter -> withState<DisplayingContent> { // this -> DisplayingContent
 
             // Launch a new coroutine that will set the state later
-            incrementCounter(current = counter)
+            incrementCounter(current = counter, timer)
 
             // Immediately return Loading state
             Loading // ^withState
@@ -75,7 +78,7 @@ class BaseClassViewModel(
         copy(timer = value)
     }
 
-    private fun incrementCounter(current: Int) = launchForState {
+    private fun incrementCounter(current: Int, timer: Int? = null) = launchForState {
         delay(1000L)
 
         if (Random.nextBoolean()) {
@@ -84,6 +87,12 @@ class BaseClassViewModel(
         }
 
         // sets this new state after calculations done
-        DisplayingContent(current + 1, (currentState as? DisplayingContent)?.timer ?: 0)
+        // this will not get the current state (because it's loading)
+        // at the moment of retrieval, but you can pass last state (e.g. in reduce()) to this function so that it knows
+        // where to take values from
+        DisplayingContent(
+            counter = current + 1,
+            timer = timer ?: (currentState as? DisplayingContent)?.timer ?: 0
+        )
     }
 }

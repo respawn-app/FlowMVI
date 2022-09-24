@@ -4,7 +4,7 @@ plugins {
 }
 
 rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.2.5-alpha"
+rootProject.version = "0.2.6-alpha"
 
 buildscript {
     repositories {

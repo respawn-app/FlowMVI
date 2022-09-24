@@ -29,15 +29,14 @@ class NoBaseClassViewModel : ViewModel() { // if you don't want to extend MVIVie
         store.launch(viewModelScope)
     }
 
-    private suspend fun MVIStore<State, Intent, Action>.reduce(intent: Intent): State {
+    private suspend fun reduce(intent: Intent): State = with(store) {
         when (intent) {
             is ClickedFab -> {
                 send(ShowSnackbar(R.string.started_processing))
 
-                // Doing long operations will delay intent processing. However, new intents result in new coroutines being launched
+                // Doing long operations will delay intent processing. New intents will NOT result in new coroutines being launched
                 // This means, if we get another intent while delay() is running, it will be processed independently and will start
-                // before this function completes. In other words, our state processing will have diverged into two independent branches
-                // Don't worry, however, about race conditions on store.currentState : thread-safety of the value variable is guaranteed by flow api
+                // after this invocation completes.
                 delay(1000)
 
                 send(ShowSnackbar(R.string.finished_processing))
