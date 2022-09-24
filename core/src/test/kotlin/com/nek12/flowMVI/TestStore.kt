@@ -9,6 +9,6 @@ import TestState
 internal fun TestStore(
     initialState: TestState,
     behavior: ActionShareBehavior,
-    recover: MVIStore<TestState, TestIntent, TestAction>.(e: Exception) -> TestState = { throw it },
-    reduce: suspend MVIStore<TestState, TestIntent, TestAction>.(TestIntent) -> TestState,
-) = MVIStore(initialState, behavior, recover, reduce)
+    recover: MVIStoreScope<TestState, TestIntent, TestAction>.(e: Exception) -> TestState = { throw it },
+    reduce: suspend MVIStoreScope<TestState, TestIntent, TestAction>.(TestIntent) -> TestState,
+) = MVIStore(initialState, behavior, recover = recover, reduce = reduce)

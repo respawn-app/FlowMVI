@@ -13,7 +13,7 @@ Choose your dependency:
 
 ```kotlin
 val flowVersion = /* look at the widget */
-implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
+    implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
 implementation("com.github.Nek-12.FlowMVI:android-compose:${flowVersion}") //For Jetpack Compose Android projects
 implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For View-based Android projects
 ```
@@ -21,28 +21,30 @@ implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For Vi
 ## Core:
 
 ```kotlin
-sealed class ScreenState : MVIState {
-    object Loading : ScreenState()
-    data class Error(e: Exception) : ScreenState()
+sealed class ScreenState: MVIState {
+    object Loading: ScreenState()
+    data class Error(e: Exception): ScreenState()
     data class DisplayingCounter(
         val counter: Int,
-    ) : ScreenState()
+    ): ScreenState()
 }
 
-sealed class ScreenIntent : MVIIntent {
-    object ClickedCounter : ScreenIntent()
+sealed class ScreenIntent: MVIIntent {
+    object ClickedCounter: ScreenIntent()
 }
 
-sealed class ScreenAction : MVIAction {
-    data class ShowMessage(val message: String) : ScreenAction()
+sealed class ScreenAction: MVIAction {
+    data class ShowMessage(val message: String): ScreenAction()
 }
 
 
 val store = MVIStore<ScreenState, ScreenIntent, ScreenAction>(
-    scope = viewModelScope,
     initialState = DisplayingCounter(0),
+    behavior = ActionShareBehavior.DISTRIBUTE,
     reduce = { intent -> /*...*/ }
 )
+
+store.launch(eventProcessingScope)
 
 //somewhere in the ui layer
 
@@ -57,17 +59,16 @@ store.subscribe(
 
 ```kotlin
 
-class ScreenViewModel : MVIViewModel<ScreenState, ScreenIntent, ScreenAction>() {
+class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
 
-    override val initialState get() = Loading
-    override fun recover(from: Exception) = Error(from) //optional
+    override fun recover(from: Exception) = Error(from) // optional
 
     override suspend fun reduce(intent: ScreenIntent) = when (intent) {
 
         //no-op if state is not DisplayingCounter
         is ClickedCounter -> withState<DisplayingCounter> { //this -> DisplayingCounter
 
-            send(ShowMessage("So simple!"))
+            send(ShowMessage("Incremented counter"))
 
             copy(counter = counter + 1)
         }
@@ -90,7 +91,7 @@ fun ComposeScreen() = MVIComposable(
     when (state) {
         is DisplayingCounter -> {
             Button(onClick = { send(ClickedCounter) }) {
-                Text("Counter: ${state.counter}") //render state,
+                Text("Counter: ${state.counter}") // render state,
             }
         }
     }
@@ -98,7 +99,7 @@ fun ComposeScreen() = MVIComposable(
 ```
 
 If you don't want to use MVIComposable, just collect the actions flow using coroutineScope and render states
-using `viewModel.states.collectAsState()`
+using `viewModel.states.collectAsStateWithLifecycle()`
 
 ## Android (View):
 
@@ -106,22 +107,22 @@ using `viewModel.states.collectAsState()`
 
 //ViewModel and Model classes have not changed
 
-class ScreenFragment : Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
+class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
 
     override val provider by viewModel<ScreenViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subscribe() //one-liner for store subscription. Lifecycle-aware and efficient.
+        subscribe() // one-liner for store subscription. Lifecycle-aware and efficient.
     }
 
     override fun render(state: ScreenState) {
-        //update your views
+        // update your views
     }
 
     override fun consume(action: ScreenAction) {
-        //handle actions
+        // handle actions
     }
 }
 ```

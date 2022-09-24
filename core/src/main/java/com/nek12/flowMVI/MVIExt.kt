@@ -4,6 +4,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -61,7 +62,7 @@ fun <S : MVIState> MVIStore<S, *, *>.launchForState(
 ) = scope.launch(context, start) {
     set(
         try {
-            block()
+            supervisorScope(block)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

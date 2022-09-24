@@ -38,7 +38,7 @@ fun <T : R, R> Flow<T>.collectAsStateOnLifecycle(
     return lifecycleAwareFlow.collectAsState(initial, context)
 }
 
-@Suppress("StateFlowValueCalledInComposition")
+@Suppress("StateFlowValueCalledInComposition", "ComposableParametersOrdering")
 @Composable
 fun <T> StateFlow<T>.collectAsStateOnLifecycle(
     context: CoroutineContext = EmptyCoroutineContext,
@@ -46,17 +46,17 @@ fun <T> StateFlow<T>.collectAsStateOnLifecycle(
 ): State<T> = collectAsStateOnLifecycle(value, context, lifecycleState)
 
 @Composable
-@Suppress("ComposableEventParameterNaming")
+@Suppress("ComposableParametersOrdering", "ComposableNaming")
 fun <T> Flow<T>.collectOnLifecycle(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    consumer: suspend CoroutineScope.(T) -> Unit,
+    consume: suspend CoroutineScope.(T) -> Unit,
 ) {
     val lifecycleFlow = rememberLifecycleFlow(this, lifecycleState)
     LaunchedEffect(lifecycleFlow) {
         // see [LifecycleOwner.subscribe] in :android for reasoning
         withContext(Dispatchers.Main.immediate) {
             lifecycleFlow.collect {
-                consumer(it)
+                consume(it)
             }
         }
     }

@@ -50,6 +50,7 @@ private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
 }
 
 @Composable
+@Suppress("ComposableParametersOrdering")
 fun <A : MVIAction> MVIProvider<*, *, A>.consume(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     onAction: suspend CoroutineScope.(action: A) -> Unit,

@@ -1,3 +1,5 @@
+@file:Suppress("Filename")
+
 package com.nek12.flowMVI.android
 
 import kotlinx.coroutines.flow.Flow

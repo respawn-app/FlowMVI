@@ -19,7 +19,7 @@ interface MVIIntent
 
 /**
  * A single, one-shot, side-effect of processing an [MVIIntent], sent by [MVIProvider].
- * Consumed in the ui-layer as a one-time action
+ * Consumed in the ui-layer as a one-time action.
  * Must be immutable.
  */
 interface MVIAction
@@ -30,7 +30,7 @@ interface MVIAction
 interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
-     * Called when a UI event happens that produces an [intent].
+     * Should be called when a UI event happens that produces an [intent].
      * @See MVIIntent
      */
     fun send(intent: I)
@@ -42,7 +42,7 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
      * A flow of [MVIAction]s to be handled by the [MVIView],
-     * usually resulting in one-shot, idempotent events.
+     * usually resulting in one-shot events.
      * How actions are distributed depends on [ActionShareBehavior].
      */
     val actions: Flow<A>
@@ -102,14 +102,14 @@ interface MVISubscriber<in S : MVIState, in A : MVIAction> {
     /**
      * Render a new [state].
      * This function will be called each time a new state is received
-     * This function should be idempotent and should not send any intents or cause side-effects.
+     * This function should be idempotent and should not send any intents.
      */
     fun render(state: S)
 
     /**
      * Consume a one-time side-effect emitted by [MVIProvider].
      * This function is called each time an [MVIAction] arrives.
-     * This function should be idempotent, should not send intents or cause side-effects.
+     * This function should not send intents.
      */
     fun consume(action: A)
 }
@@ -117,7 +117,7 @@ interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 /**
  * An enum representing how [MVIAction] sharing will be handled in the [MVIStore].
  * There are 3 possible behaviors, which will be different depending on the use-case.
- * When in doubt, use the default one, and change if you have issues only.
+ * When in doubt, use the default one, and change if you have issues.
  * @see MVIStore
  */
 enum class ActionShareBehavior {
@@ -143,7 +143,28 @@ enum class ActionShareBehavior {
     /**
      * Restricts the count of subscribers to 1.
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
-     * In other words, you will be required to create a new store for each call of [subscribe].
+     * In other words, you will be required to create a new store for each caller of [subscribe].
      */
     RESTRICT
+}
+
+/**
+ * A scope of the operation inside [MVIStore].
+ * Provides a [CoroutineScope] and an [MVIProvider] to use.
+ * **Cancelling the scope will cancel the store.launch() (intent processing)**.
+ * Throwing when in this scope will result in recover() of the parent store being called.
+ * Child coroutines should handle their exceptions independently.
+ */
+
+interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> : CoroutineScope, MVIProvider<S, I, A> {
+
+    /**
+     * @see MVIStore.send
+     */
+    fun send(action: A)
+
+    /**
+     * @see MVIStore.set
+     */
+    fun set(state: S)
 }
