@@ -12,8 +12,8 @@ Choose your dependency:
 [![](https://jitpack.io/v/Nek-12/FlowMVI.svg)](https://jitpack.io/#Nek-12/FlowMVI)
 
 ```kotlin
-val flowVersion = /* look at the widget */
-    implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
+val flowVersion = /* look at the widget */  
+implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
 implementation("com.github.Nek-12.FlowMVI:android-compose:${flowVersion}") //For Jetpack Compose Android projects
 implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For View-based Android projects
 ```
@@ -21,20 +21,20 @@ implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For Vi
 ## Core:
 
 ```kotlin
-sealed class ScreenState: MVIState {
-    object Loading: ScreenState()
-    data class Error(e: Exception): ScreenState()
+sealed interface ScreenState: MVIState { // using interfaces is more performant and adheres to MVI principles
+    object Loading: ScreenState
+    data class Error(e: Exception): ScreenState
     data class DisplayingCounter(
         val counter: Int,
-    ): ScreenState()
+    ): ScreenState
 }
 
-sealed class ScreenIntent: MVIIntent {
-    object ClickedCounter: ScreenIntent()
+sealed interface ScreenIntent: MVIIntent {
+    object ClickedCounter: ScreenIntent
 }
 
-sealed class ScreenAction: MVIAction {
-    data class ShowMessage(val message: String): ScreenAction()
+sealed interface ScreenAction: MVIAction {
+    data class ShowMessage(val message: String): ScreenAction
 }
 
 
@@ -83,8 +83,7 @@ fun ComposeScreen() = MVIComposable(
 
     consume { action ->
         when (action) {
-            is ShowMessage -> { /* ... */
-            }
+            is ShowMessage -> { /* ... * }
         }
     }
 
