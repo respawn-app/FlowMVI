@@ -83,7 +83,7 @@ fun ComposeScreen() = MVIComposable(
 
     consume { action ->
         when (action) {
-            is ShowMessage -> { /* ... * }
+            is ShowMessage -> { /* ... */ }
         }
     }
 
