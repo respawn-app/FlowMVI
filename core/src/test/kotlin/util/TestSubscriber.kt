@@ -5,32 +5,25 @@ import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVISubscriber
 import com.nek12.flowMVI.subscribe
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 
 class TestSubscriber<S : MVIState, A : MVIAction>(
-    val render: (S) -> Unit = {},
-    val consume: (A) -> Unit = {},
 ) : MVISubscriber<S, A> {
 
-    var counter = 0
-        private set
-
-    private val _states = mutableListOf<S>()
+    private val _states by atomic(mutableListOf<S>())
     val states: List<S> get() = _states
 
-    private val _actions = mutableListOf<A>()
+    private val _actions by atomic(mutableListOf<A>())
     val actions: List<A> get() = _actions
 
     override fun render(state: S) {
-        ++counter
         _states.add(state)
-        render.invoke(state)
     }
 
     override fun consume(action: A) {
-        ++counter
         _actions.add(action)
-        consume.invoke(action)
     }
 
     fun reset() {
