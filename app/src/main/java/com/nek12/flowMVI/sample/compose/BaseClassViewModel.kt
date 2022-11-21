@@ -1,7 +1,6 @@
 package com.nek12.flowMVI.sample.compose
 
 import com.nek12.flowMVI.android.MVIViewModel
-import com.nek12.flowMVI.currentState
 import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeAction.ShowSnackbar
@@ -22,9 +21,7 @@ import kotlin.random.Random
  */
 class BaseClassViewModel(
     repo: CounterRepo,
-) : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>(
-    initialState = Loading
-) {
+) : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>(initialState = Loading) {
 
     init {
         // Usually this is the place to launch any background processing that is needed
@@ -50,35 +47,30 @@ class BaseClassViewModel(
     }
 
     // Will be called each time a subscriber sends a new Intent in a separate coroutine
-    override suspend fun reduce(intent: ComposeIntent): ComposeState = when (intent) {
+    override suspend fun reduce(intent: ComposeIntent) {
+        when (intent) {
+            // Sometimes you can and want to handle certain intents when the view is in a particular state
+            // For example, not all buttons may be visible at all times
+            // For this, you only handle this intent in the state declared as type parameter of withState,
+            // otherwise the function just returns currentState
+            is ClickedCounter -> updateState<DisplayingContent> { // this -> DisplayingContent
 
-        // Sometimes you can and want to handle certain intents when the view is in a particular state
-        // For example, not all buttons may be visible at all times
-        // For this, you only handle this intent in the state declared as type parameter of withState,
-        // otherwise the function just returns currentState
-        is ClickedCounter -> withState<DisplayingContent> { // this -> DisplayingContent
+                // Launch a new coroutine that will set the state later
+                incrementCounter(current = counter, timer)
 
-            // Launch a new coroutine that will set the state later
-            incrementCounter(current = counter, timer)
+                // Immediately return Loading state
+                Loading // ^withState
+            }
 
-            // Immediately return Loading state
-            Loading // ^withState
-        }
-
-        is ClickedToBasicActivity -> {
-            // Send a side-effect to the view
-            send(GoToBasicActivity)
-
-            // do not change the state
-            currentState
+            is ClickedToBasicActivity -> {
+                send(GoToBasicActivity)
+            }
         }
     }
 
-    private fun timerToState(value: Int) = withState<DisplayingContent> {
-        copy(timer = value)
-    }
+    private suspend fun timerToState(value: Int) = updateState<DisplayingContent> { copy(timer = value) }
 
-    private fun incrementCounter(current: Int, timer: Int? = null) = launchForState {
+    private fun incrementCounter(current: Int, timer: Int? = null) = launchRecovering {
         delay(1000L)
 
         if (Random.nextBoolean()) {
@@ -90,9 +82,11 @@ class BaseClassViewModel(
         // this will not get the current state (because it's loading)
         // at the moment of retrieval, but you can pass last state (e.g. in reduce()) to this function so that it knows
         // where to take values from
-        DisplayingContent(
-            counter = current + 1,
-            timer = timer ?: (currentState as? DisplayingContent)?.timer ?: 0
-        )
+        updateState {
+            DisplayingContent(
+                counter = current + 1,
+                timer = timer ?: (this as? DisplayingContent)?.timer ?: 0
+            )
+        }
     }
 }

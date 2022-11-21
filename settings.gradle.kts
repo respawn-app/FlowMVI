@@ -4,6 +4,19 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
     }
+
+    // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/56
+    resolutionStrategy {
+        eachPlugin {
+            val module = when (requested.id.id) {
+                "kotlinx-atomicfu" -> "org.jetbrains.kotlinx:atomicfu-gradle-plugin:${requested.version}"
+                else -> null
+            }
+            if (module != null) {
+                useModule(module)
+            }
+        }
+    }
 }
 
 buildscript {
@@ -12,6 +25,7 @@ buildscript {
         gradlePluginPortal()
         mavenCentral()
     }
+
 }
 
 dependencyResolutionManagement {

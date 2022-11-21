@@ -1,9 +1,12 @@
 package com.nek12.flowMVI
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * The state of the view / consumer.
@@ -23,6 +26,9 @@ interface MVIIntent
  * Must be immutable.
  */
 interface MVIAction
+
+typealias Reducer<S, I, A> = suspend MVIStoreScope<S, I, A>.(I) -> Unit
+typealias Recover<S> = (e: Exception) -> S
 
 /**
  * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states]
@@ -57,7 +63,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
     /**
      * Set a new state directly, thread-safely and synchronously.
      */
-    fun set(state: S)
+    fun set(state: S): S
 
     /**
      * Send a new UI side-effect to be processed by subscribers, only once.
@@ -75,6 +81,19 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * Although not advised, store can experimentally be launched multiple times.
      */
     fun launch(scope: CoroutineScope): Job
+
+    @DelicateStoreApi
+    val state: S
+
+    suspend fun <R> withState(block: suspend S.() -> R): R
+
+    fun launchRecovering(
+        scope: CoroutineScope,
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        recover: Recover<S>? = null,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job
 }
 
 /**
@@ -136,7 +155,6 @@ enum class ActionShareBehavior {
      * and each action will be distributed to one subscriber.
      * If there are multiple subscribers, only one of them will handle an instance of an action,
      * and **the order is unspecified**.
-     *
      */
     DISTRIBUTE,
 
@@ -144,19 +162,19 @@ enum class ActionShareBehavior {
      * Restricts the count of subscribers to 1.
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
      * In other words, you will be required to create a new store for each caller of [subscribe].
+     * **This is the default**.
      */
     RESTRICT
 }
 
 /**
  * A scope of the operation inside [MVIStore].
- * Provides a [CoroutineScope] and an [MVIProvider] to use.
+ * Provides a [CoroutineScope] to use.
  * **Cancelling the scope will cancel the store.launch() (intent processing)**.
  * Throwing when in this scope will result in recover() of the parent store being called.
- * Child coroutines should handle their exceptions independently.
+ * Child coroutines should handle their exceptions independently, unless using [launchForState].
  */
-
-interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> : CoroutineScope, MVIProvider<S, I, A> {
+interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
 
     /**
      * @see MVIStore.send
@@ -166,5 +184,17 @@ interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> : Corouti
     /**
      * @see MVIStore.set
      */
-    fun set(state: S)
+    fun set(state: S): S
+
+    fun launchRecovering(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        recover: (Recover<S>)? = null,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job
+
+    suspend fun <R> withState(block: suspend S.() -> R): R
+
+    @DelicateStoreApi
+    val state: S
 }

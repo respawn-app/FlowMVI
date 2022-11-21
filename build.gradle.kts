@@ -2,10 +2,20 @@
 plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.version.catalog.update)
+    alias(libs.plugins.atomicfu)
 }
 
 rootProject.group = rootProject.name
 rootProject.version = "1.0.0-alpha01"
+
+
+atomicfu {
+    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+    transformJvm = true
+    jvmVariant = "VH"
+    transformJs = false
+}
+
 
 buildscript {
     repositories {

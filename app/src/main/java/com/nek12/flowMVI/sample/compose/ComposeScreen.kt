@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
@@ -51,8 +52,9 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
             is GoToBasicActivity -> context.startActivity(
                 Intent(context, BasicActivity::class.java)
             )
-            is ShowSnackbar -> launch { // snackbar suspends consume(), we do not want to block action consumption here
-                // so we'll launch a new coroutine
+            // snackbar suspends consume(), we do not want to block action consumption here
+            // so we'll launch a new coroutine
+            is ShowSnackbar -> launch {
                 scaffoldState.snackbarHostState.showSnackbar(
                     message = context.getString(action.res)
                 )
@@ -61,7 +63,14 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
     }
 
     Scaffold(Modifier.fillMaxSize(), scaffoldState = scaffoldState) {
-        ComposeScreenContent(state)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            contentAlignment = Alignment.Center
+        ) {
+            ComposeScreenContent(state)
+        }
     }
 }
 

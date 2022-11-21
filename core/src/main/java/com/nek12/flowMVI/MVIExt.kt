@@ -1,14 +1,12 @@
 package com.nek12.flowMVI
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-
-val <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.currentState: S get() = states.value
 
 /**
  * Subscribe to the store.
@@ -43,30 +41,58 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.sub
 }
 
 /**
- * Execute [block] if current state is [T] else just return [currentState].
+ * Catches exceptions only, rethrowing any throwables
  */
-inline fun <reified T : S, reified S : MVIState> MVIProvider<S, *, *>.withState(
-    block: T.() -> S
-): S = (currentState as? T)?.let(block) ?: currentState
+inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<T>.(Exception) -> Unit) =
+    catch { throwable -> (throwable as? Exception)?.let { block(it) } ?: throw throwable }
 
-/**
- * Launch a new coroutine, that will attempt to set a new state that resulted in [block] execution.
- * In case of exception being thrown, [recover] will be executed in an attempt to recover from it.
- */
-fun <S : MVIState> MVIStore<S, *, *>.launchForState(
+inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R) = (this as? T)?.let(block) ?: this
+
+//non-typed
+suspend inline fun <S : MVIState> MVIStore<S, *, *>.updateState(
+    @BuilderInference
+    crossinline transform: suspend S.() -> S
+): S = withState { set(transform()) }
+
+suspend inline fun <S : MVIState> MVIStoreScope<S, *, *>.updateState(
+    @BuilderInference crossinline transform: suspend S.() -> S
+): S = withState { set(transform()) }
+
+//typed
+@JvmName("updateStateTyped")
+suspend inline fun <reified T : S, S : MVIState> MVIStoreScope<S, *, *>.updateState(
+    @BuilderInference crossinline transform: suspend T.() -> S
+) = updateState { withType<T, S> { transform() } }
+
+@JvmName("updateStateTyped")
+suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
+    @BuilderInference crossinline transform: suspend T.() -> S
+): S = updateState { withType<T, S> { transform() } }
+
+//typed
+suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
+    @BuilderInference crossinline block: suspend T.() -> R
+): R? = withState { (this as? T)?.let { it.block() } }
+
+suspend inline fun <reified T : S, S : MVIState, R> MVIStoreScope<S, *, *>.withState(
+    @BuilderInference crossinline block: suspend T.() -> R
+): R? = withState { (this as? T)?.let { it.block() } }
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    initial: S,
+    behavior: ActionShareBehavior = ActionShareBehavior.RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>,
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce) }
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     scope: CoroutineScope,
-    context: CoroutineContext = EmptyCoroutineContext,
-    start: CoroutineStart = CoroutineStart.DEFAULT,
-    recover: suspend CoroutineScope.(Exception) -> S = { throw it },
-    block: suspend CoroutineScope.() -> S,
-) = scope.launch(context, start) {
-    set(
-        try {
-            supervisorScope(block)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            recover(e)
-        }
-    )
-}
+    initial: S,
+    behavior: ActionShareBehavior = ActionShareBehavior.RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { launch(scope) } }

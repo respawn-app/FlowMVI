@@ -16,7 +16,7 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      * A behavior to be applied when sharing actions
      * @see ActionShareBehavior
      */
-    behavior: ActionShareBehavior = DISTRIBUTE,
+    behavior: ActionShareBehavior = RESTRICT,
     /**
      * A buffer size for actions that are left unprocessed in the store.
      * On buffer overflow, the oldest action will be dropped.
@@ -28,13 +28,13 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      *
      *  **Default implementation rethrows the exception**
      */
-    @BuilderInference recover: MVIStoreScope<S, I, A>.(e: Exception) -> S = { throw it },
+    @BuilderInference recover: Recover<S> = { throw it },
     /**
      * Reduce view's intent to a new ui state.
      * Use [MVIStore.send] for sending side-effects for the view to handle.
      * Coroutines launched inside [reduce] can fail independently of each other.
      */
-    @BuilderInference reduce: suspend MVIStoreScope<S, I, A>.(I) -> S
+    @BuilderInference reduce: Reducer<S, I, A>,
 ): MVIStore<S, I, A> = when (behavior) {
     SHARE -> SharedStore(initialState, actionBuffer, recover, reduce)
     DISTRIBUTE -> DistributingStore(initialState, actionBuffer, recover, reduce)

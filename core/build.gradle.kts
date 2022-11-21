@@ -5,6 +5,7 @@ val compileKotlin: KotlinCompile by tasks
 plugins {
     kotlin("jvm")
     `maven-publish`
+    id(libs.plugins.atomicfu.id)
 }
 
 java {
