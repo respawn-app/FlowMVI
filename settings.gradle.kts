@@ -25,7 +25,6 @@ buildscript {
         gradlePluginPortal()
         mavenCentral()
     }
-
 }
 
 dependencyResolutionManagement {

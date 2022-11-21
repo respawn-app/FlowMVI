@@ -1,4 +1,4 @@
-@file:Suppress("ComposableNaming", "ComposableEventParameterNaming")
+@file:Suppress("ComposableNaming", "ComposableEventParameterNaming", "TopLevelComposableFunctions", "ComposableFunctionName")
 
 package com.nek12.flowMVI.android.compose
 

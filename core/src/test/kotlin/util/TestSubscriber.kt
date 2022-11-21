@@ -9,8 +9,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
-class TestSubscriber<S : MVIState, A : MVIAction>(
-) : MVISubscriber<S, A> {
+class TestSubscriber<S : MVIState, A : MVIAction>() : MVISubscriber<S, A> {
 
     private val _states by atomic(mutableListOf<S>())
     val states: List<S> get() = _states

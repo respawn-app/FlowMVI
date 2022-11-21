@@ -3,10 +3,8 @@ package com.nek12.flowMVI.sample.view
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nek12.flowMVI.ActionShareBehavior.SHARE
-import com.nek12.flowMVI.MVIStore
 import com.nek12.flowMVI.MVIStoreScope
 import com.nek12.flowMVI.launchedStore
-import com.nek12.flowMVI.lazyStore
 import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.view.BasicActivityAction.ShowSnackbar
 import com.nek12.flowMVI.sample.view.BasicActivityIntent.ClickedFab

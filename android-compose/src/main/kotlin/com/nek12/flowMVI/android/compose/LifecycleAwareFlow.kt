@@ -46,7 +46,7 @@ fun <T> StateFlow<T>.collectAsStateOnLifecycle(
 ): State<T> = collectAsStateOnLifecycle(value, context, lifecycleState)
 
 @Composable
-@Suppress("ComposableParametersOrdering", "ComposableNaming")
+@Suppress("ComposableParametersOrdering", "ComposableNaming", "ComposableFunctionName")
 fun <T> Flow<T>.collectOnLifecycle(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     consume: suspend CoroutineScope.(T) -> Unit,

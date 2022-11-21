@@ -4,8 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -30,7 +28,6 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.sub
     crossinline consume: (A) -> Unit,
     crossinline render: (S) -> Unit,
 ) = scope.launch {
-
     launch {
         actions.collect { consume(it) }
     }
@@ -48,7 +45,7 @@ inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<
 
 inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R) = (this as? T)?.let(block) ?: this
 
-//non-typed
+// non-typed
 suspend inline fun <S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference
     crossinline transform: suspend S.() -> S
@@ -58,7 +55,7 @@ suspend inline fun <S : MVIState> MVIStoreScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend S.() -> S
 ): S = withState { set(transform()) }
 
-//typed
+// typed
 @JvmName("updateStateTyped")
 suspend inline fun <reified T : S, S : MVIState> MVIStoreScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
@@ -69,7 +66,7 @@ suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S = updateState { withType<T, S> { transform() } }
 
-//typed
+// typed
 suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? = withState { (this as? T)?.let { it.block() } }

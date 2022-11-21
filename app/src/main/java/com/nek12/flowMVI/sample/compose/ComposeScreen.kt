@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Composable
+@Suppress("ComposableFunctionName")
 fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state ->
 
     // this -> MVIIntentScope with utility functions available
