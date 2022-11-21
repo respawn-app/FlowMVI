@@ -36,6 +36,8 @@ android {
         renderScript = false
         mlModelBinding = false
         resValues = false
+        dataBinding = false
+        viewBinding = false
     }
 
     kotlin {

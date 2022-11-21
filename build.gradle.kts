@@ -1,13 +1,11 @@
-import org.gradle.internal.impldep.org.apache.commons.lang.CharSetUtils.keep
-
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    `kotlin-dsl`
     alias(libs.plugins.detekt)
     alias(libs.plugins.version.catalog.update)
 }
 
-rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.2.6-alpha"
+rootProject.group = rootProject.name
+rootProject.version = "1.0.0-alpha01"
 
 buildscript {
     repositories {
@@ -129,6 +127,22 @@ tasks {
             xml.required.set(false)
             html.required.set(false)
             txt.required.set(false)
+        }
+    }
+
+    withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
+        // outputFormatter = "json"
+
+        fun stabilityLevel(version: String): Int {
+            Config.stabilityLevels.forEachIndexed { index, postfix ->
+                val regex = ".*[.\\-]$postfix[.\\-\\d]*".toRegex(RegexOption.IGNORE_CASE)
+                if (version.matches(regex)) return index
+            }
+            return Config.stabilityLevels.size
+        }
+
+        rejectVersionIf {
+            stabilityLevel(currentVersion) > stabilityLevel(candidate.version)
         }
     }
 }

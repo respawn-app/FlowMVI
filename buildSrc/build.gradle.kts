@@ -1,7 +1,9 @@
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
-    `kotlin-dsl-precompiled-script-plugins`
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.sam.with.receiver") version libs.versions.kotlin
+    // `kotlin-dsl-precompiled-script-plugins`
 }
 
 dependencies {

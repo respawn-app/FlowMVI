@@ -10,4 +10,5 @@ dependencies {
     api(project(":core"))
     api(libs.lifecycle.runtime)
     implementation(libs.lifecycle.viewmodel)
+    api(libs.kotlinx.coroutines.android)
 }

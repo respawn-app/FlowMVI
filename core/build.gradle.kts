@@ -28,7 +28,7 @@ publishing {
 }
 
 dependencies {
-    implementation(libs.kotlin.coroutines)
+    api(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.bundles.unittest)
 }
