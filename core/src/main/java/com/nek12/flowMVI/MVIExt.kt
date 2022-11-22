@@ -74,22 +74,3 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
 suspend inline fun <reified T : S, S : MVIState, R> MVIStoreScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? = withState { (this as? T)?.let { it.block() } }
-
-fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
-    initial: S,
-    behavior: ActionShareBehavior = ActionShareBehavior.RESTRICT,
-    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
-    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
-    @BuilderInference recover: Recover<S> = { throw it },
-    @BuilderInference reduce: Reducer<S, I, A>,
-) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce) }
-
-fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
-    scope: CoroutineScope,
-    initial: S,
-    behavior: ActionShareBehavior = ActionShareBehavior.RESTRICT,
-    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
-    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
-    @BuilderInference recover: Recover<S> = { throw it },
-    @BuilderInference reduce: Reducer<S, I, A>
-) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { launch(scope) } }

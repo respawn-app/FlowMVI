@@ -1,6 +1,4 @@
-import com.nek12.flowMVI.MVIAction
-import com.nek12.flowMVI.MVIIntent
-import com.nek12.flowMVI.MVIState
+package com.nek12.flowMVI
 
 sealed class TestState : MVIState {
     object Some : TestState()

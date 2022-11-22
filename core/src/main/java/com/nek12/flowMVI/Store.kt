@@ -6,6 +6,7 @@ import com.nek12.flowMVI.ActionShareBehavior.SHARE
 import com.nek12.flowMVI.store.ConsumingStore
 import com.nek12.flowMVI.store.DistributingStore
 import com.nek12.flowMVI.store.SharedStore
+import kotlinx.coroutines.CoroutineScope
 
 const val DEFAULT_ACTION_BUFFER_SIZE = 64
 
@@ -40,3 +41,22 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     DISTRIBUTE -> DistributingStore(initialState, actionBuffer, recover, reduce)
     RESTRICT -> ConsumingStore(initialState, actionBuffer, recover, reduce)
 }
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    initial: S,
+    behavior: ActionShareBehavior = RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>,
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce) }
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
+    scope: CoroutineScope,
+    initial: S,
+    behavior: ActionShareBehavior = RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { launch(scope) } }

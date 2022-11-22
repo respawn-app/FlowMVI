@@ -73,10 +73,7 @@ class BaseClassViewModel(
     private fun incrementCounter(current: Int, timer: Int? = null) = launchRecovering {
         delay(1000L)
 
-        if (Random.nextBoolean()) {
-            // will be propagated to the recover() handler above, or you can supply your own
-            throw IllegalArgumentException("Something bad happened during intent processing")
-        }
+        require(Random.nextBoolean()) { "Something bad happened during intent processing" }
 
         // sets this new state after calculations done
         // this will not get the current state (because it's loading)

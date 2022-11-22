@@ -61,10 +61,10 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
             while (isActive) {
                 try {
                     childScope.reduce(intents.receive())
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    recover(e)
+                } catch (expected: CancellationException) {
+                    throw expected
+                } catch (expected: Exception) {
+                    recover(expected)
                 }
                 yield()
             }
@@ -89,10 +89,10 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         try {
             // catches exceptions in nested coroutines
             supervisorScope(block)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            set((recover ?: this@BaseStore.recover).invoke(e))
+        } catch (expected: CancellationException) {
+            throw expected
+        } catch (expected: Exception) {
+            set((recover ?: this@BaseStore.recover).invoke(expected))
         }
     }
 }

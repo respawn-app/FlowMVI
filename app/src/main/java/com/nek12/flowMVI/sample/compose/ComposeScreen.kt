@@ -118,6 +118,6 @@ fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: Com
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true)
 private fun ComposeScreenPreview() {
     EmptyScope { // Use this helper function to preview functions that use MVIIntentScope
-        ComposeScreenContent(state = DisplayingContent(15, 0))
+        ComposeScreenContent(state = DisplayingContent(1, 0))
     }
 }
