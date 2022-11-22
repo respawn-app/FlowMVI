@@ -1,10 +1,15 @@
 # Flow MVI
+![GitHub](https://img.shields.io/github/license/Nek-12/FlowMVI)
+![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
+![Maintenance](https://img.shields.io/maintenance/yes/2022)
+[![Downloads on Jitpack](https://jitpack.io/v/Nek-12/FlowMVI/month.svg)](https://jitpack.io/#Nek-12/FlowMVI.svg)
 
 This is an MVI implementation based on coroutines with a few main goals:
 
 1. Being simple to understand, implement and use
 2. Following the Principle of Least Responsibility - all communication happens through strictly defined contract
 3. Featuring a clean and readable DSL
+4. Being thread-safe but asynchronous
 
 ## Let's get started:
 
@@ -12,10 +17,9 @@ Choose your dependency:
 [![](https://jitpack.io/v/Nek-12/FlowMVI.svg)](https://jitpack.io/#Nek-12/FlowMVI)
 
 ```kotlin
-val flowVersion = /* look at the widget */  
-implementation("com.github.Nek-12.FlowMVI:core:${flowVersion}") //does not depend on any particular platform
-implementation("com.github.Nek-12.FlowMVI:android-compose:${flowVersion}") //For Jetpack Compose Android projects
-implementation("com.github.Nek-12.FlowMVI:android-view:${flowVersion}") //For View-based Android projects
+implementation("com.github.Nek-12.FlowMVI:core:${flowMVIVersion}") //does not depend on any particular platform
+implementation("com.github.Nek-12.FlowMVI:android-compose:${flowMVIVersion}") //For Jetpack Compose Android projects
+implementation("com.github.Nek-12.FlowMVI:android-view:${flowMVIVersion}") //For View-based Android projects
 ```
 
 ## Core:
@@ -38,18 +42,17 @@ sealed interface ScreenAction: MVIAction {
 }
 
 
-val store = MVIStore<ScreenState, ScreenIntent, ScreenAction>(
-    initialState = DisplayingCounter(0),
+val store by launchedStore<ScreenState, ScreenIntent, ScreenAction>(
+    scope = eventProcessingCoroutineScope,
+    initial = DisplayingCounter(0),
     behavior = ActionShareBehavior.DISTRIBUTE,
     reduce = { intent -> /*...*/ }
 )
 
-store.launch(eventProcessingScope)
-
 //somewhere in the ui layer
 
 store.subscribe(
-    coroutineScope,
+    consumerCoroutineScope,
     consume = { action -> /* ... */ },
     render = { state -> /* ... */ }
 )
@@ -63,10 +66,9 @@ class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(ini
 
     override fun recover(from: Exception) = Error(from) // optional
 
-    override suspend fun reduce(intent: ScreenIntent) = when (intent) {
-
+    override suspend fun reduce(intent: ScreenIntent): Unit = when(intent) {
         //no-op if state is not DisplayingCounter
-        is ClickedCounter -> withState<DisplayingCounter> { //this -> DisplayingCounter
+        is ClickedCounter -> updateState<DisplayingCounter> { //this -> DisplayingCounter
 
             send(ShowMessage("Incremented counter"))
 
@@ -98,13 +100,13 @@ fun ComposeScreen() = MVIComposable(
 ```
 
 If you don't want to use MVIComposable, just collect the actions flow using coroutineScope and render states
-using `viewModel.states.collectAsStateWithLifecycle()`
+using `viewModel.states.collectAsStateOnLifecycle()`
 
 ## Android (View):
 
 ```kotlin
 
-//ViewModel and Model classes have not changed
+// ViewModel and Model classes have not changed
 
 class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
 
