@@ -2,10 +2,6 @@
 
 package com.nek12.flowMVI
 
-import TestAction
-import TestIntent
-import TestState
-
 internal fun TestStore(
     initialState: TestState,
     behavior: ActionShareBehavior,

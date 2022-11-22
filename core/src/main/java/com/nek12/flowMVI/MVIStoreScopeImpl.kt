@@ -5,9 +5,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlin.coroutines.CoroutineContext
 
 internal class MVIStoreScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
-    private val scope: CoroutineScope,
+    override val scope: CoroutineScope,
     private val store: MVIStore<S, I, A>,
-) : CoroutineScope by scope, MVIStoreScope<S, I, A> {
+) : MVIStoreScope<S, I, A> {
 
     override fun send(action: A) = store.send(action)
 

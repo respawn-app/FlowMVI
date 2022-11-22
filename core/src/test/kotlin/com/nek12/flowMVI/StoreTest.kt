@@ -1,7 +1,5 @@
 package com.nek12.flowMVI
 
-import TestState.Some
-import TestState.SomeData
 import app.cash.turbine.test
 import com.nek12.flowMVI.ActionShareBehavior.DISTRIBUTE
 import com.nek12.flowMVI.ActionShareBehavior.RESTRICT
@@ -14,26 +12,37 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import util.TestSubscriber
 import util.idle
 import util.launched
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
-@OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, ExperimentalKotest::class)
+@OptIn(
+    ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, ExperimentalKotest::class,
+    ExperimentalTime::class
+)
 class StoreTest : FreeSpec({
     coroutineTestScope = true
     blockingTest = true
     concurrency = 1
 
     "given store created" - {
-        val state = Some
-        val store = TestStore(state, RESTRICT) { SomeData("data") }
+        val state = TestState.Some
+        val store = TestStore(state, RESTRICT) { updateState { TestState.SomeData("data") } }
         "then state is ${state::class.simpleName}" {
             store.states.value shouldBe state
         }
@@ -73,7 +82,7 @@ class StoreTest : FreeSpec({
                     // ensure scope is enclosed, otherwise exception will be thrown outside of assertion
                     shouldThrowAny {
                         coroutineScope {
-                            TestStore(Some, RESTRICT, reduce = reduce).launched(this@coroutineScope) {
+                            TestStore(TestState.Some, RESTRICT, reduce = reduce).launched(this@coroutineScope) {
                                 subscribe(this@coroutineScope, {}, {})
                                 subscribe(this@coroutineScope, {}, {})
                             }
@@ -85,7 +94,7 @@ class StoreTest : FreeSpec({
             sub2.reset()
 
             "and action type is DISTRIBUTE" - {
-                TestStore(Some, DISTRIBUTE, reduce = reduce).launched(this) {
+                TestStore(TestState.Some, DISTRIBUTE, reduce = reduce).launched(this) {
                     "and intent received" - {
                         send(TestIntent.Some)
                         "then one subscriber received action only" {
@@ -94,8 +103,8 @@ class StoreTest : FreeSpec({
                             idle()
                             job1.cancel()
                             job2.cancel()
-                            sub1.states.shouldContainOnly(Some)
-                            sub2.states.shouldContainOnly(Some)
+                            sub1.states.shouldContainOnly(TestState.Some)
+                            sub2.states.shouldContainOnly(TestState.Some)
                             one {
                                 sub1.actions.shouldContainExactly(TestAction.Some)
                                 sub2.actions.shouldContainExactly(TestAction.Some)
@@ -110,14 +119,14 @@ class StoreTest : FreeSpec({
 
             "and action type is SHARE" - {
                 val scope = this
-                TestStore(Some, SHARE, reduce = reduce).launched(scope) {
+                TestStore(TestState.Some, SHARE, reduce = reduce).launched(scope) {
                     val job1 = sub1.subscribe(this@launched, scope)
                     val job2 = sub2.subscribe(this@launched, scope)
                     idle()
                     "and intent received" - {
                         send(TestIntent.Some)
+                        idle()
                         "then all subscribers received an action" {
-                            idle()
                             sub1.actions.shouldContainExactly(TestAction.Some)
                             sub2.actions.shouldContainExactly(TestAction.Some)
                         }
@@ -132,23 +141,21 @@ class StoreTest : FreeSpec({
     }
 
     "given store" - {
-        var intents = 0
-        val initial = SomeData(0)
-        val store = TestStore(initial, RESTRICT) { ++intents }
+        val initial = TestState.SomeData(0)
 
         "given subscriber" - {
-            val sub = TestSubscriber<TestState, TestAction>()
-
             "and multiple parallel state updates" - {
                 val scope = this
-                store.launched(scope) {
+                var intents = 0
+                val sub = TestSubscriber<TestState, TestAction>()
+                TestStore(initial, RESTRICT) { ++intents }.launched(scope) {
                     val job = sub.subscribe(this@launched, scope)
                     idle()
                     val jobs = 100
 
                     (1..jobs).map {
                         async {
-                            store.updateState<SomeData<Int>, _> {
+                            updateState<TestState.SomeData<Int>, _> {
                                 println("updating state $data")
                                 delay(Random.nextLong(10, 100))
                                 copy(data = data + 1)
@@ -162,9 +169,22 @@ class StoreTest : FreeSpec({
                         sub.states shouldHaveSize jobs + 1 // with initial state
                     }
                     "then last action contains latest state" {
-                        sub.states.last() shouldBe SomeData(jobs)
+                        sub.states.last() shouldBe TestState.SomeData(jobs)
                     }
                     job.cancel()
+                }
+            }
+
+            "and withState is not reentrant" {
+                TestStore(initial, RESTRICT) {}.launched(this) {
+                    shouldThrowExactly<TimeoutCancellationException> {
+                        withTimeout(3000) { // this will actually skip everything because of the scheduler
+                            withState {
+                                withState { } // should deadlock here
+                            }
+                        }
+                        idle()
+                    }
                 }
             }
         }

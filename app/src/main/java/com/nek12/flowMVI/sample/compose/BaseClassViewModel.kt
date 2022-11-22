@@ -1,5 +1,6 @@
 package com.nek12.flowMVI.sample.compose
 
+import androidx.lifecycle.viewModelScope
 import com.nek12.flowMVI.android.MVIViewModel
 import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
@@ -22,6 +23,7 @@ import kotlin.random.Random
 class BaseClassViewModel(
     repo: CounterRepo,
 ) : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>(initialState = Loading) {
+
 
     init {
         // Usually this is the place to launch any background processing that is needed

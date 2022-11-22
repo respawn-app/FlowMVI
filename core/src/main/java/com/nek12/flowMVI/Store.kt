@@ -10,6 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 
 const val DEFAULT_ACTION_BUFFER_SIZE = 64
 
+/**
+ * A builder function of [MVIStore]
+ */
 @Suppress("FunctionName")
 fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     initialState: S,
@@ -17,7 +20,7 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      * A behavior to be applied when sharing actions
      * @see ActionShareBehavior
      */
-    behavior: ActionShareBehavior = RESTRICT,
+    behavior: ActionShareBehavior = DISTRIBUTE,
     /**
      * A buffer size for actions that are left unprocessed in the store.
      * On buffer overflow, the oldest action will be dropped.
@@ -42,6 +45,9 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     RESTRICT -> ConsumingStore(initialState, actionBuffer, recover, reduce)
 }
 
+/**
+ * A builder function of [MVIStore] that creates  the store lazily. This function does NOT launch the store.
+ */
 fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     initial: S,
     behavior: ActionShareBehavior = RESTRICT,
@@ -51,6 +57,9 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     @BuilderInference reduce: Reducer<S, I, A>,
 ) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce) }
 
+/**
+ * A builder function of [MVIStore] that creates, and then launches the store lazily.
+ */
 fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     scope: CoroutineScope,
     initial: S,

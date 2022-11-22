@@ -27,11 +27,19 @@ interface MVIIntent
  */
 interface MVIAction
 
+/**
+ * An operation that processes incoming [MVIIntent]s
+ */
 typealias Reducer<S, I, A> = suspend MVIStoreScope<S, I, A>.(I) -> Unit
+
+/**
+ * An operation that handles exceptions when processing [MVIIntent]s
+ */
 typealias Recover<S> = (e: Exception) -> S
 
 /**
- * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states]
+ * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states].
+ * This is usually the business logic unit
  */
 interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
@@ -42,12 +50,12 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
     fun send(intent: I)
 
     /**
-     * A flow of UI states to be handled by the [MVIView].
+     * A flow of UI states to be handled by the [MVISubscriber].
      */
     val states: StateFlow<S>
 
     /**
-     * A flow of [MVIAction]s to be handled by the [MVIView],
+     * A flow of [MVIAction]s to be handled by the [MVISubscriber],
      * usually resulting in one-shot events.
      * How actions are distributed depends on [ActionShareBehavior].
      */
@@ -57,6 +65,7 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
  * A store functions independently of any subscribers.
+ * MVIStore is the base implementation of [MVIProvider].
  */
 interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
 
@@ -70,18 +79,52 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
     fun send(action: A)
 
     /**
-     * Launches store intent processing in a new coroutine on parent thread.
-     * Intents are processed as long as parent scope is active.
-     * launching store collection when it is already launched will result in an exception.
-     * Although not advised, store can experimentally be launched multiple times.
+     * Starts store intent processing in a new coroutine on the parent thread.
+     * Intents are processed as long as the parent scope is active.
+     * **Starting store processing when it is already started will result in an exception**
+     * Although not advised, store can experimentally be launched multiple times, provided you cancel the job used before.
+     * @return a [Job] that the store is running on that can be cancelled later.
      */
     fun start(scope: CoroutineScope): Job
 
+    /**
+     * Obtain or set the current state in an unsafe manner.
+     * This property is not thread-safe and parallel state updates will introduce a race condition when not
+     * handled properly.
+     */
     @DelicateStoreApi
     var state: S
 
+    /**
+     * Obtain the current state and operate on it, returning [R].
+     *
+     * This function does NOT update the state, for that, use [updateState].
+     * Store allows only one state update at a time, and because of that,
+     *
+     * **every coroutine that will invoke [withState] or [updateState]
+     * will be suspended until the previous update is finished.**
+     *
+     * This function uses locks under the hood.
+     * For a version that runs when the state is of particular subtype, see other overloads of this function.
+     *
+     * This function is **not** reentrant, which means, if you call:
+     * ```kotlin
+     * withState {
+     *   withState { }
+     * }
+     * ```
+     * **you will get a deadlock**
+     *
+     * @returns the value of [R], i.e. the result of the block.
+     */
     suspend fun <R> withState(block: suspend S.() -> R): R
 
+    /**
+     * Launch a new coroutine using given [scope],
+     * and use either provided [recover] block or the [MVIStore]'s recover block.
+     * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
+     * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
+     */
     fun launchRecovering(
         scope: CoroutineScope,
         context: CoroutineContext = EmptyCoroutineContext,
@@ -96,6 +139,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
  * Each view needs a provider, a way to [send] intents to it,
  * a way to [render] the new state, and a way to [consume] side-effects.
  * @see MVIProvider
+ * @See MVISubscriber
  */
 interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
 
@@ -111,19 +155,24 @@ interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber
     fun send(intent: I) = provider.send(intent)
 }
 
+/**
+ * A generic subscriber of [MVIProvider] that [consume]s [MVIAction]s and [render]s [MVIState]s of types [A] and [S].
+ */
 interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 
     /**
      * Render a new [state].
-     * This function will be called each time a new state is received
+     * This function will be called each time a new state is received.
+     *
      * This function should be idempotent and should not send any intents.
      */
     fun render(state: S)
 
     /**
      * Consume a one-time side-effect emitted by [MVIProvider].
+     *
      * This function is called each time an [MVIAction] arrives.
-     * This function should not send intents.
+     * This function may send intents under the promise that no loops will occur.
      */
     fun consume(action: A)
 }
@@ -150,6 +199,8 @@ enum class ActionShareBehavior {
      * and each action will be distributed to one subscriber.
      * If there are multiple subscribers, only one of them will handle an instance of an action,
      * and **the order is unspecified**.
+     *
+     * **This is the default**.
      */
     DISTRIBUTE,
 
@@ -157,7 +208,8 @@ enum class ActionShareBehavior {
      * Restricts the count of subscribers to 1.
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
      * In other words, you will be required to create a new store for each caller of [subscribe].
-     * **This is the default**.
+     *
+     * **Resubscriptions are not allowed too, including lifecycle-aware collection**.
      */
     RESTRICT
 }
@@ -165,17 +217,22 @@ enum class ActionShareBehavior {
 /**
  * A scope of the operation inside [MVIStore].
  * Provides a [CoroutineScope] to use.
- * **Cancelling the scope will cancel the store.launch() (intent processing)**.
+ * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
  * Throwing when in this scope will result in recover() of the parent store being called.
- * Child coroutines should handle their exceptions independently, unless using [launchForState].
+ * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
 interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
 
+    val scope: CoroutineScope
+
     /**
-     * @see MVIStore.send
+     * Delegates to [MVIStore.send]
      */
     fun send(action: A)
 
+    /**
+     * Delegates to [MVIStore.launchRecovering]
+     */
     fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -183,8 +240,14 @@ interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
         block: suspend CoroutineScope.() -> Unit,
     ): Job
 
+    /**
+     * Delegates to [MVIStore.withState]
+     */
     suspend fun <R> withState(block: suspend S.() -> R): R
 
+    /**
+     * Delegates to [MVIStore.state]
+     */
     @DelicateStoreApi
     var state: S
 }

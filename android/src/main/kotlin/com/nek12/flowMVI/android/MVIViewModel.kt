@@ -4,6 +4,7 @@ package com.nek12.flowMVI.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nek12.flowMVI.ActionShareBehavior
 import com.nek12.flowMVI.DelicateStoreApi
 import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
@@ -44,9 +45,14 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
      * Intents will be processed in the order they come in.
      * Change the thread as needed
+     * @See [MVIProvider.send]
+     * @see [MVIStore]
      */
     protected abstract suspend fun reduce(intent: I)
 
+    /**
+     * Delegates to [MVIStore]'s recover block.
+     */
     protected open fun recover(from: Exception): S = throw from
 
     /**
@@ -55,22 +61,23 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected open val store: MVIStore<S, I, A> by launchedStore(
         scope = viewModelScope,
         initial = initialState,
+        behavior = ActionShareBehavior.DISTRIBUTE, // required for lifecycle awareness
         recover = { recover(it) },
         reduce = { reduce(it) },
     )
 
+    override val scope get() = viewModelScope
     override val actions get() = store.actions
     override val states get() = store.states
     override fun send(intent: I) = store.send(intent)
     override fun send(action: A) = store.send(action)
-    override fun set(state: S) = store.set(state)
     override suspend fun <R> withState(block: suspend S.() -> R) = store.withState(block)
     override fun launchRecovering(
         context: CoroutineContext,
         start: CoroutineStart,
         recover: Recover<S>?,
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = store.launchRecovering(viewModelScope, context, start, recover, block)
+    ): Job = store.launchRecovering(scope, context, start, recover, block)
 
     // TODO: With context receivers stable, this below can be removed
 
@@ -83,31 +90,46 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Uses [recover] to reduce exceptions occurring in the flow to states.
      * Shorthand for [kotlinx.coroutines.flow.catch]
      */
-    protected fun <T> Flow<T>.recover() = catchExceptions { set(recover(it)) }
+    protected fun <T> Flow<T>.recover() = catchExceptions { updateState { recover(it) } }
 
     /**
      * Sets this state when flow completes without emitting any values.
      */
-    protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { set(state) }
+    protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { updateState { state } }
 
     /**
      * For a flow of states (usually mapped using [kotlinx.coroutines.flow.map]), sends each state to the subscriber.
      */
-    protected fun Flow<S>.setEach() = onEach { set(it) }
+    protected fun Flow<S>.setEach() = onEach { updateState { it } }
 
+    /**
+     * Delegates to [MVIStore.updateState]
+     */
     protected suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
 
+    /**
+     * Delegates to [MVIStore.updateState]
+     */
     @JvmName("updateStateTyped")
     protected suspend inline fun <reified T : S> updateState(
         @BuilderInference
         crossinline transform: suspend T.() -> S
-    ): S =
-        store.updateState(transform)
+    ): S = store.updateState(transform)
 
+    /**
+     * Delegates to [MVIStore.updateState]
+     */
     @JvmName("withStateTyped")
     protected suspend inline fun <reified T : S> withState(@BuilderInference crossinline block: suspend T.() -> Unit) =
         store.withState { (this as? T)?.let { it.block() } }
 
+    /**
+     * @see MVIStore.state
+     */
     @DelicateStoreApi
-    override val state: S get() = store.state
+    override var state
+        get() = store.state
+        set(value) {
+            store.state = value
+        }
 }
