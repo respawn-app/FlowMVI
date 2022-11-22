@@ -61,11 +61,6 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
 
     /**
-     * Set a new state directly, thread-safely and synchronously.
-     */
-    fun set(state: S): S
-
-    /**
      * Send a new UI side-effect to be processed by subscribers, only once.
      * Actions not consumed will await in the queue with max capacity of 64 by default.
      * Actions that make the capacity overflow will be dropped, starting with the oldest.
@@ -80,10 +75,10 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * launching store collection when it is already launched will result in an exception.
      * Although not advised, store can experimentally be launched multiple times.
      */
-    fun launch(scope: CoroutineScope): Job
+    fun start(scope: CoroutineScope): Job
 
     @DelicateStoreApi
-    val state: S
+    var state: S
 
     suspend fun <R> withState(block: suspend S.() -> R): R
 
@@ -181,11 +176,6 @@ interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
      */
     fun send(action: A)
 
-    /**
-     * @see MVIStore.set
-     */
-    fun set(state: S): S
-
     fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -196,5 +186,5 @@ interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     suspend fun <R> withState(block: suspend S.() -> R): R
 
     @DelicateStoreApi
-    val state: S
+    var state: S
 }

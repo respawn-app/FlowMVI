@@ -59,4 +59,4 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference recover: Recover<S> = { throw it },
     @BuilderInference reduce: Reducer<S, I, A>
-) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { launch(scope) } }
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { start(scope) } }

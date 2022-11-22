@@ -10,7 +10,6 @@ internal class MVIStoreScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
 ) : CoroutineScope by scope, MVIStoreScope<S, I, A> {
 
     override fun send(action: A) = store.send(action)
-    override fun set(state: S) = store.set(state)
 
     override fun launchRecovering(
         context: CoroutineContext,
@@ -22,5 +21,5 @@ internal class MVIStoreScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
 
     @DelicateStoreApi
-    override val state get() = store.state
+    override var state by store::state
 }

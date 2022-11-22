@@ -8,14 +8,13 @@ import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIStore
 import io.kotest.core.spec.style.scopes.FreeSpecContainerScope
 import io.kotest.core.spec.style.scopes.FreeSpecTerminalScope
-import io.kotest.core.test.TestScope
 import io.kotest.core.test.testCoroutineScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 
 suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction>
-        MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = launch(scope).apply {
+        MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = start(scope).apply {
     block()
     cancel()
     join()

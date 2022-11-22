@@ -43,15 +43,10 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
     private val intents = Channel<I>(Channel.UNLIMITED, SUSPEND)
 
     @DelicateStoreApi
-    override val state: S get() = _states.value
+    override var state by _states::value
 
-    override fun set(state: S): S {
-        _states.value = state
-        return state
-    }
-
-    override fun launch(scope: CoroutineScope): Job {
-        require(!isLaunched.getAndSet(true)) { "Store is already launched" }
+    override fun start(scope: CoroutineScope): Job {
+        require(!isLaunched.getAndSet(true)) { "Store is already started" }
 
         return scope.launch {
             val childScope = MVIStoreScopeImpl(
@@ -92,7 +87,7 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         } catch (expected: CancellationException) {
             throw expected
         } catch (expected: Exception) {
-            set((recover ?: this@BaseStore.recover).invoke(expected))
+            _states.value = ((recover ?: this@BaseStore.recover).invoke(expected))
         }
     }
 }

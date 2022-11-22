@@ -50,7 +50,7 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected open fun recover(from: Exception): S = throw from
 
     /**
-     * Overriding this field, don't forget to call [MVIStore.launch] yourself.
+     * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
     protected open val store: MVIStore<S, I, A> by launchedStore(
         scope = viewModelScope,

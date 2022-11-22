@@ -1,8 +1,5 @@
 package com.nek12.flowMVI
 
-import TestAction
-import TestIntent
-import TestState
 import TestState.Some
 import TestState.SomeData
 import app.cash.turbine.test
@@ -21,10 +18,8 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import util.TestSubscriber
 import util.idle
 import util.launched
@@ -48,11 +43,11 @@ class StoreTest : FreeSpec({
             }
         }
         "then can be launched" - {
-            var job = store.launch(this)
+            var job = store.start(this)
 
             "and can't be launched twice" {
                 shouldThrowExactly<IllegalArgumentException> {
-                    store.launch(this)
+                    store.start(this)
                 }
             }
             "and can be canceled" {
@@ -60,7 +55,7 @@ class StoreTest : FreeSpec({
                 job.join()
             }
             "and can be launched again" {
-                job = store.launch(this)
+                job = store.start(this)
                 job.cancel()
                 job.join()
             }

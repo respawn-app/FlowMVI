@@ -46,25 +46,27 @@ inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<
 inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R) = (this as? T)?.let(block) ?: this
 
 // non-typed
+@OptIn(DelicateStoreApi::class)
 suspend inline fun <S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference
     crossinline transform: suspend S.() -> S
-): S = withState { set(transform()) }
+): S = withState { state = transform(); state }
 
+@OptIn(DelicateStoreApi::class)
 suspend inline fun <S : MVIState> MVIStoreScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend S.() -> S
-): S = withState { set(transform()) }
+): S = withState { state = transform(); state }
 
 // typed
 @JvmName("updateStateTyped")
 suspend inline fun <reified T : S, S : MVIState> MVIStoreScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
-) = updateState { withType<T, S> { transform() } }
+) = updateState { withType<T, _> { transform() } }
 
 @JvmName("updateStateTyped")
 suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
-): S = updateState { withType<T, S> { transform() } }
+): S = updateState { withType<T, _> { transform() } }
 
 // typed
 suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
