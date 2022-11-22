@@ -3,6 +3,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
 ![Maintenance](https://img.shields.io/maintenance/yes/2022)
 [![Downloads on Jitpack](https://jitpack.io/v/Nek-12/FlowMVI/month.svg)](https://jitpack.io/#Nek-12/FlowMVI.svg)
+![Issues](https://img.shields.io/github/issues/Nek-12/FlowMVI)
 
 This is an MVI implementation based on coroutines with a few main goals:
 
@@ -15,6 +16,16 @@ This is an MVI implementation based on coroutines with a few main goals:
 
 Choose your dependency:  
 [![](https://jitpack.io/v/Nek-12/FlowMVI.svg)](https://jitpack.io/#Nek-12/FlowMVI)
+
+```toml
+[versions]
+flowmvi = # ...
+
+[dependencies]
+flowmvi-android = { module = "com.github.Nek-12.FlowMVI:android", version.ref = "flowmvi" }
+flowmvi-compose = { module = "com.github.Nek-12.FlowMVI:android-compose", version.ref = "flowmvi" }
+flowmvi-core = { module = "com.github.Nek-12.FlowMVI:core", version.ref = "flowmvi" }
+```
 
 ```kotlin
 implementation("com.github.Nek-12.FlowMVI:core:${flowMVIVersion}") //does not depend on any particular platform
@@ -135,6 +146,8 @@ possible with a couple of lambdas. For examples of such implementations,
 see [sample app](/app/src/main/java/com/nek12/flowMVI/sample/view/NoBaseClassViewModel.kt) or read java docs.
 
 For more information and more elaborate examples, see the sample app.
+
+- [] More docs are coming soon with much more detail.
 
 ## License
 
