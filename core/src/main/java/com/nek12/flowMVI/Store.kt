@@ -6,9 +6,13 @@ import com.nek12.flowMVI.ActionShareBehavior.SHARE
 import com.nek12.flowMVI.store.ConsumingStore
 import com.nek12.flowMVI.store.DistributingStore
 import com.nek12.flowMVI.store.SharedStore
+import kotlinx.coroutines.CoroutineScope
 
 const val DEFAULT_ACTION_BUFFER_SIZE = 64
 
+/**
+ * A builder function of [MVIStore]
+ */
 @Suppress("FunctionName")
 fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     initialState: S,
@@ -28,15 +32,40 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      *
      *  **Default implementation rethrows the exception**
      */
-    @BuilderInference recover: MVIStoreScope<S, I, A>.(e: Exception) -> S = { throw it },
+    @BuilderInference recover: Recover<S> = { throw it },
     /**
      * Reduce view's intent to a new ui state.
      * Use [MVIStore.send] for sending side-effects for the view to handle.
      * Coroutines launched inside [reduce] can fail independently of each other.
      */
-    @BuilderInference reduce: suspend MVIStoreScope<S, I, A>.(I) -> S
+    @BuilderInference reduce: Reducer<S, I, A>,
 ): MVIStore<S, I, A> = when (behavior) {
     SHARE -> SharedStore(initialState, actionBuffer, recover, reduce)
     DISTRIBUTE -> DistributingStore(initialState, actionBuffer, recover, reduce)
     RESTRICT -> ConsumingStore(initialState, actionBuffer, recover, reduce)
 }
+
+/**
+ * A builder function of [MVIStore] that creates  the store lazily. This function does NOT launch the store.
+ */
+fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    initial: S,
+    behavior: ActionShareBehavior = RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>,
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce) }
+
+/**
+ * A builder function of [MVIStore] that creates, and then launches the store lazily.
+ */
+fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
+    scope: CoroutineScope,
+    initial: S,
+    behavior: ActionShareBehavior = RESTRICT,
+    actionBuffer: Int = DEFAULT_ACTION_BUFFER_SIZE,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
+    @BuilderInference recover: Recover<S> = { throw it },
+    @BuilderInference reduce: Reducer<S, I, A>
+) = lazy(mode) { MVIStore(initial, behavior, actionBuffer, recover, reduce).apply { start(scope) } }

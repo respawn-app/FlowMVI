@@ -29,7 +29,6 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe
     crossinline render: (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ) = lifecycleScope.launch {
-
     // using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
 
     // https://github.com/Kotlin/kotlinx.coroutines/issues/2886

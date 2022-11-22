@@ -37,9 +37,9 @@ class BasicActivity :
     }
 
     // Each time state changes, render it here
-    override fun render(state: BasicActivityState) {
+    override fun render(state: BasicActivityState) = with(binding) {
         when (state) {
-            is DisplayingContent -> with(binding) {
+            is DisplayingContent -> {
                 counter.text = state.counter.toString()
             }
         }

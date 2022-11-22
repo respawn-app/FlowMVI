@@ -1,9 +1,12 @@
+@file:Suppress("MissingPackageDeclaration")
+
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 /**
@@ -20,10 +23,12 @@ val Project.versionCatalog: Lazy<VersionCatalog>
         extensions.getByType<VersionCatalogsExtension>().named("libs")
     }
 
-fun VersionCatalog.requirePlugin(alias: String) = findPlugin(alias).get().toString()
-
-fun VersionCatalog.requireLib(alias: String) = findLibrary(alias).get()
-
 fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
     (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }
+
+fun VersionCatalog.requirePlugin(alias: String) = findPlugin(alias).get().toString()
+fun VersionCatalog.requireLib(alias: String) = findLibrary(alias).get()
+fun VersionCatalog.requireBundle(alias: String) = findBundle(alias).get()
+
+val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId

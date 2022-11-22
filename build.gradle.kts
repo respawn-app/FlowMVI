@@ -1,19 +1,25 @@
-import org.gradle.internal.impldep.org.apache.commons.lang.CharSetUtils.keep
-
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    `kotlin-dsl`
     alias(libs.plugins.detekt)
     alias(libs.plugins.version.catalog.update)
+    alias(libs.plugins.atomicfu)
 }
 
-rootProject.group = "com.nek12.flowMVI"
-rootProject.version = "0.2.6-alpha"
+rootProject.group = rootProject.name
+rootProject.version = "1.0.0-alpha01"
+
+atomicfu {
+    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+    transformJvm = true
+    jvmVariant = "VH"
+    transformJs = false
+}
 
 buildscript {
     repositories {
         google()
-        mavenCentral()
         gradlePluginPortal()
+        mavenCentral()
     }
     dependencies {
         classpath(libs.gradle.versions)
@@ -33,25 +39,8 @@ versionCatalogUpdate {
 }
 
 allprojects {
-    repositories {
-        // order matters
-        google()
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-
     apply(plugin = "com.github.ben-manes.versions")
     apply(plugin = "io.gitlab.arturbosch.detekt")
-
-    detekt {
-        source = objects.fileCollection().from(
-            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_SRC_DIR_JAVA,
-            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_TEST_SRC_DIR_JAVA,
-            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_SRC_DIR_KOTLIN,
-            io.gitlab.arturbosch.detekt.extensions.DetektExtension.DEFAULT_TEST_SRC_DIR_KOTLIN,
-        )
-        buildUponDefaultConfig = true
-    }
 
     dependencies {
         // use rootProject as subprojects libs are ambiguous
@@ -60,12 +49,23 @@ allprojects {
     }
 
     tasks {
+        // needed to generate compose compiler reports. See /scripts
         withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+            buildUponDefaultConfig = true
+            parallel = true
+            setSource(projectDir)
+            config.setFrom(File(rootDir, Config.Detekt.configFile))
+            basePath = projectDir.absolutePath
+
+            jvmTarget = Config.jvmTarget
+            include(Config.Detekt.includedFiles)
+            exclude(Config.Detekt.excludedFiles)
             reports {
                 xml.required.set(false)
                 html.required.set(true)
-                txt.required.set(true)
-                sarif.required.set(false)
+                txt.required.set(false)
+                sarif.required.set(true)
+                md.required.set(false)
             }
         }
         withType<JavaCompile> {
@@ -74,21 +74,22 @@ allprojects {
         withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             kotlinOptions {
                 jvmTarget = "11"
-                freeCompilerArgs = freeCompilerArgs + listOf(
-                    "-opt-in=kotlin.RequiresOptIn",
-                    "-Xjvm-default=all",
-                    "-opt-in=kotlin.experimental.ExperimentalTypeInference",
-                    "-Xbackend-threads=0", // parallel IR compilation
-                )
+                freeCompilerArgs = freeCompilerArgs + Config.kotlinCompilerArgs
             }
         }
-        withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask> {
-            fun isPreview(version: String): Boolean = version.contains(
-                "(alpha|eap|preview|SNAPSHOT)".toRegex(RegexOption.IGNORE_CASE)
-            )
+        withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
+            // outputFormatter = "json"
+
+            fun stabilityLevel(version: String): Int {
+                Config.stabilityLevels.forEachIndexed { index, postfix ->
+                    val regex = ".*[.\\-]$postfix[.\\-\\d]*".toRegex(RegexOption.IGNORE_CASE)
+                    if (version.matches(regex)) return index
+                }
+                return Config.stabilityLevels.size
+            }
 
             rejectVersionIf {
-                isPreview(candidate.version)
+                stabilityLevel(currentVersion) > stabilityLevel(candidate.version)
             }
         }
     }
@@ -102,33 +103,11 @@ subprojects {
 tasks {
     register<io.gitlab.arturbosch.detekt.Detekt>("detektFormat") {
         description = "Formats whole project."
-        parallel = true
-        disableDefaultRuleSets = true
-        buildUponDefaultConfig = true
         autoCorrect = true
-        setSource(file(projectDir))
-        config.setFrom(File(rootDir, "detekt.yml"))
-        include("**/*.kt", "**/*.kts")
-        exclude("**/resources/**", "**/build/**", "**/.idea/**")
-        reports {
-            xml.required.set(false)
-            html.required.set(false)
-            txt.required.set(false)
-        }
     }
 
     register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
-        description = "Runs the whole project at once."
-        parallel = true
-        buildUponDefaultConfig = true
-        setSource(file(projectDir))
-        config.setFrom(File(rootDir, "detekt.yml"))
-        include("**/*.kt", "**/*.kts")
-        exclude("**/resources/**", "**/build/**", "**/.idea/**")
-        reports {
-            xml.required.set(false)
-            html.required.set(false)
-            txt.required.set(false)
-        }
+        description = "Run detekt on whole project"
+        autoCorrect = false
     }
 }

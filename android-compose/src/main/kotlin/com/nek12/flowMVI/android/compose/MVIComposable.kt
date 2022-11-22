@@ -36,7 +36,6 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction, VM : MVIProvider<S, I, A>> MVIC
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     content: @Composable MVIIntentScope<I, A>.(state: S) -> Unit,
 ) {
-
     val scope = rememberScope(provider, lifecycleState)
 
     // see [LifecycleOwner.subscribe] in :android for reasoning behind the dispatcher

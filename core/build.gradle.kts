@@ -5,6 +5,7 @@ val compileKotlin: KotlinCompile by tasks
 plugins {
     kotlin("jvm")
     `maven-publish`
+    id(libs.plugins.atomicfu.id)
 }
 
 java {
@@ -28,7 +29,7 @@ publishing {
 }
 
 dependencies {
-    implementation(libs.kotlin.coroutines)
+    api(libs.kotlinx.coroutines.core)
 
     testImplementation(libs.bundles.unittest)
 }

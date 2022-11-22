@@ -1,26 +1,30 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package com.nek12.flowMVI.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nek12.flowMVI.ActionShareBehavior
+import com.nek12.flowMVI.DelicateStoreApi
 import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIStore
+import com.nek12.flowMVI.MVIStoreScope
 import com.nek12.flowMVI.MVIView
-import com.nek12.flowMVI.currentState
-import com.nek12.flowMVI.launchForState
+import com.nek12.flowMVI.Recover
+import com.nek12.flowMVI.catchExceptions
+import com.nek12.flowMVI.launchedStore
+import com.nek12.flowMVI.updateState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class.
@@ -35,32 +39,47 @@ import kotlin.coroutines.EmptyCoroutineContext
  */
 abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
-) : ViewModel(), MVIProvider<S, I, A> {
+) : ViewModel(), MVIStoreScope<S, I, A>, MVIProvider<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
      * Intents will be processed in the order they come in.
      * Change the thread as needed
+     * @See [MVIProvider.send]
+     * @see [MVIStore]
      */
-    protected abstract suspend fun reduce(intent: I): S
+    protected abstract suspend fun reduce(intent: I)
 
+    /**
+     * Delegates to [MVIStore]'s recover block.
+     */
     protected open fun recover(from: Exception): S = throw from
 
     /**
-     * Overriding this field, don't forget to call [MVIStore.launch] yourself.
+     * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
-    protected open val store: MVIStore<S, I, A> = MVIStore<S, I, A>(
-        initialState = initialState,
+    protected open val store: MVIStore<S, I, A> by launchedStore(
+        scope = viewModelScope,
+        initial = initialState,
+        behavior = ActionShareBehavior.DISTRIBUTE, // required for lifecycle awareness
         recover = { recover(it) },
         reduce = { reduce(it) },
-    ).apply { launch(viewModelScope) }
+    )
 
+    override val scope get() = viewModelScope
     override val actions get() = store.actions
-    override val states: StateFlow<S> get() = store.states
+    override val states get() = store.states
     override fun send(intent: I) = store.send(intent)
+    override fun send(action: A) = store.send(action)
+    override suspend fun <R> withState(block: suspend S.() -> R) = store.withState(block)
+    override fun launchRecovering(
+        context: CoroutineContext,
+        start: CoroutineStart,
+        recover: Recover<S>?,
+        block: suspend CoroutineScope.() -> Unit,
+    ): Job = store.launchRecovering(scope, context, start, recover, block)
 
-    protected open fun send(action: A) = store.send(action)
-    protected open fun set(state: S) = store.set(state)
+    // TODO: With context receivers stable, this below can be removed
 
     /**
      * Shorthand for [Flow.launchIn] in viewModelScope
@@ -71,32 +90,46 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Uses [recover] to reduce exceptions occurring in the flow to states.
      * Shorthand for [kotlinx.coroutines.flow.catch]
      */
-    protected fun <T> Flow<T>.recover() = catchExceptions { set(recover(it)) }
+    protected fun <T> Flow<T>.recover() = catchExceptions { updateState { recover(it) } }
 
     /**
      * Sets this state when flow completes without emitting any values.
      */
-    protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { set(state) }
+    protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { updateState { state } }
 
     /**
      * For a flow of states (usually mapped using [kotlinx.coroutines.flow.map]), sends each state to the subscriber.
      */
-    protected fun Flow<S>.setEach() = onEach { set(it) }
+    protected fun Flow<S>.setEach() = onEach { updateState { it } }
 
     /**
-     * Launches a coroutine that emits a new state. It is advisable to [recover] from any errors
+     * Delegates to [MVIStore.updateState]
      */
-    protected fun launchForState(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        recover: suspend CoroutineScope.(Exception) -> S = { this@MVIViewModel.recover(it) },
-        call: suspend CoroutineScope.() -> S,
-    ) = store.launchForState(viewModelScope, context, start, recover, call)
+    protected suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
 
     /**
-     * Execute [block] if current state is [T] else just return [currentState].
+     * Delegates to [MVIStore.updateState]
      */
-    protected inline fun <reified T : S> withState(block: T.() -> S): S {
-        return (currentState as? T)?.let(block) ?: currentState
-    }
+    @JvmName("updateStateTyped")
+    protected suspend inline fun <reified T : S> updateState(
+        @BuilderInference
+        crossinline transform: suspend T.() -> S
+    ): S = store.updateState(transform)
+
+    /**
+     * Delegates to [MVIStore.updateState]
+     */
+    @JvmName("withStateTyped")
+    protected suspend inline fun <reified T : S> withState(@BuilderInference crossinline block: suspend T.() -> Unit) =
+        store.withState { (this as? T)?.let { it.block() } }
+
+    /**
+     * @see MVIStore.state
+     */
+    @DelicateStoreApi
+    override var state
+        get() = store.state
+        set(value) {
+            store.state = value
+        }
 }
