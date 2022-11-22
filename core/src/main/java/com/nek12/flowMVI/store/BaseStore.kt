@@ -87,7 +87,7 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         } catch (expected: CancellationException) {
             throw expected
         } catch (expected: Exception) {
-            _states.value = ((recover ?: this@BaseStore.recover).invoke(expected))
+            _states.value = (recover ?: this@BaseStore.recover).invoke(expected)
         }
     }
 }

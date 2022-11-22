@@ -12,24 +12,19 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import util.TestSubscriber
 import util.idle
 import util.launched
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
 @OptIn(
     ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, ExperimentalKotest::class,
