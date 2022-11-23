@@ -8,8 +8,6 @@ object Config {
     const val compileSdk = 33
     const val targetSdk = compileSdk
     const val minSdk = 26
-    const val group = "com.nek12.FlowMVI"
-    const val version = "1.0.0-alpha02"
 
     val kotlinCompilerArgs = listOf(
         "-opt-in=kotlin.RequiresOptIn",

@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.atomicfu)
 }
 
-rootProject.group = Config.group
-rootProject.version = Config.version
+rootProject.group = "com.nek12.FlowMVI"
+rootProject.version = "1.0.0-alpha02"
 
 atomicfu {
     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
