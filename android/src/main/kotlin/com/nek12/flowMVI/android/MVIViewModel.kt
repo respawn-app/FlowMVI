@@ -11,9 +11,9 @@ import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIStore
-import com.nek12.flowMVI.MVIStoreScope
 import com.nek12.flowMVI.MVIView
 import com.nek12.flowMVI.Recover
+import com.nek12.flowMVI.ReducerScope
 import com.nek12.flowMVI.catchExceptions
 import com.nek12.flowMVI.launchedStore
 import com.nek12.flowMVI.updateState
@@ -24,6 +24,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onEmpty
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -37,9 +40,10 @@ import kotlin.coroutines.CoroutineContext
  * @See MVIView
  * @See MVIProvider
  */
+@OptIn(ExperimentalContracts::class)
 abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
-) : ViewModel(), MVIStoreScope<S, I, A>, MVIProvider<S, I, A> {
+) : ViewModel(), ReducerScope<S, I, A>, MVIProvider<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -105,31 +109,38 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Delegates to [MVIStore.updateState]
      */
-    protected suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
+    override suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
 
     /**
      * Delegates to [MVIStore.updateState]
      */
     @JvmName("updateStateTyped")
     protected suspend inline fun <reified T : S> updateState(
-        @BuilderInference
-        crossinline transform: suspend T.() -> S
-    ): S = store.updateState(transform)
+        @BuilderInference crossinline transform: suspend T.() -> S
+    ): S {
+        contract {
+            callsInPlace(transform, InvocationKind.UNKNOWN)
+        }
+        return store.updateState(transform)
+    }
 
     /**
      * Delegates to [MVIStore.updateState]
      */
     @JvmName("withStateTyped")
-    protected suspend inline fun <reified T : S> withState(@BuilderInference crossinline block: suspend T.() -> Unit) =
-        store.withState { (this as? T)?.let { it.block() } }
+    protected suspend inline fun <reified T : S> withState(
+        @BuilderInference crossinline block: suspend T.() -> Unit
+    ) {
+        contract {
+            callsInPlace(block, InvocationKind.AT_MOST_ONCE)
+        }
+        return store.withState { (this as? T)?.let { it.block() } }
+    }
 
     /**
      * @see MVIStore.state
      */
     @DelicateStoreApi
-    override var state
+    override val state
         get() = store.state
-        set(value) {
-            store.state = value
-        }
 }

@@ -34,8 +34,8 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subscribe(
  */
 inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,
-    crossinline consume: (A) -> Unit,
-    crossinline render: (S) -> Unit,
+    crossinline consume: (action: A) -> Unit,
+    crossinline render: (state: S) -> Unit,
 ) = scope.launch {
     launch {
         actions.collect { consume(it) }
@@ -83,7 +83,7 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
  * @see MVIStore.withState
  */
-suspend inline fun <reified T : S, S : MVIState, R> MVIStoreScope<S, *, *>.withState(
+suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
     contract {
@@ -92,61 +92,22 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStoreScope<S, *, *>.withS
     return withState { (this as? T)?.let { it.block() } }
 }
 
-// non-typed
-/**
- * Obtain the current [MVIStore.state] and update it with the result of [transform].
- *
- * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- *
- * If you want to operate on a state of particular subtype, use the typed version of this function.
- * @see MVIStore.updateState
- * @see [withState]
- */
-@OptIn(DelicateStoreApi::class)
-suspend inline fun <S : MVIState> MVIStore<S, *, *>.updateState(
-    @BuilderInference
-    crossinline transform: suspend S.() -> S
-): S {
-    contract {
-        callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
-    }
-    return withState { state = transform(); state }
-}
-
-/**
- * Obtain the current [MVIStore.state] and update it with the result of [transform].
- *
- * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- *
- *  * If you want to operate on a state of particular subtype, use the typed version of this function.
- * @see MVIStore.updateState
- * @see [withState]
- */
-@OptIn(DelicateStoreApi::class)
-suspend inline fun <S : MVIState> MVIStoreScope<S, *, *>.updateState(
-    @BuilderInference crossinline transform: suspend S.() -> S
-): S {
-    contract {
-        callsInPlace(transform, InvocationKind.EXACTLY_ONCE)
-    }
-    return withState { state = transform(); state }
-}
-
-// typed
 /**
  * Obtain the current [MVIStore.state] and update it with
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+ * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
+ *
  * @see MVIStore.updateState
  * @see [withState]
  */
 @JvmName("updateStateTyped")
-suspend inline fun <reified T : S, S : MVIState> MVIStoreScope<S, *, *>.updateState(
+suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
-        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(transform, InvocationKind.UNKNOWN)
     }
     return updateState { withType<T, _> { transform() } }
 }
@@ -156,6 +117,7 @@ suspend inline fun <reified T : S, S : MVIState> MVIStoreScope<S, *, *>.updateSt
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+ * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
  * @see MVIStore.updateState
  * @see [withState]
  */
@@ -164,7 +126,7 @@ suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
-        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        callsInPlace(transform, InvocationKind.UNKNOWN)
     }
     return updateState { withType<T, _> { transform() } }
 }

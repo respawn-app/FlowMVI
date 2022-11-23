@@ -5,9 +5,9 @@ import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIStore
-import com.nek12.flowMVI.MVIStoreScopeImpl
 import com.nek12.flowMVI.Recover
 import com.nek12.flowMVI.Reducer
+import com.nek12.flowMVI.ReducerScopeImpl
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +19,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -43,13 +45,13 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
     private val intents = Channel<I>(Channel.UNLIMITED, SUSPEND)
 
     @DelicateStoreApi
-    override var state by _states::value
+    override val state by _states::value
 
     override fun start(scope: CoroutineScope): Job {
         require(!isLaunched.getAndSet(true)) { "Store is already started" }
 
         return scope.launch {
-            val childScope = MVIStoreScopeImpl(
+            val childScope = ReducerScopeImpl(
                 scope = this + SupervisorJob(),
                 store = this@BaseStore
             )
@@ -74,6 +76,9 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
 
     override suspend fun <R> withState(block: suspend S.() -> R): R = stateMutex.withLock { block(states.value) }
 
+    override suspend fun updateState(transform: suspend S.() -> S): S =
+        stateMutex.withLock { _states.updateAndGet { transform(it) } }
+
     override fun launchRecovering(
         scope: CoroutineScope,
         context: CoroutineContext,
@@ -87,7 +92,7 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         } catch (expected: CancellationException) {
             throw expected
         } catch (expected: Exception) {
-            _states.value = (recover ?: this@BaseStore.recover).invoke(expected)
+            _states.update { (recover ?: this@BaseStore.recover).invoke(expected) }
         }
     }
 }

@@ -42,7 +42,7 @@ class BaseClassViewModel(
 
     // Will be called when reduce or any child coroutine throws an exception
     override fun recover(from: Exception): ComposeState {
-        send(ShowSnackbar(R.string.error))
+        ShowSnackbar(R.string.error).send()
         return DisplayingContent(0, 0)
     }
 
@@ -62,9 +62,7 @@ class BaseClassViewModel(
                 Loading // ^withState
             }
 
-            is ClickedToBasicActivity -> {
-                send(GoToBasicActivity)
-            }
+            is ClickedToBasicActivity -> GoToBasicActivity.send()
         }
     }
 
@@ -76,9 +74,6 @@ class BaseClassViewModel(
         require(Random.nextBoolean()) { "Something bad happened during intent processing" }
 
         // sets this new state after calculations done
-        // this will not get the current state (because it's loading)
-        // at the moment of retrieval, but you can pass last state (e.g. in reduce()) to this function so that it knows
-        // where to take values from
         updateState {
             DisplayingContent(
                 counter = current + 1,
