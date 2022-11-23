@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.atomicfu)
 }
 
-rootProject.group = rootProject.name
-rootProject.version = "1.0.0-alpha01"
+rootProject.group = Config.group
+rootProject.version = Config.version
 
 atomicfu {
     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
