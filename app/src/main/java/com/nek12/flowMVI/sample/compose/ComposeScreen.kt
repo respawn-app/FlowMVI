@@ -21,9 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.nek12.flowMVI.android.compose.ConsumerScope
 import com.nek12.flowMVI.android.compose.EmptyScope
 import com.nek12.flowMVI.android.compose.MVIComposable
-import com.nek12.flowMVI.android.compose.ConsumerScope
 import com.nek12.flowMVI.sample.R.string
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeAction.ShowSnackbar
