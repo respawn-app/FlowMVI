@@ -11,9 +11,9 @@ import com.nek12.flowMVI.MVIIntent
 import com.nek12.flowMVI.MVIProvider
 import com.nek12.flowMVI.MVIState
 import com.nek12.flowMVI.MVIStore
-import com.nek12.flowMVI.ReducerScope
 import com.nek12.flowMVI.MVIView
 import com.nek12.flowMVI.Recover
+import com.nek12.flowMVI.ReducerScope
 import com.nek12.flowMVI.catchExceptions
 import com.nek12.flowMVI.launchedStore
 import com.nek12.flowMVI.updateState
