@@ -23,7 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nek12.flowMVI.android.compose.EmptyScope
 import com.nek12.flowMVI.android.compose.MVIComposable
-import com.nek12.flowMVI.android.compose.MVIIntentScope
+import com.nek12.flowMVI.android.compose.ConsumerScope
 import com.nek12.flowMVI.sample.R.string
 import com.nek12.flowMVI.sample.compose.ComposeAction.GoToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeAction.ShowSnackbar
@@ -32,6 +32,7 @@ import com.nek12.flowMVI.sample.compose.ComposeIntent.ClickedToBasicActivity
 import com.nek12.flowMVI.sample.compose.ComposeState.DisplayingContent
 import com.nek12.flowMVI.sample.compose.ComposeState.Empty
 import com.nek12.flowMVI.sample.compose.ComposeState.Loading
+import com.nek12.flowMVI.sample.ui.theme.MVITheme
 import com.nek12.flowMVI.sample.view.BasicActivity
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -39,8 +40,7 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 @Suppress("ComposableFunctionName")
 fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state ->
-
-    // this -> MVIIntentScope with utility functions available
+    // this -> ConsumerScope with utility functions available
 
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
@@ -50,9 +50,7 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
         // You can run suspending (but not blocking) code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
-            is GoToBasicActivity -> context.startActivity(
-                Intent(context, BasicActivity::class.java)
-            )
+            is GoToBasicActivity -> context.startActivity(Intent(context, BasicActivity::class.java))
             // snackbar suspends consume(), we do not want to block action consumption here
             // so we'll launch a new coroutine
             is ShowSnackbar -> launch {
@@ -76,48 +74,43 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
 }
 
 @Composable
-fun MVIIntentScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: ComposeState) {
-    Box(
-        Modifier.fillMaxSize(),
-        Alignment.Center,
-    ) {
-        when (state) {
-            is DisplayingContent -> {
-                Column(
-                    Modifier.fillMaxSize(),
-                    Arrangement.SpaceAround,
-                    Alignment.CenterHorizontally,
-                ) {
-                    Column {
-                        Text(
-                            stringResource(id = string.counter_text, state.counter),
-                            Modifier.clickable { send(ClickedCounter) } // send() is available in MVIIntentScope
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            stringResource(id = string.timer_template, state.timer),
-                        )
-                    }
+fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: ComposeState) {
+    when (state) {
+        is DisplayingContent -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceAround,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(id = string.counter_text, state.counter),
+                        modifier = Modifier.clickable { ClickedCounter.send() } // send() is available in ConsumerScope
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(id = string.timer_template, state.timer),
+                    )
+                }
 
-                    Button(onClick = { send(ClickedToBasicActivity) }) {
-                        Text(stringResource(id = string.to_basic_activity))
-                    }
+                Button(onClick = { ClickedToBasicActivity.send() }) {
+                    Text(text = stringResource(id = string.to_basic_activity))
                 }
             }
-            Loading -> {
-                CircularProgressIndicator()
-            }
-            Empty -> {
-                Text(stringResource(string.compose_screen_empty))
-            }
+        }
+        Loading -> {
+            CircularProgressIndicator()
+        }
+        Empty -> {
+            Text(text = stringResource(string.compose_screen_empty))
         }
     }
 }
 
 @Composable
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true)
-private fun ComposeScreenPreview() {
-    EmptyScope { // Use this helper function to preview functions that use MVIIntentScope
+private fun ComposeScreenPreview() = MVITheme {
+    EmptyScope { // Use this helper function to preview functions that use ConsumerScope
         ComposeScreenContent(state = DisplayingContent(1, 0))
     }
 }

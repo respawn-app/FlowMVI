@@ -21,7 +21,7 @@ import kotlinx.coroutines.CoroutineScope
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
+interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Send a new intent for the provider you used in [MVIComposable] {
@@ -33,18 +33,22 @@ interface MVIIntentScope<in I : MVIIntent, out A : MVIAction> {
      */
     @Composable
     fun consume(consumer: suspend CoroutineScope.(A) -> Unit)
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendAction")
+    fun I.send() = send(this)
 }
 
 @Composable
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberScope(
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
     provider: MVIProvider<S, I, A>,
     lifecycleState: Lifecycle.State,
-): MVIIntentScope<I, A> = remember(provider, lifecycleState) { MVIIntentScopeImpl(provider, lifecycleState) }
+): ConsumerScope<I, A> = remember(provider, lifecycleState) { ConsumerScopeImpl(provider, lifecycleState) }
 
-private class MVIIntentScopeImpl<in I : MVIIntent, out A : MVIAction>(
+private class ConsumerScopeImpl<in I : MVIIntent, out A : MVIAction>(
     private val provider: MVIProvider<*, I, A>,
     private val lifecycleState: Lifecycle.State,
-) : MVIIntentScope<I, A> {
+) : ConsumerScope<I, A> {
 
     override fun send(intent: I) = provider.send(intent)
 
@@ -63,15 +67,15 @@ fun <A : MVIAction> MVIProvider<*, *, A>.consume(
 
 /**
  * A no-op scope for testing and preview purposes.
- * [MVIIntentScope.send] and [MVIIntentScope.consume] do nothing
+ * [ConsumerScope.send] and [ConsumerScope.consume] do nothing
  */
 @Suppress("UNCHECKED_CAST")
 @Composable
 fun <T : MVIIntent, A : MVIAction> EmptyScope(
-    @BuilderInference call: @Composable MVIIntentScope<T, A>.() -> Unit,
-) = call(EmptyScopeImpl as MVIIntentScope<T, A>)
+    @BuilderInference call: @Composable ConsumerScope<T, A>.() -> Unit,
+) = call(EmptyScopeImpl as ConsumerScope<T, A>)
 
-private object EmptyScopeImpl : MVIIntentScope<MVIIntent, MVIAction> {
+private object EmptyScopeImpl : ConsumerScope<MVIIntent, MVIAction> {
 
     override fun send(intent: MVIIntent) = Unit
 
