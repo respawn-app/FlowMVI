@@ -850,7 +850,7 @@ compose:
   MissingModifierDefaultValue:
     active: true
   ComposableFunctionName:
-    active: true
+    active: false  # Does not work well atm
 
 #libraries:
 #  ForbiddenPublicDataClass:

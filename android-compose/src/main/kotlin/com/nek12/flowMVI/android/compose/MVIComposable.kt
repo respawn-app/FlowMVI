@@ -10,7 +10,7 @@ import com.nek12.flowMVI.MVIState
 import kotlinx.coroutines.Dispatchers
 
 /**
- * A function that introduces MVIIntentScope to the content and ensures safe lifecycle-aware and efficient collection
+ * A function that introduces ConsumerScope to the content and ensures safe lifecycle-aware and efficient collection
  * of states and actions.
  * Usage:
  * ```
@@ -34,9 +34,9 @@ import kotlinx.coroutines.Dispatchers
 fun <S : MVIState, I : MVIIntent, A : MVIAction, VM : MVIProvider<S, I, A>> MVIComposable(
     provider: VM,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    content: @Composable MVIIntentScope<I, A>.(state: S) -> Unit,
+    content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
 ) {
-    val scope = rememberScope(provider, lifecycleState)
+    val scope = rememberConsumerScope(provider, lifecycleState)
 
     // see [LifecycleOwner.subscribe] in :android for reasoning behind the dispatcher
     val state by provider.states.collectAsStateOnLifecycle(Dispatchers.Main.immediate, lifecycleState)

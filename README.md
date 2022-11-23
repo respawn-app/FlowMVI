@@ -1,5 +1,4 @@
 # Flow MVI
-
 ![GitHub](https://img.shields.io/github/license/Nek-12/FlowMVI)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
 ![Maintenance](https://img.shields.io/maintenance/yes/2022)
@@ -74,19 +73,21 @@ store.subscribe(
 
 ```kotlin
 
+// mark your state, intent and action interfaces as @Immutable for performance gains
+// @Immutable
+// sealed interface ScreenState: MVIState { ... }
+
 class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
 
     override fun recover(from: Exception) = Error(from) // optional
 
-    override suspend fun reduce(intent: ScreenIntent): Unit = when (intent) {
+    override suspend fun reduce(intent: ScreenIntent): Unit = when(intent) {
         //no-op if state is not DisplayingCounter
-        is ClickedCounter -> {
-            
+        is ClickedCounter -> updateState<DisplayingCounter> { //this -> DisplayingCounter
+
             ShowMessage("Incremented counter").send()
-            
-            updateState<DisplayingCounter> { //this -> DisplayingCounter
-                copy(counter = counter + 1)
-            }
+
+            copy(counter = counter + 1)
         }
         /* ... */
     }
@@ -95,17 +96,17 @@ class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(ini
 @Composable
 fun ComposeScreen() = MVIComposable(
     provider = getViewModel<ScreenViewModel>(), //use your fav DI framework
-) { state ->
+) { state -> // this -> ConsumerScope
 
     consume { action ->
         when (action) {
-            is ShowMessage -> Unit // do your thing
+            is ShowMessage -> { /* ... */ }
         }
     }
 
     when (state) {
         is DisplayingCounter -> {
-            Button(onClick = { send(ClickedCounter) }) {
+            Button(onClick = { ClickedCounter.send() }) {
                 Text("Counter: ${state.counter}") // render state,
             }
         }
