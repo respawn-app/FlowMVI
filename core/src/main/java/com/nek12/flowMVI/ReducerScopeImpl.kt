@@ -4,10 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlin.coroutines.CoroutineContext
 
-internal class MVIStoreScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+internal class ReducerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     override val scope: CoroutineScope,
     private val store: MVIStore<S, I, A>,
-) : MVIStoreScope<S, I, A> {
+) : ReducerScope<S, I, A> {
 
     override fun send(action: A) = store.send(action)
 
@@ -20,6 +20,8 @@ internal class MVIStoreScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
 
     override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
 
+    override suspend fun updateState(transform: suspend S.() -> S) = store.updateState(transform)
+
     @DelicateStoreApi
-    override var state by store::state
+    override val state by store::state
 }

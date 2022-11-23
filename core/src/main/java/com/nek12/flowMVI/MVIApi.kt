@@ -30,7 +30,7 @@ interface MVIAction
 /**
  * An operation that processes incoming [MVIIntent]s
  */
-typealias Reducer<S, I, A> = suspend MVIStoreScope<S, I, A>.(I) -> Unit
+typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
 
 /**
  * An operation that handles exceptions when processing [MVIIntent]s
@@ -60,6 +60,13 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
      * How actions are distributed depends on [ActionShareBehavior].
      */
     val actions: Flow<A>
+
+    // the library does not support java, and Kotlin does not allow
+    // overridable @JvmName because of java interop so its' safe to suppress this
+    // will be solved by context receivers
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendIntent")
+    fun I.send() = send(this)
 }
 
 /**
@@ -93,7 +100,19 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * handled properly.
      */
     @DelicateStoreApi
-    var state: S
+    val state: S
+
+    /**
+     * Obtain the current [MVIStore.state] and update it with the result of [transform].
+     *
+     * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+     * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
+     * **This function is not reentrant, for more info, see [MVIStore.withState].**
+     *
+     * If you want to operate on a state of particular subtype, use the typed version of this function.
+     * @see [withState]
+     */
+    suspend fun updateState(transform: suspend S.() -> S): S
 
     /**
      * Obtain the current state and operate on it, returning [R].
@@ -153,6 +172,10 @@ interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber
      * Send an intent for the [provider] to process e.g. a user click.
      */
     fun send(intent: I) = provider.send(intent)
+
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendAction")
+    fun I.send() = send(this)
 }
 
 /**
@@ -217,12 +240,17 @@ enum class ActionShareBehavior {
 /**
  * A scope of the operation inside [MVIStore].
  * Provides a [CoroutineScope] to use.
- * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
  * Throwing when in this scope will result in recover() of the parent store being called.
  * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
-interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
+interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
 
+    /**
+     * A coroutine scope the intent processing runs on. This is a child scope that is used when
+     * [MVIStore.start] is called.
+     *
+     * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
+     */
     val scope: CoroutineScope
 
     /**
@@ -246,8 +274,22 @@ interface MVIStoreScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
+     * Delegates to [MVIStore.updateState]
+     * @see MVIStore.updateState
+     * @see [withState]
+     */
+    suspend fun updateState(transform: suspend S.() -> S): S
+
+    /**
      * Delegates to [MVIStore.state]
      */
     @DelicateStoreApi
-    var state: S
+    val state: S
+
+    // the library does not support java, and Kotlin does not allow
+    // overridable @JvmName because of java interop so its' safe to suppress this
+    // will be solved by context receivers
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendAction")
+    fun A.send() = send(this)
 }

@@ -3,7 +3,7 @@ package com.nek12.flowMVI.sample.view
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nek12.flowMVI.ActionShareBehavior.SHARE
-import com.nek12.flowMVI.MVIStoreScope
+import com.nek12.flowMVI.ReducerScope
 import com.nek12.flowMVI.launchedStore
 import com.nek12.flowMVI.sample.R
 import com.nek12.flowMVI.sample.view.BasicActivityAction.ShowSnackbar
@@ -26,10 +26,10 @@ class NoBaseClassViewModel : ViewModel() {
         behavior = SHARE
     ) { reduce(it) }
 
-    private suspend fun MVIStoreScope<State, Intent, Action>.reduce(intent: Intent) {
+    private suspend fun ReducerScope<State, Intent, Action>.reduce(intent: Intent) {
         when (intent) {
             is ClickedFab -> {
-                send(ShowSnackbar(R.string.started_processing))
+                ShowSnackbar(R.string.started_processing).send()
 
                 // Doing long operations will delay intent processing. New intents will NOT result in new coroutines being launched
                 // This means, if we get another intent while delay() is running, it will be processed independently and will start
@@ -37,7 +37,7 @@ class NoBaseClassViewModel : ViewModel() {
                 // to solve this, use launchRecovering() (example in BaseClassViewModel.kt)
                 delay(1000)
 
-                send(ShowSnackbar(R.string.finished_processing))
+                ShowSnackbar(R.string.finished_processing).send()
             }
         }
 
