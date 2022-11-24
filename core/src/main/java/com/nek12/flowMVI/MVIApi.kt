@@ -106,7 +106,6 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * Obtain the current [MVIStore.state] and update it with the result of [transform].
      *
      * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
-     * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
      * **This function is not reentrant, for more info, see [MVIStore.withState].**
      *
      * If you want to operate on a state of particular subtype, use the typed version of this function.

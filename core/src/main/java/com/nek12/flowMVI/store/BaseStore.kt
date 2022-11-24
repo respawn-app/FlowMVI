@@ -76,8 +76,12 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
 
     override suspend fun <R> withState(block: suspend S.() -> R): R = stateMutex.withLock { block(states.value) }
 
-    override suspend fun updateState(transform: suspend S.() -> S): S =
-        stateMutex.withLock { _states.updateAndGet { transform(it) } }
+    override suspend fun updateState(transform: suspend S.() -> S): S = stateMutex.withLock {
+        // this section should be hopefully thread-safe and atomic
+        val state = transform(_states.value)
+        _states.value = state
+        state
+    }
 
     override fun launchRecovering(
         scope: CoroutineScope,
