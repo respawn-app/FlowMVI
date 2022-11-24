@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -76,8 +75,12 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
 
     override suspend fun <R> withState(block: suspend S.() -> R): R = stateMutex.withLock { block(states.value) }
 
-    override suspend fun updateState(transform: suspend S.() -> S): S =
-        stateMutex.withLock { _states.updateAndGet { transform(it) } }
+    override suspend fun updateState(transform: suspend S.() -> S): S = stateMutex.withLock {
+        // this section should be hopefully thread-safe and atomic
+        val state = transform(_states.value)
+        _states.value = state
+        state
+    }
 
     override fun launchRecovering(
         scope: CoroutineScope,

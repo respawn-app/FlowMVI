@@ -55,6 +55,7 @@ inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<
 /**
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
+@OverloadResolutionByLambdaReturnType
 inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -66,8 +67,10 @@ inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
  * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+ * **This function is not reentrant.**
  * @see MVIStore.withState
  */
+@OverloadResolutionByLambdaReturnType
 suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
@@ -81,8 +84,10 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
  * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+ * **This function is not reentrant.**
  * @see MVIStore.withState
  */
+@OverloadResolutionByLambdaReturnType
 suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
@@ -97,8 +102,7 @@ suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withSt
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
- *
+ * **This function is not reentrant.**
  * @see MVIStore.updateState
  * @see [withState]
  */
@@ -107,7 +111,7 @@ suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateSta
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
-        callsInPlace(transform, InvocationKind.UNKNOWN)
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
     }
     return updateState { withType<T, _> { transform() } }
 }
@@ -117,7 +121,7 @@ suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateSta
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **[transform] may be evaluated multiple times if the state is being assigned concurrently.**
+ * **This function is not reentrant.**
  * @see MVIStore.updateState
  * @see [withState]
  */
@@ -126,7 +130,7 @@ suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
-        callsInPlace(transform, InvocationKind.UNKNOWN)
+        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
     }
     return updateState { withType<T, _> { transform() } }
 }

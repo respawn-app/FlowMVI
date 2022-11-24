@@ -13,7 +13,7 @@ import com.nek12.flowMVI.sample.repo.CounterRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlin.random.Random
 
 /**
@@ -33,8 +33,7 @@ class BaseClassViewModel(
 
         repo.getCounter()
             .onEmpty(Empty) // set a new state if the flow is empty
-            .map(::timerToState) // map values to states
-            .setEach() // set mapped states
+            .onEach(::timerToState) // set mapped states
             .recover() // recover from exceptions
             .flowOn(Dispatchers.Default) // create states out of the main thread
             .consume() // launch in view model scope

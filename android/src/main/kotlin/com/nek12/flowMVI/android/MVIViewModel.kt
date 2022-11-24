@@ -128,8 +128,8 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Delegates to [MVIStore.updateState]
      */
     @JvmName("withStateTyped")
-    protected suspend inline fun <reified T : S> withState(
-        @BuilderInference crossinline block: suspend T.() -> Unit
+    protected suspend inline fun <reified T : S, R> withState(
+        @BuilderInference crossinline block: suspend T.() -> R
     ) {
         contract {
             callsInPlace(block, InvocationKind.AT_MOST_ONCE)

@@ -31,6 +31,7 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      * State to emit when [reduce] throws.
      *
      *  **Default implementation rethrows the exception**
+     *  **The body of this block may be evaluated multiple times in case of concurrent state updates**
      */
     @BuilderInference recover: Recover<S> = { throw it },
     /**
