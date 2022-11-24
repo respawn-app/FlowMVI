@@ -106,7 +106,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * Obtain the current [MVIStore.state] and update it with the result of [transform].
      *
      * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
-     * **This function is not reentrant, for more info, see [MVIStore.withState].**
+     * **This function is reentrant, for more info, see [MVIStore.withState].**
      *
      * If you want to operate on a state of particular subtype, use the typed version of this function.
      * @see [withState]
@@ -125,13 +125,13 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * This function uses locks under the hood.
      * For a version that runs when the state is of particular subtype, see other overloads of this function.
      *
-     * This function is **not** reentrant, which means, if you call:
+     * This function is reentrant, which means, if you call:
      * ```kotlin
      * withState {
      *   withState { }
      * }
      * ```
-     * **you will get a deadlock**
+     * you should not get a deadlock, but messing with coroutine contexts can still cause deadlocks.
      *
      * @returns the value of [R], i.e. the result of the block.
      */
