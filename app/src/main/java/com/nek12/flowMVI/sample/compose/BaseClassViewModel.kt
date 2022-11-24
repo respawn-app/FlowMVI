@@ -13,7 +13,6 @@ import com.nek12.flowMVI.sample.repo.CounterRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlin.random.Random
 
