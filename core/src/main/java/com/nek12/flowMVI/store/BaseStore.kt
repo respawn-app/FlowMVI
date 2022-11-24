@@ -8,6 +8,7 @@ import com.nek12.flowMVI.MVIStore
 import com.nek12.flowMVI.Recover
 import com.nek12.flowMVI.Reducer
 import com.nek12.flowMVI.ReducerScopeImpl
+import com.nek12.flowMVI.withReentrantLock
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.yield
 import kotlin.coroutines.CoroutineContext
 
@@ -73,14 +73,16 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         intents.trySend(intent)
     }
 
-    override suspend fun <R> withState(block: suspend S.() -> R): R = stateMutex.withLock { block(states.value) }
+    override suspend fun <R> withState(block: suspend S.() -> R): R =
+        stateMutex.withReentrantLock { block(states.value) }
 
-    override suspend fun updateState(transform: suspend S.() -> S): S = stateMutex.withLock {
-        // this section should be hopefully thread-safe and atomic
-        val state = transform(_states.value)
-        _states.value = state
-        state
-    }
+    override suspend fun updateState(transform: suspend S.() -> S): S =
+        stateMutex.withReentrantLock {
+            // this section should be thread-safe and atomic
+            val state = transform(_states.value)
+            _states.value = state
+            state
+        }
 
     override fun launchRecovering(
         scope: CoroutineScope,

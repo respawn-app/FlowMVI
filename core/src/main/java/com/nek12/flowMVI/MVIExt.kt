@@ -67,7 +67,6 @@ inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
  * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **This function is not reentrant.**
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
@@ -84,7 +83,6 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
  * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **This function is not reentrant.**
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
@@ -102,7 +100,6 @@ suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withSt
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **This function is not reentrant.**
  * @see MVIStore.updateState
  * @see [withState]
  */
@@ -121,7 +118,6 @@ suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateSta
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * **This function is not reentrant.**
  * @see MVIStore.updateState
  * @see [withState]
  */
