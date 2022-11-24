@@ -55,6 +55,7 @@ inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<
 /**
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
+@OverloadResolutionByLambdaReturnType
 inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -68,6 +69,7 @@ inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
  * @see MVIStore.withState
  */
+@OverloadResolutionByLambdaReturnType
 suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
@@ -83,6 +85,7 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
  * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
  * @see MVIStore.withState
  */
+@OverloadResolutionByLambdaReturnType
 suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
