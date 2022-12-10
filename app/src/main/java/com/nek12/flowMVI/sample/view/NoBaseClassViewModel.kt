@@ -2,7 +2,7 @@ package com.nek12.flowMVI.sample.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nek12.flowMVI.ActionShareBehavior.SHARE
+import com.nek12.flowMVI.ActionShareBehavior
 import com.nek12.flowMVI.ReducerScope
 import com.nek12.flowMVI.launchedStore
 import com.nek12.flowMVI.sample.R
@@ -23,7 +23,7 @@ class NoBaseClassViewModel : ViewModel() {
     val store by launchedStore<State, Intent, Action>(
         scope = viewModelScope,
         initial = DisplayingContent(0),
-        behavior = SHARE
+        behavior = ActionShareBehavior.Share(),
     ) { reduce(it) }
 
     private suspend fun ReducerScope<State, Intent, Action>.reduce(intent: Intent) {

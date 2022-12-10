@@ -7,6 +7,8 @@ plugins {
 android {
     compileSdk = 33
 
+    resourcePrefix  =  "flowmvi_"
+
     defaultConfig {
         minSdk = 22
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
