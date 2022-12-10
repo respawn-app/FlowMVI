@@ -1,4 +1,4 @@
-package util
+package com.nek12.flowMVI.util
 
 import com.nek12.flowMVI.MVIAction
 import com.nek12.flowMVI.MVIProvider
