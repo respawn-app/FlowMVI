@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val compileKotlin: KotlinCompile by tasks
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     kotlin("jvm")
     `maven-publish`
@@ -11,6 +12,10 @@ plugins {
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
+}
+
+kotlin {
+    explicitApi()
 }
 
 compileKotlin.kotlinOptions {

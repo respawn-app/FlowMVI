@@ -1,5 +1,5 @@
 [versions]
-gradleAndroid = "8.0.0-alpha08"
+gradleAndroid = "8.0.0-alpha09"
 # @pin
 kotlin = "1.7.21"
 koin = "3.2.2"

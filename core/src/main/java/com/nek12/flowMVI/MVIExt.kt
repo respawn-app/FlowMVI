@@ -3,6 +3,7 @@
 package com.nek12.flowMVI
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
@@ -15,28 +16,28 @@ import kotlin.contracts.contract
  * Subscribe to the store using provided scope.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
-fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
-) = subscribe(provider, scope)
+): Job = subscribe(provider, scope)
 
 /**
  * Subscribe to the store using provided scope.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
-fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subscribe(
     provider: MVIProvider<S, I, A>,
     scope: CoroutineScope
-) = provider.subscribe(scope, ::consume, ::render)
+): Job = provider.subscribe(scope, ::consume, ::render)
 
 /**
  * Subscribe to the store using provided scope.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
-inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.subscribe(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,
     crossinline consume: (action: A) -> Unit,
     crossinline render: (state: S) -> Unit,
-) = scope.launch {
+): Job = scope.launch {
     launch {
         actions.collect { consume(it) }
     }
@@ -49,14 +50,15 @@ inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.sub
 /**
  * Catches exceptions only, rethrowing any throwables
  */
-inline fun <T> Flow<T>.catchExceptions(crossinline block: suspend FlowCollector<T>.(Exception) -> Unit) =
-    catch { throwable -> (throwable as? Exception)?.let { block(it) } ?: throw throwable }
+public inline fun <T> Flow<T>.catchExceptions(
+    crossinline block: suspend FlowCollector<T>.(Exception) -> Unit
+): Flow<T> = catch { throwable -> (throwable as? Exception)?.let { block(it) } ?: throw throwable }
 
 /**
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
 @OverloadResolutionByLambdaReturnType
-inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
+public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
@@ -70,7 +72,7 @@ inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
-suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
+public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
     contract {
@@ -86,7 +88,7 @@ suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
-suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
+public suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
     contract {
@@ -104,7 +106,7 @@ suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withSt
  * @see [withState]
  */
 @JvmName("updateStateTyped")
-suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateState(
+public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
@@ -122,7 +124,7 @@ suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateSta
  * @see [withState]
  */
 @JvmName("updateStateTyped")
-suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
+public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {

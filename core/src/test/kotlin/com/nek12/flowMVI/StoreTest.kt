@@ -1,9 +1,9 @@
 package com.nek12.flowMVI
 
 import app.cash.turbine.test
-import com.nek12.flowMVI.ActionShareBehavior.DISTRIBUTE
-import com.nek12.flowMVI.ActionShareBehavior.RESTRICT
-import com.nek12.flowMVI.ActionShareBehavior.SHARE
+import com.nek12.flowMVI.util.TestSubscriber
+import com.nek12.flowMVI.util.idle
+import com.nek12.flowMVI.util.launched
 import io.kotest.assertions.one
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
@@ -20,9 +20,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import util.TestSubscriber
-import util.idle
-import util.launched
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 
@@ -37,7 +34,7 @@ class StoreTest : FreeSpec({
 
     "given store created" - {
         val state = TestState.Some
-        val store = TestStore(state, RESTRICT) { updateState { TestState.SomeData("data") } }
+        val store = TestStore(state, ActionShareBehavior.Restrict()) { updateState { TestState.SomeData("data") } }
         "then state is ${state::class.simpleName}" {
             store.states.value shouldBe state
         }
@@ -77,7 +74,11 @@ class StoreTest : FreeSpec({
                     // ensure scope is enclosed, otherwise exception will be thrown outside of assertion
                     shouldThrowAny {
                         coroutineScope {
-                            TestStore(TestState.Some, RESTRICT, reduce = reduce).launched(this@coroutineScope) {
+                            TestStore(
+                                initialState = TestState.Some,
+                                behavior = ActionShareBehavior.Restrict(),
+                                reduce = reduce
+                            ).launched(this@coroutineScope) {
                                 subscribe(this@coroutineScope, {}, {})
                                 subscribe(this@coroutineScope, {}, {})
                             }
@@ -89,7 +90,7 @@ class StoreTest : FreeSpec({
             sub2.reset()
 
             "and action type is DISTRIBUTE" - {
-                TestStore(TestState.Some, DISTRIBUTE, reduce = reduce).launched(this) {
+                TestStore(TestState.Some, ActionShareBehavior.Distribute(), reduce = reduce).launched(this) {
                     "and intent received" - {
                         send(TestIntent.Some)
                         "then one subscriber received action only" {
@@ -114,7 +115,7 @@ class StoreTest : FreeSpec({
 
             "and action type is SHARE" - {
                 val scope = this
-                TestStore(TestState.Some, SHARE, reduce = reduce).launched(scope) {
+                TestStore(TestState.Some, ActionShareBehavior.Share(), reduce = reduce).launched(scope) {
                     val job1 = sub1.subscribe(this@launched, scope)
                     val job2 = sub2.subscribe(this@launched, scope)
                     idle()
@@ -143,7 +144,7 @@ class StoreTest : FreeSpec({
                 val scope = this
                 var intents = 0
                 val sub = TestSubscriber<TestState, TestAction>()
-                TestStore(initial, RESTRICT) { ++intents }.launched(scope) {
+                TestStore(initial, ActionShareBehavior.Restrict()) { ++intents }.launched(scope) {
                     val job = sub.subscribe(this@launched, scope)
                     idle()
                     val jobs = 100
@@ -171,7 +172,7 @@ class StoreTest : FreeSpec({
             }
 
             "and withState is not reentrant" {
-                TestStore(initial, RESTRICT) {}.launched(this) {
+                TestStore(initial, ActionShareBehavior.Restrict()) {}.launched(this) {
                     shouldThrowExactly<TimeoutCancellationException> {
                         withTimeout(3000) { // this will actually skip everything because of the scheduler
                             withState {

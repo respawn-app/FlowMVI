@@ -11,13 +11,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 internal class SharedStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
+    replay: Int,
     actionBufferSize: Int,
     @BuilderInference recover: Recover<S>,
     @BuilderInference reduce: Reducer<S, I, A>,
 ) : BaseStore<S, I, A>(initialState, recover, reduce) {
 
     private val _actions = MutableSharedFlow<A>(
-        replay = 0,
+        replay = replay,
         extraBufferCapacity = actionBufferSize,
         onBufferOverflow = DROP_OLDEST
     )

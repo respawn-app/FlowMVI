@@ -5,4 +5,4 @@ package com.nek12.flowMVI
 )
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
-annotation class DelicateStoreApi
+public annotation class DelicateStoreApi
