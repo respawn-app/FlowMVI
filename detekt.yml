@@ -42,7 +42,7 @@ console-reports:
 
 output-reports:
   active: true
-  exclude: null
+  exclude: []
   # - 'TxtOutputReport'
   # - 'XmlOutputReport'
   # - 'HtmlOutputReport'
@@ -728,7 +728,7 @@ style:
   RedundantHigherOrderMapUsage:
     active: true
   RedundantVisibilityModifierRule:
-    active: true
+    active: false # explicit api
   ReturnCount:
     active: true
     max: 5

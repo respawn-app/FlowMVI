@@ -12,61 +12,61 @@ import kotlin.coroutines.EmptyCoroutineContext
  * The state of the view / consumer.
  * The state must be comparable and immutable (most likely a data class)
  */
-interface MVIState
+public interface MVIState
 
 /**
  * User interaction or other event that happens in the UI layer.
  * Must be immutable.
  */
-interface MVIIntent
+public interface MVIIntent
 
 /**
  * A single, one-shot, side-effect of processing an [MVIIntent], sent by [MVIProvider].
  * Consumed in the ui-layer as a one-time action.
  * Must be immutable.
  */
-interface MVIAction
+public interface MVIAction
 
 /**
  * An operation that processes incoming [MVIIntent]s
  */
-typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
+public typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
 
 /**
  * An operation that handles exceptions when processing [MVIIntent]s
  */
-typealias Recover<S> = (e: Exception) -> S
+public typealias Recover<S> = (e: Exception) -> S
 
 /**
  * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states].
  * This is usually the business logic unit
  */
-interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
+public interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Should be called when a UI event happens that produces an [intent].
      * @See MVIIntent
      */
-    fun send(intent: I)
+    public fun send(intent: I)
 
     /**
      * A flow of UI states to be handled by the [MVISubscriber].
      */
-    val states: StateFlow<S>
+    public val states: StateFlow<S>
 
     /**
      * A flow of [MVIAction]s to be handled by the [MVISubscriber],
      * usually resulting in one-shot events.
      * How actions are distributed depends on [ActionShareBehavior].
      */
-    val actions: Flow<A>
+    public val actions: Flow<A>
 
     // the library does not support java, and Kotlin does not allow
     // overridable @JvmName because of java interop so its' safe to suppress this
     // will be solved by context receivers
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendIntent")
-    fun I.send() = send(this)
+    public fun I.send(): Unit = send(this)
 }
 
 /**
@@ -74,7 +74,7 @@ interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
  * A store functions independently of any subscribers.
  * MVIStore is the base implementation of [MVIProvider].
  */
-interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
+public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
 
     /**
      * Send a new UI side-effect to be processed by subscribers, only once.
@@ -83,7 +83,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
      */
-    fun send(action: A)
+    public fun send(action: A)
 
     /**
      * Starts store intent processing in a new coroutine on the parent thread.
@@ -92,7 +92,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * Although not advised, store can experimentally be launched multiple times, provided you cancel the job used before.
      * @return a [Job] that the store is running on that can be cancelled later.
      */
-    fun start(scope: CoroutineScope): Job
+    public fun start(scope: CoroutineScope): Job
 
     /**
      * Obtain or set the current state in an unsafe manner.
@@ -100,7 +100,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * handled properly.
      */
     @DelicateStoreApi
-    val state: S
+    public val state: S
 
     /**
      * Obtain the current [MVIStore.state] and update it with the result of [transform].
@@ -111,7 +111,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * If you want to operate on a state of particular subtype, use the typed version of this function.
      * @see [withState]
      */
-    suspend fun updateState(transform: suspend S.() -> S): S
+    public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**
      * Obtain the current state and operate on it, returning [R].
@@ -135,7 +135,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      *
      * @returns the value of [R], i.e. the result of the block.
      */
-    suspend fun <R> withState(block: suspend S.() -> R): R
+    public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
      * Launch a new coroutine using given [scope],
@@ -143,7 +143,7 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
      * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
      * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
      */
-    fun launchRecovering(
+    public fun launchRecovering(
         scope: CoroutineScope,
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -159,28 +159,28 @@ interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<
  * @see MVIProvider
  * @See MVISubscriber
  */
-interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
+public interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
 
     /**
      * Provider, an object that handles business logic.
      * @See MVIProvider
      */
-    val provider: MVIProvider<S, I, A>
+    public val provider: MVIProvider<S, I, A>
 
     /**
      * Send an intent for the [provider] to process e.g. a user click.
      */
-    fun send(intent: I) = provider.send(intent)
+    public fun send(intent: I): Unit = provider.send(intent)
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
-    fun I.send() = send(this)
+    public fun I.send(): Unit = send(this)
 }
 
 /**
  * A generic subscriber of [MVIProvider] that [consume]s [MVIAction]s and [render]s [MVIState]s of types [A] and [S].
  */
-interface MVISubscriber<in S : MVIState, in A : MVIAction> {
+public interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 
     /**
      * Render a new [state].
@@ -188,7 +188,7 @@ interface MVISubscriber<in S : MVIState, in A : MVIAction> {
      *
      * This function should be idempotent and should not send any intents.
      */
-    fun render(state: S)
+    public fun render(state: S)
 
     /**
      * Consume a one-time side-effect emitted by [MVIProvider].
@@ -196,7 +196,7 @@ interface MVISubscriber<in S : MVIState, in A : MVIAction> {
      * This function is called each time an [MVIAction] arrives.
      * This function may send intents under the promise that no loops will occur.
      */
-    fun consume(action: A)
+    public fun consume(action: A)
 }
 
 /**
@@ -205,7 +205,7 @@ interface MVISubscriber<in S : MVIState, in A : MVIAction> {
  * When in doubt, use the default one, and change if you have issues.
  * @see MVIStore
  */
-enum class ActionShareBehavior {
+public sealed interface ActionShareBehavior {
 
     /**
      * Actions will be distributed to all subscribers equally. Each subscriber will receive a reference to a single
@@ -214,7 +214,7 @@ enum class ActionShareBehavior {
      * action entirely (i.e. other subscribers won't receive it when they "return" if they weren't present at the
      * time of emission).
      */
-    SHARE,
+    public data class Share(val buffer: Int = DefaultBufferSize, val replay: Int = 0) : ActionShareBehavior
 
     /**
      * Fan-out behavior means that multiple subscribers are allowed,
@@ -224,7 +224,7 @@ enum class ActionShareBehavior {
      *
      * **This is the default**.
      */
-    DISTRIBUTE,
+    public data class Distribute(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
 
     /**
      * Restricts the count of subscribers to 1.
@@ -233,7 +233,12 @@ enum class ActionShareBehavior {
      *
      * **Resubscriptions are not allowed too, including lifecycle-aware collection**.
      */
-    RESTRICT
+    public data class Restrict(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
+
+    public companion object {
+
+        public const val DefaultBufferSize: Int = 64
+    }
 }
 
 /**
@@ -242,7 +247,7 @@ enum class ActionShareBehavior {
  * Throwing when in this scope will result in recover() of the parent store being called.
  * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
-interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
+public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
 
     /**
      * A coroutine scope the intent processing runs on. This is a child scope that is used when
@@ -250,17 +255,17 @@ interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
      *
      * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
      */
-    val scope: CoroutineScope
+    public val scope: CoroutineScope
 
     /**
      * Delegates to [MVIStore.send]
      */
-    fun send(action: A)
+    public fun send(action: A)
 
     /**
      * Delegates to [MVIStore.launchRecovering]
      */
-    fun launchRecovering(
+    public fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
         recover: (Recover<S>)? = null,
@@ -270,25 +275,25 @@ interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     /**
      * Delegates to [MVIStore.withState]
      */
-    suspend fun <R> withState(block: suspend S.() -> R): R
+    public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
      * Delegates to [MVIStore.updateState]
      * @see MVIStore.updateState
      * @see [withState]
      */
-    suspend fun updateState(transform: suspend S.() -> S): S
+    public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**
      * Delegates to [MVIStore.state]
      */
     @DelicateStoreApi
-    val state: S
+    public val state: S
 
     // the library does not support java, and Kotlin does not allow
     // overridable @JvmName because of java interop so its' safe to suppress this
     // will be solved by context receivers
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
-    fun A.send() = send(this)
+    public fun A.send(): Unit = send(this)
 }

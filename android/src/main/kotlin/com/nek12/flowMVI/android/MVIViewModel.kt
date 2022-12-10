@@ -65,7 +65,7 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected open val store: MVIStore<S, I, A> by launchedStore(
         scope = viewModelScope,
         initial = initialState,
-        behavior = ActionShareBehavior.DISTRIBUTE, // required for lifecycle awareness
+        behavior = ActionShareBehavior.Distribute(), // required for lifecycle awareness
         recover = { recover(it) },
         reduce = { reduce(it) },
     )

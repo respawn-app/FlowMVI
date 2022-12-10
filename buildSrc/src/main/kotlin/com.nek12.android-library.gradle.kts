@@ -41,6 +41,7 @@ android {
     }
 
     kotlin {
+        explicitApi()
         sourceSets.main {
             kotlin.srcDir("build/generated/ksp/main/kotlin")
         }
