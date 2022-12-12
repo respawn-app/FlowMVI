@@ -33,6 +33,10 @@ implementation("com.github.Nek-12.FlowMVI:android-compose:${flowMVIVersion}") //
 implementation("com.github.Nek-12.FlowMVI:android-view:${flowMVIVersion}") //For View-based Android projects
 ```
 
+## How it works:
+
+![](docs/FlowMVI.svg)
+
 ## Core:
 
 ```kotlin
@@ -149,9 +153,8 @@ composition. You are not required in any way to extend MVIView or MVIViewModel, 
 possible with a couple of lambdas. For examples of such implementations,
 see [sample app](/app/src/main/java/com/nek12/flowMVI/sample/view/NoBaseClassViewModel.kt) or read java docs.
 
-For more information and more elaborate examples, see the sample app.
-
-- [] More docs are coming soon with much more detail.
+For more information and more elaborate examples, see the sample app.  
+More docs are coming soon with much more detail.
 
 ## License
 
