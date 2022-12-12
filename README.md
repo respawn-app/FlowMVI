@@ -35,7 +35,7 @@ implementation("com.github.Nek-12.FlowMVI:android-view:${flowMVIVersion}") //For
 
 ## How it works:
 
-![](docs/FlowMVI.svg)
+![](docs/FlowMVI.jpg)
 
 ## Core:
 
@@ -60,8 +60,8 @@ sealed interface ScreenAction: MVIAction {
 val store by launchedStore<ScreenState, ScreenIntent, ScreenAction>(
     scope = eventProcessingCoroutineScope,
     initial = DisplayingCounter(0),
-    behavior = ActionShareBehavior.DISTRIBUTE,
-    reduce = { intent -> /*...*/ }
+    behavior = ActionShareBehavior.Distribute(),
+    reduce = { intent -> /*...*/ },
 )
 
 //somewhere in the ui layer
@@ -69,7 +69,7 @@ val store by launchedStore<ScreenState, ScreenIntent, ScreenAction>(
 store.subscribe(
     consumerCoroutineScope,
     consume = { action -> /* ... */ },
-    render = { state -> /* ... */ }
+    render = { state -> /* ... */ },
 )
 ```
 
