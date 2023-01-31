@@ -2,6 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/Nek-12/FlowMVI)
 ![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
 ![Maintenance](https://img.shields.io/maintenance/yes/2022)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dd3eb9115b7e4b1197388105175241b1)](https://app.codacy.com/gh/respawn-app/FlowMVI?utm_source=github.com&utm_medium=referral&utm_content=respawn-app/FlowMVI&utm_campaign=Badge_Grade_Settings)
 [![Downloads on Jitpack](https://jitpack.io/v/Nek-12/FlowMVI/month.svg)](https://jitpack.io/#Nek-12/FlowMVI.svg)
 ![Issues](https://img.shields.io/github/issues/Nek-12/FlowMVI)
 
