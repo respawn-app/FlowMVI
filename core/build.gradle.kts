@@ -2,6 +2,7 @@
 plugins {
     id("pro.respawn.shared-library")
     id(libs.plugins.atomicfu.id)
+    alias(libs.plugins.kotest)
 }
 
 kotlin {

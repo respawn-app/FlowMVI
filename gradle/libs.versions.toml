@@ -23,6 +23,7 @@ versionsPlugin = "0.44.0"
 versionCatalogUpdatePlugin = "0.7.0"
 kotlinx-atomicfu = "0.19.0"
 dokka = "1.7.20"
+kotest-plugin = "5.0.2"
 gradleDoctorPlugin = "0.8.1"
 dependencyAnalysisPlugin = "1.18.0"
 
@@ -49,6 +50,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockk-jvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
@@ -70,12 +72,10 @@ version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", versi
 unittest = [
     "koin-test",
     "kotest-assertions",
-    "kotest-junit",
     "kotest-property",
     "kotlin-reflect",
-    "mockk",
-    "mockk-jvm",
     "turbine",
+    "kotest-framework",
 ]
 koin = [
     "koin-android",
@@ -90,3 +90,4 @@ version-catalog-update = { id = "nl.littlerobots.version-catalog-update", versio
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
