@@ -1,17 +1,15 @@
-name: CI
+name: publish
 
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 concurrency:
-  group: "build"
+  group: "publish"
   cancel-in-progress: true
 
 jobs:
-  build:
+  publish:
     runs-on: macos-latest
 
     steps:
@@ -19,11 +17,6 @@ jobs:
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-
-      - name: Create local properties
-        env:
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "$LOCAL_PROPERTIES" > local.properties
 
       - name: set up JDK
         uses: actions/setup-java@v3
@@ -40,11 +33,13 @@ jobs:
         with:
           xcode-version: latest
 
-      - name: Run detekt
-        run: ./gradlew detektAll
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" > local.properties
 
-      - name: Build
-        run: ./gradlew assemble --stacktrace
-
-      - name: Unit tests
-        run: ./gradlew allTests --stacktrace
+      - name: Publish to sonatype
+        env:
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+        run: ./gradlew publishAllPublicationsToSonatypeRepository --stacktrace

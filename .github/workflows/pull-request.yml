@@ -1,0 +1,13 @@
+name: PR automation
+
+on:
+  pull_request:
+    types: [ opened ]
+
+jobs:
+  assign author:
+    runs-on: macos-latest
+    steps:
+      - uses: samspills/assign-pr-to-author@v1.0.2
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'

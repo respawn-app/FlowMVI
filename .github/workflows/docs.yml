@@ -1,0 +1,60 @@
+on:
+  push:
+    branches: [ master ]
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  docs:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          check-latest: true
+          java-version: 19
+          cache: 'gradle'
+
+      - name: Validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" > local.properties
+
+      - name: Update docs/README.md
+        run: cp ./README.md ./docs/README.md
+
+      # TODO: Waiting for Dokka gradle 8.0 support https://github.com/Kotlin/dokka/pull/2816
+      #      - name: Generate docs
+      #        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: './docs/'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
