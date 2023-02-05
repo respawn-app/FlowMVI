@@ -1,5 +1,7 @@
 @file:Suppress("MissingPackageDeclaration")
 
+import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.commonMain
+import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.commonTest
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.creating
@@ -7,6 +9,7 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 @Suppress("unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
 fun Project.configureMultiplatform(
@@ -14,8 +17,46 @@ fun Project.configureMultiplatform(
     android: Boolean = false,
     ios: Boolean = false,
     jvm: Boolean = false,
+    js: Boolean = false,
+    linux: Boolean = false,
+    mingw: Boolean = false,
 ) = ext.apply {
+
     explicitApi()
+
+    val libs by versionCatalog
+
+    val commonMain by sourceSets.getting
+    val commonTest by sourceSets.getting {
+        dependencies {
+            implementation(kotlin("test"))
+        }
+    }
+
+    sourceSets.apply {
+        all {
+            languageSettings {
+                languageVersion = Config.kotlinVersion
+                progressiveMode = true
+                optIn("kotlin.RequiresOptIn")
+            }
+        }
+    }
+
+    if (linux) {
+        linuxX64()
+    }
+
+    if (mingw) {
+        mingwX64()
+    }
+
+    if (js) {
+        js(IR) {
+            browser()
+            nodejs()
+        }
+    }
 
     if (android) {
         android {
@@ -38,13 +79,22 @@ fun Project.configureMultiplatform(
                 useJUnitPlatform()
             }
         }
-    }
 
+        sourceSets.apply {
+            val jvmTest by getting {
+                dependencies {
+                    implementation(libs.requireLib("kotest-junit"))
+                }
+            }
+        }
+    }
     if (ios) {
         listOf(
             iosX64(),
             iosArm64(),
-            iosSimulatorArm64()
+            iosSimulatorArm64(),
+            macosArm64(),
+            macosX64(),
         ).forEach {
             it.binaries.framework {
                 binaryOption("bundleId", Config.artifactId)
@@ -52,23 +102,7 @@ fun Project.configureMultiplatform(
                 baseName = Config.artifactId
             }
         }
-
         sourceSets.apply {
-            all {
-                languageSettings {
-                    languageVersion = Config.kotlinVersion
-                    progressiveMode = true
-                    optIn("kotlin.RequiresOptIn")
-                }
-            }
-
-            val commonMain by getting
-            val commonTest by getting {
-                dependencies {
-                    implementation(kotlin("test"))
-                }
-            }
-
             val iosX64Main by getting
             val iosArm64Main by getting
             val iosSimulatorArm64Main by getting
@@ -88,5 +122,5 @@ fun Project.configureMultiplatform(
                 iosSimulatorArm64Test.dependsOn(this)
             }
         }
-    }
+    } // ios
 }

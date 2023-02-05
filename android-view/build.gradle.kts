@@ -1,6 +1,6 @@
 plugins {
     id("pro.respawn.shared-library")
-    id("com.android.library")
+    id("pro.respawn.android-library")
 }
 
 kotlin {

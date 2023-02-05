@@ -11,11 +11,12 @@ kotlin {
         android = false,
         ios = true,
         jvm = true,
+        js = true,
+        linux = true,
+        mingw = true,
     )
 }
 
 dependencies {
     commonMainApi(libs.kotlinx.coroutines.core)
-
-    commonTestImplementation(libs.bundles.unittest)
 }
