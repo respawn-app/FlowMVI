@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>KMM Utils</title>
+    <title>FlowMVI</title>
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
     <meta content="Description" name="description">
     <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0" name="viewport">
@@ -19,8 +19,8 @@
 <div id="app"></div>
 <script language="javascript">
 window.$docsify = {
-  name: 'KMMUtils',
-  repo: 'https://github.com/respawn-app/kmmutils',
+  name: 'FlowMVI',
+  repo: 'https://github.com/respawn-app/flowMVI',
   loadSidebar: false,
   subMaxLevel: 2,
   executeScript: true,
@@ -43,9 +43,7 @@ window.$docsify = {
          function (hook, vm) {
             hook.doneEach(function (html) {
                Prism.highlightAll()
-               console.log('mounted,', Prism, Prism.languages.flow)
             })
-
          }
       ]
 }
@@ -68,13 +66,5 @@ window.$docsify = {
 </script>
 <script src="//unpkg.com/docsify-share/build/index.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
-<!--  plugins: [
-  EditOnGithubPlugin.create(
-    'https://github.com/respawn-app/kmmutils/blob/master/docs/',
-    null,
-    null,
-    )
-  ],
--->
 </body>
 </html>

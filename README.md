@@ -1,6 +1,6 @@
 # Flow MVI
-[![CI](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml)
-![Docs](https://img.shields.io/website?down_color=red&label=Docs&up_color=green&up_message=Online&url=http%3A%2F%2Fopensource.respawn.pro%2FflowMVI%2F%23%2F)
+[![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
+![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
 ![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
