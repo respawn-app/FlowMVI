@@ -1,7 +1,9 @@
 @file:Suppress("MemberVisibilityCanBePrivate", "MissingPackageDeclaration", "UndocumentedPublicFunction")
 
+import Config.jvmTarget
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
+import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.kotlin
 import org.gradle.api.Project
 
 fun Project.configureAndroid(

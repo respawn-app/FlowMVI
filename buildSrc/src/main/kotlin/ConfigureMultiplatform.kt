@@ -71,7 +71,6 @@ fun Project.configureMultiplatform(
 
     if (jvm) {
         jvm {
-            jvmToolchain(Config.jvmTarget.target.toInt())
             compilations.all {
                 kotlinOptions.jvmTarget = Config.jvmTarget.target
             }

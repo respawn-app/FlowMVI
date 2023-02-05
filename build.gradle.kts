@@ -1,5 +1,5 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
-import org.jetbrains.kotlin.konan.file.File.Companion.javaHome
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -36,6 +36,12 @@ subprojects {
 
     dependencies {
         dokkaPlugin(rootProject.libs.dokka.android)
+    }
+
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = Config.jvmTarget.target
+        }
     }
 }
 
