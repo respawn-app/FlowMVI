@@ -2,10 +2,13 @@ package pro.respawn.flowmvi
 
 import app.cash.turbine.test
 import io.kotest.assertions.one
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainOnly
 import io.kotest.matchers.collections.shouldHaveSize
@@ -16,6 +19,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.withTimeout
 import pro.respawn.flowmvi.util.TestSubscriber
 import pro.respawn.flowmvi.util.idle
@@ -23,10 +27,7 @@ import pro.respawn.flowmvi.util.launched
 import kotlin.random.Random
 import kotlin.time.ExperimentalTime
 
-@OptIn(
-    ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, ExperimentalKotest::class,
-    ExperimentalTime::class
-)
+@OptIn(ExperimentalKotest::class)
 class StoreTest : FreeSpec({
     coroutineTestScope = true
     blockingTest = true
@@ -171,16 +172,22 @@ class StoreTest : FreeSpec({
                 }
             }
 
-            "and withState is not reentrant" {
+            "and withState is reentrant" {
+                val scope = this
+                val sub = TestSubscriber<TestState, TestAction>()
                 TestStore(initial, ActionShareBehavior.Restrict()) {}.launched(this) {
-                    shouldThrowExactly<TimeoutCancellationException> {
-                        withTimeout(3000) { // this will actually skip everything because of the scheduler
+                    val job = sub.subscribe(this, scope)
+                    shouldNotThrowAny {
+                        withState {
                             withState {
-                                withState { } // should deadlock here
-                            }
+                                send(TestAction.Some)
+                            } // should not deadlock here
                         }
                         idle()
                     }
+                    sub.actions shouldContain TestAction.Some
+
+                    job.cancel()
                 }
             }
         }

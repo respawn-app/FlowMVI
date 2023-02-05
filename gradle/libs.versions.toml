@@ -51,7 +51,8 @@ koin-compose = "io.insert-koin:koin-androidx-compose:3.4.1"
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+# TODO: Does not support js
+#kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -76,8 +77,8 @@ koin = [
 unittest = [
     "koin-test",
     "kotest-assertions",
-    "kotest-framework",
     "kotest-property",
+    "kotest-junit",
     "kotlin-reflect",
     "turbine",
 ]

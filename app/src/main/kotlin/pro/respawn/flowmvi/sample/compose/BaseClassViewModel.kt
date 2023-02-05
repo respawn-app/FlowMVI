@@ -32,7 +32,6 @@ class BaseClassViewModel(
         incrementCounter(-1)
 
         repo.getCounter()
-            .onEmpty(Empty) // set a new state if the flow is empty
             .onEach(::timerToState) // set mapped states
             .recover() // recover from exceptions
             .flowOn(Dispatchers.Default) // create states out of the main thread

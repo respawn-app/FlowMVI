@@ -24,7 +24,7 @@ fun Project.configureMultiplatform(
     val commonMain by sourceSets.getting
     val commonTest by sourceSets.getting {
         dependencies {
-            implementation(kotlin("test"))
+            // implementation(kotlin("test"))
         }
     }
 
@@ -51,7 +51,9 @@ fun Project.configureMultiplatform(
     if (js) {
         js(IR) {
             browser()
-            // nodejs()
+            nodejs()
+            binaries.library()
+            binaries.executable()
         }
     }
 

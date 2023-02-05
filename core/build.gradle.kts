@@ -11,10 +11,18 @@ kotlin {
         android = false,
         ios = true,
         jvm = true,
-        js = false, // TODO: Fix kotest nodejs resolution
+        js = false, // TODO: Fix nodejs resolution
         linux = true,
         mingw = true,
     )
+
+    sourceSets.apply {
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.bundles.unittest)
+            }
+        }
+    }
 }
 
 dependencies {
