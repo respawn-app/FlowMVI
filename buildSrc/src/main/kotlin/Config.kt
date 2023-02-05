@@ -11,17 +11,16 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 object Config {
 
     const val group = "pro.respawn"
-    const val artifact = "kmmutils"
+    const val artifact = "flowmvi"
 
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 1
-    const val minorRelease = 0
-    const val patch = 1
+    const val minorRelease = 1
+    const val patch = 0
     const val versionName = "$majorRelease.$minorRelease.$patch"
 
     // kotlin
-    const val languageVersion = "1.8"
     val kotlinCompilerArgs = listOf(
         "-Xjvm-default=all", // enable all jvm optimizations
         "-Xcontext-receivers",
@@ -38,14 +37,14 @@ object Config {
     val javaVersion = JavaVersion.VERSION_11
     const val compileSdk = 33
     const val targetSdk = compileSdk
-    const val minSdk = 26
-    const val kotlinVersion = "1.8"
+    const val minSdk = 21
+    const val kotlinVersion = "1.9"
 
     // android
     const val namespace = artifactId
     const val buildToolsVersion = "33.0.0"
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
-    const val isMinifyEnabledRelease = true
+    const val isMinifyEnabledRelease = false
     const val isMinifyEnabledDebug = false
     const val defaultProguardFile = "proguard-android-optimize.txt"
     const val proguardFile = "proguard-rules.pro"

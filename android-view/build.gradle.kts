@@ -1,5 +1,15 @@
 plugins {
-    id("com.nek12.android-library")
+    id("pro.respawn.shared-library")
+    id("com.android.library")
+}
+
+kotlin {
+    configureMultiplatform(
+        this,
+        android = true,
+        ios = false,
+        jvm = false,
+    )
 }
 
 android {

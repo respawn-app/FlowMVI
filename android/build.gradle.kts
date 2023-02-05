@@ -1,5 +1,5 @@
 plugins {
-    id("com.nek12.android-library")
+    id("pro.respawn.android-library")
 }
 
 android {

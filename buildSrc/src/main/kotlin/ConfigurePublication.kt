@@ -54,8 +54,8 @@ fun Project.configurePublication() {
 
                 pom {
                     name.set(Config.artifact)
-                    description.set("A collection of Kotlin Multiplatform essentials")
-                    url.set("https://github.com/respawn-app/kmmutils")
+                    description.set("A simple, classic KMM MVI implementation based on coroutines")
+                    url.set("https://github.com/respawn-app/flowMVI")
 
                     licenses {
                         license {
@@ -75,7 +75,7 @@ fun Project.configurePublication() {
                         }
                     }
                     scm {
-                        url.set("https://github.com/respawn-app/kmmutils.git")
+                        url.set("https://github.com/respawn-app/flowMVI.git")
                     }
                 }
             }

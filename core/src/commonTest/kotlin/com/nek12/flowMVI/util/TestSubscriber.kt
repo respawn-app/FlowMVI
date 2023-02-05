@@ -7,7 +7,6 @@ import com.nek12.flowMVI.MVISubscriber
 import com.nek12.flowMVI.subscribe
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 
 class TestSubscriber<S : MVIState, A : MVIAction> : MVISubscriber<S, A> {
 

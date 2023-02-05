@@ -1,6 +1,7 @@
 @file:Suppress("MissingPackageDeclaration")
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
@@ -55,7 +56,7 @@ fun Project.configureMultiplatform(
         sourceSets.apply {
             all {
                 languageSettings {
-                    languageVersion = Config.languageVersion
+                    languageVersion = Config.kotlinVersion
                     progressiveMode = true
                     optIn("kotlin.RequiresOptIn")
                 }

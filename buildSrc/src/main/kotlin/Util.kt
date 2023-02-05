@@ -32,10 +32,6 @@ fun VersionCatalog.requireBundle(alias: String) = findBundle(alias).get()
 
 val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId
 
-// fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinMultiplatformCommonOptions.() -> Unit) {
-//     (this as ExtensionAware).extensions.configure("kotlinOptions", block)
-// }
-
 /**
  * Creates a java array initializer code for a list of strings.
  * { "a", "b", "c" }

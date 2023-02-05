@@ -66,7 +66,7 @@ fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
                 "archivesBaseName",
                 project.name
             )
-            isMinifyEnabled = false
+            isMinifyEnabled = Config.isMinifyEnabledRelease
         }
     }
 

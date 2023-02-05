@@ -1,7 +1,7 @@
 [versions]
 gradleAndroid = "8.0.0-beta01"
 # @pin
-kotlin = "1.8.10"
+kotlin = "1.8.0"
 koin = "3.2.2"
 detekt = "1.22.0"
 coroutines = "1.6.4"
@@ -21,7 +21,7 @@ detektFormattingPlugin = "1.22.0"
 composeDetektPlugin = "1.2.2"
 versionsPlugin = "0.44.0"
 versionCatalogUpdatePlugin = "0.7.0"
-kotlinx-atomicfu = "0.18.5"
+kotlinx-atomicfu = "0.19.0"
 dokka = "1.7.20"
 gradleDoctorPlugin = "0.8.1"
 dependencyAnalysisPlugin = "1.18.0"
@@ -29,6 +29,7 @@ dependencyAnalysisPlugin = "1.18.0"
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
@@ -63,6 +64,7 @@ compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "co
 compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
+version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 
 [bundles]
 unittest = [
