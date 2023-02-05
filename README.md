@@ -31,10 +31,6 @@ flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowm
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 ```
 
-## How it works:
-
-![](docs/FlowMVI.jpg)
-
 ## Core:
 
 ```kotlin
