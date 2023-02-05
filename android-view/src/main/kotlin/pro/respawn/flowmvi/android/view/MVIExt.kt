@@ -21,12 +21,17 @@ import pro.respawn.flowmvi.android.subscribe
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
     provider: MVIProvider<S, I, A>,
-    crossinline consume: (action: A) -> Unit,
-    crossinline render: (state: S) -> Unit,
+    consume: (action: A) -> Unit,
+    render: (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job = viewLifecycleOwner.subscribe(provider, consume, render, lifecycleState)
+): Job = viewLifecycleOwner.subscribe(
+    provider = provider,
+    consume = consume,
+    render = render,
+    lifecycleState = lifecycleState
+)
 
 /**
  *  Subscribe to the provider lifecycle-aware. Call this in [Fragment.onViewCreated]

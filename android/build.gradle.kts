@@ -1,4 +1,5 @@
 plugins {
+    kotlin("android")
     id("pro.respawn.android-library")
 }
 

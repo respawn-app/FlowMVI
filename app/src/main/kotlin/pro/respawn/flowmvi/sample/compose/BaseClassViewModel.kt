@@ -5,7 +5,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.android.MVIViewModel
-import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
 import pro.respawn.flowmvi.sample.compose.ComposeAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedCounter
@@ -15,6 +14,7 @@ import pro.respawn.flowmvi.sample.compose.ComposeState.Empty
 import pro.respawn.flowmvi.sample.compose.ComposeState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import kotlin.random.Random
+import pro.respawn.flowmvi.sample.R
 
 /**
  * See also NoBaseClassViewModel

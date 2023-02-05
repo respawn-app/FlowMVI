@@ -1,5 +1,3 @@
-@file:Suppress("Filename")
-
 package pro.respawn.flowmvi.android
 
 import androidx.lifecycle.Lifecycle

@@ -11,7 +11,7 @@ kotlin {
         android = false,
         ios = true,
         jvm = true,
-        js = false, // TODO: Fix resolution of nodejs 16
+        js = false, // TODO: Fix kotest nodejs resolution
         linux = true,
         mingw = true,
     )

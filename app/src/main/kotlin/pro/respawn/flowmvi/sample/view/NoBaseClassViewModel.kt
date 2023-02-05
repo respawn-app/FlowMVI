@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.ActionShareBehavior
+import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.ReducerScope
 import pro.respawn.flowmvi.launchedStore
-import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.view.BasicActivityAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.view.BasicActivityIntent.ClickedFab
 import pro.respawn.flowmvi.sample.view.BasicActivityState.DisplayingContent

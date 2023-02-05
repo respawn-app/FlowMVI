@@ -19,7 +19,6 @@ import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIStore
-import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.Recover
 import pro.respawn.flowmvi.ReducerScope
 import pro.respawn.flowmvi.catchExceptions
@@ -101,11 +100,13 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Sets this state when flow completes without emitting any values.
      */
+    @Deprecated("onEmpty is not thread-safe. Use onEach instead", ReplaceWith("onEach"))
     protected fun <T> Flow<T>.onEmpty(state: S) = onEmpty { updateState { state } }
 
     /**
      * For a flow of states (usually mapped using [kotlinx.coroutines.flow.map]), sends each state to the subscriber.
      */
+    @Deprecated("setEach is not thread-safe. Use onEach instead", ReplaceWith("onEach"))
     protected fun Flow<S>.setEach() = onEach { updateState { it } }
 
     /**
@@ -119,12 +120,7 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     @JvmName("updateStateTyped")
     protected suspend inline fun <reified T : S> updateState(
         @BuilderInference crossinline transform: suspend T.() -> S
-    ): S {
-        contract {
-            callsInPlace(transform, InvocationKind.UNKNOWN)
-        }
-        return store.updateState(transform)
-    }
+    ): S = store.updateState(transform)
 
     /**
      * Delegates to [MVIStore.updateState]
