@@ -779,6 +779,7 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: '(_|ignored|expected|serialVersionUID)'
+    excludes: [ '**/*test*/**', '**/*.kts' ]
     ignoreAnnotated: [ 'androidx.compose.ui.tooling.preview.Preview' ]
   UseArrayLiteralsInAnnotations:
     active: true

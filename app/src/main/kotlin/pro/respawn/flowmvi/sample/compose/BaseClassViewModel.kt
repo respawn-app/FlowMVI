@@ -11,7 +11,6 @@ import pro.respawn.flowmvi.sample.compose.ComposeAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedToBasicActivity
 import pro.respawn.flowmvi.sample.compose.ComposeState.DisplayingContent
-import pro.respawn.flowmvi.sample.compose.ComposeState.Empty
 import pro.respawn.flowmvi.sample.compose.ComposeState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import kotlin.random.Random
