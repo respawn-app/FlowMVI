@@ -38,7 +38,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "com.nek12.flowmvi"
+rootProject.name = "pro.respawn.flowmvi"
 
 include(":app")
 include(":core")

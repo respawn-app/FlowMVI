@@ -21,24 +21,27 @@ object Config {
     const val versionName = "$majorRelease.$minorRelease.$patch"
 
     // kotlin
+
+    val optIns = listOf(
+        "kotlinx.coroutines.ExperimentalCoroutinesApi",
+        "kotlinx.coroutines.FlowPreview",
+        "kotlin.RequiresOptIn",
+        "kotlin.experimental.ExperimentalTypeInference"
+    )
     val kotlinCompilerArgs = listOf(
         "-Xjvm-default=all", // enable all jvm optimizations
         "-Xcontext-receivers",
         "-Xbackend-threads=0", // parallel IR compilation
-        "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "-opt-in=kotlinx.coroutines.FlowPreview",
-        "-opt-in=kotlin.Experimental",
-        "-opt-in=kotlin.RequiresOptIn",
         "-Xuse-k2",
         // "-XXLanguage:+ExplicitBackingFields"
-    )
+    ) + optIns.map { "-opt-in=$it" }
 
     val jvmTarget = JvmTarget.JVM_11
     val javaVersion = JavaVersion.VERSION_11
     const val compileSdk = 33
     const val targetSdk = compileSdk
     const val minSdk = 21
-    const val kotlinVersion = "1.9"
+    const val kotlinVersion = "1.8"
 
     // android
     const val namespace = artifactId

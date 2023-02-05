@@ -1,15 +1,11 @@
 @file:Suppress("MissingPackageDeclaration")
 
-import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.commonMain
-import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.commonTest
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
 @Suppress("unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
 fun Project.configureMultiplatform(
@@ -38,7 +34,9 @@ fun Project.configureMultiplatform(
             languageSettings {
                 languageVersion = Config.kotlinVersion
                 progressiveMode = true
-                optIn("kotlin.RequiresOptIn")
+                Config.optIns.forEach {
+                    optIn(it)
+                }
             }
         }
     }
@@ -54,7 +52,7 @@ fun Project.configureMultiplatform(
     if (js) {
         js(IR) {
             browser()
-            nodejs()
+            // nodejs()
         }
     }
 

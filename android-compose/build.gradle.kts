@@ -1,19 +1,12 @@
 plugins {
-    id("pro.respawn.shared-library")
+    kotlin("android")
     id("pro.respawn.android-library")
 }
 
-kotlin {
-    configureMultiplatform(
-        this,
-        android = true,
-        ios = false,
-        jvm = false,
-    )
-}
+configurePublication()
 
 android {
-    namespace = "${rootProject.group}.android.compose"
+    namespace = "${Config.artifactId}.android.compose"
 
     buildFeatures {
         compose = true
@@ -24,10 +17,10 @@ android {
         useLiveLiterals = true
     }
 }
-//
-// dependencies {
-//     api(project(":android"))
-//
-//     implementation(libs.compose.ui)
-//     implementation(libs.compose.foundation)
-// }
+
+dependencies {
+    api(project(":android"))
+
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+}

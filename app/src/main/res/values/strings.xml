@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FLowMVISample</string>
+    <string name="app_name">FlowMVI Sample</string>
     <string name="error">An error occurred</string>
     <string name="to_basic_activity">Go to basic activity</string>
     <string name="counter_text">Counter: %d (click me!)</string>

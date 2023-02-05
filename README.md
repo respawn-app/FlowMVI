@@ -1,9 +1,9 @@
 # Flow MVI
 [![CI](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml)
 ![Docs](https://img.shields.io/website?down_color=red&label=Docs&up_color=green&up_message=Online&url=http%3A%2F%2Fopensource.respawn.pro%2FflowMVI%2F%23%2F)
-![License](https://img.shields.io/github/license/Nek-12/FlowMVI)
-![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
-![Issues](https://img.shields.io/github/issues/Nek-12/FlowMVI)
+![License](https://img.shields.io/github/license/respawn-app/flowMVI)
+![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
+![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
 ![GitHub top language](https://img.shields.io/github/languages/top/respawn-app/flowMVI)
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![Codacy](https://app.codacy.com/project/badge/Grade/33309557cdd04b649e940843aa5f1e38)](https://www.codacy.com/gh/respawn-app/FlowMVI/dashboard)
@@ -149,7 +149,7 @@ And that's it!
 If you don't like base classes, interfaces or abstraction, there always are ways to avoid inheritance and use
 composition. You are not required in any way to extend MVIView or MVIViewModel, or even MVIProvider. Everything is
 possible with a couple of lambdas. For examples of such implementations,
-see [sample app](/app/src/main/java/com/nek12/flowMVI/sample/view/NoBaseClassViewModel.kt) or read java docs.
+see [sample app](/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/NoBaseClassViewModel.kt) or read java docs.
 
 For more information and more elaborate examples, see the sample app.  
 More docs are coming soon with much more detail.

@@ -1,51 +1,29 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    kotlin("android")
 }
 
 android {
-    namespace = "com.nek12.flowMVI.sample"
-    compileSdk = 33
+    configureAndroid(this)
+    namespace = "${Config.artifactId}.sample"
+    compileSdk = Config.compileSdk
 
     defaultConfig {
-        applicationId = "com.nek12.flowMVI.sample"
+        applicationId = Config.artifactId
         minSdk = 26
-        targetSdk = 33
+        targetSdk = Config.targetSdk
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = Config.jvmTarget.target
-    }
     buildFeatures {
         compose = true
         viewBinding = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    }
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
+    implementation(project(":android"))
     implementation(project(":android-compose"))
     implementation(project(":android-view"))
 

@@ -1,19 +1,12 @@
 plugins {
-    id("pro.respawn.shared-library")
+    kotlin("android")
     id("pro.respawn.android-library")
 }
 
-kotlin {
-    configureMultiplatform(
-        this,
-        android = true,
-        ios = false,
-        jvm = false,
-    )
-}
+configurePublication()
 
 android {
-    namespace = "${rootProject.group}.android.view"
+    namespace = "${Config.artifactId}.android.view"
 }
 
 dependencies {
