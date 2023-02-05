@@ -1,9 +1,11 @@
 plugins {
-    id("com.nek12.android-library")
+    id("pro.respawn.android-library")
 }
 
+configurePublication()
+
 android {
-    namespace = "${rootProject.group}.android.compose"
+    namespace = "${Config.artifactId}.android.compose"
 
     buildFeatures {
         compose = true

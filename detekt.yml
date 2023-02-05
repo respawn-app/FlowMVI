@@ -67,18 +67,18 @@ comments:
     active: false
     endOfSentenceFormat: '([.?!][ \t\n\r\f<])|([.?!:]$)'
   UndocumentedPublicClass:
-    active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    active: true
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**', '**/sample/**', '**.kts' ]
     searchInNestedClass: true
     searchInInnerClass: true
     searchInInnerObject: true
     searchInInnerInterface: true
   UndocumentedPublicFunction:
-    active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    active: true
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**', '**/sample/**', '**.kts' ]
   UndocumentedPublicProperty:
-    active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    active: true
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**', '**/sample/**', '**.kts' ]
 
 complexity:
   active: true
@@ -110,7 +110,7 @@ complexity:
       - 'isNotNull'
       - 'ifNull'
   CognitiveComplexMethod:
-    active: true
+    active: false # TODO: Maybe enable later
   LabeledExpression:
     active: false
     ignoredLabels: [ ]
@@ -122,9 +122,9 @@ complexity:
     threshold: 100
     ignoreAnnotated: [ 'Composable' ]
   LongParameterList:
-    active: true
-    functionThreshold: 8
-    constructorThreshold: 8
+    active: false # does not play well with compose
+    functionThreshold: 6
+    constructorThreshold: 6
     ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotated: [ ]
@@ -142,18 +142,18 @@ complexity:
   StringLiteralDuplication:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
-    threshold: 3
+    threshold: 5
     ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
   TooManyFunctions:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
-    thresholdInFiles: 22
-    thresholdInClasses: 22
-    thresholdInInterfaces: 22
-    thresholdInObjects: 22
-    thresholdInEnums: 22
+    thresholdInFiles: 50
+    thresholdInClasses: 11
+    thresholdInInterfaces: 11
+    thresholdInObjects: 11
+    thresholdInEnums: 11
     ignoreDeprecated: true
     ignorePrivate: true
     ignoreOverridden: true
@@ -313,7 +313,7 @@ formatting:
     autoCorrect: true
     layout: '*,java.**,javax.**,kotlin.**,^'
   Indentation:
-    active: false
+    active: true
     autoCorrect: true
     indentSize: 4
   MaximumLineLength:
@@ -461,7 +461,7 @@ naming:
   InvalidPackageDeclaration:
     active: true
     excludes: [ '**/*.kts' ]
-    rootPackage: 'com.nek12.respawn'
+    rootPackage: 'pro.respawn.flowmvi'
   MatchingDeclarationName:
     active: false
     mustBeFirst: true
@@ -510,7 +510,7 @@ performance:
   CouldBeSequence:
     active: true
   UnnecessaryPartOfBinaryExpression:
-    active: true
+    active: false # todo: unclear what this is
   ArrayPrimitive:
     active: true
   ForEachOnRange:
@@ -589,7 +589,7 @@ potential-bugs:
   UnreachableCode:
     active: true
   UnsafeCallOnNullableType:
-    active: true
+    active: false
   UnsafeCast:
     active: true
   UnusedUnaryOperator:
@@ -667,13 +667,15 @@ style:
   MagicNumber:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    ignoreAnnotated:
+      - 'androidx.compose.ui.tooling.preview.Preview'
     ignoreNumbers:
       - '-1'
+      - '2'
       - '24'
       - '12'
       - '0'
       - '1'
-      - '2'
       - '10'
       - '100'
       - '1000'
@@ -777,6 +779,7 @@ style:
   UnusedPrivateMember:
     active: true
     allowedNames: '(_|ignored|expected|serialVersionUID)'
+    excludes: [ '**/*test*/**', '**/*.kts' ]
     ignoreAnnotated: [ 'androidx.compose.ui.tooling.preview.Preview' ]
   UseArrayLiteralsInAnnotations:
     active: true
@@ -850,18 +853,18 @@ compose:
   MissingModifierDefaultValue:
     active: true
   ComposableFunctionName:
-    active: false  # Does not work well atm
+    active: false # TODO: Broken
 
-#libraries:
-#  ForbiddenPublicDataClass:
-#    active: false
-#    excludes: [ '**' ]
-#    ignorePackages:
-#      - '*.internal'
-#      - '*.internal.*'
-#  LibraryCodeMustSpecifyReturnType:
-#    active: true
-#    excludes: [ '**' ]
-#  LibraryEntitiesShouldNotBePublic:
-#    active: true
-#    excludes: [ '**' ]
+libraries:
+  ForbiddenPublicDataClass:
+    active: false
+    excludes: [ '**' ]
+    ignorePackages:
+      - '*.internal'
+      - '*.internal.*'
+  LibraryCodeMustSpecifyReturnType:
+    active: true
+    excludes: [ ]
+  LibraryEntitiesShouldNotBePublic:
+    active: true
+    excludes: [ '**' ]

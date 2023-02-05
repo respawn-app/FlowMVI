@@ -1,37 +1,34 @@
 # Flow MVI
-![GitHub](https://img.shields.io/github/license/Nek-12/FlowMVI)
-![GitHub last commit](https://img.shields.io/github/last-commit/Nek-12/FlowMVI)
-![Maintenance](https://img.shields.io/maintenance/yes/2022)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dd3eb9115b7e4b1197388105175241b1)](https://app.codacy.com/gh/respawn-app/FlowMVI?utm_source=github.com&utm_medium=referral&utm_content=respawn-app/FlowMVI&utm_campaign=Badge_Grade_Settings)
-[![Downloads on Jitpack](https://jitpack.io/v/Nek-12/FlowMVI/month.svg)](https://jitpack.io/#Nek-12/FlowMVI.svg)
-![Issues](https://img.shields.io/github/issues/Nek-12/FlowMVI)
+[![CI](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/respawn-app/flowMVI/actions/workflows/ci.yml)
+![Docs](https://img.shields.io/website?down_color=red&label=Docs&up_color=green&up_message=Online&url=http%3A%2F%2Fopensource.respawn.pro%2FflowMVI%2F%23%2F)
+![License](https://img.shields.io/github/license/respawn-app/flowMVI)
+![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
+![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
+![GitHub top language](https://img.shields.io/github/languages/top/respawn-app/flowMVI)
+[![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
+[![Codacy](https://app.codacy.com/project/badge/Grade/33309557cdd04b649e940843aa5f1e38)](https://www.codacy.com/gh/respawn-app/FlowMVI/dashboard)
 
-This is an MVI implementation based on coroutines with a few main goals:
+FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a few main goals:
 
 1. Being simple to understand, implement and use
 2. Following the Principle of Least Responsibility - all communication happens through strictly defined contract
 3. Featuring a clean and readable DSL
 4. Being thread-safe but asynchronous
 
+Documentation is at [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)
+
 ## Let's get started:
 
-Choose your dependency:  
-[![](https://jitpack.io/v/Nek-12/FlowMVI.svg)](https://jitpack.io/#Nek-12/FlowMVI)
+![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
 ```toml
 [versions]
-flowmvi = # ...
+flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-flowmvi-android = { module = "com.github.Nek-12.FlowMVI:android", version.ref = "flowmvi" }
-flowmvi-compose = { module = "com.github.Nek-12.FlowMVI:android-compose", version.ref = "flowmvi" }
-flowmvi-core = { module = "com.github.Nek-12.FlowMVI:core", version.ref = "flowmvi" }
-```
-
-```kotlin
-implementation("com.github.Nek-12.FlowMVI:core:${flowMVIVersion}") //does not depend on any particular platform
-implementation("com.github.Nek-12.FlowMVI:android-compose:${flowMVIVersion}") //For Jetpack Compose Android projects
-implementation("com.github.Nek-12.FlowMVI:android-view:${flowMVIVersion}") //For View-based Android projects
+flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
+flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # view-based 
+flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 ```
 
 ## How it works:
@@ -152,7 +149,7 @@ And that's it!
 If you don't like base classes, interfaces or abstraction, there always are ways to avoid inheritance and use
 composition. You are not required in any way to extend MVIView or MVIViewModel, or even MVIProvider. Everything is
 possible with a couple of lambdas. For examples of such implementations,
-see [sample app](/app/src/main/java/com/nek12/flowMVI/sample/view/NoBaseClassViewModel.kt) or read java docs.
+see [sample app](/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/NoBaseClassViewModel.kt) or read java docs.
 
 For more information and more elaborate examples, see the sample app.  
 More docs are coming soon with much more detail.
@@ -160,17 +157,18 @@ More docs are coming soon with much more detail.
 ## License
 
 ```
-Copyright 2022 Nikita Vaizin
+   Copyright 2022 Respawn Team and contributors
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
 ```

@@ -1,40 +1,30 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-val compileKotlin: KotlinCompile by tasks
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm")
-    `maven-publish`
+    id("pro.respawn.shared-library")
     id(libs.plugins.atomicfu.id)
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    alias(libs.plugins.kotest)
 }
 
 kotlin {
-    explicitApi()
-}
+    configureMultiplatform(
+        this,
+        android = false,
+        ios = true,
+        jvm = true,
+        js = false, // TODO: Fix nodejs resolution
+        linux = true,
+        mingw = true,
+    )
 
-compileKotlin.kotlinOptions {
-    jvmTarget = "11"
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            groupId = rootProject.group.toString()
-            artifactId = project.name
-            version = rootProject.version.toString()
-            from(components["java"])
+    sourceSets.apply {
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.bundles.unittest)
+            }
         }
     }
 }
 
 dependencies {
-    api(libs.kotlinx.coroutines.core)
-
-    testImplementation(libs.bundles.unittest)
+    commonMainApi(libs.kotlinx.coroutines.core)
 }

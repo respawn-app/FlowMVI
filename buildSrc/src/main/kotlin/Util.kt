@@ -1,4 +1,9 @@
-@file:Suppress("MissingPackageDeclaration")
+@file:Suppress(
+    "MemberVisibilityCanBePrivate",
+    "MissingPackageDeclaration",
+    "UndocumentedPublicProperty",
+    "UndocumentedPublicFunction"
+)
 
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
@@ -8,6 +13,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.plugin.use.PluginDependency
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import java.util.Base64
 
 /**
  * Load version catalog for usage in places where it is not available yet with gradle 7.x.
@@ -23,12 +29,33 @@ val Project.versionCatalog: Lazy<VersionCatalog>
         extensions.getByType<VersionCatalogsExtension>().named("libs")
     }
 
-fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("kotlinOptions", block)
-}
-
 fun VersionCatalog.requirePlugin(alias: String) = findPlugin(alias).get().toString()
 fun VersionCatalog.requireLib(alias: String) = findLibrary(alias).get()
 fun VersionCatalog.requireBundle(alias: String) = findBundle(alias).get()
 
 val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId
+
+fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
+    (this as ExtensionAware).extensions.configure("kotlinOptions", block)
+}
+
+/**
+ * Creates a java array initializer code for a list of strings.
+ * { "a", "b", "c" }
+ */
+fun List<String>.toJavaArrayString() = buildString {
+    append("{")
+
+    this@toJavaArrayString.forEachIndexed { i, it ->
+
+        append("\"$it\"")
+
+        if (i != this@toJavaArrayString.lastIndex) {
+            append(", ")
+        }
+    }
+
+    append("}")
+}
+
+fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())

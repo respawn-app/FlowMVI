@@ -1,87 +1,94 @@
 [versions]
-gradleAndroid = "8.0.0-alpha09"
-# @pin
-kotlin = "1.7.21"
-koin = "3.2.2"
-detekt = "1.22.0"
-coroutines = "1.6.4"
-lifecycle = "2.5.1"
-flowExt = "0.3.0"
+activity = "1.6.1"
+compose = "1.4.0-alpha05"
+compose-compiler = "1.4.0"
+composeDetektPlugin = "1.2.2"
 core-ktx = "1.9.0"
-compose = "1.3.1"
-compose-compiler = "1.4.0-alpha02"
+coroutines = "1.6.4"
+dependencyAnalysisPlugin = "1.18.0"
+detekt = "1.22.0"
+detektFormattingPlugin = "1.22.0"
+dokka = "1.7.20"
+flowExt = "0.3.0"
+fragment = "1.5.5"
+gradleAndroid = "8.0.0-beta01"
+gradleDoctorPlugin = "0.8.1"
+junit = "4.13.2"
+koin = "3.3.2"
 kotest = "5.5.4"
+kotest-plugin = "5.0.2"
+# @pin
+kotlin = "1.8.0"
+kotlinx-atomicfu = "0.19.0"
+lifecycle = "2.5.1"
+material = "1.8.0"
 mockk = "1.13.2"
 turbine = "0.12.1"
-junit = "4.13.2"
-activity = "1.6.1"
-material = "1.7.0"
-fragment = "1.5.4"
-detektFormattingPlugin = "1.22.0"
-composeDetektPlugin = "1.2.2"
-versionsPlugin = "0.44.0"
 versionCatalogUpdatePlugin = "0.7.0"
-kotlinx-atomicfu = "0.18.5"
+versionsPlugin = "0.45.0"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
-detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
-gradle-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
-#core kotlin
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
-flowext = { module = "io.github.hoc081098:FlowExt-jvm", version.ref = "flowExt" }
-# androidx
-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
-material = { module = "com.google.android.material:material", version.ref = "material" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
-#test
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
+compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
+detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
+detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
+dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
+flowext = { module = "io.github.hoc081098:FlowExt", version.ref = "flowExt" }
+gradle-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 junit = { module = "junit:junit", version.ref = "junit" }
-kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+koin-android = "io.insert-koin:koin-android:3.3.2"
+koin-compose = "io.insert-koin:koin-androidx-compose:3.4.1"
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+# TODO: Does not support js
+#kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockk-jvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-#di
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-android = "io.insert-koin:koin-android:3.3.0"
-koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
-koin-compose = "io.insert-koin:koin-androidx-compose:3.3.0"
-#compose
-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 
 [bundles]
-unittest = [
-    "koin-test",
-    "kotest-assertions",
-    "kotest-junit",
-    "kotest-property",
-    "kotlin-reflect",
-    "mockk",
-    "mockk-jvm",
-    "turbine",
-]
 koin = [
     "koin-android",
     "koin-core",
 ]
+unittest = [
+    "koin-test",
+    "kotest-assertions",
+    "kotest-property",
+    "kotest-junit",
+    "kotlin-reflect",
+    "turbine",
+]
 
 [plugins]
 atomicfu = { id = "kotlinx-atomicfu", version.ref = "kotlinx-atomicfu" }
+dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
+versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
