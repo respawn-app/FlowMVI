@@ -17,4 +17,4 @@
 *.jpg binary
 *.db binary
 
-scripts/* linguist-vendored
+.idea/* linguist-vendored
