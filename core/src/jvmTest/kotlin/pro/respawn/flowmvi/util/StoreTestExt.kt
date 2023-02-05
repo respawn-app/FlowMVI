@@ -14,7 +14,7 @@ import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIStore
 
 suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction>
-        MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = start(scope).apply {
+MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = start(scope).apply {
     block()
     cancel()
     join()

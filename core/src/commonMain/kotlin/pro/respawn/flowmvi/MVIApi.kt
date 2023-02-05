@@ -67,6 +67,9 @@ public interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIActi
     // will be solved by context receivers
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendIntent")
+    /**
+     * @see MVIProvider.send
+     */
     public fun I.send(): Unit = send(this)
 }
 
@@ -175,6 +178,9 @@ public interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISub
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
+    /**
+     * @see MVIProvider.send
+     */
     public fun I.send(): Unit = send(this)
 }
 
@@ -214,6 +220,8 @@ public sealed interface ActionShareBehavior {
      * that each consume actions. Be aware that, however, if there's at least one subscriber, they will consume an
      * action entirely (i.e. other subscribers won't receive it when they "return" if they weren't present at the
      * time of emission).
+     * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
+     * @param replay How many actions will be replayed to each new subscriber
      */
     public data class Share(val buffer: Int = DefaultBufferSize, val replay: Int = 0) : ActionShareBehavior
 
@@ -224,6 +232,8 @@ public sealed interface ActionShareBehavior {
      * and **the order is unspecified**.
      *
      * **This is the default**.
+     *
+     * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      */
     public data class Distribute(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
 
@@ -233,11 +243,17 @@ public sealed interface ActionShareBehavior {
      * In other words, you will be required to create a new store for each caller of [subscribe].
      *
      * **Resubscriptions are not allowed too, including lifecycle-aware collection**.
+     *
+     * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      */
     public data class Restrict(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
 
     public companion object {
 
+        /**
+         * The default action buffer size
+         * @see kotlinx.coroutines.channels.Channel.BUFFERED
+         */
         public const val DefaultBufferSize: Int = 64
     }
 }
@@ -294,6 +310,9 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     // the library does not support java, and Kotlin does not allow
     // overridable @JvmName because of java interop so its' safe to suppress this
     // will be solved by context receivers
+    /**
+     * @see [MVIProvider.send]
+     */
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
     public fun A.send(): Unit = send(this)

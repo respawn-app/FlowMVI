@@ -25,18 +25,23 @@ import kotlin.experimental.ExperimentalTypeInference
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
-     * Send a new intent for the provider you used in [MVIComposable] {
+     * Send a new intent for the provider you used in [MVIComposable]
+     * @see MVIProvider.send
      */
     public fun send(intent: I)
 
     /**
      * Call this somewhere at the top of your [MVIComposable] to consume actions received from the provider
+     * @see MVIProvider.consume
      */
     @Composable
     public fun consume(consumer: suspend CoroutineScope.(A) -> Unit)
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
+    /**
+     * @see send
+     */
     public fun I.send(): Unit = send(this)
 }
 
@@ -61,6 +66,9 @@ private class ConsumerScopeImpl<in I : MVIIntent, out A : MVIAction>(
 
 @Composable
 @Suppress("ComposableParametersOrdering")
+/**
+ * @see [ConsumerScope.consume]
+ */
 public fun <A : MVIAction> MVIProvider<*, *, A>.consume(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     onAction: suspend CoroutineScope.(action: A) -> Unit,

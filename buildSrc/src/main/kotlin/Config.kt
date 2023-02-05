@@ -41,6 +41,7 @@ object Config {
     const val compileSdk = 33
     const val targetSdk = compileSdk
     const val minSdk = 21
+    const val appMinSdk = 26
     const val kotlinVersion = "1.8"
 
     // android

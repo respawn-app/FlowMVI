@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = Config.artifactId
-        minSdk = 26
+        minSdk = Config.appMinSdk
         targetSdk = Config.targetSdk
         versionCode = 1
         versionName = "1.0"

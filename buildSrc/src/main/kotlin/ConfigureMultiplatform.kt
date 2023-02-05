@@ -17,7 +17,6 @@ fun Project.configureMultiplatform(
     linux: Boolean = false,
     mingw: Boolean = false,
 ) = ext.apply {
-
     explicitApi()
 
     val libs by versionCatalog

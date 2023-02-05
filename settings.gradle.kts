@@ -46,7 +46,6 @@ include(":android")
 include(":android-compose")
 include(":android-view")
 
-
 fun RepositoryHandler.ivyNative() {
     ivy { url = uri("https://download.jetbrains.com") }
 

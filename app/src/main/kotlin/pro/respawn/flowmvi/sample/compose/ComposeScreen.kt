@@ -23,10 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
+import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
 import pro.respawn.flowmvi.sample.compose.ComposeAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedCounter
