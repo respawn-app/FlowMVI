@@ -49,41 +49,42 @@ fun Project.publishMultiplatform() {
 /**
  * Publish the android artifact
  */
-fun Project.publishAndroid() = afterEvaluate {
-    val properties = gradleLocalProperties(rootDir)
-    val isReleaseBuild = properties["release"]?.toString().toBoolean()
+fun Project.publishAndroid() {
+    afterEvaluate {
+        val properties = gradleLocalProperties(rootDir)
+        val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
-    requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-        sonatypeRepository(isReleaseBuild, properties)
+        requireNotNull(extensions.findByType<PublishingExtension>()).apply {
+            sonatypeRepository(isReleaseBuild, properties)
 
-        publications {
-            create("release", MavenPublication::class.java) {
-                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
-                groupId = rootProject.group.toString()
-                artifactId = project.name
+            publications {
+                create("release", MavenPublication::class.java) {
+                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                    groupId = rootProject.group.toString()
+                    artifactId = project.name
 
-                configurePom()
-                configureVersion(isReleaseBuild)
+                    configurePom()
+                    configureVersion(isReleaseBuild)
 
-                pom.withXml {
-                    val dependenciesNode = asNode().appendNode("dependencies")
-                    configurations.implementation.get().allDependencies.forEach {
-                        if (it.name != "unspecified") {
-                            val dependencyNode = dependenciesNode.appendNode("dependency")
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
+                    pom.withXml {
+                        val dependenciesNode = asNode().appendNode("dependencies")
+                        configurations.implementation.get().allDependencies.forEach {
+                            if (it.name != "unspecified") {
+                                val dependencyNode = dependenciesNode.appendNode("dependency")
+                                dependencyNode.appendNode("groupId", it.group)
+                                dependencyNode.appendNode("artifactId", it.name)
+                                dependencyNode.appendNode("version", it.version)
+                            }
                         }
                     }
                 }
             }
         }
-
         signPublications(properties)
+    }
 
-        tasks.withType<AbstractPublishToMaven>().configureEach {
-            dependsOn(tasks.withType<BundleAar>())
-        }
+    tasks.withType<Sign>().configureEach {
+        dependsOn(tasks.withType<BundleAar>())
     }
 }
 
@@ -161,6 +162,7 @@ private fun Project.signPublications(properties: Properties) =
         tasks.withType<Sign>().configureEach {
             onlyIf { isReleaseBuild }
         }
+
         tasks.withType<AbstractPublishToMaven>().configureEach {
             dependsOn(tasks.withType<Sign>())
         }
