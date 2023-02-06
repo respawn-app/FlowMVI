@@ -5,6 +5,8 @@ plugins {
     alias(libs.plugins.kotest)
 }
 
+publishMultiplatform()
+
 kotlin {
     configureMultiplatform(
         this,

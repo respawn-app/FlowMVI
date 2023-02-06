@@ -2,7 +2,7 @@ plugins {
     id("pro.respawn.android-library")
 }
 
-configurePublication()
+publishAndroid()
 
 android {
     namespace = "${Config.artifactId}.android.compose"

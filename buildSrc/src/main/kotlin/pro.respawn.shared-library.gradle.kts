@@ -3,5 +3,3 @@ plugins {
     id("maven-publish")
     signing
 }
-
-configurePublication()
