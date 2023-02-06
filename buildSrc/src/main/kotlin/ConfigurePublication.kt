@@ -33,7 +33,6 @@ fun Project.publishMultiplatform() {
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-
             sonatypeRepository(isReleaseBuild, properties)
 
             publications.withType<MavenPublication>().configureEach {
@@ -47,6 +46,9 @@ fun Project.publishMultiplatform() {
     }
 }
 
+/**
+ * Publish the android artifact
+ */
 fun Project.publishAndroid() = afterEvaluate {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
