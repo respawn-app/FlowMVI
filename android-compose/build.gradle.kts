@@ -2,8 +2,6 @@ plugins {
     id("pro.respawn.android-library")
 }
 
-publishAndroid()
-
 android {
     namespace = "${Config.artifactId}.android.compose"
 
@@ -18,6 +16,7 @@ android {
 }
 
 dependencies {
+    api(project(":core"))
     api(project(":android"))
 
     implementation(libs.compose.ui)

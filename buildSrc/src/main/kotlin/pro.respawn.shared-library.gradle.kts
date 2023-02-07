@@ -3,3 +3,5 @@ plugins {
     id("maven-publish")
     signing
 }
+
+publishMultiplatform()

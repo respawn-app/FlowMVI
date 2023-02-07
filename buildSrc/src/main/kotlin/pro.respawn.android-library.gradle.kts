@@ -12,3 +12,5 @@ android {
 kotlin {
     explicitApi()
 }
+
+publishAndroid()

@@ -1,15 +1,16 @@
 @file:Suppress("MissingPackageDeclaration")
 
-import Config.artifact
-import Config.artifactId
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
+import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.api
+import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.compileOnly
 import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.implementation
+import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.runtimeOnly
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
-import org.gradle.internal.impldep.com.amazonaws.util.XpathUtils.asNode
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.register
@@ -68,12 +69,16 @@ fun Project.publishAndroid() {
 
                     pom.withXml {
                         val dependenciesNode = asNode().appendNode("dependencies")
-                        configurations.implementation.get().allDependencies.forEach {
-                            if (it.name != "unspecified") {
-                                val dependencyNode = dependenciesNode.appendNode("dependency")
-                                dependencyNode.appendNode("groupId", it.group)
-                                dependencyNode.appendNode("artifactId", it.name)
-                                dependencyNode.appendNode("version", it.version)
+                        configurations.mavenScoped.forEach { it, scope ->
+                            it.allDependencies.all {
+                                if (group == null || version == null || name == "unspecified")
+                                    return@all
+
+                                val node = dependenciesNode.appendNode("dependency")
+                                node.appendNode("groupId", group)
+                                node.appendNode("artifactId", name)
+                                node.appendNode("version", version)
+                                node.appendNode("scope", scope)
                             }
                         }
                     }
@@ -167,3 +172,11 @@ private fun Project.signPublications(properties: Properties) =
             dependsOn(tasks.withType<Sign>())
         }
     }
+
+val ConfigurationContainer.mavenScoped
+    get() = mapOf(
+        runtimeOnly.get() to "runtime",
+        api.get() to "compile",
+        implementation.get() to "compile",
+        compileOnly.get() to "provided"
+    )
