@@ -27,7 +27,8 @@ flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
-flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # view-based 
+flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
+flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 ```
 
