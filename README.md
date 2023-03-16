@@ -1,6 +1,7 @@
 # Flow MVI
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)
+[![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://javadoc.io/doc/pro.respawn.flowmvi/core)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
 ![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
@@ -15,8 +16,8 @@ FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a 
 3. Featuring a clean and readable DSL
 4. Being thread-safe but asynchronous
 
-Documentation is at [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)
-KDocs are at [FlowMVI/javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)
+* Documentation is at [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)  
+* KDocs are at [FlowMVI/javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)
 
 ## Let's get started:
 
@@ -147,7 +148,7 @@ And that's it!
 If you don't like base classes, interfaces or abstraction, there always are ways to avoid inheritance and use
 composition. You are not required in any way to extend MVIView or MVIViewModel, or even MVIProvider. Everything is
 possible with a couple of lambdas. For examples of such implementations,
-see [sample app](/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/NoBaseClassViewModel.kt) or read java docs.
+see [sample app](/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/NoBaseClassViewModel.kt) or read javadocs.
 
 For more information and more elaborate examples, see the sample app.  
 More docs are coming soon with much more detail.
