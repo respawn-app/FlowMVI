@@ -167,3 +167,5 @@ hs_err_pid*
 !gradle/gradle-wrapper.jar
 # built and copied by dokka plugin
 ./docs/javadocs/**
+# yarn.lock location & other
+/kotlin-js-store/**

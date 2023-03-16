@@ -34,17 +34,36 @@ dependencyResolutionManagement {
     repositories {
         google()
         ivyNative()
+        node()
         mavenCentral()
     }
 }
 
-rootProject.name = "FlowMVI"
+fun RepositoryHandler.node() {
+    exclusiveContent {
+        forRepository {
+            ivy("https://nodejs.org/dist/") {
+                name = "Node Distributions at $url"
+                patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
+                metadataSources { artifact() }
+                content { includeModule("org.nodejs", "node") }
+            }
+        }
+        filter { includeGroup("org.nodejs") }
+    }
 
-include(":app")
-include(":core")
-include(":android")
-include(":android-compose")
-include(":android-view")
+    exclusiveContent {
+        forRepository {
+            ivy("https://github.com/yarnpkg/yarn/releases/download") {
+                name = "Yarn Distributions at $url"
+                patternLayout { artifact("v[revision]/[artifact](-v[revision]).[ext]") }
+                metadataSources { artifact() }
+                content { includeModule("com.yarnpkg", "yarn") }
+            }
+        }
+        filter { includeGroup("com.yarnpkg") }
+    }
+}
 
 fun RepositoryHandler.ivyNative() {
     ivy { url = uri("https://download.jetbrains.com") }
@@ -73,3 +92,11 @@ fun RepositoryHandler.ivyNative() {
         filter { includeModuleByRegex(".*", ".*kotlin-native-prebuilt.*") }
     }
 }
+
+rootProject.name = "FlowMVI"
+
+include(":app")
+include(":core")
+include(":android")
+include(":android-compose")
+include(":android-view")
