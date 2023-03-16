@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsSetupTask
 
 @Suppress("unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
 fun Project.configureMultiplatform(
@@ -52,6 +53,20 @@ fun Project.configureMultiplatform(
             nodejs()
             binaries.library()
             binaries.executable()
+        }
+        // TODO: KMM js <> gradle 8.0 incompatibility
+        tasks.run {
+            val jsLibrary = named("jsProductionLibraryCompileSync")
+            val jsExecutable = named("jsProductionExecutableCompileSync")
+            named("jsBrowserProductionWebpack").configure {
+                dependsOn(jsLibrary)
+            }
+            named("jsBrowserProductionLibraryPrepare").configure {
+                dependsOn(jsExecutable)
+            }
+            named("jsNodeProductionLibraryPrepare").configure {
+                dependsOn(jsExecutable)
+            }
         }
     }
 
