@@ -1,21 +1,13 @@
+@file:Suppress("MissingPackageDeclaration")
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.api
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.compileOnly
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.implementation
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.runtimeOnly
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
-import org.gradle.plugins.signing.SigningExtension
-import java.net.URI
-import java.util.Properties
 
 /**
  * Configures Maven publishing to sonatype for this project

@@ -16,14 +16,14 @@ import org.gradle.plugins.signing.SigningExtension
 import java.net.URI
 import java.util.Properties
 
-fun MavenPublication.configureVersion(release: Boolean) {
+internal fun MavenPublication.configureVersion(release: Boolean) {
     version = buildString {
         append(Config.versionName)
         if (!release) append("-SNAPSHOT")
     }
 }
 
-fun MavenPublication.configurePom() = pom {
+internal fun MavenPublication.configurePom() = pom {
     name.set(Config.artifact)
     description.set("A simple, classic KMM MVI implementation based on coroutines")
     url.set("https://github.com/respawn-app/flowMVI")
@@ -50,7 +50,7 @@ fun MavenPublication.configurePom() = pom {
     }
 }
 
-fun PublishingExtension.sonatypeRepository(release: Boolean, properties: Properties) = repositories {
+internal fun PublishingExtension.sonatypeRepository(release: Boolean, properties: Properties) = repositories {
     maven {
         name = "sonatype"
         url = URI(
@@ -67,7 +67,7 @@ fun PublishingExtension.sonatypeRepository(release: Boolean, properties: Propert
     }
 }
 
-fun Project.signPublications(properties: Properties) =
+internal fun Project.signPublications(properties: Properties) =
     requireNotNull(extensions.findByType<SigningExtension>()).apply {
         val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
@@ -95,7 +95,7 @@ fun Project.signPublications(properties: Properties) =
         }
     }
 
-val ConfigurationContainer.mavenScoped
+internal val ConfigurationContainer.mavenScoped
     get() = mapOf(
         runtimeOnly.get() to "runtime",
         api.get() to "compile",
