@@ -1,7 +1,5 @@
 * [Home](/)
-* [Quickstart](quickstart.md)
-* [Core](core.md)
+* [Usage Guide](howto.md)
 * [Android](android.md)
-* [Compose](compose.md)
 * [Usage | FAQ](usage.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)
