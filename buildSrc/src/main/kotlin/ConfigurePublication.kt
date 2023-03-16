@@ -6,13 +6,19 @@ import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.api
 import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.compileOnly
 import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.implementation
 import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.runtimeOnly
+import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.getting
+import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
@@ -28,16 +34,14 @@ fun Project.publishMultiplatform() {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
-    val javadocJar = tasks.register("javadocJar", Jar::class) {
-        archiveClassifier.set("javadoc")
-    }
+    val dokkaJavadocJar = tasks.named("dokkaJavadocJar")
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications.withType<MavenPublication>().configureEach {
-                artifact(javadocJar)
+                artifact(dokkaJavadocJar)
 
                 configurePom()
                 configureVersion(isReleaseBuild)

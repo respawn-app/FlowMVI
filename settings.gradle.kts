@@ -38,7 +38,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "pro.respawn.flowmvi"
+rootProject.name = "FlowMVI"
 
 include(":app")
 include(":core")

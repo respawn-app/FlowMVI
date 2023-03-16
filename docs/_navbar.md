@@ -1,5 +1,6 @@
 * [Home](/)
 * [Core](core.md)
-* [Usage](usage.md)
 * [Android](android.md)
 * [Compose](compose.md)
+* [Usage|FAQ](usage.md)
+* [Javadocs](javadocs/index.html)

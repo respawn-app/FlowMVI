@@ -165,3 +165,5 @@ hs_err_pid*
 .firebase-service-account.json
 /.idea/artifacts/**
 !gradle/gradle-wrapper.jar
+# built and copied by dokka plugin
+./docs/javadocs/**
