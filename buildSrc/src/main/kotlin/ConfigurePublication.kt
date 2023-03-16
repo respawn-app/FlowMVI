@@ -156,10 +156,7 @@ private fun Project.signPublications(properties: Properties) =
         isRequired = isReleaseBuild
 
         if (signingKey != null && signingPassword != null) {
-            println("Using in memory PGP keys for signing")
             useInMemoryPgpKeys(signingKey, signingPassword)
-        } else {
-            println("Using local.properties for signing")
         }
 
         sign(publishing.publications)
