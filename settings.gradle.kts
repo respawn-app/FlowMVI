@@ -39,14 +39,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FlowMVI"
-
-include(":app")
-include(":core")
-include(":android")
-include(":android-compose")
-include(":android-view")
-
 fun RepositoryHandler.node() {
     exclusiveContent {
         forRepository {
@@ -100,3 +92,11 @@ fun RepositoryHandler.ivyNative() {
         filter { includeModuleByRegex(".*", ".*kotlin-native-prebuilt.*") }
     }
 }
+
+rootProject.name = "FlowMVI"
+
+include(":app")
+include(":core")
+include(":android")
+include(":android-compose")
+include(":android-view")
