@@ -33,7 +33,6 @@ fun Project.publishMultiplatform() {
 
             publications.withType<MavenPublication>().configureEach {
                 artifact(dokkaJavadocJar)
-
                 configurePom()
                 configureVersion(isReleaseBuild)
             }
@@ -66,8 +65,7 @@ fun Project.publishAndroid() {
                         val dependenciesNode = asNode().appendNode("dependencies")
                         configurations.mavenScoped.forEach { it, scope ->
                             it.allDependencies.all {
-                                if (group == null || version == null || name == "unspecified")
-                                    return@all
+                                if (group == null || version == null || name == "unspecified") return@all
 
                                 val node = dependenciesNode.appendNode("dependency")
                                 node.appendNode("groupId", group)
@@ -156,12 +154,14 @@ private fun Project.signPublications(properties: Properties) =
 
         sign(publishing.publications)
 
-        tasks.withType<Sign>().configureEach {
-            onlyIf { isReleaseBuild }
-        }
+        tasks.run {
+            withType<Sign>().configureEach {
+                onlyIf { isReleaseBuild }
+            }
 
-        tasks.withType<AbstractPublishToMaven>().configureEach {
-            dependsOn(tasks.withType<Sign>())
+            withType<AbstractPublishToMaven>().configureEach {
+                dependsOn(tasks.withType<Sign>())
+            }
         }
     }
 
