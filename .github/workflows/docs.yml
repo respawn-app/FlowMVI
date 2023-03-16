@@ -43,14 +43,16 @@ jobs:
       - name: Update docs/README.md
         run: cp ./README.md ./docs/README.md
 
-      # TODO: Waiting for Dokka gradle 8.0 support https://github.com/Kotlin/dokka/pull/2816
-      #      - name: Generate docs
-      #        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
+      - name: Generate docs
+        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
+
+      - name: Move docs to the parent docs dir
+        run: cp -r ./build/dokka ./docs/javadocs/
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
-      - name: Upload artifact
+      - name: Upload pages
         uses: actions/upload-pages-artifact@v1
         with:
           path: './docs/'

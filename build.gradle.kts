@@ -8,7 +8,8 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.atomicfu)
+    // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/281
+    // alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
 }
 
@@ -38,9 +39,17 @@ subprojects {
         dokkaPlugin(rootProject.libs.dokka.android)
     }
 
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = Config.jvmTarget.target
+    tasks {
+        register<org.gradle.jvm.tasks.Jar>("dokkaJavadocJar") {
+            dependsOn(dokkaJavadoc)
+            from(dokkaJavadoc.flatMap { it.outputDirectory })
+            archiveClassifier.set("javadoc")
+        }
+        withType<KotlinCompile>().configureEach {
+            compilerOptions {
+                jvmTarget.set(Config.jvmTarget)
+                languageVersion.set(Config.kotlinVersion)
+            }
         }
     }
 }
@@ -75,18 +84,18 @@ versionCatalogUpdate {
     }
 }
 
-atomicfu {
-    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
-    transformJvm = true
-    jvmVariant = "VH"
-    transformJs = false
-}
-
-tasks.dokkaHtmlMultiModule.configure {
-    outputDirectory.set(buildDir.resolve("dokka"))
-}
+// atomicfu {
+//     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+//     transformJvm = false
+//     jvmVariant = "VH"
+//     transformJs = false
+// }
 
 tasks {
+    dokkaHtmlMultiModule.configure {
+        moduleName.set(rootProject.name)
+        outputDirectory.set(buildDir.resolve("dokka"))
+    }
     // needed to generate compose compiler reports. See /scripts
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         buildUponDefaultConfig = true

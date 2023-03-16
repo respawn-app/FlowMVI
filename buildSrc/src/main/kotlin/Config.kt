@@ -17,7 +17,7 @@ object Config {
 
     const val majorRelease = 1
     const val minorRelease = 1
-    const val patch = 2
+    const val patch = 3
     const val versionName = "$majorRelease.$minorRelease.$patch"
 
     // kotlin
@@ -38,11 +38,11 @@ object Config {
 
     val jvmTarget = JvmTarget.JVM_11
     val javaVersion = JavaVersion.VERSION_11
+    val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
     const val compileSdk = 33
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
-    const val kotlinVersion = "1.8"
 
     // android
     const val namespace = artifactId

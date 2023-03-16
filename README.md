@@ -16,6 +16,7 @@ FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a 
 4. Being thread-safe but asynchronous
 
 Documentation is at [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)
+KDocs are at [FlowMVI/javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)
 
 ## Let's get started:
 

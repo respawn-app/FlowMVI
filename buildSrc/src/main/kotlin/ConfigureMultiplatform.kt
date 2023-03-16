@@ -31,11 +31,9 @@ fun Project.configureMultiplatform(
     sourceSets.apply {
         all {
             languageSettings {
-                languageVersion = Config.kotlinVersion
+                languageVersion = Config.kotlinVersion.version
                 progressiveMode = true
-                Config.optIns.forEach {
-                    optIn(it)
-                }
+                Config.optIns.forEach { optIn(it) }
             }
         }
     }

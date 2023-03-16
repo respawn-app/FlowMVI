@@ -1,33 +1,35 @@
 [versions]
 activity = "1.6.1"
-compose = "1.4.0-alpha05"
-compose-compiler = "1.4.0"
+compose = "1.4.0-rc01"
+compose-compiler = "1.4.3"
 composeDetektPlugin = "1.2.2"
 core-ktx = "1.9.0"
 coroutines = "1.6.4"
-dependencyAnalysisPlugin = "1.18.0"
+dependencyAnalysisPlugin = "1.19.0"
 detekt = "1.22.0"
 detektFormattingPlugin = "1.22.0"
-dokka = "1.7.20"
+dokka = "1.8.10"
 flowExt = "0.3.0"
 fragment = "1.5.5"
-gradleAndroid = "8.0.0-beta01"
+gradleAndroid = "8.0.0-beta05"
 gradleDoctorPlugin = "0.8.1"
 junit = "4.13.2"
-koin = "3.3.2"
-kotest = "5.5.4"
-kotest-plugin = "5.0.2"
+koin = "3.3.3"
+kotest = "5.5.5"
+kotest-plugin = "5.5.5"
 # @pin
-kotlin = "1.8.0"
-kotlinx-atomicfu = "0.19.0"
-lifecycle = "2.5.1"
+kotlin = "1.8.10"
+kotlinx-atomicfu = "0.20.0"
+lifecycle = "2.6.0"
 material = "1.8.0"
 mockk = "1.13.2"
 turbine = "0.12.1"
-versionCatalogUpdatePlugin = "0.7.0"
-versionsPlugin = "0.45.0"
+versionCatalogUpdatePlugin = "0.8.0"
+versionsPlugin = "0.46.0"
+koin-compose = "3.4.2"
 
 [libraries]
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
@@ -46,8 +48,8 @@ dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", v
 flowext = { module = "io.github.hoc081098:FlowExt", version.ref = "flowExt" }
 gradle-versions = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 junit = { module = "junit:junit", version.ref = "junit" }
-koin-android = "io.insert-koin:koin-android:3.3.2"
-koin-compose = "io.insert-koin:koin-androidx-compose:3.4.1"
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-compose" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
@@ -77,8 +79,8 @@ koin = [
 unittest = [
     "koin-test",
     "kotest-assertions",
-    "kotest-property",
     "kotest-junit",
+    "kotest-property",
     "kotlin-reflect",
     "turbine",
 ]

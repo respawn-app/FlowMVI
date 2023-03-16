@@ -11,9 +11,7 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
-import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
@@ -27,17 +25,14 @@ import java.util.Properties
 fun Project.publishMultiplatform() {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
-
-    val javadocJar = tasks.register("javadocJar", Jar::class) {
-        archiveClassifier.set("javadoc")
-    }
+    val dokkaJavadocJar = tasks.named("dokkaJavadocJar")
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications.withType<MavenPublication>().configureEach {
-                artifact(javadocJar)
+                artifact(dokkaJavadocJar)
 
                 configurePom()
                 configureVersion(isReleaseBuild)
@@ -156,10 +151,7 @@ private fun Project.signPublications(properties: Properties) =
         isRequired = isReleaseBuild
 
         if (signingKey != null && signingPassword != null) {
-            println("Using in memory PGP keys for signing")
             useInMemoryPgpKeys(signingKey, signingPassword)
-        } else {
-            println("Using local.properties for signing")
         }
 
         sign(publishing.publications)
@@ -173,7 +165,7 @@ private fun Project.signPublications(properties: Properties) =
         }
     }
 
-val ConfigurationContainer.mavenScoped
+private val ConfigurationContainer.mavenScoped
     get() = mapOf(
         runtimeOnly.get() to "runtime",
         api.get() to "compile",
