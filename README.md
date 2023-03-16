@@ -73,11 +73,6 @@ store.subscribe(
 ## Android (Compose):
 
 ```kotlin
-
-// mark your state, intent and action interfaces as @Immutable for performance gains
-// @Immutable
-// sealed interface ScreenState: MVIState { ... }
-
 class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
 
     override fun recover(from: Exception) = Error(from) // optional
@@ -114,10 +109,6 @@ fun ComposeScreen() = MVIComposable(
     }
 }
 ```
-
-If you don't want to use MVIComposable, just collect the actions flow using coroutineScope and render states
-using `viewModel.states.collectAsStateOnLifecycle()`
-
 ## Android (View):
 
 ```kotlin
@@ -145,12 +136,7 @@ class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenActio
 ```
 
 And that's it!   
-If you don't like base classes, interfaces or abstraction, there always are ways to avoid inheritance and use
-composition. You are not required in any way to extend MVIView or MVIViewModel, or even MVIProvider. Everything is
-possible with a couple of lambdas. For examples of such implementations,
-see [sample app](/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/NoBaseClassViewModel.kt) or read javadocs.
-
-For more information and more elaborate examples, see the sample app.  
+For more information and more elaborate examples, see the documentation.  
 More docs are coming soon with much more detail.
 
 ## License
