@@ -8,7 +8,8 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.dokka)
-    alias(libs.plugins.atomicfu)
+    // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/281
+    // alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
 }
 
@@ -75,12 +76,12 @@ versionCatalogUpdate {
     }
 }
 
-atomicfu {
-    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
-    transformJvm = true
-    jvmVariant = "VH"
-    transformJs = false
-}
+// atomicfu {
+//     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+//     transformJvm = false
+//     jvmVariant = "VH"
+//     transformJs = false
+// }
 
 tasks.dokkaHtmlMultiModule.configure {
     outputDirectory.set(buildDir.resolve("dokka"))

@@ -1,7 +1,7 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id("pro.respawn.shared-library")
-    id(libs.plugins.atomicfu.id)
+    // id(libs.plugins.atomicfu.id)
     alias(libs.plugins.kotest)
 }
 
@@ -27,4 +27,5 @@ kotlin {
 
 dependencies {
     commonMainApi(libs.kotlinx.coroutines.core)
+    commonMainImplementation(libs.kotlinx.atomicfu)
 }
