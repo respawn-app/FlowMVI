@@ -65,11 +65,11 @@ public interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIActi
     // the library does not support java, and Kotlin does not allow
     // overridable @JvmName because of java interop so its' safe to suppress this
     // will be solved by context receivers
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("sendIntent")
     /**
      * @see MVIProvider.send
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendIntent")
     public fun I.send(): Unit = send(this)
 }
 
@@ -176,11 +176,11 @@ public interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISub
      */
     public fun send(intent: I): Unit = provider.send(intent)
 
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("sendAction")
     /**
      * @see MVIProvider.send
      */
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("sendAction")
     public fun I.send(): Unit = send(this)
 }
 
@@ -307,9 +307,6 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     @DelicateStoreApi
     public val state: S
 
-    // the library does not support java, and Kotlin does not allow
-    // overridable @JvmName because of java interop so its' safe to suppress this
-    // will be solved by context receivers
     /**
      * @see [MVIProvider.send]
      */

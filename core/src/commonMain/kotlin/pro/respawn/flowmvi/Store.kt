@@ -17,11 +17,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      */
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     /**
-     * A buffer size for actions that are left unprocessed in the store.
-     * On buffer overflow, the oldest action will be dropped.
-     * Intents have unlimited buffer.
-     */
-    /**
      * State to emit when [reduce] throws.
      *
      *  **Default implementation rethrows the exception**
@@ -42,6 +37,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
 
 /**
  * A builder function of [MVIStore] that creates  the store lazily. This function does NOT launch the store.
+ * @see MVIStore
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     initial: S,
@@ -53,6 +49,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
 
 /**
  * A builder function of [MVIStore] that creates, and then launches the store lazily.
+ * @see MVIStore
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     scope: CoroutineScope,

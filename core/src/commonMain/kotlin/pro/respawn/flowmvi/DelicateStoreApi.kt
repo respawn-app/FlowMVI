@@ -4,7 +4,7 @@ package pro.respawn.flowmvi
  * Marker annotation for store apis that are not thread-safe
  */
 @RequiresOptIn(
-    message = "This API is low-level. Make sure you are not abusing it, because thread sync issues are likely."
+    message = "This API is low-level. If you use it, make sure to not introduce races to your state management"
 )
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)

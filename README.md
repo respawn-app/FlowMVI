@@ -7,7 +7,6 @@
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
 ![GitHub top language](https://img.shields.io/github/languages/top/respawn-app/flowMVI)
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
-[![Codacy](https://app.codacy.com/project/badge/Grade/33309557cdd04b649e940843aa5f1e38)](https://www.codacy.com/gh/respawn-app/FlowMVI/dashboard)
 
 FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a few main goals:
 
@@ -37,32 +36,28 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref 
 ## Core:
 
 ```kotlin
-sealed interface ScreenState: MVIState { // using interfaces is more performant and adheres to MVI principles
-    object Loading: ScreenState
-    data class Error(e: Exception): ScreenState
-    data class DisplayingCounter(
-        val counter: Int,
-    ): ScreenState
+sealed interface ScreenState : MVIState {
+    data object Loading : ScreenState
+    data class Error(e: Exception) : ScreenState
+    data class DisplayingCounter(val counter: Int) : ScreenState
 }
 
-sealed interface ScreenIntent: MVIIntent {
-    object ClickedCounter: ScreenIntent
+sealed interface ScreenIntent : MVIIntent {
+    data object ClickedCounter : ScreenIntent
 }
 
-sealed interface ScreenAction: MVIAction {
-    data class ShowMessage(val message: String): ScreenAction
+sealed interface ScreenAction : MVIAction {
+    data class ShowMessage(val message: String) : ScreenAction
 }
 
 
 val store by launchedStore<ScreenState, ScreenIntent, ScreenAction>(
     scope = eventProcessingCoroutineScope,
-    initial = DisplayingCounter(0),
-    behavior = ActionShareBehavior.Distribute(),
+    initial = Loading,
     reduce = { intent -> /*...*/ },
 )
 
-//somewhere in the ui layer
-
+// somewhere in the ui layer...
 store.subscribe(
     consumerCoroutineScope,
     consume = { action -> /* ... */ },
@@ -73,12 +68,9 @@ store.subscribe(
 ## Android (Compose):
 
 ```kotlin
-class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
+class ScreenViewModel : MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
 
-    override fun recover(from: Exception) = Error(from) // optional
-
-    override suspend fun reduce(intent: ScreenIntent): Unit = when(intent) {
-        //no-op if state is not DisplayingCounter
+    override suspend fun reduce(intent: ScreenIntent): Unit = when (intent) {
         is ClickedCounter -> updateState<DisplayingCounter> { //this -> DisplayingCounter
 
             ShowMessage("Incremented counter").send()
@@ -91,12 +83,14 @@ class ScreenViewModel: MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(ini
 
 @Composable
 fun ComposeScreen() = MVIComposable(
-    provider = getViewModel<ScreenViewModel>(), //use your fav DI framework
-) { state -> // this -> ConsumerScope
+    provider = getViewModel<ScreenViewModel>(),
+) { state ->
 
     consume { action ->
         when (action) {
-            is ShowMessage -> { /* ... */ }
+            is ShowMessage -> {
+                /* ... */
+            }
         }
     }
 
@@ -122,7 +116,7 @@ class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenActio
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subscribe() // one-liner for store subscription. Lifecycle-aware and efficient.
+        subscribe() // One-liner for store subscription. Lifecycle-aware and efficient.
     }
 
     override fun render(state: ScreenState) {
@@ -136,8 +130,7 @@ class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenActio
 ```
 
 And that's it!   
-For more information and more elaborate examples, see the documentation.  
-More docs are coming soon with much more detail.
+For more information and sample code, see the [Documentation](https://opensource.respawn.pro/FlowMVI).
 
 ## License
 

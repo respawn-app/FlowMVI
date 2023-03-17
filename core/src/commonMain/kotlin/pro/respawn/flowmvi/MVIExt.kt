@@ -120,7 +120,7 @@ public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.up
  * Obtain the current [MVIStore.state] and update it with
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
- * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
+ * **This function will suspend until all previous [MVIStore.updateState] invocations are finished.**
  * @see MVIStore.updateState
  * @see [withState]
  */
