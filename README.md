@@ -7,6 +7,7 @@
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
 ![GitHub top language](https://img.shields.io/github/languages/top/respawn-app/flowMVI)
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
+[![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
 FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a few main goals:
 
