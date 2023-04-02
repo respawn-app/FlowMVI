@@ -2,7 +2,6 @@
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
-import gradle.kotlin.dsl.accessors._23673d25a43a3ae0349f048e5ad21ead.kotlin
 import org.gradle.api.Project
 
 fun Project.configureAndroid(
@@ -44,12 +43,16 @@ fun Project.configureAndroid(
 
     val libs by versionCatalog
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.findVersion("compose-compiler").get().toString()
+        kotlinCompilerExtensionVersion = libs.requireVersion("compose-compiler")
     }
 
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += setOf(
+                "DebugProbesKt.bin",
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "/META-INF/versions/9/previous-compilation-data.bin"
+            )
         }
     }
 
@@ -78,17 +81,11 @@ fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
                 "archivesBaseName",
                 project.name
             )
-            isMinifyEnabled = Config.isMinifyEnabledRelease
         }
     }
 
     defaultConfig {
         consumerProguardFiles(file(Config.consumerProguardFile))
-    }
-
-    buildFeatures {
-        buildConfig = false
-        androidResources = true // required for R8 to work
     }
 
     libraryVariants.all {
