@@ -19,13 +19,8 @@ fun Project.configureMultiplatform(
     explicitApi()
 
     val libs by versionCatalog
-
     val commonMain by sourceSets.getting
-    val commonTest by sourceSets.getting {
-        dependencies {
-            // implementation(kotlin("test"))
-        }
-    }
+    val commonTest by sourceSets.getting
 
     sourceSets.apply {
         all {
@@ -37,13 +32,9 @@ fun Project.configureMultiplatform(
         }
     }
 
-    if (linux) {
-        linuxX64()
-    }
+    if (linux) linuxX64()
 
-    if (mingw) {
-        mingwX64()
-    }
+    if (mingw) mingwX64()
 
     if (js) {
         js(IR) {
@@ -70,12 +61,11 @@ fun Project.configureMultiplatform(
 
     if (android) {
         android {
-            publishAllLibraryVariants()
+            publishLibraryVariants(Config.publishingVariant)
         }
 
         sourceSets.apply {
             val androidMain by getting
-            // val androidTest by getting
         }
     }
 

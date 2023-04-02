@@ -1,9 +1,6 @@
 @file:Suppress("MissingPackageDeclaration", "unused")
 
 import com.android.build.api.dsl.LibraryExtension
-import com.android.build.api.dsl.LibraryPublishing
-import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.internal.crash.afterEvaluate
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.Project
@@ -41,16 +38,13 @@ fun Project.publishMultiplatform() {
     }
 }
 
-const val variant = "release"
-
 /**
  * Publish the android artifact
  */
 fun Project.publishAndroid() {
-
     requireNotNull(extensions.findByType<LibraryExtension>()).apply {
         publishing {
-            singleVariant(variant) {
+            singleVariant(Config.publishingVariant) {
                 withSourcesJar()
                 withJavadocJar()
             }
@@ -68,9 +62,9 @@ fun Project.publishAndroid() {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications {
-                create(variant, MavenPublication::class.java) {
-                    from(components[variant])
-                    suppressPomMetadataWarningsFor(variant)
+                create(Config.publishingVariant, MavenPublication::class.java) {
+                    from(components[Config.publishingVariant])
+                    suppressPomMetadataWarningsFor(Config.publishingVariant)
                     groupId = rootProject.group.toString()
                     artifactId = project.name
 

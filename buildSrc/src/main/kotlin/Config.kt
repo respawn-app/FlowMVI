@@ -43,6 +43,7 @@ object Config {
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
+    const val publishingVariant = "release"
 
     // android
     const val namespace = artifactId
