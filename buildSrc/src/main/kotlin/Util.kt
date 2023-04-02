@@ -25,13 +25,12 @@ import java.util.Base64
  * ```
  */
 val Project.versionCatalog: Lazy<VersionCatalog>
-    get() = lazy {
-        extensions.getByType<VersionCatalogsExtension>().named("libs")
-    }
+    get() = lazy { extensions.getByType<VersionCatalogsExtension>().named("libs") }
 
 fun VersionCatalog.requirePlugin(alias: String) = findPlugin(alias).get().toString()
 fun VersionCatalog.requireLib(alias: String) = findLibrary(alias).get()
 fun VersionCatalog.requireBundle(alias: String) = findBundle(alias).get()
+fun VersionCatalog.requireVersion(alias: String) = findVersion(alias).get().toString()
 
 val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId
 
@@ -41,7 +40,7 @@ fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit
 
 /**
  * Creates a java array initializer code for a list of strings.
- * { "a", "b", "c" }
+ * Example: { "a", "b", "c" }
  */
 fun List<String>.toJavaArrayString() = buildString {
     append("{")

@@ -1,11 +1,6 @@
 @file:Suppress("MissingPackageDeclaration")
 
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.api
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.compileOnly
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.implementation
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.runtimeOnly
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
@@ -94,11 +89,3 @@ internal fun Project.signPublications(properties: Properties) =
             }
         }
     }
-
-internal val ConfigurationContainer.mavenScoped
-    get() = mapOf(
-        runtimeOnly.get() to "runtime",
-        api.get() to "compile",
-        implementation.get() to "compile",
-        compileOnly.get() to "provided"
-    )

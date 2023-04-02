@@ -17,7 +17,7 @@ object Config {
 
     const val majorRelease = 1
     const val minorRelease = 1
-    const val patch = 3
+    const val patch = 4
     const val versionName = "$majorRelease.$minorRelease.$patch"
 
     // kotlin
@@ -43,6 +43,7 @@ object Config {
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
+    const val publishingVariant = "release"
 
     // android
     const val namespace = artifactId

@@ -1,7 +1,7 @@
 [versions]
-activity = "1.6.1"
-compose = "1.4.0-rc01"
-compose-compiler = "1.4.3"
+activity = "1.7.0"
+compose = "1.4.0"
+compose-compiler = "1.4.4"
 composeDetektPlugin = "1.2.2"
 core-ktx = "1.9.0"
 coroutines = "1.6.4"
@@ -10,26 +10,25 @@ detekt = "1.22.0"
 detektFormattingPlugin = "1.22.0"
 dokka = "1.8.10"
 flowExt = "0.3.0"
-fragment = "1.5.5"
-gradleAndroid = "8.0.0-beta05"
+fragment = "1.5.6"
+gradleAndroid = "8.0.0-rc01"
 gradleDoctorPlugin = "0.8.1"
 junit = "4.13.2"
-koin = "3.3.3"
+koin = "3.4.0"
+koin-compose = "3.4.3"
 kotest = "5.5.5"
 kotest-plugin = "5.5.5"
 # @pin
 kotlin = "1.8.10"
-kotlinx-atomicfu = "0.20.0"
-lifecycle = "2.6.0"
+kotlinx-atomicfu = "0.20.1"
+lifecycle = "2.6.1"
 material = "1.8.0"
 mockk = "1.13.2"
-turbine = "0.12.1"
+turbine = "0.12.3"
 versionCatalogUpdatePlugin = "0.8.0"
 versionsPlugin = "0.46.0"
-koin-compose = "3.4.2"
 
 [libraries]
-kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
@@ -60,6 +59,7 @@ kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest"
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }

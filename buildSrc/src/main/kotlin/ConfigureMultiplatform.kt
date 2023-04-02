@@ -1,4 +1,4 @@
-@file:Suppress("MissingPackageDeclaration")
+@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.creating
@@ -7,7 +7,6 @@ import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-@Suppress("unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
     android: Boolean = false,
@@ -20,13 +19,8 @@ fun Project.configureMultiplatform(
     explicitApi()
 
     val libs by versionCatalog
-
     val commonMain by sourceSets.getting
-    val commonTest by sourceSets.getting {
-        dependencies {
-            // implementation(kotlin("test"))
-        }
-    }
+    val commonTest by sourceSets.getting
 
     sourceSets.apply {
         all {
@@ -38,13 +32,9 @@ fun Project.configureMultiplatform(
         }
     }
 
-    if (linux) {
-        linuxX64()
-    }
+    if (linux) linuxX64()
 
-    if (mingw) {
-        mingwX64()
-    }
+    if (mingw) mingwX64()
 
     if (js) {
         js(IR) {
@@ -71,12 +61,11 @@ fun Project.configureMultiplatform(
 
     if (android) {
         android {
-            publishAllLibraryVariants()
+            publishLibraryVariants(Config.publishingVariant)
         }
 
         sourceSets.apply {
             val androidMain by getting
-            // val androidTest by getting
         }
     }
 

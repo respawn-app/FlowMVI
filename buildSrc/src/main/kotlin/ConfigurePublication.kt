@@ -1,18 +1,20 @@
-@file:Suppress("MissingPackageDeclaration")
+@file:Suppress("MissingPackageDeclaration", "unused")
 
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
 /**
  * Configures Maven publishing to sonatype for this project
  */
-@Suppress("unused")
 fun Project.publishMultiplatform() {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
@@ -30,12 +32,28 @@ fun Project.publishMultiplatform() {
         }
         signPublications(properties)
     }
+
+    tasks.withType<AbstractPublishToMaven> {
+        dependsOn(dokkaJavadocJar)
+    }
 }
 
 /**
  * Publish the android artifact
  */
 fun Project.publishAndroid() {
+    requireNotNull(extensions.findByType<LibraryExtension>()).apply {
+        publishing {
+            singleVariant(Config.publishingVariant) {
+                withSourcesJar()
+                withJavadocJar()
+            }
+        }
+        testFixtures {
+            enable = true
+        }
+    }
+
     afterEvaluate {
         val properties = gradleLocalProperties(rootDir)
         val isReleaseBuild = properties["release"]?.toString().toBoolean()
@@ -44,28 +62,14 @@ fun Project.publishAndroid() {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications {
-                create("release", MavenPublication::class.java) {
-                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                create(Config.publishingVariant, MavenPublication::class.java) {
+                    from(components[Config.publishingVariant])
+                    suppressPomMetadataWarningsFor(Config.publishingVariant)
                     groupId = rootProject.group.toString()
                     artifactId = project.name
 
                     configurePom()
                     configureVersion(isReleaseBuild)
-
-                    pom.withXml {
-                        val dependenciesNode = asNode().appendNode("dependencies")
-                        configurations.mavenScoped.forEach { it, scope ->
-                            it.allDependencies.all {
-                                if (group == null || version == null || name == "unspecified") return@all
-
-                                val node = dependenciesNode.appendNode("dependency")
-                                node.appendNode("groupId", group)
-                                node.appendNode("artifactId", name)
-                                node.appendNode("version", version)
-                                node.appendNode("scope", scope)
-                            }
-                        }
-                    }
                 }
             }
         }
