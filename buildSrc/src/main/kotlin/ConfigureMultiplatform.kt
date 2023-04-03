@@ -1,5 +1,6 @@
-@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
+@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction", "LongMethod")
 
+import Config.jvmTarget
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
@@ -25,6 +26,7 @@ fun Project.configureMultiplatform(
     sourceSets.apply {
         all {
             languageSettings {
+                progressiveMode = true
                 languageVersion = Config.kotlinVersion.version
                 progressiveMode = true
                 Config.optIns.forEach { optIn(it) }
@@ -72,7 +74,10 @@ fun Project.configureMultiplatform(
     if (jvm) {
         jvm {
             compilations.all {
-                kotlinOptions.jvmTarget = Config.jvmTarget.target
+                kotlinOptions {
+                    jvmTarget = Config.jvmTarget.target
+                    freeCompilerArgs += Config.jvmCompilerArgs
+                }
             }
             testRuns["test"].executionTask.configure {
                 useJUnitPlatform()

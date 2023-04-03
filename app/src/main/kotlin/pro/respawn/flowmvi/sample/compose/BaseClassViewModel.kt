@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import pro.respawn.flowmvi.DelicateStoreApi
 import pro.respawn.flowmvi.android.MVIViewModel
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
@@ -28,19 +29,19 @@ class BaseClassViewModel(
         // You can also subscribe to any flows you want here, since the only source of truth in your viewmodel
         // Must now be actions / states flows
         // Use operators onEach/map+setEach to emit states / actions on flow emissions
-        incrementCounter(-1)
-
-        repo.getCounter()
-            .onEach(::timerToState) // set mapped states
+        repo.getTimer()
+            .onEach(::produceState) // set mapped states
             .recover() // recover from exceptions
             .flowOn(Dispatchers.Default) // create states out of the main thread
             .consume() // launch in view model scope
     }
 
     // Will be called when reduce or any child coroutine throws an exception
+    // usually we would display a full-screen error here
+    @OptIn(DelicateStoreApi::class)
     override fun recover(from: Exception): ComposeState {
-        ShowSnackbar(R.string.error).send()
-        return DisplayingContent(0, 0)
+        send(ShowSnackbar(R.string.error))
+        return state
     }
 
     // Will be called each time a subscriber sends a new Intent in a separate coroutine
@@ -53,29 +54,30 @@ class BaseClassViewModel(
             is ClickedCounter -> updateState<DisplayingContent> { // this -> DisplayingContent
 
                 // Launch a new coroutine that will set the state later
-                incrementCounter(current = counter, timer)
+                incrementCounter()
 
                 // Immediately return Loading state
                 Loading // ^withState
             }
 
-            is ClickedToBasicActivity -> GoToBasicActivity.send()
+            is ClickedToBasicActivity -> send(GoToBasicActivity)
         }
     }
 
-    private suspend fun timerToState(value: Int) = updateState<DisplayingContent> { copy(timer = value) }
+    private suspend fun produceState(timer: Int) = updateState {
+        val current = this as? DisplayingContent
+        DisplayingContent(
+            timer = timer,
+            counter = current?.counter ?: 0,
+        )
+    }
 
-    private fun incrementCounter(current: Int, timer: Int? = null) = launchRecovering {
-        delay(1000L)
-
-        require(Random.nextBoolean()) { "Something bad happened during intent processing" }
-
+    private fun DisplayingContent.incrementCounter() = launchRecovering {
         // sets this new state after calculations done
         updateState {
-            DisplayingContent(
-                counter = current + 1,
-                timer = timer ?: (this as? DisplayingContent)?.timer ?: 0
-            )
+            delay(1000L)
+            require(Random.nextBoolean()) { "Something bad happened during intent processing" }
+            copy(counter = counter + 1)
         }
     }
 }

@@ -26,15 +26,19 @@ object Config {
         "kotlinx.coroutines.ExperimentalCoroutinesApi",
         "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
-        "kotlin.experimental.ExperimentalTypeInference"
+        "kotlin.experimental.ExperimentalTypeInference",
+        "kotlin.contracts.ExperimentalContracts"
     )
-    val kotlinCompilerArgs = listOf(
-        "-Xjvm-default=all", // enable all jvm optimizations
-        "-Xcontext-receivers",
+    val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
-        "-Xuse-k2",
-        // "-XXLanguage:+ExplicitBackingFields"
-    ) + optIns.map { "-opt-in=$it" }
+    )
+    val jvmCompilerArgs = buildList {
+        addAll(compilerArgs)
+        add("-Xjvm-default=all") // enable all jvm optimizations
+        add("-Xcontext-receivers")
+        // add("-Xuse-k2")
+        addAll(optIns.map { "-opt-in=$it" })
+    }
 
     val jvmTarget = JvmTarget.JVM_11
     val javaVersion = JavaVersion.VERSION_11

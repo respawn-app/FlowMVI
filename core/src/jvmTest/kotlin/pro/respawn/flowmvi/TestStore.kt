@@ -3,8 +3,8 @@
 package pro.respawn.flowmvi
 
 internal fun TestStore(
-    initialState: TestState,
+    initial: TestState,
     behavior: ActionShareBehavior,
     recover: Recover<TestState> = { throw it },
-    reduce: Reducer<TestState, TestIntent, TestAction>,
-) = MVIStore(initialState, behavior, recover = recover, reduce = reduce)
+    reduce: Reduce<TestState, TestIntent, TestAction>,
+) = MVIStore(initial, behavior, recover = recover, reduce = reduce)

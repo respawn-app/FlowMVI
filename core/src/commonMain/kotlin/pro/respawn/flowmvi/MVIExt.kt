@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalContracts::class)
-
 package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
@@ -8,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmName
@@ -34,6 +31,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subs
  * Subscribe to the store using provided scope.
  * This function is __not__ lifecycle-aware and just uses provided scope for flow collection.
  */
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I, A>.subscribe(
     scope: CoroutineScope,
     crossinline consume: (action: A) -> Unit,
@@ -59,6 +57,7 @@ public inline fun <T> Flow<T>.catchExceptions(
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
 @OverloadResolutionByLambdaReturnType
+@FlowMVIDSL
 public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -73,6 +72,7 @@ public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R):
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
+@FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
@@ -89,6 +89,7 @@ public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.wit
  * @see MVIStore.withState
  */
 @OverloadResolutionByLambdaReturnType
+@FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
     @BuilderInference crossinline block: suspend T.() -> R
 ): R? {
@@ -107,6 +108,7 @@ public suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>
  * @see [withState]
  */
 @JvmName("updateStateTyped")
+@FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
@@ -125,6 +127,7 @@ public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.up
  * @see [withState]
  */
 @JvmName("updateStateTyped")
+@FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
@@ -133,3 +136,17 @@ public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.update
     }
     return updateState { withType<T, _> { transform() } }
 }
+
+// this BS is happening because kotlin context receivers are not available yet and there's no other way to provide multiple contexts
+/**
+ * A property that returns a [Reduce] lambda using the given [Reducer].
+ * May be needed to deal with contexts of invocation.
+ */
+public inline val <S : MVIState, I : MVIIntent> Reducer<S, I>.reduce: Reduce<S, I, *>
+    get() = { with(this as CoroutineScope) { reduce(it) } }
+
+/**
+ * A property that returns a [Recover] lambda using the given [Reducer].
+ * May be needed to deal with contexts of invocation.
+ */
+public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { recover(it) }

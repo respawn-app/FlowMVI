@@ -12,6 +12,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.FlowMVIDSL
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIProvider
@@ -22,6 +23,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
+@FlowMVIDSL
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
@@ -65,6 +67,7 @@ private class ConsumerScopeImpl<in I : MVIIntent, out A : MVIAction>(
 }
 
 @Composable
+@FlowMVIDSL
 @Suppress("ComposableParametersOrdering")
 /**
  * @see [ConsumerScope.consume]
@@ -81,6 +84,7 @@ public fun <A : MVIAction> MVIProvider<*, *, A>.consume(
 @OptIn(ExperimentalTypeInference::class)
 @Suppress("UNCHECKED_CAST")
 @Composable
+@FlowMVIDSL
 public fun <T : MVIIntent, A : MVIAction> EmptyScope(
     @BuilderInference call: @Composable ConsumerScope<T, A>.() -> Unit,
 ): Unit = call(EmptyScopeImpl as ConsumerScope<T, A>)

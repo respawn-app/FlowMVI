@@ -31,7 +31,7 @@ public interface MVIAction
 /**
  * An operation that processes incoming [MVIIntent]s
  */
-public typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
+public typealias Reduce<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
 
 /**
  * An operation that handles exceptions when processing [MVIIntent]s
@@ -39,8 +39,8 @@ public typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) ->
 public typealias Recover<S> = (e: Exception) -> S
 
 /**
- * An entity that handles [MVIIntent]s sent by UI layer and manages UI [states].
- * This is usually the business logic unit
+ * An entity that handles [MVIIntent]s, produces [actions] and manages [states].
+ * This is usually the business logic unit.
  */
 public interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
@@ -75,14 +75,15 @@ public interface MVIProvider<out S : MVIState, in I : MVIIntent, out A : MVIActi
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
+ * Usually not subclassed but used with a corresponding builder (see [lazyStore], [launchedStore]).
  * A store functions independently of any subscribers.
  * MVIStore is the base implementation of [MVIProvider].
  */
 public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIProvider<S, I, A> {
 
     /**
-     * Send a new UI side-effect to be processed by subscribers, only once.
-     * Actions not consumed will await in the queue with max capacity of 64 by default.
+     * Send a new side-effect to be processed by subscribers, only once.
+     * Actions not consumed will await in the queue with max capacity given as an implementation detail.
      * Actions that make the capacity overflow will be dropped, starting with the oldest.
      * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
@@ -90,10 +91,10 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
     public fun send(action: A)
 
     /**
-     * Starts store intent processing in a new coroutine on the parent thread.
+     * Starts store intent processing in a new coroutine in the given [scope].
      * Intents are processed as long as the parent scope is active.
-     * **Starting store processing when it is already started will result in an exception**
-     * Although not advised, store can experimentally be launched multiple times, provided you cancel the job used before.
+     * **Starting store processing when it is already started will result in an exception.**
+     * Although not advised, store can be launched multiple times, provided you cancel the job used before.
      * @return a [Job] that the store is running on that can be cancelled later.
      */
     public fun start(scope: CoroutineScope): Job
@@ -102,6 +103,7 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      * Obtain or set the current state in an unsafe manner.
      * This property is not thread-safe and parallel state updates will introduce a race condition when not
      * handled properly.
+     * Such race conditions arise when using multiple data streams such as [Flow]s
      */
     @DelicateStoreApi
     public val state: S
@@ -115,6 +117,7 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      * If you want to operate on a state of particular subtype, use the typed version of this function.
      * @see [withState]
      */
+    @FlowMVIDSL
     public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**
@@ -135,20 +138,21 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      *   withState { }
      * }
      * ```
-     * you should not get a deadlock, but messing with coroutine contexts can still cause deadlocks.
+     * you should not get a deadlock, but messing with coroutine contexts can still cause problems.
      *
      * @returns the value of [R], i.e. the result of the block.
      */
+    @FlowMVIDSL
     public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
-     * Launch a new coroutine using given [scope],
+     * Launch a new coroutine using given scope,
      * and use either provided [recover] block or the [MVIStore]'s recover block.
      * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
      * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
      */
-    public fun launchRecovering(
-        scope: CoroutineScope,
+    @FlowMVIDSL
+    public fun CoroutineScope.launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
         recover: Recover<S>? = null,
@@ -158,7 +162,7 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
 
 /**
  * A [consume]r of [MVIProvider]'s events that has certain state [S].
- * Each view needs a provider, a way to [send] intents to it,
+ * Each [MVIView] needs a provider, a way to [send] intents to it,
  * a way to [render] the new state, and a way to [consume] side-effects.
  * @see MVIProvider
  * @See MVISubscriber
@@ -186,6 +190,7 @@ public interface MVIView<S : MVIState, in I : MVIIntent, A : MVIAction> : MVISub
 
 /**
  * A generic subscriber of [MVIProvider] that [consume]s [MVIAction]s and [render]s [MVIState]s of types [A] and [S].
+ * For a more fully defined version, see [MVIView].
  */
 public interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 
@@ -193,7 +198,7 @@ public interface MVISubscriber<in S : MVIState, in A : MVIAction> {
      * Render a new [state].
      * This function will be called each time a new state is received.
      *
-     * This function should be idempotent and should not send any intents.
+     * This function should be idempotent, pure, and should not send any intents.
      */
     public fun render(state: S)
 
@@ -207,7 +212,7 @@ public interface MVISubscriber<in S : MVIState, in A : MVIAction> {
 }
 
 /**
- * An enum representing how [MVIAction] sharing will be handled in the [MVIStore].
+ * An class representing how [MVIAction] sharing will be handled in the [MVIStore].
  * There are 3 possible behaviors, which will be different depending on the use-case.
  * When in doubt, use the default one, and change if you have issues.
  * @see MVIStore
@@ -240,9 +245,9 @@ public sealed interface ActionShareBehavior {
     /**
      * Restricts the count of subscribers to 1.
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
-     * In other words, you will be required to create a new store for each caller of [subscribe].
+     * In other words, you will be required to create a new store for each invocation of [subscribe].
      *
-     * **Resubscriptions are not allowed too, including lifecycle-aware collection**.
+     * **Repeated subscriptions are not allowed too, including lifecycle-aware collection**.
      *
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      */
@@ -259,20 +264,37 @@ public sealed interface ActionShareBehavior {
 }
 
 /**
+ * An interface for defining a function that will [reduce] incoming [MVIIntent]s.
+ * Similar to [Reduce], but can be implemented somewhere else and composed.
+ * For ways to convert this to [Reduce] to create a store, see extension functions `recover` and `reduce`.
+ */
+public fun interface Reducer<S : MVIState, in I : MVIIntent> {
+
+    /**
+     * Reduce consumer's intent to a new [MVIState] or zero or more [MVIAction]s.
+     * Use [MVIStore.send] for sending side-effects for the [MVISubscriber] to handle.
+     * Coroutines launched inside [reduce] can fail independently of each other.
+     */
+    // false-positive https://youtrack.jetbrains.com/issue/KTIJ-7642
+    @Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION")
+    public suspend fun CoroutineScope.reduce(intent: I)
+
+    /**
+     * State to emit when [reduce] throws.
+     *
+     *  **Default implementation rethrows the exception.**
+     *  **The body of this block may be evaluated multiple times in case of concurrent state updates**
+     */
+    public fun recover(from: Exception): S = throw from
+}
+
+/**
  * A scope of the operation inside [MVIStore].
  * Provides a [CoroutineScope] to use.
- * Throwing when in this scope will result in recover() of the parent store being called.
+ * Throwing when in this scope will result in [Reducer.recover] of the store being called.
  * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
 public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
-
-    /**
-     * A coroutine scope the intent processing runs on. This is a child scope that is used when
-     * [MVIStore.start] is called.
-     *
-     * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
-     */
-    public val scope: CoroutineScope
 
     /**
      * Delegates to [MVIStore.send]
@@ -282,6 +304,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     /**
      * Delegates to [MVIStore.launchRecovering]
      */
+    @FlowMVIDSL
     public fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -292,6 +315,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     /**
      * Delegates to [MVIStore.withState]
      */
+    @FlowMVIDSL
     public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
@@ -299,6 +323,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
      * @see MVIStore.updateState
      * @see [withState]
      */
+    @FlowMVIDSL
     public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**

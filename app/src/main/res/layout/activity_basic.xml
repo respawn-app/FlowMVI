@@ -18,10 +18,28 @@
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/counter"
+        android:id="@+id/tvCounter"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@+id/fab" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvParam"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@+id/tvCounter" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

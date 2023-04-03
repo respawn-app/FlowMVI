@@ -60,7 +60,7 @@ class StoreTest : FreeSpec({
     }
 
     "given store that sends actions and updates states" - {
-        val reduce: Reducer<TestState, TestIntent, TestAction> = { send(TestAction.Some) }
+        val reduce: Reduce<TestState, TestIntent, TestAction> = { send(TestAction.Some) }
         "and 2 subscribers" - {
             val sub1 = TestSubscriber<TestState, TestAction>()
             val sub2 = TestSubscriber<TestState, TestAction>()
@@ -70,7 +70,7 @@ class StoreTest : FreeSpec({
                     shouldThrowAny {
                         coroutineScope {
                             TestStore(
-                                initialState = TestState.Some,
+                                initial = TestState.Some,
                                 behavior = ActionShareBehavior.Restrict(),
                                 reduce = reduce
                             ).launched(this@coroutineScope) {
