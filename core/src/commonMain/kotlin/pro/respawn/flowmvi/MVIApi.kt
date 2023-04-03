@@ -260,7 +260,7 @@ public sealed interface ActionShareBehavior {
          * The default action buffer size
          * @see kotlinx.coroutines.channels.Channel.BUFFERED
          */
-        public const val DefaultBufferSize: Int = Channel.BUFFERED
+        public const val DefaultBufferSize: Int = 64
     }
 }
 
