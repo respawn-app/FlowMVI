@@ -9,8 +9,4 @@ android {
     configureAndroidLibrary(this)
 }
 
-kotlin {
-    explicitApi()
-}
-
 publishAndroid()

@@ -260,6 +260,26 @@ public sealed interface ActionShareBehavior {
     }
 }
 
+public fun interface Reducer<S : MVIState, in I : MVIIntent> {
+
+    /**
+     * Reduce consumer's intent to a new state.
+     * Use [MVIStore.send] for sending side-effects for the view to handle.
+     * Coroutines launched inside [reduce] can fail independently of each other.
+     */
+    // false-positive https://youtrack.jetbrains.com/issue/KTIJ-7642
+    @Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION")
+    public suspend fun CoroutineScope.reduce(intent: I)
+
+    /**
+     * State to emit when [reduce] throws.
+     *
+     *  **Default implementation rethrows the exception**
+     *  **The body of this block may be evaluated multiple times in case of concurrent state updates**
+     */
+    public fun recover(from: Exception): S = throw from
+}
+
 /**
  * A scope of the operation inside [MVIStore].
  * Provides a [CoroutineScope] to use.

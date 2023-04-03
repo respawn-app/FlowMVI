@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import pro.respawn.flowmvi.ActionShareBehavior
 import pro.respawn.flowmvi.DelicateStoreApi
@@ -34,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
  * @See pro.respawn.flowmvi.MVISubscriber
  * @See MVIProvider
  */
-abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
+public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
 ) : ViewModel(), ReducerScope<S, I, A>, MVIProvider<S, I, A> {
 
@@ -64,14 +65,14 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     )
 
     @DelicateStoreApi
-    override val state get() = store.state
-    override val actions get() = store.actions
-    override val states get() = store.states
-    override fun send(intent: I) = store.send(intent)
-    override fun send(action: A) = store.send(action)
+    override val state: S get() = store.state
+    override val scope: CoroutineScope get() = viewModelScope
+    override val actions: Flow<A> get() = store.actions
+    override val states: StateFlow<S> get() = store.states
+    override fun send(intent: I): Unit = store.send(intent)
+    override fun send(action: A): Unit = store.send(action)
     override suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
-
-    final override suspend fun <R> withState(block: suspend S.() -> R) = store.withState(block)
+    final override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
     override fun launchRecovering(
         context: CoroutineContext,
         start: CoroutineStart,
@@ -84,13 +85,13 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Shorthand for [Flow.launchIn] in viewModelScope
      */
-    protected fun <T> Flow<T>.consume() = launchIn(viewModelScope)
+    protected fun <T> Flow<T>.consume(): Job = launchIn(viewModelScope)
 
     /**
      * Uses [recover] to reduce exceptions occurring in the flow to states.
      * Shorthand for [kotlinx.coroutines.flow.catch]
      */
-    protected fun <T> Flow<T>.recover() = catchExceptions { updateState { recover(it) } }
+    protected fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { updateState { recover(it) } }
 
 
     /**
