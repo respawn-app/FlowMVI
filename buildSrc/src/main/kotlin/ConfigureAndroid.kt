@@ -2,6 +2,7 @@
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
+import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.kotlin
 import org.gradle.api.Project
 
 fun Project.configureAndroid(
@@ -28,6 +29,12 @@ fun Project.configureAndroid(
     compileOptions {
         sourceCompatibility = Config.javaVersion
         targetCompatibility = Config.javaVersion
+    }
+
+    kotlinOptions {
+        freeCompilerArgs += Config.jvmCompilerArgs
+        jvmTarget = Config.jvmTarget.target
+        languageVersion = Config.kotlinVersion.version
     }
 
     buildFeatures {

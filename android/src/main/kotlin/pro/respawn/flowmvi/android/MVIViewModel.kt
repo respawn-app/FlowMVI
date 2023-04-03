@@ -68,7 +68,7 @@ abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
         initial = initialState,
         behavior = ActionShareBehavior.Distribute(), // required for lifecycle awareness
         recover = { recover(it) },
-        reduce = { reduce(it) },
+        reduce = { this@MVIViewModel.reduce(it) },
     )
 
     override val scope get() = viewModelScope

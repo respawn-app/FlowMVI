@@ -1,5 +1,5 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -39,12 +39,6 @@ subprojects {
             dependsOn(dokkaJavadoc)
             from(dokkaJavadoc.flatMap { it.outputDirectory })
             archiveClassifier.set("javadoc")
-        }
-        withType<KotlinCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(Config.jvmTarget)
-                languageVersion.set(Config.kotlinVersion)
-            }
         }
     }
 }
