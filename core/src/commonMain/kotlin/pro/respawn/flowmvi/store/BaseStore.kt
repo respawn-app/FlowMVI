@@ -24,7 +24,7 @@ import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.Recover
-import pro.respawn.flowmvi.Reducer
+import pro.respawn.flowmvi.Reduce
 import pro.respawn.flowmvi.ReducerScopeImpl
 import pro.respawn.flowmvi.withReentrantLock
 import kotlin.coroutines.CoroutineContext
@@ -32,19 +32,17 @@ import kotlin.coroutines.CoroutineContext
 internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
     initialState: S,
     @BuilderInference private val recover: Recover<S>,
-    @BuilderInference private val reduce: Reducer<S, I, A>,
+    @BuilderInference private val reduce: Reduce<S, I, A>,
 ) : MVIStore<S, I, A> {
 
-    private val stateMutex = Mutex()
-
     private val _states = MutableStateFlow(initialState)
-    override val states: StateFlow<S> = _states.asStateFlow()
     private val isLaunched = atomic(false)
-
     private val intents = Channel<I>(Channel.UNLIMITED, SUSPEND)
+    private val stateMutex = Mutex()
 
     @DelicateStoreApi
     override val state by _states::value
+    override val states: StateFlow<S> = _states.asStateFlow()
 
     override fun start(scope: CoroutineScope): Job {
         require(!isLaunched.getAndSet(true)) { "Store is already started" }
@@ -77,12 +75,7 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         stateMutex.withReentrantLock { block(states.value) }
 
     override suspend fun updateState(transform: suspend S.() -> S): S =
-        stateMutex.withReentrantLock {
-            // this section should be thread-safe and atomic
-            val state = transform(_states.value)
-            _states.value = state
-            state
-        }
+        stateMutex.withReentrantLock { transform(_states.value).also { _states.value = it } }
 
     override fun launchRecovering(
         scope: CoroutineScope,
@@ -92,7 +85,6 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
         block: suspend CoroutineScope.() -> Unit,
     ): Job = scope.launch(context, start) {
         try {
-            // catches exceptions in nested coroutines
             supervisorScope(block)
         } catch (expected: CancellationException) {
             throw expected

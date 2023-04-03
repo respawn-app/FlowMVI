@@ -31,7 +31,7 @@ public interface MVIAction
 /**
  * An operation that processes incoming [MVIIntent]s
  */
-public typealias Reducer<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
+public typealias Reduce<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> Unit
 
 /**
  * An operation that handles exceptions when processing [MVIIntent]s

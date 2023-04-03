@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable.start
 import pro.respawn.flowmvi.store.ConsumingStore
 import pro.respawn.flowmvi.store.DistributingStore
 import pro.respawn.flowmvi.store.SharedStore
@@ -28,7 +29,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      * Use [MVIStore.send] for sending side-effects for the view to handle.
      * Coroutines launched inside [reduce] can fail independently of each other.
      */
-    @BuilderInference reduce: Reducer<S, I, A>,
+    @BuilderInference reduce: Reduce<S, I, A>,
 ): MVIStore<S, I, A> = when (behavior) {
     is ActionShareBehavior.Share -> SharedStore(initialState, behavior.replay, behavior.buffer, recover, reduce)
     is ActionShareBehavior.Distribute -> DistributingStore(initialState, behavior.buffer, recover, reduce)
@@ -44,7 +45,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference recover: Recover<S> = { throw it },
-    @BuilderInference reduce: Reducer<S, I, A>,
+    @BuilderInference reduce: Reduce<S, I, A>,
 ): Lazy<MVIStore<S, I, A>> = lazy(mode) { MVIStore(initial, behavior, recover, reduce) }
 
 /**
@@ -57,5 +58,5 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference recover: Recover<S> = { throw it },
-    @BuilderInference reduce: Reducer<S, I, A>
+    @BuilderInference reduce: Reduce<S, I, A>
 ): Lazy<MVIStore<S, I, A>> = lazy(mode) { MVIStore(initial, behavior, recover, reduce).apply { start(scope) } }
