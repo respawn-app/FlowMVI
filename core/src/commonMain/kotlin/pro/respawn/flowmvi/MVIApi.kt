@@ -115,6 +115,7 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      * If you want to operate on a state of particular subtype, use the typed version of this function.
      * @see [withState]
      */
+    @FlowMVIDSL
     public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**
@@ -139,6 +140,7 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      *
      * @returns the value of [R], i.e. the result of the block.
      */
+    @FlowMVIDSL
     public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
@@ -264,6 +266,7 @@ public sealed interface ActionShareBehavior {
  * Throwing when in this scope will result in recover() of the parent store being called.
  * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
+@FlowMVIDSL
 public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
 
     /**
