@@ -11,12 +11,6 @@
     * Overall, there are cases when changes are so frequent that you'll want to just leave some logic on the UI layer to
       avoid polluting the heap with garbage collected objects and keep the UI performant. Use only when necessary, as
       any logic in the UI layer is not great for the architecture.
-
-### Compose:
-
-* Make sure you use compose `@Immutable` on your Contract interfaces to prevent compose from making your
-  composables [non-skippable](https://developer.android.com/jetpack/compose/performance/bestpractices). They must be
-  immutable anyway, so feel free to always use the annotation.
 * Avoid subscribing to a bunch of flows in your Store / ViewModel. The best way to implement a reactive UI pattern is to
   use `combine(vararg flows...)` and merge all of your data streams into one flow, and then just use the `transform`
   block to handle the changes. Example:
