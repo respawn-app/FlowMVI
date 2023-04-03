@@ -18,13 +18,13 @@ import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.Recover
-import pro.respawn.flowmvi.ReducerScope
 import pro.respawn.flowmvi.catchExceptions
 import pro.respawn.flowmvi.launchedStore
 import pro.respawn.flowmvi.updateState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class.
@@ -37,7 +37,7 @@ import kotlin.coroutines.CoroutineContext
  */
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     initialState: S,
-) : ViewModel(), ReducerScope<S, I, A>, MVIProvider<S, I, A> {
+) : ViewModel(), MVIProvider<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -64,21 +64,40 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
         reduce = { this@MVIViewModel.reduce(it) },
     )
 
-    @DelicateStoreApi
-    override val state: S get() = store.state
-    override val scope: CoroutineScope get() = viewModelScope
     override val actions: Flow<A> get() = store.actions
     override val states: StateFlow<S> get() = store.states
     override fun send(intent: I): Unit = store.send(intent)
-    override fun send(action: A): Unit = store.send(action)
-    override suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
-    final override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
-    override fun launchRecovering(
-        context: CoroutineContext,
-        start: CoroutineStart,
-        recover: Recover<S>?,
+
+    @DelicateStoreApi
+    /**
+     * @see MVIStore.state
+     */
+    protected open val state: S get() = store.state
+
+    /**
+     * @see MVIStore.send
+     */
+    protected open fun send(action: A): Unit = store.send(action)
+
+    /**
+     * @see MVIStore.updateState
+     */
+    protected suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
+
+    /**
+     * @see MVIStore.withState
+     */
+    protected suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
+
+    /**
+     * @see MVIStore.launchRecovering
+     */
+    protected fun launchRecovering(
+        context: CoroutineContext = EmptyCoroutineContext,
+        start: CoroutineStart = CoroutineStart.DEFAULT,
+        recover: Recover<S>? = { recover(it) },
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = store.launchRecovering(viewModelScope, context, start, recover, block)
+    ): Job = with(store) { viewModelScope.launchRecovering(context, start, recover, block) }
 
     // TODO: With context receivers stable, this below can be removed
 
@@ -93,14 +112,18 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      */
     protected fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { updateState { recover(it) } }
 
-
     /**
      * Delegates to [MVIStore.updateState]
      */
     @JvmName("updateStateTyped")
     protected suspend inline fun <reified T : S> updateState(
         @BuilderInference crossinline transform: suspend T.() -> S
-    ): S = store.updateState(transform)
+    ): S {
+        contract {
+            callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        }
+        return store.updateState(transform)
+    }
 
     /**
      * Delegates to [MVIStore.updateState]

@@ -149,8 +149,8 @@ public interface MVIStore<S : MVIState, in I : MVIIntent, A : MVIAction> : MVIPr
      * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
      * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
      */
-    public fun launchRecovering(
-        scope: CoroutineScope,
+    @FlowMVIDSL
+    public fun CoroutineScope.launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
         recover: Recover<S>? = null,
@@ -286,16 +286,7 @@ public fun interface Reducer<S : MVIState, in I : MVIIntent> {
  * Throwing when in this scope will result in recover() of the parent store being called.
  * Child coroutines should handle their exceptions independently, unless using [launchRecovering].
  */
-@FlowMVIDSL
 public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
-
-    /**
-     * A coroutine scope the intent processing runs on. This is a child scope that is used when
-     * [MVIStore.start] is called.
-     *
-     * **Cancelling the scope will cancel the [MVIStore.start] (intent processing)**.
-     */
-    public val scope: CoroutineScope
 
     /**
      * Delegates to [MVIStore.send]
@@ -305,6 +296,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     /**
      * Delegates to [MVIStore.launchRecovering]
      */
+    @FlowMVIDSL
     public fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -315,6 +307,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
     /**
      * Delegates to [MVIStore.withState]
      */
+    @FlowMVIDSL
     public suspend fun <R> withState(block: suspend S.() -> R): R
 
     /**
@@ -322,6 +315,7 @@ public interface ReducerScope<S : MVIState, in I : MVIIntent, A : MVIAction> {
      * @see MVIStore.updateState
      * @see [withState]
      */
+    @FlowMVIDSL
     public suspend fun updateState(transform: suspend S.() -> S): S
 
     /**

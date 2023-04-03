@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.NonCancellable.start
 import pro.respawn.flowmvi.store.ConsumingStore
 import pro.respawn.flowmvi.store.DistributingStore
 import pro.respawn.flowmvi.store.SharedStore

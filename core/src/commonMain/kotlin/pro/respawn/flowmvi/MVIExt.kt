@@ -139,6 +139,6 @@ public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.update
 
 // this BS is happening because kotlin context receivers are not available yet and there's no other way to provide multiple contexts
 public inline val <S : MVIState, I : MVIIntent> Reducer<S, I>.reduce: Reduce<S, I, *>
-    get() = { with(scope) { reduce(it) } }
+    get() = { with(this as CoroutineScope) { reduce(it) } }
 
 public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { recover(it) }

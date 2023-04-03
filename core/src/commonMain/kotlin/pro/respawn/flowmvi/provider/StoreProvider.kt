@@ -16,13 +16,13 @@ import pro.respawn.flowmvi.Recover
 import pro.respawn.flowmvi.Reducer
 import pro.respawn.flowmvi.catchExceptions
 import pro.respawn.flowmvi.lazyStore
+import pro.respawn.flowmvi.recover
+import pro.respawn.flowmvi.reduce
 import pro.respawn.flowmvi.updateState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
-import pro.respawn.flowmvi.recover
-import kotlin.coroutines.EmptyCoroutineContext
 
 public abstract class StoreProvider<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
@@ -34,37 +34,25 @@ public abstract class StoreProvider<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected open val store: MVIStore<S, I, A> by lazyStore(
         initial = initial,
         behavior = behavior,
-        recover = { recover(it) },
-        reduce = { scope.reduce(it) },
+        recover = recover,
+        reduce = reduce,
     )
 
     @DelicateStoreApi
-    override val state: S get() = store.state
+    final override val state: S get() = store.state
     override val states: StateFlow<S> get() = store.states
     override val actions: Flow<A> get() = store.actions
     override fun send(intent: I): Unit = store.send(intent)
     override fun send(action: A): Unit = store.send(action)
-    override fun start(scope: CoroutineScope): Job = store.start(scope).also { scope.onStart() }
-    override suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
-    override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
-
-    @FlowMVIDSL
-    final override fun launchRecovering(
-        scope: CoroutineScope,
+    final override fun start(scope: CoroutineScope): Job = store.start(scope).also { scope.onStart() }
+    final override suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
+    final override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
+    final override fun CoroutineScope.launchRecovering(
         context: CoroutineContext,
         start: CoroutineStart,
         recover: Recover<S>?,
         block: suspend CoroutineScope.() -> Unit
-    ): Job = store.launchRecovering(scope, context, start, recover, block)
-
-    @FlowMVIDSL
-    @JvmName("launchRecoveringWithReceiver")
-    protected fun CoroutineScope.launchRecovering(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        recover: Recover<S>? = this@StoreProvider.recover,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job = store.launchRecovering(this, context, start, recover, block)
+    ): Job = with(store) { launchRecovering(context, start, recover ?: { recover(it) }, block) }
 
     /**
      * Uses [recover] to reduce exceptions occurring in the flow to states.
@@ -73,11 +61,18 @@ public abstract class StoreProvider<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { updateState { recover(it) } }
 
     @JvmName("updateStateTyped")
+    @FlowMVIDSL
     protected suspend inline fun <reified T : S> updateState(
         @BuilderInference crossinline transform: suspend T.() -> S
-    ): S = store.updateState(transform)
+    ): S {
+        contract {
+            callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        }
+        return store.updateState(transform)
+    }
 
     @JvmName("withStateTyped")
+    @FlowMVIDSL
     protected suspend inline fun <reified T : S, R> withState(
         @BuilderInference crossinline block: suspend T.() -> R
     ) {

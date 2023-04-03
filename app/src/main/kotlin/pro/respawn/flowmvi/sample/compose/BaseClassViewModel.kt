@@ -40,7 +40,7 @@ class BaseClassViewModel(
     // usually we would display a full-screen error here
     @OptIn(DelicateStoreApi::class)
     override fun recover(from: Exception): ComposeState {
-        ShowSnackbar(R.string.error).send()
+        send(ShowSnackbar(R.string.error))
         return state
     }
 
@@ -60,7 +60,7 @@ class BaseClassViewModel(
                 Loading // ^withState
             }
 
-            is ClickedToBasicActivity -> GoToBasicActivity.send()
+            is ClickedToBasicActivity -> send(GoToBasicActivity)
         }
     }
 

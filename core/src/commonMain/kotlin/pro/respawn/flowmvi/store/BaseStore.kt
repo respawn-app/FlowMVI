@@ -26,7 +26,7 @@ import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.Recover
 import pro.respawn.flowmvi.Reduce
 import pro.respawn.flowmvi.ReducerScopeImpl
-import pro.respawn.flowmvi.withReentrantLock
+import pro.respawn.flowmvi.util.withReentrantLock
 import kotlin.coroutines.CoroutineContext
 
 internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>(
@@ -77,13 +77,12 @@ internal abstract class BaseStore<S : MVIState, in I : MVIIntent, A : MVIAction>
     override suspend fun updateState(transform: suspend S.() -> S): S =
         stateMutex.withReentrantLock { transform(_states.value).also { _states.value = it } }
 
-    override fun launchRecovering(
-        scope: CoroutineScope,
+    override fun CoroutineScope.launchRecovering(
         context: CoroutineContext,
         start: CoroutineStart,
         recover: Recover<S>?,
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = scope.launch(context, start) {
+    ): Job = launch(context, start) {
         try {
             supervisorScope(block)
         } catch (expected: CancellationException) {

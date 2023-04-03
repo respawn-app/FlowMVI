@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi
+package pro.respawn.flowmvi.util
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
