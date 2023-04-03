@@ -7,7 +7,6 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.qualifier
-import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.android.StoreViewModel
 import pro.respawn.flowmvi.android.subscribe

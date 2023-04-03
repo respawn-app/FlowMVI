@@ -138,7 +138,15 @@ public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.update
 }
 
 // this BS is happening because kotlin context receivers are not available yet and there's no other way to provide multiple contexts
+/**
+ * A property that returns a [Reduce] lambda using the given [Reducer].
+ * May be needed to deal with contexts of invocation.
+ */
 public inline val <S : MVIState, I : MVIIntent> Reducer<S, I>.reduce: Reduce<S, I, *>
     get() = { with(this as CoroutineScope) { reduce(it) } }
 
+/**
+ * A property that returns a [Recover] lambda using the given [Reducer].
+ * May be needed to deal with contexts of invocation.
+ */
 public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { recover(it) }

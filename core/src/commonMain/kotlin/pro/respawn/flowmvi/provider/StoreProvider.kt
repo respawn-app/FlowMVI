@@ -24,6 +24,15 @@ import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 
+/**
+ * A base class that uses [MVIStore] under the hood and allows you to separate your logic from the framework layer
+ * Used to move from using lambdas to a procedural-based approach (function invocations) for [reduce] and [recover].
+ * Subclass [StoreProvider] and define your business logic. Pass this to a framework layer that will handle the
+ * lifecycle of the provider, such as a ViewModel.
+ * Override [recover] to add error handling to the logic.
+ * Implement [reduce] to allow state processing.
+ * Override [onStart] to define actions to take when the parent [store] is started.
+ */
 public abstract class StoreProvider<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute()

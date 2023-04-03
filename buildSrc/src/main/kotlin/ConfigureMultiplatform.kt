@@ -1,4 +1,4 @@
-@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction")
+@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction", "LongMethod")
 
 import Config.jvmTarget
 import org.gradle.api.Project
@@ -6,10 +6,7 @@ import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,

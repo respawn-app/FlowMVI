@@ -70,7 +70,7 @@ class StoreTest : FreeSpec({
                     shouldThrowAny {
                         coroutineScope {
                             TestStore(
-                                initialState = TestState.Some,
+                                initial = TestState.Some,
                                 behavior = ActionShareBehavior.Restrict(),
                                 reduce = reduce
                             ).launched(this@coroutineScope) {

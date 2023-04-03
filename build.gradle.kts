@@ -1,5 +1,4 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompileCommon
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {

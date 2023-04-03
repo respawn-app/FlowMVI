@@ -10,7 +10,7 @@ import pro.respawn.flowmvi.store.SharedStore
  */
 @Suppress("FunctionName")
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
-    initialState: S,
+    initial: S,
     /**
      * A behavior to be applied when sharing actions
      * @see ActionShareBehavior
@@ -30,13 +30,14 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      */
     @BuilderInference reduce: Reduce<S, I, A>,
 ): MVIStore<S, I, A> = when (behavior) {
-    is ActionShareBehavior.Share -> SharedStore(initialState, behavior.replay, behavior.buffer, recover, reduce)
-    is ActionShareBehavior.Distribute -> DistributingStore(initialState, behavior.buffer, recover, reduce)
-    is ActionShareBehavior.Restrict -> ConsumingStore(initialState, behavior.buffer, recover, reduce)
+    is ActionShareBehavior.Share -> SharedStore(initial, behavior.replay, behavior.buffer, recover, reduce)
+    is ActionShareBehavior.Distribute -> DistributingStore(initial, behavior.buffer, recover, reduce)
+    is ActionShareBehavior.Restrict -> ConsumingStore(initial, behavior.buffer, recover, reduce)
 }
 
 /**
- * A builder function of [MVIStore] that creates  the store lazily. This function does NOT launch the store.
+ * A builder function of [MVIStore] that creates  the store lazily. This function does **not** launch the store.
+ * Call [MVIStore.start] yourself as appropriate.
  * @see MVIStore
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
@@ -48,7 +49,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
 ): Lazy<MVIStore<S, I, A>> = lazy(mode) { MVIStore(initial, behavior, recover, reduce) }
 
 /**
- * A builder function of [MVIStore] that creates, and then launches the store lazily.
+ * A builder function of [MVIStore] that creates, and then launches the store lazily on first access.
  * @see MVIStore
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(

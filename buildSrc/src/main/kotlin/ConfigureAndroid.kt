@@ -4,7 +4,6 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.kotlin
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
 fun Project.configureAndroid(
     commonExtension: CommonExtension<*, *, *, *>,
