@@ -114,6 +114,32 @@ use the composition scope to process your events. Event processing will stop in 
 In `onResume()`, the composable will resubscribe. MVIComposable will recompose when state changes, but not
 resubscribe to events.
 
+If you have defined your `ScreenContent` function, you will get a composable that can be easily used in previews.
+That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
+But there's a catch: It has a ConsumerScope<I, A> as a receiver. To deal with this, there is an `EmptyScope` composable.
+EmptyScope introduces a scope that does not collect actions and does nothing when an intent is sent, which is
+exactly what we want for previews. We can now define our `PreviewParameterProvider` and the Preview composable.
+
+```kotlin
+private class StateProvider : CollectionPreviewParameterProvider<ScreenState>(
+    listOf(
+        DisplayingContent(1, 1),
+        Loading,
+        Empty,
+    )
+)
+
+@Composable
+@Preview(name = "ScreenPreview", showSystemUi = true, showBackground = true, backgroundColor = 0xFFFFFFFF)
+private fun ScreenPreview(
+    @PreviewParameter(StateProvider::class) state: ScreenState,
+) = MVITheme {
+    EmptyScope {
+        ScreenPreview(state = state)
+    }
+}
+```
+
 See [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/compose/ComposeScreen.kt)
 for a more elaborate example.
 
@@ -125,7 +151,6 @@ For a View-based project, inheritance rules. Just implement `MVIView` in your Fr
 internal class ScreenFragment : Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
 
     private val binding by viewBinding<ScreenFragmentBinding>()
-
     override val provider by viewModel<ScreenViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -62,55 +64,68 @@ fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state 
     }
 
     Scaffold(Modifier.fillMaxSize(), scaffoldState = scaffoldState) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
-            contentAlignment = Alignment.Center
-        ) {
-            ComposeScreenContent(state)
-        }
+        ComposeScreenContent(state, modifier = Modifier.padding(it))
     }
 }
 
 @Composable
-fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(state: ComposeState) {
-    when (state) {
-        is DisplayingContent -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceAround,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(id = R.string.counter_text, state.counter),
-                        modifier = Modifier.clickable { ClickedCounter.send() } // send() is available in ConsumerScope
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(id = R.string.timer_template, state.timer),
-                    )
-                }
+private fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(
+    state: ComposeState,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        when (state) {
+            is DisplayingContent -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceAround,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.counter_text, state.counter),
+                            // send() is available in ConsumerScope
+                            modifier = Modifier.clickable { send(ClickedCounter) }
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = stringResource(id = R.string.timer_template, state.timer),
+                        )
+                    }
 
-                Button(onClick = { ClickedToBasicActivity.send() }) {
-                    Text(text = stringResource(id = R.string.to_basic_activity))
+                    Button(onClick = { send(ClickedToBasicActivity) }) {
+                        Text(text = stringResource(id = R.string.to_basic_activity))
+                    }
                 }
             }
-        }
-        Loading -> {
-            CircularProgressIndicator()
-        }
-        Empty -> {
-            Text(text = stringResource(R.string.compose_screen_empty))
+            Loading -> {
+                CircularProgressIndicator()
+            }
+            Empty -> {
+                Text(text = stringResource(R.string.compose_screen_empty))
+            }
         }
     }
 }
 
+private class StateProvider : CollectionPreviewParameterProvider<ComposeState>(
+    listOf(
+        DisplayingContent(1, 1),
+        Loading,
+        Empty,
+    )
+)
+
 @Composable
-@Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true)
-private fun ComposeScreenPreview() = MVITheme {
-    EmptyScope { // Use this helper function to preview functions that use ConsumerScope
-        ComposeScreenContent(state = DisplayingContent(1, 0))
+@Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true, backgroundColor = 0xFFFFFFFF)
+private fun ComposeScreenPreview(
+    @PreviewParameter(StateProvider::class) state: ComposeState,
+) = MVITheme {
+    // Use this helper function to preview functions that use ConsumerScope
+    EmptyScope {
+        ComposeScreenContent(state = state)
     }
 }
