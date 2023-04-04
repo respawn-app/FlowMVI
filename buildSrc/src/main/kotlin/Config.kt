@@ -16,9 +16,10 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 1
-    const val minorRelease = 1
-    const val patch = 4
-    const val versionName = "$majorRelease.$minorRelease.$patch"
+    const val minorRelease = 2
+    const val patch = 0
+    const val postfix = "alpha01"
+    const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
 
     // kotlin
 
