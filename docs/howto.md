@@ -87,8 +87,8 @@ class ScreenProvider : StoreProvider<ScreenState, ScreenIntent, ScreenAction>(Sc
 
     override suspend fun CoroutineScope.reduce(intent: ScreenIntent) {
         when (intent) {
-            is ScreenIntent.ClickedFab -> {
-                send(ScreenAction.ShowSnackbar("Clicked fab!"))
+            is ScreenIntent.ClickedCounter -> {
+                send(ScreenAction.ShowMessage("Clicked counter!"))
                 updateState<ScreenState.DisplayingCounter> {
                     copy(counter = counter + 1)
                 }
@@ -99,7 +99,7 @@ class ScreenProvider : StoreProvider<ScreenState, ScreenIntent, ScreenAction>(Sc
 }
 
 /* where you want to start processing... */
-val provider = BasicProvider()
+val provider = ScreenProvider()
 provider.start(eventProcessingCoroutineScope)
 
 ```
@@ -183,7 +183,7 @@ store.subscribe(
     * The `render` block must be a [pure function](https://en.wikipedia.org/wiki/Pure_function), avoid sending Intents
       or Actions in that block. Send Intents from click listeners or other callbacks instead.
 
-## All Done!
+## That's it!
 
 * If you're on android, see [Android guidelines](android.md) for info on how to use FlowMVI with Android.
-* Full-fledged support for iOS is on its way but with a few tweaks for coroutines, you can use FlowMVI with iOS already.
+* For more guidance, see [FAQ](usage.md)
