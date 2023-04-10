@@ -3,14 +3,13 @@ package pro.respawn.flowmvi.sample.view
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.provider.StoreProvider
-import pro.respawn.flowmvi.sample.ProviderClass
 import pro.respawn.flowmvi.sample.R
+import pro.respawn.flowmvi.sample.di.ProviderClass
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import pro.respawn.flowmvi.sample.view.BasicAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.view.BasicIntent.ClickedFab
 import pro.respawn.flowmvi.sample.view.BasicState.DisplayingCounter
 import pro.respawn.flowmvi.sample.view.BasicState.Loading
-import pro.respawn.flowmvi.updateState
 
 class BasicProvider(
     private val param: String,
