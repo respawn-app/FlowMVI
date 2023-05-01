@@ -18,7 +18,7 @@ object Config {
     const val majorRelease = 1
     const val minorRelease = 2
     const val patch = 0
-    const val postfix = "alpha01"
+    const val postfix = "alpha02"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
 
     // kotlin
@@ -52,7 +52,6 @@ object Config {
 
     // android
     const val namespace = artifactId
-    const val buildToolsVersion = "33.0.0"
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
     const val isMinifyEnabledRelease = false
     const val isMinifyEnabledDebug = false

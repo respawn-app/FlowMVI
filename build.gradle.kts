@@ -1,4 +1,6 @@
+import Config.jvmTarget
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -24,6 +26,13 @@ buildscript {
 allprojects {
     group = Config.artifactId
     version = Config.versionName
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(Config.jvmTarget)
+            languageVersion.set(Config.kotlinVersion)
+            freeCompilerArgs.addAll(Config.compilerArgs)
+        }
+    }
 }
 
 subprojects {
