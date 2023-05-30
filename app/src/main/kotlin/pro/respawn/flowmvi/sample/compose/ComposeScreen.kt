@@ -21,13 +21,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
+import pro.respawn.flowmvi.android.compose.StateProvider
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
 import pro.respawn.flowmvi.sample.compose.ComposeAction.ShowSnackbar
@@ -36,7 +36,7 @@ import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedToBasicActivity
 import pro.respawn.flowmvi.sample.compose.ComposeState.DisplayingContent
 import pro.respawn.flowmvi.sample.compose.ComposeState.Empty
 import pro.respawn.flowmvi.sample.compose.ComposeState.Loading
-import pro.respawn.flowmvi.sample.ui.theme.MVITheme
+import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
 import pro.respawn.flowmvi.sample.view.BasicActivity
 
 @Composable
@@ -111,19 +111,17 @@ private fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(
     }
 }
 
-private class StateProvider : CollectionPreviewParameterProvider<ComposeState>(
-    listOf(
-        DisplayingContent(1, 1),
-        Loading,
-        Empty,
-    )
+private class PreviewProvider : StateProvider<ComposeState>(
+    DisplayingContent(1, 1),
+    Loading,
+    Empty,
 )
 
 @Composable
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true, backgroundColor = 0xFFFFFFFF)
 private fun ComposeScreenPreview(
-    @PreviewParameter(StateProvider::class) state: ComposeState,
-) = MVITheme {
+    @PreviewParameter(PreviewProvider::class) state: ComposeState,
+) = MVISampleTheme {
     // Use this helper function to preview functions that use ConsumerScope
     EmptyScope {
         ComposeScreenContent(state = state)
