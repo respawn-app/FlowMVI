@@ -10,17 +10,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
-import pro.respawn.flowmvi.ActionShareBehavior
-import pro.respawn.flowmvi.DelicateStoreApi
+import pro.respawn.flowmvi.action.ActionShareBehavior
+import pro.respawn.flowmvi.dsl.DelicateStoreApi
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.store.MVIStore
 import pro.respawn.flowmvi.Recover
-import pro.respawn.flowmvi.catchExceptions
-import pro.respawn.flowmvi.launchedStore
-import pro.respawn.flowmvi.updateState
+import pro.respawn.flowmvi.dsl.catchExceptions
+import pro.respawn.flowmvi.store.launchedStore
+import pro.respawn.flowmvi.dsl.updateState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
@@ -107,7 +107,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected fun <T> Flow<T>.consume(): Job = launchIn(viewModelScope)
 
     /**
-     * Uses [recover] to reduce exceptions occurring in the flow to states.
+     * Uses [recover] to reducer exceptions occurring in the flow to states.
      * Shorthand for [kotlinx.coroutines.flow.catch]
      */
     protected fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { updateState { recover(it) } }

@@ -8,7 +8,7 @@ import org.koin.dsl.bind
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.store.MVIStore
 import pro.respawn.flowmvi.android.StoreViewModel
 
 open class ProviderClass<S : MVIState, I : MVIIntent, A : MVIAction> {

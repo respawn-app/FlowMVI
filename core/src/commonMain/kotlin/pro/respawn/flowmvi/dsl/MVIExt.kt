@@ -1,13 +1,30 @@
-package pro.respawn.flowmvi
+package pro.respawn.flowmvi.dsl
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import pro.respawn.flowmvi.MVIAction
+import pro.respawn.flowmvi.MVIIntent
+import pro.respawn.flowmvi.MVIProvider
+import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.MVISubscriber
+import pro.respawn.flowmvi.MVIView
+import pro.respawn.flowmvi.Recover
+import pro.respawn.flowmvi.Reduce
+import pro.respawn.flowmvi.base.Reducer
+import pro.respawn.flowmvi.ReducerScope
+import pro.respawn.flowmvi.store.Store
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
 
 /**
@@ -16,7 +33,7 @@ import kotlin.jvm.JvmName
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscribe(
     scope: CoroutineScope,
-): Job = subscribe(provider, scope)
+): Job = subscribe(store, scope)
 
 /**
  * Subscribe to the store using provided scope.
@@ -128,7 +145,7 @@ public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.up
  */
 @JvmName("updateStateTyped")
 @FlowMVIDSL
-public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.updateState(
+public suspend inline fun <reified T : S, S : MVIState> Store<S, *>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
 ): S {
     contract {
@@ -150,3 +167,25 @@ public inline val <S : MVIState, I : MVIIntent> Reducer<S, I>.reduce: Reduce<S, 
  * May be needed to deal with contexts of invocation.
  */
 public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { recover(it) }
+
+/**
+ * Launch a new coroutine using given scope,
+ * and use either provided [recover] block or the [MVIStore]'s recover block.
+ * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
+ * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
+ */
+@FlowMVIDSL
+public fun CoroutineScope.launchRecovering(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    recover: (Exception) -> Unit = { throw it },
+    block: suspend CoroutineScope.() -> Unit,
+): Job = launch(context, start) {
+    try {
+        supervisorScope(block)
+    } catch (expected: CancellationException) {
+        throw expected
+    } catch (expected: Exception) {
+        recover(expected)
+    }
+}

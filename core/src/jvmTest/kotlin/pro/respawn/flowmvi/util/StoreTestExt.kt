@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.store.MVIStore
 
 suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction>
 MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = start(scope).apply {

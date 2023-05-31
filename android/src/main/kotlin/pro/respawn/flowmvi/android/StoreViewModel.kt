@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.store.MVIStore
 
 /**
  * An extendable class for creating a [ViewModel] that directly uses an [MVIStore] to act as an [MVIProvider].

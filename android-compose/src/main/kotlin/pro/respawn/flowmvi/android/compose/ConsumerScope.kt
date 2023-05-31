@@ -12,7 +12,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
-import pro.respawn.flowmvi.FlowMVIDSL
+import pro.respawn.flowmvi.dsl.FlowMVIDSL
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIProvider
@@ -27,13 +27,13 @@ import kotlin.experimental.ExperimentalTypeInference
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
-     * Send a new intent for the provider you used in [MVIComposable]
+     * Send a new intent for the store you used in [MVIComposable]
      * @see MVIProvider.send
      */
     public fun send(intent: I)
 
     /**
-     * Call this somewhere at the top of your [MVIComposable] to consume actions received from the provider
+     * Call this somewhere at the top of your [MVIComposable] to consume actions received from the store
      * @see MVIProvider.consume
      */
     @Composable

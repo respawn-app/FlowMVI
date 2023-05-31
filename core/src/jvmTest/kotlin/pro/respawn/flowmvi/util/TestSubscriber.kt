@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVISubscriber
-import pro.respawn.flowmvi.subscribe
+import pro.respawn.flowmvi.dsl.subscribe
 
 class TestSubscriber<S : MVIState, A : MVIAction> : MVISubscriber<S, A> {
 

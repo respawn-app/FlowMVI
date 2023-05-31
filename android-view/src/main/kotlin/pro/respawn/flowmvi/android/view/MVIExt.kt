@@ -34,11 +34,11 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
 )
 
 /**
- *  Subscribe to the provider lifecycle-aware. Call this in [Fragment.onViewCreated]
+ *  Subscribe to the store lifecycle-aware. Call this in [Fragment.onViewCreated]
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job where T : Fragment, T : MVIView<S, I, A> =
-    viewLifecycleOwner.subscribe(provider, ::consume, ::render, lifecycleState)
+    viewLifecycleOwner.subscribe(store, ::consume, ::render, lifecycleState)

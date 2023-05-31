@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import pro.respawn.flowmvi.DelicateStoreApi
+import pro.respawn.flowmvi.dsl.DelicateStoreApi
 import pro.respawn.flowmvi.android.MVIViewModel
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
@@ -36,7 +36,7 @@ class BaseClassViewModel(
             .consume() // launch in view model scope
     }
 
-    // Will be called when reduce or any child coroutine throws an exception
+    // Will be called when reducer or any child coroutine throws an exception
     // usually we would display a full-screen error here
     @OptIn(DelicateStoreApi::class)
     override fun recover(from: Exception): ComposeState {

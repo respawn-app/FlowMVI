@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi
+package pro.respawn.flowmvi.dsl
 
 /**
  * A DSL marker for the FlowMVI DSL.

@@ -23,8 +23,8 @@ class BasicActivity :
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
 
-    // If your viewModel implements MVIProvider, you can just use by viewModel() on provider variable
-    override val provider: StoreViewModel<BasicState, BasicIntent, BasicAction> by viewModel(
+    // If your viewModel implements MVIProvider, you can just use by viewModel() on store variable
+    override val store: StoreViewModel<BasicState, BasicIntent, BasicAction> by viewModel(
         qualifier = BasicProvider.qualifier,
     ) { parametersOf("I am a parameter") }
 
@@ -33,7 +33,7 @@ class BasicActivity :
         _b = ActivityBasicBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Subscribe to the provider
+        // Subscribe to the store
         // for fragments, call this in onViewCreated()
         subscribe()
 

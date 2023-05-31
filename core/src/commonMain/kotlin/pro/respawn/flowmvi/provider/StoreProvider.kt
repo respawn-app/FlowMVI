@@ -5,20 +5,20 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import pro.respawn.flowmvi.ActionShareBehavior
-import pro.respawn.flowmvi.DelicateStoreApi
-import pro.respawn.flowmvi.FlowMVIDSL
+import pro.respawn.flowmvi.action.ActionShareBehavior
+import pro.respawn.flowmvi.dsl.DelicateStoreApi
+import pro.respawn.flowmvi.dsl.FlowMVIDSL
 import pro.respawn.flowmvi.MVIAction
 import pro.respawn.flowmvi.MVIIntent
 import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.Recover
-import pro.respawn.flowmvi.Reducer
-import pro.respawn.flowmvi.catchExceptions
+import pro.respawn.flowmvi.base.Reducer
+import pro.respawn.flowmvi.dsl.catchExceptions
+import pro.respawn.flowmvi.dsl.recover
+import pro.respawn.flowmvi.dsl.reduce
+import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.lazyStore
-import pro.respawn.flowmvi.recover
-import pro.respawn.flowmvi.reduce
-import pro.respawn.flowmvi.updateState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
@@ -28,7 +28,7 @@ import kotlin.jvm.JvmName
  * A base class that uses [MVIStore] under the hood and allows you to separate your logic from the framework layer
  * Used to move from using lambdas to a procedural-based approach (function invocations) for [reduce] and [recover].
  * Subclass [StoreProvider] and define your business logic. Pass this to a framework layer that will handle the
- * lifecycle of the provider, such as a ViewModel.
+ * lifecycle of the store, such as a ViewModel.
  * Override [recover] to add error handling to the logic.
  * Implement [reduce] to allow state processing.
  * Override [onStart] to define actions to take when the parent [store] is started.
@@ -64,7 +64,7 @@ public abstract class StoreProvider<S : MVIState, I : MVIIntent, A : MVIAction>(
     ): Job = with(store) { launchRecovering(context, start, recover ?: { recover(it) }, block) }
 
     /**
-     * Uses [recover] to reduce exceptions occurring in the flow to states.
+     * Uses [recover] to reducer exceptions occurring in the flow to states.
      * Shorthand for [kotlinx.coroutines.flow.catch]
      */
     protected fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { updateState { recover(it) } }

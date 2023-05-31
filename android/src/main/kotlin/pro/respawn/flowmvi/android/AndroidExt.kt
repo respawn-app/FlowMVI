@@ -48,7 +48,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.su
 }
 
 /**
- * Subscribe to the provider lifecycle-aware.
+ * Subscribe to the store lifecycle-aware.
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
@@ -58,10 +58,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
 ): Job where T : LifecycleOwner, T : MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
 
 /**
- * Subscribe to the provider lifecycle-aware.
+ * Subscribe to the store lifecycle-aware.
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(provider, lifecycleState)
+): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(store, lifecycleState)
