@@ -8,23 +8,33 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
-import pro.respawn.flowmvi.action.ActionShareBehavior
-import pro.respawn.flowmvi.dsl.DelicateStoreApi
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.store.MVIStore
-import pro.respawn.flowmvi.Recover
-import pro.respawn.flowmvi.dsl.catchExceptions
-import pro.respawn.flowmvi.store.launchedStore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
+import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.api.ActionReceiver
+import pro.respawn.flowmvi.api.DelicateStoreApi
+import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.MutableStore
+import pro.respawn.flowmvi.api.Recoverable
+import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.SubscriberContext
+import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.plugins.recover
+import pro.respawn.flowmvi.plugins.reduce
+import pro.respawn.flowmvi.updateState
+import pro.respawn.flowmvi.util.catchExceptions
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * A [ViewModel] that uses [MVIStore] internally to provide a convenient base class.
@@ -36,8 +46,9 @@ import kotlin.coroutines.EmptyCoroutineContext
  * @See MVIProvider
  */
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
-    initialState: S,
-) : ViewModel(), MVIProvider<S, I, A> {
+    final override val initial: S,
+    final override val name: String = "ViewModel",
+) : ViewModel(), IntentReceiver<I>, StateReceiver<S>, ActionReceiver<A>, Store<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -51,43 +62,42 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Delegates to [MVIStore]'s recover block.
      */
-    protected open fun recover(from: Exception): S = throw from
+
+    @Deprecated(
+        "use onError and update state manually (the new function now returns Unit)",
+        ReplaceWith("onError(e): Unit"),
+    )
+    protected open suspend fun recover(e: Exception): S = throw e
+
+    protected open suspend fun onError(e: Exception): Unit = throw e
+
+    @DelicateStoreApi
+    override fun useState(block: S.() -> S): Unit = store.useState(block)
 
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
-    protected open val store: MVIStore<S, I, A> by launchedStore(
-        scope = viewModelScope,
-        initial = initialState,
-        behavior = ActionShareBehavior.Distribute(), // required for lifecycle awareness
-        recover = { recover(it) },
-        reduce = { this@MVIViewModel.reduce(it) },
-    )
+    protected open val store: MutableStore<S, I, A> by lazyStore(name, viewModelScope, initial) {
+        recover { updateState { recover(it) }; null }
+        reduce { reduce(it) }
+    }
 
-    override val actions: Flow<A> get() = store.actions
-    override val states: StateFlow<S> get() = store.states
     override fun send(intent: I): Unit = store.send(intent)
-
-    @DelicateStoreApi
-    /**
-     * @see MVIStore.state
-     */
-    protected open val state: S get() = store.state
 
     /**
      * @see MVIStore.send
      */
-    protected open fun send(action: A): Unit = store.send(action)
+    override suspend fun send(action: A): Unit = store.send(action)
 
     /**
      * @see MVIStore.updateState
      */
-    protected suspend fun updateState(transform: suspend S.() -> S): S = store.updateState(transform)
+    override suspend fun updateState(transform: suspend S.() -> S): Unit = store.updateState(transform)
 
     /**
      * @see MVIStore.withState
      */
-    protected suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
+    override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
 
     /**
      * @see MVIStore.launchRecovering
@@ -95,11 +105,17 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
-        recover: Recover<S>? = { recover(it) },
+        recover: suspend (Exception) -> Unit? = { onError(it) },
         block: suspend CoroutineScope.() -> Unit,
-    ): Job = with(store) { viewModelScope.launchRecovering(context, start, recover, block) }
-
-    // TODO: With context receivers stable, this below can be removed
+    ): Job = viewModelScope.launch(context, start) {
+        try {
+            supervisorScope(block)
+        } catch (expected: CancellationException) {
+            throw expected
+        } catch (expected: Exception) {
+            recover(expected)
+        }
+    }
 
     /**
      * Shorthand for [Flow.launchIn] in viewModelScope
@@ -118,11 +134,11 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     @JvmName("updateStateTyped")
     protected suspend inline fun <reified T : S> updateState(
         @BuilderInference crossinline transform: suspend T.() -> S
-    ): S {
+    ) {
         contract {
             callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
         }
-        return store.updateState(transform)
+        return store.updateState<T, S>(transform)
     }
 
     /**
@@ -137,4 +153,11 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
         return store.withState { (this as? T)?.let { it.block() } }
     }
+
+    override fun start(scope: CoroutineScope): Job = error("Store is already started by the ViewModel")
+
+    override fun get(pluginName: String): StorePlugin<S, I, A>? = store[pluginName]
+
+    override fun CoroutineScope.subscribe(block: SubscriberContext<S, I, A>.() -> Unit): Job =
+        with(store) { subscribe(block) }
 }

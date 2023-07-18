@@ -7,13 +7,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.MVISubscriber
 import pro.respawn.flowmvi.MVIView
+import pro.respawn.flowmvi.api.ActionConsumer
+import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StateConsumer
+import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.dsl.subscribe
 
 /**
  *  Subscribe to the [provider] lifecycle-aware.
@@ -22,28 +24,21 @@ import pro.respawn.flowmvi.MVIView
  *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  *  @see repeatOnLifecycle
  */
+
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe(
-    provider: MVIProvider<S, I, A>,
-    crossinline consume: (action: A) -> Unit,
-    crossinline render: (state: S) -> Unit,
+    store: Store<S, I, A>,
+    crossinline consume: suspend (action: A) -> Unit,
+    crossinline render: suspend (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job = lifecycleScope.launch {
+): Job = lifecycleScope.launch(Dispatchers.Main.immediate) {
     // using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
 
     // https://github.com/Kotlin/kotlinx.coroutines/issues/2886
     // TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
-    withContext(Dispatchers.Main.immediate) {
-        launch {
-            repeatOnLifecycle(lifecycleState) {
-                provider.states.collect { render(it) }
-            }
-        }
 
-        launch {
-            repeatOnLifecycle(lifecycleState) {
-                provider.actions.collect { consume(it) }
-            }
-        }
+    repeatOnLifecycle(lifecycleState) {
+        subscribe(store, consume, render)
     }
 }
 
@@ -52,16 +47,21 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.su
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
+
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
-    provider: MVIProvider<S, I, A>,
+    provider: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : MVISubscriber<S, A> = subscribe(provider, ::consume, ::render, lifecycleState)
+): Job where T : LifecycleOwner, T : StateConsumer<S>, T : ActionConsumer<A> =
+    subscribe(provider, ::consume, ::render, lifecycleState)
 
 /**
  * Subscribe to the store lifecycle-aware.
  * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
  * @see repeatOnLifecycle
  */
+
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(store, lifecycleState)
+): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(provider, lifecycleState)
