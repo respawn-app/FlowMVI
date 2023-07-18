@@ -1,22 +1,23 @@
-package pro.respawn.flowmvi
+package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import pro.respawn.flowmvi.base.IntentReceiver
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.IntentReceiver
 
-internal interface IntentModule<in I : MVIIntent> : IntentReceiver<I> {
+internal interface IntentModule<I : MVIIntent> : IntentReceiver<I> {
 
-    suspend fun receive(): @UnsafeVariance I
+    suspend fun receive(): I
 }
 
 internal fun <I : MVIIntent> intentModule(
-    capacity: Int = Channel.UNLIMITED,
-    overflow: BufferOverflow = BufferOverflow.SUSPEND
+    capacity: Int,
+    overflow: BufferOverflow,
 ): IntentModule<I> = IntentModuleImpl(capacity, overflow)
 
 private class IntentModuleImpl<I : MVIIntent>(
-    capacity: Int = Channel.UNLIMITED,
-    overflow: BufferOverflow = BufferOverflow.SUSPEND
+    capacity: Int,
+    overflow: BufferOverflow,
 ) : IntentModule<I> {
 
     private val intents = Channel<I>(capacity, overflow)
