@@ -8,9 +8,9 @@ import io.kotest.core.test.testCoroutineScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.store.MVIStore
 
 suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction>

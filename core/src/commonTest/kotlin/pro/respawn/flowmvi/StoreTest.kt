@@ -16,8 +16,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import pro.respawn.flowmvi.action.ActionShareBehavior
-import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.subscribe
 import pro.respawn.flowmvi.util.TestSubscriber
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.launched
@@ -91,8 +91,8 @@ class StoreTest : FreeSpec({
                     "and intent received" - {
                         send(TestIntent.Some)
                         "then one subscriber received action only" {
-                            val job1 = sub1.subscribe(this@launched, this)
-                            val job2 = sub2.subscribe(this@launched, this)
+                            val job1 = pro.respawn.flowmvi.subscribe(this@launched, this)
+                            val job2 = pro.respawn.flowmvi.subscribe(this@launched, this)
                             idle()
                             job1.cancel()
                             job2.cancel()
@@ -113,8 +113,8 @@ class StoreTest : FreeSpec({
             "and action type is SHARE" - {
                 val scope = this
                 TestStore(TestState.Some, ActionShareBehavior.Share(), reduce = reduce).launched(scope) {
-                    val job1 = sub1.subscribe(this@launched, scope)
-                    val job2 = sub2.subscribe(this@launched, scope)
+                    val job1 = pro.respawn.flowmvi.subscribe(this@launched, scope)
+                    val job2 = pro.respawn.flowmvi.subscribe(this@launched, scope)
                     idle()
                     "and intent received" - {
                         send(TestIntent.Some)
@@ -142,7 +142,7 @@ class StoreTest : FreeSpec({
                 var intents = 0
                 val sub = TestSubscriber<TestState, TestAction>()
                 TestStore(initial, ActionShareBehavior.Restrict()) { ++intents }.launched(scope) {
-                    val job = sub.subscribe(this@launched, scope)
+                    val job = pro.respawn.flowmvi.subscribe(this@launched, scope)
                     idle()
                     val jobs = 100
 
@@ -172,7 +172,7 @@ class StoreTest : FreeSpec({
                 val scope = this
                 val sub = TestSubscriber<TestState, TestAction>()
                 TestStore(initial, ActionShareBehavior.Restrict()) {}.launched(this) {
-                    val job = sub.subscribe(this, scope)
+                    val job = pro.respawn.flowmvi.subscribe(this, scope)
                     shouldNotThrowAny {
                         withState {
                             withState {

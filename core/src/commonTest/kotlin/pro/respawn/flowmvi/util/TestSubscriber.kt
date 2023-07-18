@@ -2,11 +2,11 @@ package pro.respawn.flowmvi.util
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
-import pro.respawn.flowmvi.MVIAction
+import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.MVISubscriber
-import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.subscribe
 
 class TestSubscriber<S : MVIState, A : MVIAction> : MVISubscriber<S, A> {
 
@@ -33,7 +33,7 @@ class TestSubscriber<S : MVIState, A : MVIAction> : MVISubscriber<S, A> {
         provider: MVIProvider<S, *, A>,
         scope: CoroutineScope,
         test: TestSubscriber<S, A>.() -> Unit
-    ) = subscribe(provider, scope).apply {
+    ) = pro.respawn.flowmvi.subscribe(provider, scope).apply {
         test()
         cancel()
         join()

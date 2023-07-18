@@ -2,7 +2,7 @@
 
 package pro.respawn.flowmvi
 
-import pro.respawn.flowmvi.action.ActionShareBehavior
+import pro.respawn.flowmvi.api.ActionShareBehavior
 
 internal fun TestStore(
     initial: TestState,
