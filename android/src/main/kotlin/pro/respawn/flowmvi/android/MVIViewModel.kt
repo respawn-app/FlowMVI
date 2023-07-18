@@ -19,7 +19,6 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.MutableStore
-import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
@@ -45,6 +44,16 @@ import kotlin.coroutines.cancellation.CancellationException
  * @See pro.respawn.flowmvi.MVISubscriber
  * @See MVIProvider
  */
+@Deprecated(
+    """
+MVIViewModel is now deprecated. A better API was designed for MVIViewModels that is multiplatform,
+extensible, and uses composition instead of locking you onto a specific base class.
+To migrate, create a wrapper class that has a `store` property, inject dependencies into it normally, and build the store 
+using store() function.
+Please see example impl at: 
+https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicProvider.kt
+"""
+)
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val initial: S,
     final override val name: String = "ViewModel",
@@ -63,13 +72,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Delegates to [MVIStore]'s recover block.
      */
 
-    @Deprecated(
-        "use onError and update state manually (the new function now returns Unit)",
-        ReplaceWith("onError(e): Unit"),
-    )
     protected open suspend fun recover(e: Exception): S = throw e
-
-    protected open suspend fun onError(e: Exception): Unit = throw e
 
     @DelicateStoreApi
     override fun useState(block: S.() -> S): Unit = store.useState(block)
@@ -105,7 +108,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     protected fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
-        recover: suspend (Exception) -> Unit? = { onError(it) },
+        recover: suspend (Exception) -> S? = { this.recover(it) },
         block: suspend CoroutineScope.() -> Unit,
     ): Job = viewModelScope.launch(context, start) {
         try {
