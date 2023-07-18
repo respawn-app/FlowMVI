@@ -55,11 +55,11 @@ public class GenericPluginBuilder internal constructor(public val name: String) 
     @Suppress("UNCHECKED_CAST")
     internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build() = storePlugin(name) {
         onIntent {
-            intent(it)
+            this@GenericPluginBuilder.intent(it)
             it
         }
         onAction {
-            action(it)
+            this@GenericPluginBuilder.action(it)
             it
         }
         onState { old, new ->

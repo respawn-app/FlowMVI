@@ -7,4 +7,5 @@ public fun interface IntentReceiver<in I : MVIIntent> {
      * @See MVIIntent
      */
     public fun send(intent: I)
+    public suspend fun intent(intent: I): Unit = send(intent)
 }

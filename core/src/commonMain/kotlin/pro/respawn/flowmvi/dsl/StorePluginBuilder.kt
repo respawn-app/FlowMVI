@@ -59,8 +59,8 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     internal fun build(): StorePlugin<S, I, A> = object : AbstractStorePlugin<S, I, A>(name) {
         override suspend fun PipelineContext<S, I, A>.onStart() = start()
         override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = state(old, new)
-        override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(intent)
-        override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(action)
+        override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(this, intent)
+        override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(this, action)
         override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = exception(e)
         override suspend fun PipelineContext<S, I, A>.onSubscribe() = subscribe()
         override fun onStop(): Unit = stop()

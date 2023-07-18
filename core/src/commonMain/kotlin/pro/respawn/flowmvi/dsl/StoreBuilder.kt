@@ -3,7 +3,6 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior
@@ -12,7 +11,6 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.MutableStore
-import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import pro.respawn.flowmvi.store.StoreImpl

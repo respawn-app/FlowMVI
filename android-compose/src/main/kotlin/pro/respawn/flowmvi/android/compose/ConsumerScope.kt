@@ -32,8 +32,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-@FlowMVIDSL
-public interface ConsumerScope<S : MVIState, in I : MVIIntent, out A : MVIAction> {
+public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Send a new intent for the store you used in [MVIComposable]
@@ -47,7 +46,6 @@ public interface ConsumerScope<S : MVIState, in I : MVIIntent, out A : MVIAction
      * @see send
      */
     public fun I.send(): Unit = send(this)
-    public val state: S
     public val actions: Flow<A>
 }
 
@@ -55,22 +53,21 @@ public interface ConsumerScope<S : MVIState, in I : MVIIntent, out A : MVIAction
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): ConsumerScope<S, I, A> {
+): ConsumerScopeImpl<S, I, A> {
     val scope = remember(store) { ConsumerScopeImpl(store) }
     scope.collect(lifecycleState)
     return scope
 }
 
 @Stable
-private class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
-) : ConsumerScope<S, I, A> {
+) : ConsumerScope<I, A> {
 
-    private val _state = mutableStateOf(store.initial)
+    internal val state = mutableStateOf(store.initial)
     private val _actions = Channel<A>(Channel.UNLIMITED)
 
     override fun send(intent: I) = store.send(intent)
-    override val state by _state
     override val actions = _actions.consumeAsFlow()
     override fun hashCode(): Int = store.hashCode()
     override fun equals(other: Any?) = store == other
@@ -83,7 +80,7 @@ private class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
                 lifecycleState = lifecycleState,
                 store = store,
                 consume = { _actions.send(it) },
-                render = { _state.value = it }
+                render = { state.value = it }
             )
         }
     }
@@ -95,7 +92,7 @@ private class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
 /**
  * @see [ConsumerScope.consume]
  */
-public fun <A : MVIAction> ConsumerScope<*, *, A>.consume(
+public fun <A : MVIAction> ConsumerScope<*, A>.consume(
     onAction: suspend CoroutineScope.(action: A) -> Unit,
 ): Unit = LaunchedEffect(this) {
     actions.collect { onAction(it) }
@@ -108,15 +105,11 @@ public fun <A : MVIAction> ConsumerScope<*, *, A>.consume(
 @OptIn(ExperimentalTypeInference::class)
 @Composable
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> EmptyScope(
-    state: S? = null,
-    @BuilderInference call: @Composable ConsumerScope<S, I, A>.() -> Unit,
+public fun <I : MVIIntent, A : MVIAction> EmptyScope(
+    @BuilderInference call: @Composable ConsumerScope<I, A>.() -> Unit,
 ): Unit = call(
-    object : ConsumerScope<S, I, A> {
+    object : ConsumerScope<I, A> {
         override fun send(intent: I) = Unit
-        override val state: S = requireNotNull(state) {
-            "State was not provided, pass it as an argument to the EmptyScope"
-        }
         override val actions: Flow<A> = emptyFlow()
     }
 )

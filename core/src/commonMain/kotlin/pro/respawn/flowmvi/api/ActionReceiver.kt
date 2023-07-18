@@ -12,4 +12,5 @@ public fun interface ActionReceiver<in A : MVIAction> {
      * @See MVIProvider
      */
     public suspend fun send(action: A)
+    public suspend fun action(action: A): Unit = send(action)
 }
