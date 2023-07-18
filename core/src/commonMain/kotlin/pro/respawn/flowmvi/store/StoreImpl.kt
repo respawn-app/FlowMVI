@@ -66,7 +66,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
     }.apply {
         invokeOnCompletion {
-            require(started.getAndSet(false)) { "Store is not started!" }
+            started.getAndSet(false)
             plugin { onStop() }
         }
     }
@@ -74,7 +74,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun CoroutineScope.subscribe(block: SubscriberContext<S, I, A>.() -> Unit) = pipeline(this) {
         ++subscriberCount
         if (subscriberCount == 1) plugin { onSubscribe() }
-        SubscriberContext(this@StoreImpl, this@pipeline).run(block)
+        SubscriberContext(this@StoreImpl, this@subscribe).run(block)
         awaitCancellation()
     }.apply {
         invokeOnCompletion { --subscriberCount }

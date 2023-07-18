@@ -5,28 +5,27 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.di.ProviderClass
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
 class CounterProvider(
-    private val param: String,
     private val repo: CounterRepo,
 ) {
 
-    val store = store<CounterState, CounterIntent, CounterAction>(name, CounterState.Loading) {
+    val store = store<CounterState, CounterIntent, CounterAction>("Counter", CounterState.Loading) {
+        install(androidLoggingPlugin())
         whileSubscribed {
             repo.getTimer()
                 .onEach { produceState(it) } // set mapped states
-                .flowOn(Dispatchers.Default) // create states out of the main thread
+                .flowOn(this + Dispatchers.Default) // create states out of the main thread
                 .collect()
         }
         reduce {
@@ -53,9 +52,7 @@ class CounterProvider(
         updateState {
             // remember that you have to merge states when you are running produceState
             val current = this as? CounterState.DisplayingCounter
-            CounterState.DisplayingCounter(timer, current?.counter ?: 0, param)
+            CounterState.DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
         }
     }
-
-    companion object : ProviderClass()
 }

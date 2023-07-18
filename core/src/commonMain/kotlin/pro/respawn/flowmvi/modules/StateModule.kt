@@ -3,13 +3,12 @@ package pro.respawn.flowmvi.modules
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.util.withReentrantLock
 
 internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
@@ -33,5 +32,5 @@ private class StateModuleImpl<S : MVIState>(initial: S) : StateModule<S> {
         stateMutex.withReentrantLock { block(states.value) }
 
     override suspend fun updateState(transform: suspend S.() -> S) =
-        stateMutex.withReentrantLock { _states.value = transform(_states.value) }
+        stateMutex.withReentrantLock { _states.update { transform(it) } }
 }

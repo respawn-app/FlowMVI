@@ -2,13 +2,11 @@ package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.ActionReceiver
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
@@ -34,13 +32,23 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
         PipelineContext<S, I, A>,
         IntentReceiver<I> by this,
         StateReceiver<S> by this,
-        ActionReceiver<A> by this,
-        CoroutineScope by (scope + SupervisorJob() + PipelineExceptionHandler()) {
+        ActionReceiver<A> by this {
         override val key: CoroutineContext.Key<*> = PipelineContext.Key
+        private val handler = PipelineExceptionHandler()
+
+        override fun launch(
+            context: CoroutineContext,
+            start: CoroutineStart,
+            block: suspend CoroutineScope.() -> Unit
+        ) = scope.launch(context + this + handler, start, block)
+
+        override fun <T> async(
+            context: CoroutineContext,
+            start: CoroutineStart,
+            block: suspend CoroutineScope.() -> T
+        ) = scope.async(context + this + handler, start, block)
     }
     return pipeline.launch {
-        withContext(pipeline) {
-            block(pipeline)
-        }
+        block(pipeline)
     }
 }

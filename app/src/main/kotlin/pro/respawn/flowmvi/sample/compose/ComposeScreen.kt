@@ -23,7 +23,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
@@ -34,25 +33,21 @@ import pro.respawn.flowmvi.sample.provider.CounterAction
 import pro.respawn.flowmvi.sample.provider.CounterAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.provider.CounterIntent
 import pro.respawn.flowmvi.sample.provider.CounterIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.provider.CounterProvider
 import pro.respawn.flowmvi.sample.provider.CounterState
 import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.provider.CounterViewModel
 import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
 
 private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen() = MVIComposable(
-    getViewModel(
-        qualifier = CounterProvider.qualifier,
-    ) { parametersOf("I am a parameter") }
-) { state: CounterState -> // this -> ConsumerScope
+fun ComposeScreen() = MVIComposable(getViewModel<CounterViewModel>()) { state -> // this -> ConsumerScope
 
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
 
-    consume { action: CounterAction ->
+    consume { action ->
         // This block is run in a new coroutine each time we consume a new actions.
         // You can run suspending (but not blocking) code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
@@ -80,20 +75,17 @@ private fun Scope.ComposeScreenContent(
         when (state) {
             is DisplayingCounter -> Column(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceAround,
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Column {
                     Text(
                         text = stringResource(id = R.string.timer_template, state.timer),
                         // send() is available in ConsumerScope
                         modifier = Modifier.clickable { send(ClickedCounter) }
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = stringResource(id = R.string.counter_template, state.timer),
+                        text = stringResource(id = R.string.counter_template, state.counter),
                     )
-                }
 
                 Button(onClick = { send(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))

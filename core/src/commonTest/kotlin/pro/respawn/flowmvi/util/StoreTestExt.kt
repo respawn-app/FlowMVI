@@ -11,11 +11,16 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.store.MVIStore
+import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.SubscriberContext
 
-suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction>
-MVIStore<S, I, A>.launched(scope: CoroutineScope, block: MVIStore<S, I, A>.() -> Unit) = start(scope).apply {
-    block()
+suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.launched(
+    store: Store<S, I, A>,
+    crossinline block: SubscriberContext<S, I, A>.() -> Unit
+) = store.start(this).apply {
+    with(store) {
+        subscribe { block() }
+    }
     cancel()
     join()
 }

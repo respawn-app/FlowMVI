@@ -94,7 +94,7 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
  */
 public fun <A : MVIAction> ConsumerScope<*, A>.consume(
     onAction: suspend CoroutineScope.(action: A) -> Unit,
-): Unit = LaunchedEffect(this) {
+): Unit = LaunchedEffect(Unit) {
     actions.collect { onAction(it) }
 }
 

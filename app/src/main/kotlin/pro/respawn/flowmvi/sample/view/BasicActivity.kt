@@ -1,22 +1,22 @@
 package pro.respawn.flowmvi.sample.view
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.MVIView
-import pro.respawn.flowmvi.android.StoreViewModel
 import pro.respawn.flowmvi.android.subscribe
+import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 import pro.respawn.flowmvi.sample.provider.CounterAction
 import pro.respawn.flowmvi.sample.provider.CounterAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.provider.CounterIntent
 import pro.respawn.flowmvi.sample.provider.CounterIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.provider.CounterProvider
 import pro.respawn.flowmvi.sample.provider.CounterState
 import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.provider.CounterViewModel
 
 class BasicActivity :
     ComponentActivity(),
@@ -27,9 +27,7 @@ class BasicActivity :
     private val binding get() = requireNotNull(_b)
 
     // If your viewModel implements MVIProvider, you can just use by viewModel() on store variable
-    override val provider: StoreViewModel<CounterState, CounterIntent, CounterAction> by viewModel(
-        qualifier = CounterProvider.qualifier,
-    ) { parametersOf("I am a parameter") }
+    override val provider by viewModel<CounterViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +40,9 @@ class BasicActivity :
 
         binding.apply {
             btnIncrement.setOnClickListener { send(ClickedCounter) }
-            btnToCompose.setOnClickListener { finish() }
+            btnToCompose.setOnClickListener {
+                startActivity(Intent(this@BasicActivity, ComposeActivity::class.java))
+            }
         }
     }
 

@@ -11,17 +11,18 @@
         android:theme="@style/Theme.MVI">
         <activity
             android:name=".view.BasicActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MVI.View" />
-        <activity
-            android:name=".compose.ComposeActivity"
             android:exported="true"
-            android:theme="@style/Theme.MVI">
+            android:theme="@style/Theme.MVI.View">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".compose.ComposeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MVI">
         </activity>
     </application>
 
