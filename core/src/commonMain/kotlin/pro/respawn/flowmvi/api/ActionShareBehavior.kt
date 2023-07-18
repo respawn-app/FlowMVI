@@ -1,4 +1,6 @@
-package pro.respawn.flowmvi.action
+package pro.respawn.flowmvi.api
+
+import kotlinx.coroutines.channels.BufferOverflow
 
 /**
  * An class representing how [MVIAction] sharing will be handled in the [MVIStore].
@@ -17,7 +19,11 @@ public sealed interface ActionShareBehavior {
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      * @param replay How many actions will be replayed to each new subscriber
      */
-    public data class Share(val buffer: Int = DefaultBufferSize, val replay: Int = 0) : ActionShareBehavior
+    public data class Share(
+        val buffer: Int = DefaultBufferSize,
+        val replay: Int = 0,
+        val overflow: BufferOverflow = BufferOverflow.SUSPEND,
+    ) : ActionShareBehavior
 
     /**
      * Fan-out behavior means that multiple subscribers are allowed,
@@ -29,7 +35,10 @@ public sealed interface ActionShareBehavior {
      *
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      */
-    public data class Distribute(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
+    public data class Distribute(
+        val buffer: Int = DefaultBufferSize,
+        val overflow: BufferOverflow = BufferOverflow.SUSPEND
+    ) : ActionShareBehavior
 
     /**
      * Restricts the count of subscribers to 1.
@@ -40,7 +49,12 @@ public sealed interface ActionShareBehavior {
      *
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      */
-    public data class Restrict(val buffer: Int = DefaultBufferSize) : ActionShareBehavior
+    public data class Restrict(
+        val buffer: Int = DefaultBufferSize,
+        val overflow: BufferOverflow = BufferOverflow.SUSPEND
+    ) : ActionShareBehavior
+
+    public object Disabled : ActionShareBehavior
 
     public companion object {
 

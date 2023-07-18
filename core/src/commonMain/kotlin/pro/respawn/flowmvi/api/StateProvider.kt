@@ -1,9 +1,7 @@
-package pro.respawn.flowmvi.base
+package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import pro.respawn.flowmvi.dsl.DelicateStoreApi
-import pro.respawn.flowmvi.MVIState
 
 public interface StateProvider<out S : MVIState> {
 

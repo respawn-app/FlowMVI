@@ -1,12 +1,7 @@
-package pro.respawn.flowmvi.store
+package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.base.IntentReceiver
-import pro.respawn.flowmvi.base.StateProvider
-import pro.respawn.flowmvi.base.StateReceiver
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
@@ -14,10 +9,10 @@ import pro.respawn.flowmvi.base.StateReceiver
  * A store functions independently of any subscribers.
  * MVIStore is the base implementation of [MVIProvider].
  */
-public interface Store<S : MVIState, in I : MVIIntent> :
-    StateProvider<S>,
-    StateReceiver<S>,
-    IntentReceiver<I> {
+public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I> {
+
+    public val name: String
+    public val initial: S
 
     /**
      * Starts store intent processing in a new coroutine in the given [scope].
@@ -27,4 +22,13 @@ public interface Store<S : MVIState, in I : MVIIntent> :
      * @return a [Job] that the store is running on that can be cancelled later.
      */
     public fun start(scope: CoroutineScope): Job
+
+    public fun CoroutineScope.subscribe(block: SubscriberContext<S, I, A>.() -> Unit): Job
+
+    public operator fun get(pluginName: String): StorePlugin<S, I, A>?
 }
+
+public interface MutableStore<S : MVIState, I : MVIIntent, A : MVIAction> :
+    Store<S, I, A>,
+    StateReceiver<S>,
+    ActionReceiver<A>

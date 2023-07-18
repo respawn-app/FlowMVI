@@ -1,8 +1,6 @@
-package pro.respawn.flowmvi.action
+package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.flow.Flow
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVISubscriber
 
 public interface ActionProvider<out A : MVIAction> {
 

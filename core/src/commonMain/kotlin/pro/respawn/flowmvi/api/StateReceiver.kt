@@ -1,8 +1,4 @@
-package pro.respawn.flowmvi.base
-
-import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.dsl.DelicateStoreApi
-import pro.respawn.flowmvi.dsl.FlowMVIDSL
+package pro.respawn.flowmvi.api
 
 public interface StateReceiver<S : MVIState> {
 

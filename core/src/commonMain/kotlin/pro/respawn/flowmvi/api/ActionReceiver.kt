@@ -1,8 +1,7 @@
-package pro.respawn.flowmvi.action
+package pro.respawn.flowmvi.api
 
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIProvider
-
+// https://youtrack.jetbrains.com/issue/KTIJ-7642
+@Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION")
 public fun interface ActionReceiver<in A : MVIAction> {
 
     /**
@@ -12,5 +11,5 @@ public fun interface ActionReceiver<in A : MVIAction> {
      * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
      */
-    public fun send(action: A)
+    public suspend fun send(action: A)
 }

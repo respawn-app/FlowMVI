@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.dsl
+package pro.respawn.flowmvi.api
 
 /**
  * Marker annotation for store apis that are not thread-safe
