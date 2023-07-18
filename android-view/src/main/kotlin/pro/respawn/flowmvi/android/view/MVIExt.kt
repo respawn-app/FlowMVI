@@ -7,12 +7,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
 import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.android.subscribe
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.Store
 
 /**
  *  Subscribe to the [provider] lifecycle-aware. Call this in [Fragment.onViewCreated]
@@ -22,12 +22,12 @@ import pro.respawn.flowmvi.android.subscribe
  *  @see repeatOnLifecycle
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
-    provider: MVIProvider<S, I, A>,
+    provider: Store<S, I, A>,
     consume: (action: A) -> Unit,
     render: (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job = viewLifecycleOwner.subscribe(
-    provider = provider,
+    store = provider,
     consume = consume,
     render = render,
     lifecycleState = lifecycleState
@@ -41,4 +41,4 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job where T : Fragment, T : MVIView<S, I, A> =
-    viewLifecycleOwner.subscribe(store, ::consume, ::render, lifecycleState)
+    viewLifecycleOwner.subscribe(provider, ::consume, ::render, lifecycleState)
