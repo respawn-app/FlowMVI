@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import pro.respawn.flowmvi.dsl.DelicateStoreApi
 import pro.respawn.flowmvi.android.MVIViewModel
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
@@ -21,7 +20,7 @@ import kotlin.random.Random
  */
 class BaseClassViewModel(
     repo: CounterRepo,
-) : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>(initialState = Loading) {
+) : MVIViewModel<ComposeState, ComposeIntent, ComposeAction>(initial = Loading) {
 
     init {
         // Usually this is the place to launch any background processing that is needed
@@ -38,11 +37,7 @@ class BaseClassViewModel(
 
     // Will be called when reducer or any child coroutine throws an exception
     // usually we would display a full-screen error here
-    @OptIn(DelicateStoreApi::class)
-    override fun recover(from: Exception): ComposeState {
-        send(ShowSnackbar(R.string.error))
-        return state
-    }
+    override suspend fun recover(e: Exception): ComposeState = ComposeState.Error(e)
 
     // Will be called each time a subscriber sends a new Intent in a separate coroutine
     override suspend fun reduce(intent: ComposeIntent) {

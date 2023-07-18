@@ -5,24 +5,22 @@ import org.koin.core.definition.Definition
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIState
-import pro.respawn.flowmvi.store.MVIStore
 import pro.respawn.flowmvi.android.StoreViewModel
+import pro.respawn.flowmvi.api.Store
 
-open class ProviderClass<S : MVIState, I : MVIIntent, A : MVIAction> {
+open class ProviderClass {
 
-    private val name = requireNotNull(this::class.qualifiedName) { "Can't use anonymous class as a Provider" }
-
+    val name = requireNotNull(this::class.qualifiedName) { "Can't use anonymous class as a Provider" }
     val qualifier = named(name)
 }
 
-inline fun <S : MVIState, I : MVIIntent, A : MVIAction, reified P : MVIStore<S, I, A>> Module.storeViewModel(
-    klass: ProviderClass<S, I, A>,
-) = viewModel(klass.qualifier) { StoreViewModel(get<P>(klass.qualifier) { it }) } bind StoreViewModel::class
+fun Module.storeViewModel(
+    klass: ProviderClass,
+) = viewModel(klass.qualifier) {
+    StoreViewModel(get<Store<*, *, *>>(klass.qualifier) { it })
+} bind StoreViewModel::class
 
-inline fun <S : MVIState, I : MVIIntent, A : MVIAction, reified P : MVIStore<S, I, A>> Module.provider(
-    klass: ProviderClass<S, I, A>,
-    noinline definition: Definition<P>
-) = factory(klass.qualifier, definition) bind MVIStore::class
+fun Module.provider(
+    klass: ProviderClass,
+    definition: Definition<Store<*, *, *>>,
+) = factory(klass.qualifier, definition) bind Store::class

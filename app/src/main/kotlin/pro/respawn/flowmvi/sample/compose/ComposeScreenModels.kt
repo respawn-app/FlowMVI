@@ -2,15 +2,16 @@ package pro.respawn.flowmvi.sample.compose
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Stable
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
 
 @Stable
 sealed class ComposeState : MVIState {
 
     object Loading : ComposeState()
     object Empty : ComposeState()
+    data class Error(val e: Exception?) : ComposeState()
     data class DisplayingContent(
         val timer: Int,
         val counter: Int,

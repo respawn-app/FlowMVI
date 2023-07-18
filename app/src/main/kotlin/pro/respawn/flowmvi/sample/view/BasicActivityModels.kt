@@ -1,8 +1,8 @@
 package pro.respawn.flowmvi.sample.view
 
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
 
 sealed interface BasicState : MVIState {
     object Loading : BasicState

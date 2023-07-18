@@ -12,6 +12,6 @@ val appModule = module {
     singleOf(::CounterRepo)
     viewModelOf(::BaseClassViewModel)
     // or instead simply create a subclass of StoreViewModel
-    provider(BasicProvider) { new(::BasicProvider) }
+    provider(BasicProvider) { new(::BasicProvider).store }
     storeViewModel(BasicProvider)
 }

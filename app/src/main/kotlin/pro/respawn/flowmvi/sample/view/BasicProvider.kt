@@ -1,51 +1,57 @@
 package pro.respawn.flowmvi.sample.view
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import pro.respawn.flowmvi.provider.StoreProvider
+import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.dsl.store
+import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.plugins.reduce
+import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.di.ProviderClass
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import pro.respawn.flowmvi.sample.view.BasicAction.ShowSnackbar
 import pro.respawn.flowmvi.sample.view.BasicIntent.ClickedFab
 import pro.respawn.flowmvi.sample.view.BasicState.DisplayingCounter
-import pro.respawn.flowmvi.sample.view.BasicState.Loading
+
+private typealias Ctx = PipelineContext<BasicState, BasicIntent, BasicAction>
 
 class BasicProvider(
     private val param: String,
     private val repo: CounterRepo,
-) : StoreProvider<BasicState, BasicIntent, BasicAction>(Loading) {
+) {
 
-    companion object : ProviderClass<BasicState, BasicIntent, BasicAction>()
+    val store = store<BasicState, BasicIntent, BasicAction>(name, BasicState.Loading) {
+        whileSubscribed {
+            launchLoadCounter()
+        }
+        reduce {
+            when (it) {
+                is ClickedFab -> {
+                    send(ShowSnackbar(R.string.started_processing))
 
-    override fun CoroutineScope.onStart() {
-        launchLoadCounter()
-    }
+                    // Doing long operations will delay intent processing. New intents will NOT result in new coroutines being launched
+                    // This means, if we get another intent while delay() is running, it will be processed independently and will start
+                    // after this invocation completes.
+                    // to solve this, use launch() (example in BaseClassViewModel.kt)
+                    delay(1000)
 
-    override suspend fun CoroutineScope.reduce(intent: BasicIntent) {
-        when (intent) {
-            is ClickedFab -> {
-                send(ShowSnackbar(R.string.started_processing))
+                    send(ShowSnackbar(R.string.finished_processing))
+                }
+            }
 
-                // Doing long operations will delay intent processing. New intents will NOT result in new coroutines being launched
-                // This means, if we get another intent while delay() is running, it will be processed independently and will start
-                // after this invocation completes.
-                // to solve this, use launchRecovering() (example in BaseClassViewModel.kt)
-                delay(1000)
-
-                send(ShowSnackbar(R.string.finished_processing))
+            updateState<DisplayingCounter, _> {
+                copy(counter = counter + 1)
             }
         }
-
-        updateState<DisplayingCounter> {
-            copy(counter = counter + 1)
-        }
     }
 
-    private fun CoroutineScope.launchLoadCounter() = launchRecovering {
+    private fun Ctx.launchLoadCounter() = launch {
         val counter = repo.getCounterSync()
         updateState {
             DisplayingCounter(counter, param)
         }
     }
+
+    companion object : ProviderClass()
 }

@@ -24,7 +24,7 @@ class BasicActivity :
     private val binding get() = requireNotNull(_b)
 
     // If your viewModel implements MVIProvider, you can just use by viewModel() on store variable
-    override val store: StoreViewModel<BasicState, BasicIntent, BasicAction> by viewModel(
+    override val provider: StoreViewModel<BasicState, BasicIntent, BasicAction> by viewModel(
         qualifier = BasicProvider.qualifier,
     ) { parametersOf("I am a parameter") }
 
