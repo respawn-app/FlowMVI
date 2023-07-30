@@ -19,7 +19,7 @@ internal class CappedMutableCollection<T>(
     }
 }
 
-public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
+public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     name: String,
     maxStates: Int,
     maxIntents: Int,
