@@ -12,18 +12,19 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import pro.respawn.flowmvi.MVIStore
+import pro.respawn.flowmvi.MutableStore
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.MutableStore
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.lazyStore
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.updateState
@@ -77,11 +78,15 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
-    protected open val store: MutableStore<S, I, A> by lazyStore(viewModelScope) {
-        recover { updateState { recover(it) }; null }
+    @Suppress("UNCHECKED_CAST", "DEPRECATION")
+    protected open val store: MutableStore<S, I, A> by lazyStore<S, I, A>(viewModelScope) {
+        recover {
+            updateState { recover(it) }
+            null
+        }
         reduce { reduce(it) }
         initial(initial)
-    }
+    } as Lazy<MutableStore<S, I, A>>
 
     override fun send(intent: I): Unit = store.send(intent)
 
