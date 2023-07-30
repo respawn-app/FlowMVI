@@ -89,7 +89,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * @see MVIStore.send
      */
-    public override fun send(action: A): Unit = store.send(action)
+    public override suspend fun send(action: A): Unit = store.send(action)
 
     /**
      * @see MVIStore.updateState

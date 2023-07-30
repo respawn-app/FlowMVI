@@ -8,7 +8,7 @@ context(PipelineContext<*, I, *>)
 public fun <I : MVIIntent> I.send(): Unit = intent(this)
 
 context(PipelineContext<*, *, A>)
-public fun <A : MVIAction> A.send(): Unit = action(this)
+public suspend fun <A : MVIAction> A.send(): Unit = action(this)
 
 context(PipelineContext<*, I, *>)
 public suspend fun <I : MVIIntent> I.emit(): Unit = emit(this)

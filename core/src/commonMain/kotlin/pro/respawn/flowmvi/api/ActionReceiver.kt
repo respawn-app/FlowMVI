@@ -9,7 +9,7 @@ public interface ActionReceiver<in A : MVIAction> {
      * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
      */
-    public fun send(action: A)
-    public suspend fun emit(action: A)
-    public fun action(action: A): Unit = send(action)
+    public suspend fun send(action: A)
+    public suspend fun emit(action: A): Unit = send(action)
+    public suspend fun action(action: A): Unit = send(action)
 }

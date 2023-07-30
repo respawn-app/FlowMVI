@@ -20,11 +20,9 @@ internal abstract class ChannelActionModule<A : MVIAction>(
 
     protected val _actions = Channel<A>(bufferSize, overflow)
 
-    override fun send(action: A) {
+    override suspend fun send(action: A) {
         _actions.trySend(action)
     }
-
-    override suspend fun emit(action: A) = _actions.send(action)
 }
 
 internal class DistributingModule<A : MVIAction>(
@@ -57,18 +55,15 @@ internal class SharedModule<A : MVIAction>(
 
     override val actions = _actions.asSharedFlow()
 
-    override fun send(action: A) {
+    override suspend fun send(action: A) {
         _actions.tryEmit(action)
     }
-
-    override suspend fun emit(action: A) = _actions.emit(action)
 }
 
 internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
 
     override val actions get() = error(ActionsDisabledMessage)
-    override suspend fun emit(action: A) = error(ActionsDisabledMessage)
-    override fun send(action: A) = error(ActionsDisabledMessage)
+    override suspend fun send(action: A) = error(ActionsDisabledMessage)
 
     private companion object {
 
