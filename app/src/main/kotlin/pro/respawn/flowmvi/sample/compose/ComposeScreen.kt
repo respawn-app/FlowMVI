@@ -4,9 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
@@ -78,21 +76,21 @@ private fun Scope.ComposeScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                    Text(
-                        text = stringResource(id = R.string.timer_template, state.timer),
-                        // send() is available in ConsumerScope
-                        modifier = Modifier.clickable { send(ClickedCounter) }
-                    )
-                    Text(
-                        text = stringResource(id = R.string.counter_template, state.counter),
-                    )
+                Text(
+                    text = stringResource(id = R.string.timer_template, state.timer),
+                    // send() is available in ConsumerScope
+                    modifier = Modifier.clickable { send(ClickedCounter) }
+                )
+                Text(
+                    text = stringResource(id = R.string.counter_template, state.counter),
+                )
 
                 Button(onClick = { send(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))
                 }
             }
             is CounterState.Loading -> CircularProgressIndicator()
-            is CounterState.Error -> Text(stringResource(R.string.error_message))
+            is CounterState.Error -> Text(state.e.message.toString())
         }
     }
 }

@@ -2,17 +2,18 @@ package pro.respawn.flowmvi.sample.provider
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.repo.CounterRepo
+import kotlin.random.Random
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
@@ -25,26 +26,32 @@ class CounterProvider(
         whileSubscribed {
             repo.getTimer()
                 .onEach { produceState(it) } // set mapped states
-                .flowOn(this + Dispatchers.Default) // create states out of the main thread
-                .collect()
+                .consume(Dispatchers.Default)
         }
         reduce {
             when (it) {
                 is CounterIntent.ClickedCounter -> {
                     action(CounterAction.ShowSnackbar(R.string.started_processing))
 
-                    // Doing long operations will delay intent processing. New intents will NOT result in new coroutines being launched
-                    // This means, if we get another intent while delay() is running, it will be processed independently and will start
-                    // after this invocation completes.
-                    // to solve this, use launch() (example in BaseClassViewModel.kt)
                     delay(1000)
 
                     action(CounterAction.ShowSnackbar(R.string.finished_processing))
+                    launch {
+                        require(Random.nextBoolean()) { "Oops, there was an error in a job" }
+                    }
                     updateState<CounterState.DisplayingCounter, _> {
                         copy(counter = counter + 1)
                     }
                 }
             }
+        }
+        recover {
+            if (it is IllegalArgumentException)
+                send(CounterAction.ShowSnackbar(R.string.error_message))
+            else updateState {
+                CounterState.Error(it)
+            }
+            null
         }
     }
 
