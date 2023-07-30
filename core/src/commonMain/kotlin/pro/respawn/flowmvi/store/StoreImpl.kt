@@ -25,7 +25,6 @@ import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import kotlin.coroutines.coroutineContext
 
-@OptIn(ExperimentalStdlibApi::class)
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
     private val actionModule: ActionModule<A> = actionModule(config.actionShareBehavior),
@@ -34,7 +33,6 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 ) : MutableStore<S, I, A>,
     Provider<S, I, A>,
     Recoverable,
-    AutoCloseable,
     StateModule<S> by stateModule,
     IntentModule<I> by intentModule,
     ActionModule<A> by actionModule {
