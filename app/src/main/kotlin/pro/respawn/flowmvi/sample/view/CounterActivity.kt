@@ -8,24 +8,25 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.android.subscribe
+import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 import pro.respawn.flowmvi.sample.provider.CounterAction
 import pro.respawn.flowmvi.sample.provider.CounterAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.provider.CounterIntent
-import pro.respawn.flowmvi.sample.provider.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.provider.CounterState
 import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.provider.CounterViewModel
+import pro.respawn.flowmvi.sample.provider.LambdaViewModel
 
 // Or use lambdas when calling subscribe()
-class CounterActivity : ComponentActivity(), MVIView<CounterState, CounterIntent, CounterAction> {
+class CounterActivity :
+    ComponentActivity(),
+    MVIView<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
 
     // If your viewModel implements MVIProvider, you can just use by viewModel() on store variable
-    override val provider by viewModel<CounterViewModel>()
+    override val provider by viewModel<LambdaViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +38,7 @@ class CounterActivity : ComponentActivity(), MVIView<CounterState, CounterIntent
         subscribe()
 
         binding.apply {
-            btnIncrement.setOnClickListener { send(ClickedCounter) }
+            btnIncrement.setOnClickListener { provider.onClickCounter() }
             btnToCompose.setOnClickListener {
                 startActivity(Intent(this@CounterActivity, ComposeActivity::class.java))
             }

@@ -4,6 +4,7 @@
     <string name="counter_button_label">Increment counter</string>
     <string name="counter_template">Counter: %d</string>
     <string name="started_processing">Started processing your intent</string>
+    <string name="lambda_processing">Look, I am a lambda!</string>
     <string name="finished_processing">Finished processing intent</string>
     <string name="timer_template">Timer: %d</string>
     <string name="empty_message">Oops! Nothing here</string>
