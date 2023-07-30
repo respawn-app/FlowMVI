@@ -1,30 +1,22 @@
 package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @FlowMVIDSL
 public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
-    CoroutineContext.Element {
+    CoroutineContext.Element,
+    CoroutineScope {
 
-    public fun launch(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job
-
-    public fun <T> async(
-        context: CoroutineContext = EmptyCoroutineContext,
-        start: CoroutineStart = CoroutineStart.DEFAULT,
-        block: suspend CoroutineScope.() -> T
-    ): Deferred<T>
+    public suspend fun <T> Flow<T>.consume(context: CoroutineContext = Dispatchers.Default): Unit =
+        flowOn(this@PipelineContext + Dispatchers.Default).collect()
 
     public companion object Key : CoroutineContext.Key<PipelineContext<*, *, *>>
 }
