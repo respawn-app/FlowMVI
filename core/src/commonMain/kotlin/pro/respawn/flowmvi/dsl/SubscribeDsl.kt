@@ -10,6 +10,11 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 
+/**
+ * Subscribe to the [store] and invoke [consume] and [render] in parallel in the provided scope.
+ * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * @see [Store.subscribe]
+ */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
     store: Store<S, I, A>,

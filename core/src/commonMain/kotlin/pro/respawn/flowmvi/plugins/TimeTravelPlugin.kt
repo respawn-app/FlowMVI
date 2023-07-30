@@ -20,6 +20,19 @@ internal class CappedMutableCollection<T>(
     }
 }
 
+/**
+ * A plugin that keeps track of changes in the store.
+ * It keeps references to last `maxStates` (inclusive) states and so on for other properties.
+ * Keep a reference to this plugin and use it to enable custom time travel support or validate the store's behavior
+ * in tests.
+ * @param states last states of the store, put in a stack.
+ * @param intents last intents of the store, put in a stack.
+ * @param actions last actions of the store, put in a stack.
+ * @param exceptions last states of the store, put in a stack.
+ * @param subscriptions subscription count of the store. Never decreases.
+ * @param launches count the times the store was launched. Never decreases.
+ * @param stops count the times the store was stopped. Never decreases.
+ */
 public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     name: String,
     maxStates: Int,
@@ -43,6 +56,9 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
     public var stops: Int by atomic(0)
         internal set
 
+    /**
+     * Reset all values of this plugin and start from scratch.
+     */
     public fun reset() {
         _states.clear()
         _intents.clear()
@@ -69,17 +85,28 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
         subscriptions += 1
     }
 
-    override fun onStop() {
+    override fun onStop(e: Exception?) {
         stops += 1
     }
 
     public companion object {
 
+        /**
+         * The default max size for time travel holders
+         */
         public const val DefaultHistorySize: Int = 64
+
+        /**
+         * Default time travel plugin name. Hardcoded to prevent multiple plugins from being installed.
+         */
         public const val Name: String = "TimeTravelPlugin"
     }
 }
 
+/**
+ * Create a new [TimeTravelPlugin]. Keep a reference to the plugin to use its properties.
+ * @return the plugin.
+ */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
     name: String = TimeTravelPlugin.Name,
     maxStates: Int = TimeTravelPlugin.DefaultHistorySize,
@@ -88,6 +115,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
     maxExceptions: Int = TimeTravelPlugin.DefaultHistorySize,
 ): TimeTravelPlugin<S, I, A> = TimeTravelPlugin(name, maxStates, maxIntents, maxActions, maxExceptions)
 
+/**
+ * Create a new [TimeTravelPlugin] and installs it. Keep a reference to the plugin to use its properties.
+ * @return the plugin.
+ */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
     name: String = TimeTravelPlugin.Name,
     maxStates: Int = TimeTravelPlugin.DefaultHistorySize,

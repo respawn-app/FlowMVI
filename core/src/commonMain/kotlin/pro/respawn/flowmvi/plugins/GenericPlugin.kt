@@ -5,8 +5,14 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
+/**
+ * A builder of a Generic store plugin that can be used with any store.
+ * Due to the risk of mangling with the generic store's properties, this plugin cannot affect the store in any way.
+ * The types of intents are also erased.
+ */
 public class GenericPluginBuilder internal constructor() {
 
     private var intent: suspend (MVIIntent) -> Unit = {}
@@ -16,38 +22,64 @@ public class GenericPluginBuilder internal constructor() {
     private var start: suspend () -> Unit = {}
     private var subscribe: suspend (subscriptionCount: Int) -> Unit = {}
     private var stop: (e: Exception?) -> Unit = {}
+
+    /**
+     * This plugin's name.
+     * @see StorePlugin.name
+     */
     public var name: String? = null
 
+    /**
+     * Same as [StorePlugin.onIntent], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onIntent(block: suspend (intent: MVIIntent) -> Unit) {
         intent = block
     }
 
+    /**
+     * Same as [StorePlugin.onState], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onState(block: suspend (old: MVIState, new: MVIState) -> Unit) {
         state = block
     }
 
+    /**
+     * Same as [StorePlugin.onStart], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onStart(block: suspend () -> Unit) {
         start = block
     }
 
+    /**
+     * Same as [StorePlugin.onStop], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onStop(block: (e: Exception?) -> Unit) {
         stop = block
     }
 
+    /**
+     * Same as [StorePlugin.onException], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onException(block: suspend (e: Exception) -> Unit) {
         exception = block
     }
 
+    /**
+     * Same as [StorePlugin.onAction], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onAction(block: suspend (action: MVIAction) -> Unit) {
         action = block
     }
 
+    /**
+     * Same as [StorePlugin.onSubscribe], but for generic plugins
+     */
     @FlowMVIDSL
     public fun onSubscribe(block: suspend (subscriptionCount: Int) -> Unit) {
         subscribe = block
@@ -79,7 +111,18 @@ public class GenericPluginBuilder internal constructor() {
     } as StorePlugin<S, I, A>
 }
 
+/**
+ * Create a new [GenericPluginBuilder].
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
     @BuilderInference builder: GenericPluginBuilder.() -> Unit,
 ): StorePlugin<S, I, A> = GenericPluginBuilder().apply(builder).build()
+
+/**
+ * Create a new [genericPlugin] and install it.
+ */
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.genericPlugin(
+    @BuilderInference plugin: GenericPluginBuilder.() -> Unit,
+): Unit = install(genericPlugin(builder = plugin))

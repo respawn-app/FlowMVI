@@ -18,10 +18,10 @@ internal abstract class ChannelActionModule<A : MVIAction>(
     overflow: BufferOverflow,
 ) : ActionModule<A> {
 
-    protected val _actions = Channel<A>(bufferSize, overflow)
+    protected val delegate = Channel<A>(bufferSize, overflow)
 
     override suspend fun send(action: A) {
-        _actions.trySend(action)
+        delegate.trySend(action)
     }
 }
 
@@ -30,7 +30,7 @@ internal class DistributingModule<A : MVIAction>(
     overflow: BufferOverflow,
 ) : ChannelActionModule<A>(bufferSize, overflow) {
 
-    override val actions = _actions.receiveAsFlow()
+    override val actions = delegate.receiveAsFlow()
 }
 
 internal class ConsumingModule<A : MVIAction>(
@@ -38,7 +38,7 @@ internal class ConsumingModule<A : MVIAction>(
     overflow: BufferOverflow,
 ) : ChannelActionModule<A>(bufferSize, overflow) {
 
-    override val actions = _actions.consumeAsFlow()
+    override val actions = delegate.consumeAsFlow()
 }
 
 internal class SharedModule<A : MVIAction>(

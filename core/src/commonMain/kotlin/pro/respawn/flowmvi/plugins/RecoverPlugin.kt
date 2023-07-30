@@ -11,12 +11,19 @@ import pro.respawn.flowmvi.dsl.storePlugin
 
 public typealias Recover<S, I, A> = suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?
 
+/**
+ * Create and install a [recoverPlugin].
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.recover(
     name: String? = null,
     recover: Recover<S, I, A>,
 ): Unit = install(recoverPlugin(name, recover))
 
+/**
+ * Create a recover plugin that simply invokes [StorePlugin.onException] and decides how to proceed accordingly.
+ * See the parent function for more information.
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverPlugin(
     name: String? = null,

@@ -8,6 +8,10 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.AbstractStorePlugin
 
+/**
+ * A class that builds a new [StorePlugin]
+ * For more documentation, see [StorePlugin]
+ */
 public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
@@ -17,38 +21,63 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     private var start: suspend PipelineContext<S, I, A>.() -> Unit = { }
     private var subscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
     private var stop: (e: Exception?) -> Unit = { }
+
+    /**
+     * @see [StorePlugin.name]
+     */
     public var name: String? = null
 
+    /**
+     * @see [StorePlugin.onIntent]
+     */
     @FlowMVIDSL
     public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?) {
         intent = block
     }
 
+    /**
+     * @see [StorePlugin.onState]
+     */
     @FlowMVIDSL
     public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?) {
         state = block
     }
 
+    /**
+     * @see [StorePlugin.onStart]
+     */
     @FlowMVIDSL
     public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit) {
         start = block
     }
 
+    /**
+     * @see [StorePlugin.onStop]
+     */
     @FlowMVIDSL
     public fun onStop(block: (e: Exception?) -> Unit) {
         stop = block
     }
 
+    /**
+     * @see [StorePlugin.onException]
+     */
     @FlowMVIDSL
     public fun onException(block: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?) {
         exception = block
     }
 
+    /**
+     * @see [StorePlugin.onAction]
+     */
     @FlowMVIDSL
     public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?) {
         action = block
     }
 
+    /**
+     * @see [StorePlugin.onSubscribe]
+     */
     @FlowMVIDSL
     public fun onSubscribe(block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit) {
         subscribe = block
@@ -66,6 +95,11 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     }
 }
 
+/**
+ * Build a new [StorePlugin] using [StorePluginBuilder].
+ * See [StoreBuilder.install] to install the plugin automatically.
+ * @see [StorePlugin]
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> storePlugin(
     @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,

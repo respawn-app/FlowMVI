@@ -36,7 +36,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
      * Send a new intent for the store you used in [MVIComposable]
-     * @see MutableStore.send
+     * @see pro.respawn.flowmvi.api.IntentReceiver.send
      */
     public fun send(intent: I)
 
@@ -46,6 +46,10 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
      * @see send
      */
     public fun I.send(): Unit = send(this)
+
+    /**
+     * A property that is being delegated to when calling [Store.subscribe] in composition
+     */
     public val actions: Flow<A>
 }
 
@@ -86,12 +90,11 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     }
 }
 
+/**
+ * Basically an alias for [ConsumerScope.actions].collect()
+ */
 @Composable
 @FlowMVIDSL
-@Suppress("ComposableParametersOrdering")
-/**
- * @see [ConsumerScope.consume]
- */
 public fun <A : MVIAction> ConsumerScope<*, A>.consume(
     onAction: suspend CoroutineScope.(action: A) -> Unit,
 ): Unit = LaunchedEffect(Unit) {
