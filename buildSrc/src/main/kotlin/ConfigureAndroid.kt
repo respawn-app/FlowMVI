@@ -15,6 +15,10 @@ fun Project.configureAndroid(
         proguardFiles(getDefaultProguardFile(Config.defaultProguardFile), Config.proguardFile)
     }
 
+    lint {
+        warning += "AutoboxingStateCreation"
+    }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = Config.isMinifyEnabledRelease
