@@ -1,11 +1,11 @@
 package pro.respawn.flowmvi.api
+
 /**
- * The state of the view / consumer.
- * The state must be comparable and immutable (most likely a data class)
+ * The state of the subscriber.
+ * The state must be **comparable** and **immutable** (most likely a data class or a data object).
  */
 public interface MVIState {
 
-    // planned for the future
-    // override fun equals(other: Any?): Boolean
-    // override fun hashCode(): Int
+    override fun equals(other: Any?): Boolean
+    override fun hashCode(): Int
 }
