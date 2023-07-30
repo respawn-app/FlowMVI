@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.sample.provider
 
+import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.android.StoreViewModel
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.send
@@ -12,9 +13,10 @@ class CounterViewModel(
 ) : StoreViewModel<CounterState, CounterIntent, CounterAction>(CounterProvider(repo).store)
 
 class LambdaViewModel(
+    savedStateHandle: SavedStateHandle,
     repo: CounterRepo
 ) : StoreViewModel<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction>(
-    LambdaCounterProvider(repo).store
+    LambdaCounterProvider(savedStateHandle, repo).store
 ) {
 
     fun onClickCounter() = send {

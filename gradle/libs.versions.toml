@@ -68,6 +68,7 @@ lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", v
 material = { module = "com.google.android.material:material", version.ref = "material" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
+lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 
 [bundles]
 koin = [

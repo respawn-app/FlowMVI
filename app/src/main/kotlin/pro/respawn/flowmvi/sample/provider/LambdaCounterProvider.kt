@@ -1,8 +1,10 @@
 package pro.respawn.flowmvi.sample.provider
 
+import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
+import pro.respawn.flowmvi.android.plugins.saveState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.reduceLambdas
@@ -13,6 +15,7 @@ import pro.respawn.flowmvi.sample.repo.CounterRepo
 private typealias Context = PipelineContext<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction>
 
 class LambdaCounterProvider(
+    private val savedStateHandle: SavedStateHandle,
     private val repo: CounterRepo,
 ) {
 
@@ -20,6 +23,7 @@ class LambdaCounterProvider(
         name = "Counter"
         install(androidLoggingPlugin())
         reduceLambdas()
+        saveState(savedStateHandle)
         whileSubscribed {
             repo.getTimer()
                 .onEach { produceState(it) } // set mapped states

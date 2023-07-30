@@ -47,7 +47,7 @@ import kotlin.coroutines.cancellation.CancellationException
 @Deprecated(
     """
 MVIViewModel is now deprecated. A better API was designed for MVIViewModels that is multiplatform,
-extensible, and uses composition instead of locking you onto a specific base class.
+extensible, and uses composition instead of locking you into a specific base class.
 To migrate, create a wrapper class that has a `store` property, inject dependencies into it normally, and build the store 
 using store() function.
 Please see example implementation in the project's repository or or consult with the documentation for a full guide.

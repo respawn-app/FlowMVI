@@ -25,7 +25,8 @@ public value class LambdaIntent<S : MVIState, A : MVIAction>(
     /**
      * Invoke the [block] of this intent
      */
-    internal suspend operator fun PipelineContext<S, LambdaIntent<S, A>, A>.invoke(): Unit = block.invoke(this)
+    internal suspend operator fun PipelineContext<S, LambdaIntent<S, A>, A>.invoke(): Unit = block(this)
+    override fun toString(): String = "LambdaIntent"
 }
 
 /**

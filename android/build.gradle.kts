@@ -11,4 +11,5 @@ dependencies {
     api(libs.lifecycle.runtime)
     api(libs.lifecycle.viewmodel)
     api(libs.kotlinx.coroutines.android)
+    implementation(libs.lifecycle.savedstate)
 }
