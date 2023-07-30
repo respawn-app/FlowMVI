@@ -5,19 +5,20 @@ package pro.respawn.flowmvi
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.Reduce
+import pro.respawn.flowmvi.plugins.TimeTravelPlugin
 import pro.respawn.flowmvi.plugins.consoleLoggingPlugin
 import pro.respawn.flowmvi.plugins.reduce
-import pro.respawn.flowmvi.util.TestInfo
-import pro.respawn.flowmvi.util.testPlugin
+import pro.respawn.flowmvi.plugins.timeTravelPlugin
 
 internal fun testStore(
-    holder: TestInfo<TestState, TestIntent, TestAction> = TestInfo(),
+    timeTravel: TimeTravelPlugin<TestState, TestIntent, TestAction> = timeTravelPlugin(),
     initial: TestState = TestState.Some,
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     reduce: Reduce<TestState, TestIntent, TestAction>,
-) = store<_, _, _>("TestStore", initial) {
+) = store<_, _, _> {
     actionShareBehavior = behavior
     reduce(reduce = reduce)
-    install(testPlugin(holder))
+    install(timeTravel)
     install(consoleLoggingPlugin("Logging"))
+    initial(initial)
 }

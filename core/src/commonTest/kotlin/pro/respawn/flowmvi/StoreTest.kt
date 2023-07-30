@@ -1,19 +1,20 @@
 package pro.respawn.flowmvi
 
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.plugins.Reduce
-import pro.respawn.flowmvi.util.TestInfo
+import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.util.idle
+import pro.respawn.flowmvi.util.test
 
 @OptIn(ExperimentalKotest::class)
 class StoreTest : FreeSpec({
-    coroutineTestScope = true
     blockingTest = true
     concurrency = 1
 
@@ -24,40 +25,40 @@ class StoreTest : FreeSpec({
             behavior = ActionShareBehavior.Restrict()
         ) { updateState { TestState.SomeData("data") } }
         "then can be launched" - {
-            var job = store.start(this)
-
-            // "and can't be launched twice" {
-            //     shouldThrowExactly<IllegalArgumentException> {
-            //         store.start(this)
-            //     }
-            // }
-            "and can be canceled" {
-                job.cancelAndJoin()
+            store.test {
+                idle()
+                "and can't be launched twice" {
+                    shouldThrowExactly<IllegalArgumentException> {
+                        store.test { }
+                        idle()
+                    }
+                }
+                "and can be canceled" {
+                    store.close()
+                }
             }
             "and can be launched again" {
-                job = store.start(this)
-                job.cancelAndJoin()
+                store.test { }
+                idle()
             }
         }
     }
 
-    "given store that sends actions and updates states" {
-        val sub = TestInfo<TestState, TestIntent, TestAction>()
+    "given store that sends actions and updates states" - {
+        val sub = timeTravelPlugin<TestState, TestIntent, TestAction>()
         val reduce: Reduce<TestState, TestIntent, TestAction> = { send(TestAction.Some) }
-        val store = testStore(holder = sub, reduce = reduce)
-        val job = store.start(this)
-        with(store) {
-            subscribe {
-                states.value shouldBe TestState.Some
+        val store = testStore(timeTravel = sub, reduce = reduce)
+
+        "then can accept actions" {
+            store.test {
+                send(TestIntent.Some)
             }
+            idle()
+            sub.launches shouldBe 1
+            sub.subscriptions shouldBe 1
+            sub.stops shouldBe 1
+            sub.intents.shouldContainExactly(TestIntent.Some)
+            sub.actions.shouldContain(TestAction.Some)
         }
-        store.send(TestIntent.Some)
-        idle()
-        job.cancelAndJoin()
-        sub.launches shouldBe 1
-        sub.subscriptions shouldBe 1
-        sub.stops shouldBe 1
-        sub.intents.shouldContainExactly(TestIntent.Some)
-        sub.actions.shouldContain(TestAction.Some)
     }
 })
