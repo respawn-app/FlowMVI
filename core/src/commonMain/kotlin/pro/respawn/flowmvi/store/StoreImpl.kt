@@ -4,6 +4,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.MVIAction
@@ -58,7 +59,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun start(scope: CoroutineScope) = pipeline(scope, CoroutineStart.LAZY) {
         plugin { onStart() }
-        while (scope.isActive) {
+        while ((this@pipeline as CoroutineScope).isActive) {
             plugin { onIntent(receive()) }
             yield()
         }
@@ -67,7 +68,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             launchJob.getAndSet(null)?.cancel()
             plugin { onStop() }
         }
-        require(launchJob.getAndSet(this@apply) == null) { "Store is already started" }
+        if (launchJob.getAndSet(this@apply) != null) cancel(StartedMessage, IllegalStateException(StartedMessage))
         start()
     }
 
@@ -101,13 +102,15 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private companion object {
 
-        const val NonSuspendingSubscriberMessage = """
+        private const val StartedMessage = "Store is already started"
+
+        private const val NonSuspendingSubscriberMessage = """
 You have subscribed to the store, but your subscribe() block has returned early (without throwing a
 CancellationException). When you subscribe, make sure to continue collecting values from the store until the Job 
 Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store.
         """
 
-        const val InvalidContextMessage = """
+        private const val InvalidContextMessage = """
 You have overridden the CoroutineContext associated to the store in one of the coroutines, but then attempted to use it.
 This is not allowed because you lose the ability to call store functions in your plugins/jobs.
 Please amend the store context instead. Example:

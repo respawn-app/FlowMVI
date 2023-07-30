@@ -4,6 +4,7 @@ import kotlinx.atomicfu.atomic
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
 internal class CappedMutableCollection<T>(
@@ -50,6 +51,26 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
         subscriptions = 0
         launches = 0
         stops = 0
+    }
+
+    override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S = new.also { _states.add(it) }
+
+    override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I = intent.also { _intents.add(it) }
+
+    override suspend fun PipelineContext<S, I, A>.onAction(action: A): A = action.also { _actions.add(it) }
+
+    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception = e.also { _exceptions.add(it) }
+
+    override suspend fun PipelineContext<S, I, A>.onStart() {
+        launches += 1
+    }
+
+    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
+        subscriptions += 1
+    }
+
+    override fun onStop() {
+        stops += 1
     }
 
     public companion object {

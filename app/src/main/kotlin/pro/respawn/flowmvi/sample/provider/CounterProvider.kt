@@ -22,6 +22,7 @@ class CounterProvider(
 ) {
 
     val store = store<CounterState, CounterIntent, CounterAction> {
+        name = "Counter"
         install(androidLoggingPlugin())
         whileSubscribed {
             repo.getTimer()

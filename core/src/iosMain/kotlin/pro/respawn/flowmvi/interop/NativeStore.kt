@@ -18,7 +18,7 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private val scope = CoroutineScope(Dispatchers.Main)
     public val initial: S = store.initial
-    public val name: String = store.name
+    public val name: String? = store.name
 
     init {
         if (autoStart) store.start(scope)
