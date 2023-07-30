@@ -6,7 +6,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.api.MutableStore
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.subscribe
@@ -232,7 +231,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
         null
     }
     initial(initial)
-}
+} as MutableStore<S, I, A>
 
 /**
  * A builder function of [MVIStore] that creates  the store lazily. This function does **not** launch the store.

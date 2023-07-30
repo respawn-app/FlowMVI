@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MVI">
         <activity
-            android:name=".view.BasicActivity"
+            android:name=".view.CounterActivity"
             android:exported="true"
             android:theme="@style/Theme.MVI.View">
             <intent-filter>

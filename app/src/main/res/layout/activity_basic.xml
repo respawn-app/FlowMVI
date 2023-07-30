@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.BasicActivity">
+    tools:context=".view.CounterActivity">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvCounter"
@@ -15,6 +15,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
         tools:text="Counter: 5" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -22,6 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/tvCounter"
         tools:text="Timer: 5" />
 
@@ -30,6 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/tvTimer"
         tools:text="param" />
 
@@ -39,6 +45,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:text="@string/counter_button_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,6 +56,8 @@
         android:id="@+id/btnToCompose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:layout_gravity="bottom|end"
         android:text="@string/to_compose_button_label"
         app:layout_constraintEnd_toEndOf="parent"

@@ -18,10 +18,8 @@ import pro.respawn.flowmvi.sample.provider.CounterState
 import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.provider.CounterViewModel
 
-class BasicActivity :
-    ComponentActivity(),
-    // Or use lambdas when calling subscribe()
-    MVIView<CounterState, CounterIntent, CounterAction> {
+// Or use lambdas when calling subscribe()
+class CounterActivity : ComponentActivity(), MVIView<CounterState, CounterIntent, CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
@@ -41,7 +39,7 @@ class BasicActivity :
         binding.apply {
             btnIncrement.setOnClickListener { send(ClickedCounter) }
             btnToCompose.setOnClickListener {
-                startActivity(Intent(this@BasicActivity, ComposeActivity::class.java))
+                startActivity(Intent(this@CounterActivity, ComposeActivity::class.java))
             }
         }
     }
@@ -64,6 +62,8 @@ class BasicActivity :
                 }
                 progress.hide()
                 tvError.isVisible = false
+                btnIncrement.isVisible = true
+                btnToCompose.isVisible = true
             }
             is CounterState.Loading -> {
                 tvCounter.isVisible = false
@@ -71,6 +71,8 @@ class BasicActivity :
                 tvTimer.isVisible = false
                 progress.show()
                 tvError.isVisible = false
+                btnIncrement.isVisible = false
+                btnToCompose.isVisible = false
             }
             is CounterState.Error -> {
                 tvCounter.isVisible = false
@@ -78,6 +80,8 @@ class BasicActivity :
                 tvTimer.isVisible = false
                 progress.hide()
                 tvError.isVisible = true
+                btnIncrement.isVisible = false
+                btnToCompose.isVisible = false
             }
         }
     }
