@@ -9,7 +9,8 @@ import kotlinx.coroutines.Job
  * A store functions independently of any subscribers.
  * MVIStore is the base implementation of [MVIProvider].
  */
-public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I> {
+@OptIn(ExperimentalStdlibApi::class)
+public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I>, AutoCloseable {
 
     public val name: String
     public val initial: S
