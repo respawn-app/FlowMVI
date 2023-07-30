@@ -18,7 +18,7 @@ internal class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction> inter
     override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) =
         plugins { onSubscribe(subscriberCount) }
 
-    override fun onStop(): Unit = plugins { onStop() }
+    override fun onStop(e: Exception?): Unit = plugins { onStop(e) }
 
     private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.forEach(block)
     private inline fun <R> plugins(

@@ -16,7 +16,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     private var exception: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception? = { it }
     private var start: suspend PipelineContext<S, I, A>.() -> Unit = { }
     private var subscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
-    private var stop: () -> Unit = { }
+    private var stop: (e: Exception?) -> Unit = { }
     public var name: String? = null
 
     @FlowMVIDSL
@@ -35,7 +35,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     }
 
     @FlowMVIDSL
-    public fun onStop(block: () -> Unit) {
+    public fun onStop(block: (e: Exception?) -> Unit) {
         stop = block
     }
 
@@ -62,7 +62,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
         override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(this, action)
         override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = exception(e)
         override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) = subscribe(subscriberCount)
-        override fun onStop(): Unit = stop()
+        override fun onStop(e: Exception?): Unit = stop(e)
     }
 }
 

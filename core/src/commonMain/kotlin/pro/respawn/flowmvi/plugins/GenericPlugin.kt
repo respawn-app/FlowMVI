@@ -15,7 +15,7 @@ public class GenericPluginBuilder internal constructor() {
     private var exception: suspend (e: Exception) -> Unit = {}
     private var start: suspend () -> Unit = {}
     private var subscribe: suspend (subscriptionCount: Int) -> Unit = {}
-    private var stop: () -> Unit = {}
+    private var stop: (e: Exception?) -> Unit = {}
     public var name: String? = null
 
     @FlowMVIDSL
@@ -34,7 +34,7 @@ public class GenericPluginBuilder internal constructor() {
     }
 
     @FlowMVIDSL
-    public fun onStop(block: () -> Unit) {
+    public fun onStop(block: (e: Exception?) -> Unit) {
         stop = block
     }
 

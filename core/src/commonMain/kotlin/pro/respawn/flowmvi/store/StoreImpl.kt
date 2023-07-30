@@ -1,16 +1,19 @@
 package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import pro.respawn.flowmvi.MutableStore
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.MutableStore
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Recoverable
@@ -26,6 +29,7 @@ import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import kotlin.coroutines.coroutineContext
 
+@Suppress("Deprecation") // wil be removed
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
     private val actionModule: ActionModule<A> = actionModule(config.actionShareBehavior),
@@ -60,13 +64,21 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun start(scope: CoroutineScope) = pipeline(scope, CoroutineStart.LAZY) {
         plugin { onStart() }
         while ((this@pipeline as CoroutineScope).isActive) {
-            plugin { onIntent(receive()) }
+            val intent = receive()
+            if (config.parallelIntents) launch {
+                plugin { onIntent(intent) }
+            } else
+                plugin { onIntent(intent) }
             yield()
         }
     }.apply {
-        invokeOnCompletion {
+        invokeOnCompletion { throwable ->
             launchJob.getAndSet(null)?.cancel()
-            plugin { onStop() }
+            when (throwable) {
+                null, is CancellationException -> plugin { onStop(null) }
+                !is Exception -> throw throwable
+                else -> plugin { onStop(throwable) }
+            }
         }
         if (launchJob.getAndSet(this@apply) != null) cancel(StartedMessage, IllegalStateException(StartedMessage))
         start()
@@ -81,6 +93,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         invokeOnCompletion { --subscriberCount }
     }
 
+    @OptIn(DelicateStoreApi::class)
     @Suppress("UNCHECKED_CAST")
     private suspend inline fun <T> withPipeline(block: PipelineContext<S, I, A>.() -> T): T {
         val pipeline = checkNotNull(

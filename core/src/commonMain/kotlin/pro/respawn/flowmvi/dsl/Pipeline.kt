@@ -1,3 +1,5 @@
+@file:OptIn(DelicateStoreApi::class)
+
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -7,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newCoroutineContext
 import pro.respawn.flowmvi.api.ActionReceiver
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
