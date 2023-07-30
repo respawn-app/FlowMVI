@@ -7,44 +7,28 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 
 internal class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    name: String = DefaultName,
-    private val plugins: Map<String, StorePlugin<S, I, A>>,
-) : AbstractStorePlugin<S, I, A>(name) {
-
-    internal constructor(
-        name: String = DefaultName,
-        plugins: Iterable<StorePlugin<S, I, A>>
-    ) : this(name, plugins.associateBy { it.name })
+    private val plugins: Set<StorePlugin<S, I, A>>,
+) : AbstractStorePlugin<S, I, A>(Name) {
 
     override suspend fun PipelineContext<S, I, A>.onStart(): Unit = plugins { onStart() }
     override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = plugins(new) { onState(old, it) }
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = plugins(intent) { onIntent(it) }
     override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = plugins(action) { onAction(it) }
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = plugins(e) { onException(it) }
-    override suspend fun PipelineContext<S, I, A>.onSubscribe() = plugins { onSubscribe() }
+    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) =
+        plugins { onSubscribe(subscriberCount) }
+
     override fun onStop(): Unit = plugins { onStop() }
 
-    private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.values.forEach(block)
+    private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.forEach(block)
     private inline fun <R> plugins(
         initial: R,
         block: StorePlugin<S, I, A>.(R) -> R?
-    ) = plugins.values.fold<_, R?>(initial) { acc, it -> it.block(acc ?: return@plugins acc) }
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is CompositePlugin<*, *, *>) return false
-        return name == other.name && plugins.keys == other.plugins.keys
-    }
-
-    override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + plugins.keys.hashCode()
-        return result
-    }
-
-    operator fun get(name: String) = plugins[name]
+    ) = plugins.fold<_, R?>(initial) { acc, it -> it.block(acc ?: return@plugins acc) }
 
     companion object {
 
-        const val DefaultName = "CompositePlugin"
+        // there may only be one composite plugin as it's intended for internal usage
+        private const val Name = "CompositePlugin"
     }
 }

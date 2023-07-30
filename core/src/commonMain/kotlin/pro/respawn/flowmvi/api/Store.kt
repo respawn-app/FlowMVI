@@ -23,9 +23,8 @@ public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentRecei
      */
     public fun start(scope: CoroutineScope): Job
 
-    public fun CoroutineScope.subscribe(block: SubscriberContext<S, I, A>.() -> Unit): Job
+    public fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit): Job
 
-    public operator fun get(pluginName: String): StorePlugin<S, I, A>?
 }
 
 public interface MutableStore<S : MVIState, I : MVIIntent, A : MVIAction> :

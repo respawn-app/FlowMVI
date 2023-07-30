@@ -20,10 +20,13 @@ public typealias Reduce<S, I, A> = suspend PipelineContext<S, I, A>.(intent: I) 
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
     name: String = ReducePluginName,
     reduce: Reduce<S, I, A>,
-): Unit = install(reducePlugin(name, reduce))
+): StorePlugin<S, I, A> = install(reducePlugin(name, reduce))
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
     name: String = ReducePluginName,
     crossinline reduce: Reduce<S, I, A>,
-): StorePlugin<S, I, A> = storePlugin(name) { onIntent { it.also { reduce(it) } } }
+): StorePlugin<S, I, A> = storePlugin {
+    this.name = name
+    onIntent { it.also { reduce(it) } }
+}

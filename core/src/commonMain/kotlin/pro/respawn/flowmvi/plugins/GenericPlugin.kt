@@ -7,15 +7,16 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.storePlugin
 
-public class GenericPluginBuilder internal constructor(public val name: String) {
+public class GenericPluginBuilder internal constructor() {
 
     private var intent: suspend (MVIIntent) -> Unit = {}
     private var state: suspend (old: MVIState, new: MVIState) -> Unit = { _, _ -> }
     private var action: suspend (MVIAction) -> Unit = {}
     private var exception: suspend (e: Exception) -> Unit = {}
     private var start: suspend () -> Unit = {}
-    private var subscribe: suspend () -> Unit = {}
+    private var subscribe: suspend (subscriptionCount: Int) -> Unit = {}
     private var stop: () -> Unit = {}
+    public var name: String? = null
 
     @FlowMVIDSL
     public fun onIntent(block: suspend (intent: MVIIntent) -> Unit) {
@@ -48,12 +49,13 @@ public class GenericPluginBuilder internal constructor(public val name: String) 
     }
 
     @FlowMVIDSL
-    public fun onSubscribe(block: suspend () -> Unit) {
+    public fun onSubscribe(block: suspend (subscriptionCount: Int) -> Unit) {
         subscribe = block
     }
 
     @Suppress("UNCHECKED_CAST")
-    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build() = storePlugin(name) {
+    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build() = storePlugin {
+        name = this@GenericPluginBuilder.name
         onIntent {
             this@GenericPluginBuilder.intent(it)
             it
@@ -79,6 +81,5 @@ public class GenericPluginBuilder internal constructor(public val name: String) 
 
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
-    name: String,
     @BuilderInference builder: GenericPluginBuilder.() -> Unit,
-): StorePlugin<S, I, A> = GenericPluginBuilder(name).apply(builder).build()
+): StorePlugin<S, I, A> = GenericPluginBuilder().apply(builder).build()

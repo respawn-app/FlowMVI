@@ -9,18 +9,19 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
-public const val RecoverPluginName: String = "RecoverPlugin"
-
 public typealias Recover<S, I, A> = suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?
 
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.recover(
-    name: String = RecoverPluginName,
+    name: String? = null,
     recover: Recover<S, I, A>,
-): Unit = install(recoverPlugin(name, recover))
+): StorePlugin<S, I, A> = install(recoverPlugin(name, recover))
 
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverPlugin(
-    name: String = RecoverPluginName,
+    name: String? = null,
     recover: Recover<S, I, A>
-): StorePlugin<S, I, A> = storePlugin(name) { onException(recover) }
+): StorePlugin<S, I, A> = storePlugin {
+    this.name = name
+    onException(recover)
+}

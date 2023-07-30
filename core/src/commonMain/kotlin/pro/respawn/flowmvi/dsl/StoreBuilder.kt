@@ -37,15 +37,12 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction>(
     public var intentCapacity: Int = Channel.UNLIMITED
 
     @FlowMVIDSL
-    public fun install(plugin: StorePlugin<S, I, A>) {
-        plugins.add(plugin)
-    }
+    public fun <T : StorePlugin<S, I, A>> install(plugin: T): T = plugin.also { plugins.add(it) }
 
     @FlowMVIDSL
     public fun install(
-        name: String,
         plugin: StorePluginBuilder<S, I, A>.() -> Unit
-    ): Unit = install(storePlugin(name, plugin))
+    ): StorePlugin<S, I, A> = install(storePlugin(plugin))
 
     @PublishedApi
     @FlowMVIDSL

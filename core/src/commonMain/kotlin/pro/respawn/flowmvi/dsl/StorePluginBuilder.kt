@@ -8,17 +8,16 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.AbstractStorePlugin
 
-public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    public val name: String,
-) {
+public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
     private var state: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S? = { _, new -> new }
     private var action: suspend PipelineContext<S, I, A>.(A) -> A? = { it }
     private var exception: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception? = { it }
     private var start: suspend PipelineContext<S, I, A>.() -> Unit = { }
-    private var subscribe: suspend PipelineContext<S, I, A>.() -> Unit = {}
+    private var subscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
     private var stop: () -> Unit = { }
+    public var name: String? = null
 
     @FlowMVIDSL
     public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?) {
@@ -51,7 +50,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
     }
 
     @FlowMVIDSL
-    public fun onSubscribe(block: suspend PipelineContext<S, I, A>.() -> Unit) {
+    public fun onSubscribe(block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit) {
         subscribe = block
     }
 
@@ -62,13 +61,12 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> inte
         override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(this, intent)
         override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(this, action)
         override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = exception(e)
-        override suspend fun PipelineContext<S, I, A>.onSubscribe() = subscribe()
+        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) = subscribe(subscriberCount)
         override fun onStop(): Unit = stop()
     }
 }
 
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> storePlugin(
-    name: String,
     @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>(name).apply(builder).build()
+): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>().apply(builder).build()

@@ -10,20 +10,19 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
-public const val WhileSubscribedPluginName: String = "WhileSubscribed"
-
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
-    name: String = WhileSubscribedPluginName,
+    name: String? = null,
     firstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
-): Unit = install(whileSubscribedPlugin(name, firstSubscription))
+): StorePlugin<S, I, A> = install(whileSubscribedPlugin(name, firstSubscription))
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(
-    name: String = WhileSubscribedPluginName,
-    crossinline firstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = storePlugin(name) {
-    onSubscribe {
-        launch { firstSubscription() }
+    name: String? = null,
+    crossinline onFirstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
+): StorePlugin<S, I, A> = storePlugin {
+    this.name = name
+    onSubscribe { subscribers ->
+        if (subscribers == 0) launch { onFirstSubscription() }
     }
 }
