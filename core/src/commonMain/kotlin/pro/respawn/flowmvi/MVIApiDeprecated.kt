@@ -4,6 +4,7 @@ package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.ActionConsumer
+import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateConsumer
@@ -176,3 +177,17 @@ public fun interface Reducer<S : MVIState, in I : MVIIntent> {
  * Throwing when in this scope will result in [Reducer.recover] of the store being called.
  */
 public typealias ReducerScope<S, I, A> = PipelineContext<S, I, A>
+
+/**
+ * A mutable version of the [Store] that implements [StateReceiver] and [ActionReceiver].
+ */
+@Deprecated(
+    """
+This will be removed in the future, because all store operations can happen inside the store now.
+This is only used to support MVIViewModel and other Deprecated APIs.
+"""
+)
+public interface MutableStore<S : MVIState, I : MVIIntent, A : MVIAction> :
+    Store<S, I, A>,
+    StateReceiver<S>,
+    ActionReceiver<A>

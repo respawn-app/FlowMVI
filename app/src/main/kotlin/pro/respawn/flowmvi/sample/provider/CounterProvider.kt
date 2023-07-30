@@ -58,11 +58,9 @@ class CounterProvider(
         initial(CounterState.Loading)
     }
 
-    private fun Ctx.produceState(timer: Int) = launch {
-        updateState {
-            // remember that you have to merge states when you are running produceState
-            val current = this as? CounterState.DisplayingCounter
-            CounterState.DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
-        }
+    private suspend fun Ctx.produceState(timer: Int) = updateState {
+        // remember that you have to merge states when you are running produceState
+        val current = this as? CounterState.DisplayingCounter
+        CounterState.DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
     }
 }
