@@ -21,7 +21,7 @@ class CounterProvider(
     private val repo: CounterRepo,
 ) {
 
-    val store = store<CounterState, CounterIntent, CounterAction>("Counter", CounterState.Loading) {
+    val store = store<CounterState, CounterIntent, CounterAction> {
         install(androidLoggingPlugin())
         whileSubscribed {
             repo.getTimer()
@@ -53,6 +53,8 @@ class CounterProvider(
             }
             null
         }
+
+        initial(CounterState.Loading)
     }
 
     private fun Ctx.produceState(timer: Int) = launch {

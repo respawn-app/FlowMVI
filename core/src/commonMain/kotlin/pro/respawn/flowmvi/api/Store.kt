@@ -12,7 +12,7 @@ import kotlinx.coroutines.Job
 @OptIn(ExperimentalStdlibApi::class)
 public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I>, AutoCloseable {
 
-    public val name: String
+    public val name: String?
     public val initial: S
 
     /**

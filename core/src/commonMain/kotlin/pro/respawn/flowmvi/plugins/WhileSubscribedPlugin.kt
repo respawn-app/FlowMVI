@@ -14,7 +14,7 @@ import pro.respawn.flowmvi.dsl.storePlugin
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
     name: String? = null,
     firstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = install(whileSubscribedPlugin(name, firstSubscription))
+): Unit = install(whileSubscribedPlugin(name, firstSubscription))
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(

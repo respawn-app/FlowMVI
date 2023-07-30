@@ -49,13 +49,11 @@ MVIViewModel is now deprecated. A better API was designed for MVIViewModels that
 extensible, and uses composition instead of locking you onto a specific base class.
 To migrate, create a wrapper class that has a `store` property, inject dependencies into it normally, and build the store 
 using store() function.
-Please see example impl at: 
-https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicProvider.kt
+Please see example implementation in the project's repository or or consult with the documentation for a full guide.
 """
 )
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val initial: S,
-    final override val name: String = "ViewModel",
 ) : ViewModel(), IntentReceiver<I>, StateReceiver<S>, ActionReceiver<A>, Store<S, I, A> {
 
     /**
@@ -79,9 +77,10 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
-    protected open val store: MutableStore<S, I, A> by lazyStore(name, viewModelScope, initial) {
+    protected open val store: MutableStore<S, I, A> by lazyStore(viewModelScope) {
         recover { updateState { recover(it) }; null }
         reduce { reduce(it) }
+        initial(initial)
     }
 
     override fun send(intent: I): Unit = store.send(intent)

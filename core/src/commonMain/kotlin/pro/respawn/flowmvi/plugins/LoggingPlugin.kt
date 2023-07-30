@@ -20,21 +20,22 @@ public enum class StoreLogLevel {
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.logging(
     log: (level: StoreLogLevel, tag: String, msg: String) -> Unit
-): StorePlugin<S, I, A> = install(loggingPlugin(name, log))
+): Unit = install(loggingPlugin(name, log))
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
-    tag: String,
+    tag: String?,
     crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit,
 ): StorePlugin<S, I, A> = genericPlugin {
-    name = tag
-    onState { old, new -> log(Trace, tag, "\nState:\n--->\n$old\n<---\n$new") }
-    onIntent { log(Debug, tag, "Intent -> $it") }
-    onAction { log(Debug, tag, "Action -> $it") }
-    onException { log(Error, tag, "Exception:\n ${it.stackTraceToString()}") }
-    onStart { log(Info, tag, "Started") }
-    onSubscribe { log(Info, tag, "New subscriber #${it + 1}") }
-    onStop { log(Info, tag, "Stopped") }
+    val name = tag ?: "Logging"
+    this.name = name
+    onState { old, new -> log(Trace, name, "\nState:\n--->\n$old\n<---\n$new") }
+    onIntent { log(Debug, name, "Intent -> $it") }
+    onAction { log(Debug, name, "Action -> $it") }
+    onException { log(Error, name, "Exception:\n ${it.stackTraceToString()}") }
+    onStart { log(Info, name, "Started") }
+    onSubscribe { log(Info, name, "New subscriber #${it + 1}") }
+    onStop { log(Info, name, "Stopped") }
 }
 
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> consoleLoggingPlugin(tag: String): StorePlugin<S, I, A> =

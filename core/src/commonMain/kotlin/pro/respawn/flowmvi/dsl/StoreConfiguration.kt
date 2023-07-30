@@ -10,8 +10,8 @@ import pro.respawn.flowmvi.plugins.CompositePlugin
 
 @FlowMVIDSL
 internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIAction>(
-    val name: String,
     val initial: S,
+    val name: String?,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
     val plugin: CompositePlugin<S, I, A>,

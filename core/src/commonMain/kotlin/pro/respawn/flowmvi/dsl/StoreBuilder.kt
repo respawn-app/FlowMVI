@@ -14,15 +14,19 @@ import pro.respawn.flowmvi.api.MutableStore
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import pro.respawn.flowmvi.store.StoreImpl
+import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
+@JvmInline
+public value class Init<S : MVIState>(public val state: S)
+
+public typealias Build<S, I, A> = StoreBuilder<S, I, A>.() -> Init<S>
+
 @FlowMVIDSL
-public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction>(
-    public val name: String,
-    public val initial: S,
-) {
+public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
+    public var name: String? = null
 
     @FlowMVIDSL
     public var parallelIntents: Boolean = false
@@ -43,14 +47,17 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     @FlowMVIDSL
     public fun install(
-        plugin: StorePluginBuilder<S, I, A>.() -> Unit
-    ): Unit = install(storePlugin(plugin))
+        block: StorePluginBuilder<S, I, A>.() -> Unit
+    ): Unit = install(storePlugin(block))
+
+    @FlowMVIDSL
+    public fun initial(state: S): Init<S> = Init(state)
 
     @PublishedApi
     @FlowMVIDSL
-    internal fun build(): MutableStore<S, I, A> = StoreConfiguration(
+    internal fun build(init: Init<S>): MutableStore<S, I, A> = StoreConfiguration(
         name = name,
-        initial = initial,
+        initial = init.state,
         parallelIntents = parallelIntents,
         actionShareBehavior = actionShareBehavior,
         intentCapacity = intentCapacity,
@@ -61,39 +68,30 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction>(
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
-    name: String,
-    initial: S,
-    configure: StoreBuilder<S, I, A>.() -> Unit,
-): MutableStore<S, I, A> = StoreBuilder<S, I, A>(name, initial).run {
-    configure()
-    build()
+    @BuilderInference crossinline configure: Build<S, I, A>,
+): MutableStore<S, I, A> = StoreBuilder<S, I, A>().run {
+    build(configure())
 }
 
 @FlowMVIDSL
 @JvmName("noActionStore")
 public inline fun <S : MVIState, I : MVIIntent> store(
-    name: String,
-    initial: S,
-    crossinline configure: StoreBuilder<S, I, Nothing>.() -> Unit
-): MutableStore<S, I, Nothing> = store<S, I, Nothing>(name, initial) {
+    @BuilderInference crossinline configure: Build<S, I, Nothing>,
+): MutableStore<S, I, Nothing> = store<S, I, Nothing> {
     actionShareBehavior = ActionShareBehavior.Disabled
     configure()
 }
 
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
-    name: String,
-    initial: S,
-    configure: StoreBuilder<S, I, A>.() -> Unit,
-): Lazy<MutableStore<S, I, A>> = lazy { store(name, initial, configure) }
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    @BuilderInference crossinline configure: Build<S, I, A>,
+): Lazy<MutableStore<S, I, A>> = lazy { store(configure) }
 
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
-    name: String,
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     scope: CoroutineScope,
-    initial: S,
-    configure: StoreBuilder<S, I, A>.() -> Unit,
-): Lazy<MutableStore<S, I, A>> = lazy { store(name, initial, configure).apply { start(scope) } }
+    @BuilderInference crossinline configure: Build<S, I, A>,
+): Lazy<MutableStore<S, I, A>> = lazy { store(configure).apply { start(scope) } }
 
 private fun duplicatePluginMessage(name: String) = """
     You have attempted to install plugin $name which was already installed.

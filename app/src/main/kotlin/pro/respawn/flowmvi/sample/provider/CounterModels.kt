@@ -5,7 +5,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 
 sealed interface CounterState : MVIState {
-    object Loading : CounterState
+    data object Loading : CounterState
     data class Error(val e: Exception) : CounterState
     data class DisplayingCounter(
         val timer: Int,
@@ -15,7 +15,7 @@ sealed interface CounterState : MVIState {
 }
 
 sealed interface CounterIntent : MVIIntent {
-    object ClickedCounter : CounterIntent
+    data object ClickedCounter : CounterIntent
 }
 
 sealed interface CounterAction : MVIAction {
