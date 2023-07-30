@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newCoroutineContext
@@ -27,6 +28,7 @@ internal fun Recoverable.PipelineExceptionHandler() = CoroutineExceptionHandler 
 @FlowMVIDSL
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
     scope: CoroutineScope,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
     block: suspend PipelineContext<S, I, A>.() -> Unit
 ): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : ActionReceiver<A>, T : Recoverable {
     val pipeline = object :
@@ -40,7 +42,5 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
         override val coroutineContext by lazy { scope.newCoroutineContext(this + handler) }
     }
 
-    return pipeline.launch {
-        block(pipeline)
-    }
+    return pipeline.launch(start = start) { block(pipeline) }
 }

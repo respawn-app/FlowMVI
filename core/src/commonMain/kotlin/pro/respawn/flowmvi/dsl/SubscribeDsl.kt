@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -16,7 +17,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
     subscribe {
-        launch { actions.collect { consume(it) } }
-        launch { states.collect { render(it) } }
+        coroutineScope inner@{
+            this@inner.launch {
+                actions.collect { consume(it) }
+            }
+            this@inner.launch {
+                states.collect { render(it) }
+            }
+        }
     }
 }

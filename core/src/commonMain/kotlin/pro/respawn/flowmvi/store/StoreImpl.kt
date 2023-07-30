@@ -2,9 +2,9 @@ package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
 import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -58,8 +58,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
     }
 
-    override fun start(scope: CoroutineScope) = pipeline(scope) {
-        require(launchJob.getAndSet(job) == null) { "Store is already started" }
+    override fun start(scope: CoroutineScope) = pipeline(scope, CoroutineStart.LAZY) {
         plugin { onStart() }
         while (scope.isActive) {
             plugin { onIntent(receive()) }
@@ -70,12 +69,14 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             launchJob.getAndSet(null)?.cancel()
             plugin { onStop() }
         }
+        require(launchJob.getAndSet(this@apply) == null) { "Store is already started" }
+        start()
     }
 
     override fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit) = pipeline(this) {
         plugin { onSubscribe(subscriberCount) }
         ++subscriberCount
-        block()
+        block(this@StoreImpl)
         error(NonSuspendingSubscriberMessage)
     }.apply {
         invokeOnCompletion { --subscriberCount }
