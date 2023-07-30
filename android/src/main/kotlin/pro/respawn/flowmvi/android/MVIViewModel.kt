@@ -19,10 +19,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.MutableStore
+import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.Store
-import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.api.SubscriberContext
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.recover
@@ -90,7 +89,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * @see MVIStore.send
      */
-    override suspend fun send(action: A): Unit = store.send(action)
+    public override fun send(action: A): Unit = store.send(action)
 
     /**
      * @see MVIStore.updateState
@@ -159,8 +158,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun start(scope: CoroutineScope): Job = error("Store is already started by the ViewModel")
 
-    override fun get(pluginName: String): StorePlugin<S, I, A>? = store[pluginName]
-
-    override fun CoroutineScope.subscribe(block: SubscriberContext<S, I, A>.() -> Unit): Job =
-        with(store) { subscribe(block) }
+    public override fun CoroutineScope.subscribe(
+        block: suspend Provider<S, I, A>.() -> Unit
+    ): Job = with(store) { subscribe(block) }
 }
