@@ -1,4 +1,3 @@
-import Config.jvmTarget
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import org.jetbrains.dokka.gradle.AbstractDokkaTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile

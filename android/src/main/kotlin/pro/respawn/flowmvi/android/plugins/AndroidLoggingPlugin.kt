@@ -23,9 +23,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> androidLoggingPlugin(
  * Create a new [loggingPlugin] that prints using android's [Log].
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.androidLoggingPlugin(
-    tag: String? = name,
+    name: String? = this.name,
     level: Int? = null,
-): StorePlugin<S, I, A> = loggingPlugin(tag) { priority, tag, msg ->
+): StorePlugin<S, I, A> = loggingPlugin(name) { priority, tag, msg ->
     Log.println(level ?: priority.asLogPriority, tag, msg)
 }
 

@@ -1,3 +1,4 @@
+@file:Suppress("Deprecation") // wil be removed
 package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
@@ -29,7 +30,6 @@ import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import kotlin.coroutines.coroutineContext
 
-@Suppress("Deprecation") // wil be removed
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
     private val actionModule: ActionModule<A> = actionModule(config.actionShareBehavior),

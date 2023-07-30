@@ -33,6 +33,7 @@ internal class CappedMutableCollection<T>(
  * @param launches count the times the store was launched. Never decreases.
  * @param stops count the times the store was stopped. Never decreases.
  */
+@Suppress("KDocUnresolvedReference")
 public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     name: String,
     maxStates: Int,

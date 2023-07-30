@@ -5,7 +5,6 @@ package pro.respawn.flowmvi.dsl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import pro.respawn.flowmvi.MutableStore
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -118,7 +117,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 
     @PublishedApi
     @FlowMVIDSL
-    internal fun build(init: Init<S>): MutableStore<S, I, A> = StoreConfiguration(
+    internal fun build(init: Init<S>): Store<S, I, A> = StoreConfiguration(
         name = name,
         initial = init.state,
         parallelIntents = parallelIntents,
