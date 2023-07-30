@@ -1,8 +1,6 @@
 package pro.respawn.flowmvi.api
 
-// https://youtrack.jetbrains.com/issue/KTIJ-7642
-@Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION")
-public fun interface ActionReceiver<in A : MVIAction> {
+public interface ActionReceiver<in A : MVIAction> {
 
     /**
      * Send a new side-effect to be processed by subscribers, only once.
@@ -11,6 +9,7 @@ public fun interface ActionReceiver<in A : MVIAction> {
      * How actions will be distributed depends on [ActionShareBehavior].
      * @See MVIProvider
      */
-    public suspend fun send(action: A)
-    public suspend fun action(action: A): Unit = send(action)
+    public fun send(action: A)
+    public suspend fun emit(action: A)
+    public fun action(action: A): Unit = send(action)
 }

@@ -2,8 +2,8 @@ package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.api.MVIIntent
 
 internal interface IntentModule<I : MVIIntent> : IntentReceiver<I> {
 
@@ -27,4 +27,6 @@ private class IntentModuleImpl<I : MVIIntent>(
     override fun send(intent: I) {
         intents.trySend(intent)
     }
+
+    override suspend fun emit(intent: I) = intents.send(intent)
 }
