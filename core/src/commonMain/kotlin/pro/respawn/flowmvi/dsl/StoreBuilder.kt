@@ -20,12 +20,14 @@ import kotlin.jvm.JvmName
 @JvmInline
 public value class Init<S : MVIState>(public val state: S)
 
-public typealias Build<S, I, A> = StoreBuilder<S, I, A>.() -> Init<S>
+public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Init<S>
 
 @FlowMVIDSL
-public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
+public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
+
+    @FlowMVIDSL
     public var name: String? = null
 
     @FlowMVIDSL
@@ -68,7 +70,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
-    @BuilderInference crossinline configure: Build<S, I, A>,
+    @BuilderInference crossinline configure: BuildStore<S, I, A>,
 ): MutableStore<S, I, A> = StoreBuilder<S, I, A>().run {
     build(configure())
 }
@@ -76,7 +78,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
 @FlowMVIDSL
 @JvmName("noActionStore")
 public inline fun <S : MVIState, I : MVIIntent> store(
-    @BuilderInference crossinline configure: Build<S, I, Nothing>,
+    @BuilderInference crossinline configure: BuildStore<S, I, Nothing>,
 ): MutableStore<S, I, Nothing> = store<S, I, Nothing> {
     actionShareBehavior = ActionShareBehavior.Disabled
     configure()
@@ -84,13 +86,13 @@ public inline fun <S : MVIState, I : MVIIntent> store(
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
-    @BuilderInference crossinline configure: Build<S, I, A>,
+    @BuilderInference crossinline configure: BuildStore<S, I, A>,
 ): Lazy<MutableStore<S, I, A>> = lazy { store(configure) }
 
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     scope: CoroutineScope,
-    @BuilderInference crossinline configure: Build<S, I, A>,
+    @BuilderInference crossinline configure: BuildStore<S, I, A>,
 ): Lazy<MutableStore<S, I, A>> = lazy { store(configure).apply { start(scope) } }
 
 private fun duplicatePluginMessage(name: String) = """
