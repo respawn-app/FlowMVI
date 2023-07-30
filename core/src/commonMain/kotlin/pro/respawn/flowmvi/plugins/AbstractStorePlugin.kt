@@ -9,7 +9,7 @@ public abstract class AbstractStorePlugin<S : MVIState, I : MVIIntent, A : MVIAc
     override val name: String? = null,
 ) : StorePlugin<S, I, A> {
 
-    override fun toString(): String = "StorePlugin \"$name \""
+    override fun toString(): String = "StorePlugin \"${name ?: super.toString()}\""
     override fun hashCode(): Int = name?.hashCode() ?: super.hashCode()
     override fun equals(other: Any?): Boolean {
         if (other !is StorePlugin<*, *, *>) return false

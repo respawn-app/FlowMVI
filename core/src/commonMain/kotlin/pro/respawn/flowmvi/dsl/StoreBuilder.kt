@@ -37,12 +37,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction>(
     public var intentCapacity: Int = Channel.UNLIMITED
 
     @FlowMVIDSL
-    public fun <T : StorePlugin<S, I, A>> install(plugin: T): T = plugin.also { plugins.add(it) }
+    public fun install(plugin: StorePlugin<S, I, A>) {
+        require(plugins.add(plugin)) { duplicatePluginMessage(plugin.toString()) }
+    }
 
     @FlowMVIDSL
     public fun install(
         plugin: StorePluginBuilder<S, I, A>.() -> Unit
-    ): StorePlugin<S, I, A> = install(storePlugin(plugin))
+    ): Unit = install(storePlugin(plugin))
 
     @PublishedApi
     @FlowMVIDSL
@@ -92,3 +94,11 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     initial: S,
     configure: StoreBuilder<S, I, A>.() -> Unit,
 ): Lazy<MutableStore<S, I, A>> = lazy { store(name, initial, configure).apply { start(scope) } }
+
+private fun duplicatePluginMessage(name: String) = """
+    You have attempted to install plugin $name which was already installed.
+    Plugins can be repeatable if they have different names or are different instances of the target class.
+    You either have installed the same plugin instance twice or have installed two plugins with the same name.
+    To fix, please either create a new plugin instance for each installation (when not using names) 
+    or override the plugin name to be unique among all plugins for this store.
+""".trimIndent()
