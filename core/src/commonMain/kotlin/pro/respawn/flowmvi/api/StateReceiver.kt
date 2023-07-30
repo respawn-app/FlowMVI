@@ -1,14 +1,21 @@
 package pro.respawn.flowmvi.api
 
+/**
+ * An entity that handles [MVIState] updates. This entity modifies the state of the [StateProvider].
+ * This is most often implemented as by a [Store] and exposed through [PipelineContext].
+ */
 public interface StateReceiver<S : MVIState> {
 
     /**
-     * Obtain the current [MVIStore.state] and update it with the result of [transform].
+     * Obtain the current [StateProvider.state] and update it with the result of [transform]
+     * atomically and in a suspending manner.
      *
-     * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
-     * **This function is reentrant, for more info, see [MVIStore.withState].**
+     * **This function will suspend until all previous [withState] or [updateState] invocations are finished.**
+     * **This function is reentrant, for more info, see [withState].**
      *
      * If you want to operate on a state of particular subtype, use the typed version of this function.
+     *
+     * Using the return value of the function is not recommended and may be deprecated in the future.
      * @see [withState]
      */
     @FlowMVIDSL
@@ -21,7 +28,7 @@ public interface StateReceiver<S : MVIState> {
      * Store allows only one state update at a time, and because of that,
      *
      * **every coroutine that will invoke [withState] or [updateState]
-     * will be suspended until the previous update is finished.**
+     * will be suspended until the previous state handler is finished.**
      *
      * This function uses locks under the hood.
      * For a version that runs when the state is of particular subtype, see other overloads of this function.
@@ -32,13 +39,19 @@ public interface StateReceiver<S : MVIState> {
      *   withState { }
      * }
      * ```
-     * you should not get a deadlock, but messing with coroutine contexts can still cause problems.
+     * you should not get a deadlock, but overriding coroutine contexts can still cause problems.
      *
      * @returns the value of [R], i.e. the result of the block.
      */
     @FlowMVIDSL
     public suspend fun <R> withState(block: suspend S.() -> R): R
 
+    /**
+     * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in
+     * the coroutine context, which means it can cause races when you want to update states atomically.
+     * This function is performant, but **circumvents ALL plugins** and is **not thread-safe**.
+     * It should only be used for the most critical state updates happening very often.
+     */
     @FlowMVIDSL
     @DelicateStoreApi
     public fun useState(block: S.() -> S)

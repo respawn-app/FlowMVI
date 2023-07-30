@@ -2,6 +2,11 @@ package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * An entity that can provide [MVIAction]s through the [actions] flow.
+ * This flow may behave differently depending on [ActionShareBehavior] chosen.
+ * This is mainly implemented by the [Store] and exposed through [Provdier] ([Store.subscribe])
+ */
 public interface ActionProvider<out A : MVIAction> {
 
     /**

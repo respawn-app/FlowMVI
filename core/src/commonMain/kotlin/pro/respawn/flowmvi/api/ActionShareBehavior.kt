@@ -3,10 +3,12 @@ package pro.respawn.flowmvi.api
 import kotlinx.coroutines.channels.BufferOverflow
 
 /**
- * An class representing how [MVIAction] sharing will be handled in the [MVIStore].
- * There are 3 possible behaviors, which will be different depending on the use-case.
+ * An class representing how [MVIAction] sharing will be handled in the [ActionProvider].
+ * There are 4 possible behaviors, which will be different depending on your use-case.
  * When in doubt, use the default one, and change if you have issues.
- * @see MVIStore
+ * @see ActionProvider
+ * @see ActionReceiver
+ * @see ActionConsumer
  */
 public sealed interface ActionShareBehavior {
 
@@ -18,6 +20,8 @@ public sealed interface ActionShareBehavior {
      * time of emission).
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
      * @param replay How many actions will be replayed to each new subscriber
+     * @param overflow How actions that overflow the [buffer] are handled.
+     * @see [kotlinx.coroutines.channels.BufferOverflow]
      */
     public data class Share(
         val buffer: Int = DefaultBufferSize,
@@ -26,14 +30,14 @@ public sealed interface ActionShareBehavior {
     ) : ActionShareBehavior
 
     /**
-     * Fan-out behavior means that multiple subscribers are allowed,
+     * Fan-out (distribute) behavior means that multiple subscribers are allowed,
      * and each action will be distributed to one subscriber.
      * If there are multiple subscribers, only one of them will handle an instance of an action,
      * and **the order is unspecified**.
      *
-     * **This is the default**.
-     *
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
+     * @param overflow How actions that overflow the [buffer] are handled.
+     * @see [kotlinx.coroutines.channels.BufferOverflow]
      */
     public data class Distribute(
         val buffer: Int = DefaultBufferSize,
@@ -45,15 +49,22 @@ public sealed interface ActionShareBehavior {
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
      * In other words, you will be required to create a new store for each invocation of [subscribe].
      *
-     * **Repeated subscriptions are not allowed too, including lifecycle-aware collection**.
+     * **Repeated subscriptions are not allowed, including lifecycle-aware collection**.
      *
      * @param buffer How many actions will be buffered when consumer processes them slower than they are emitted
+     * @param overflow How actions that overflow the [buffer] are handled.
+     * @see [kotlinx.coroutines.channels.BufferOverflow]
      */
     public data class Restrict(
         val buffer: Int = DefaultBufferSize,
         val overflow: BufferOverflow = BufferOverflow.SUSPEND
     ) : ActionShareBehavior
 
+    /**
+     * Designates that [MVIAction]s are disabled entirely.
+     * Attempting to consume or send an action will throw.
+     * This is the default behavior when using [Nothing] as a parameter for an action store
+     */
     public object Disabled : ActionShareBehavior
 
     public companion object {
