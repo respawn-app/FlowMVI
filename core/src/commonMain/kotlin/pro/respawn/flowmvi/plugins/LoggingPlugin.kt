@@ -34,9 +34,10 @@ public enum class StoreLogLevel {
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.logging(
-    tag: String? = name,
+    tag: String? = this.name,
+    name: String = "${tag.orEmpty()}Logging",
     log: (level: StoreLogLevel, tag: String, msg: String) -> Unit
-): Unit = install(loggingPlugin(tag, log))
+): Unit = install(loggingPlugin(tag, name, log))
 
 /**
  * Create a new [StorePlugin] that prints messages using [log].
@@ -45,18 +46,18 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.lo
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
-    tag: String? = null,
+    tag: String?,
+    name: String = "${tag.orEmpty()}Logging",
     crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit,
 ): StorePlugin<S, I, A> = genericPlugin {
-    val realTag = tag ?: DefaultLogTag
-    name = tag
-    onState { old, new -> log(Trace, realTag, "\nState:\n--->\n$old\n<---\n$new") }
-    onIntent { log(Debug, realTag, "Intent -> $it") }
-    onAction { log(Debug, realTag, "Action -> $it") }
-    onException { log(Error, realTag, "Exception:\n $it") }
-    onStart { log(Info, realTag, "Started") }
-    onSubscribe { log(Info, realTag, "New subscriber #${it + 1}") }
-    onStop { log(Info, realTag, "Stopped with e=$it") }
+    this.name = name
+    onState { old, new -> log(Trace, tag ?: name, "\nState:\n--->\n$old\n<---\n$new") }
+    onIntent { log(Debug, tag ?: name, "Intent -> $it") }
+    onAction { log(Debug, tag ?: name, "Action -> $it") }
+    onException { log(Error, tag ?: name, "Exception:\n $it") }
+    onStart { log(Info, tag ?: name, "Started") }
+    onSubscribe { log(Info, tag ?: name, "New subscriber #${it + 1}") }
+    onStop { log(Info, tag ?: name, "Stopped with e=$it") }
 }
 
 /**
@@ -66,5 +67,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> consoleLoggingPlugin(
-    tag: String? = null
-): StorePlugin<S, I, A> = loggingPlugin(tag) { _, _, msg -> println("$tag: $msg") }
+    tag: String? = null,
+    name: String = "${tag.orEmpty()}Logging",
+): StorePlugin<S, I, A> = loggingPlugin(tag, name) { _, _, msg -> println("$tag: $msg") }
