@@ -10,7 +10,8 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
 /**
- * Installs a plugin that invokes [block] in when [pro.respawn.flowmvi.api.Store.start] is called.
+ * Installs a plugin that invokes [block] when [pro.respawn.flowmvi.api.Store.start] is called.
+ * @see StorePlugin.onStart
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.init(
@@ -18,11 +19,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.in
 ): Unit = install(initPlugin(block))
 
 /**
- * Creates plugin that invokes [block] in when [pro.respawn.flowmvi.api.Store.start] is called.
+ * Creates a plugin that invokes [block] after [pro.respawn.flowmvi.api.Store.start] is called.
+ * @see StorePlugin.onStart
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> initPlugin(
     block: suspend PipelineContext<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = storePlugin {
-    onStart(block)
-}
+): StorePlugin<S, I, A> = storePlugin { onStart(block) }

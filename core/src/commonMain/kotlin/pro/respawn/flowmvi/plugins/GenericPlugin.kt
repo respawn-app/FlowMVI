@@ -13,7 +13,7 @@ import pro.respawn.flowmvi.dsl.storePlugin
  * Due to the risk of mangling with the generic store's properties, this plugin cannot affect the store in any way.
  * The types of intents are also erased.
  */
-public class GenericPluginBuilder internal constructor() {
+public class GenericPluginBuilder @PublishedApi internal constructor() {
 
     private var intent: suspend (MVIIntent) -> Unit = {}
     private var state: suspend (old: MVIState, new: MVIState) -> Unit = { _, _ -> }
@@ -86,7 +86,8 @@ public class GenericPluginBuilder internal constructor() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build() = storePlugin {
+    @PublishedApi
+    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build(): StorePlugin<S, I, A> = storePlugin {
         name = this@GenericPluginBuilder.name
         onIntent {
             this@GenericPluginBuilder.intent(it)
@@ -115,7 +116,7 @@ public class GenericPluginBuilder internal constructor() {
  * Create a new [GenericPluginBuilder].
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
     @BuilderInference builder: GenericPluginBuilder.() -> Unit,
 ): StorePlugin<S, I, A> = GenericPluginBuilder().apply(builder).build()
 
@@ -123,6 +124,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
  * Create a new [genericPlugin] and install it.
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.genericPlugin(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.genericPlugin(
     @BuilderInference plugin: GenericPluginBuilder.() -> Unit,
 ): Unit = install(genericPlugin(builder = plugin))

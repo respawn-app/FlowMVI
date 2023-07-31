@@ -11,14 +11,14 @@ internal class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction> inter
 ) : AbstractStorePlugin<S, I, A>(Name) {
 
     override suspend fun PipelineContext<S, I, A>.onStart(): Unit = plugins { onStart() }
+    override fun onStop(e: Exception?): Unit = plugins { onStop(e) }
     override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = plugins(new) { onState(old, it) }
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = plugins(intent) { onIntent(it) }
     override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = plugins(action) { onAction(it) }
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = plugins(e) { onException(it) }
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) =
-        plugins { onSubscribe(subscriberCount) }
-
-    override fun onStop(e: Exception?): Unit = plugins { onStop(e) }
+    override suspend fun PipelineContext<S, I, A>.onSubscribe(
+        subscriberCount: Int
+    ) = plugins { onSubscribe(subscriberCount) }
 
     private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.forEach(block)
     private inline fun <R> plugins(

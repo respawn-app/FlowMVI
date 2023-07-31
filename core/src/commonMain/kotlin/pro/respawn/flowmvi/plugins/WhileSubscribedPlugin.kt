@@ -16,9 +16,9 @@ import pro.respawn.flowmvi.dsl.storePlugin
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
     name: String? = null,
-    onFirstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
+    crossinline onFirstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
 ): Unit = install(whileSubscribedPlugin(name, onFirstSubscription))
 
 /**

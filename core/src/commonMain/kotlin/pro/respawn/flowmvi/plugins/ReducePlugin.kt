@@ -10,7 +10,8 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
 /**
- * Default name for Reduce plugin. This is hardcoded so that multiple [reduce] invocations are not allowed w/o
+ * Default name for [reducePlugin].
+ * This is hardcoded so that multiple [reduce] invocations are not allowed w/o
  * explicit consent of the user as most often multiple reducers are not used.
  * Provide your own name if you want to have multiple reducers.
  */
@@ -27,9 +28,9 @@ public typealias Reduce<S, I, A> = suspend PipelineContext<S, I, A>.(intent: I) 
  * Provide your own name if you want to have multiple reducers.
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
     name: String = ReducePluginName,
-    reduce: Reduce<S, I, A>,
+    crossinline reduce: Reduce<S, I, A>,
 ): Unit = install(reducePlugin(name, reduce))
 
 /**

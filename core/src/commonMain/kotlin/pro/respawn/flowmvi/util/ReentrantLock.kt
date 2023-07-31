@@ -5,6 +5,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
+import kotlin.jvm.JvmInline
 
 internal suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
     val key = ReentrantMutexContextKey(this)
@@ -16,10 +17,12 @@ internal suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
     }
 }
 
-internal class ReentrantMutexContextElement(
+@JvmInline
+internal value class ReentrantMutexContextElement(
     override val key: ReentrantMutexContextKey
 ) : CoroutineContext.Element
 
-internal data class ReentrantMutexContextKey(
+@JvmInline
+internal value class ReentrantMutexContextKey(
     val mutex: Mutex
 ) : CoroutineContext.Key<ReentrantMutexContextElement>

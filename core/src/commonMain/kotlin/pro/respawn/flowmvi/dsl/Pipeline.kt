@@ -29,10 +29,10 @@ internal fun Recoverable.PipelineExceptionHandler() = CoroutineExceptionHandler 
 }
 
 @FlowMVIDSL
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
+internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
     scope: CoroutineScope,
     start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend PipelineContext<S, I, A>.() -> Unit
+    crossinline block: suspend PipelineContext<S, I, A>.() -> Unit
 ): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : ActionReceiver<A>, T : Recoverable {
     val pipeline = object :
         PipelineContext<S, I, A>,
