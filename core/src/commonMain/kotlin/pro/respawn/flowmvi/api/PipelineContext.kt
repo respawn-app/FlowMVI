@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
@@ -38,8 +37,8 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
-    CoroutineContext.Element,
-    CoroutineScope {
+    CoroutineScope,
+    CoroutineContext.Element {
 
     /**
      * An alias for [Flow.collect] that does not override the context amending it instead.

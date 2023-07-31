@@ -53,10 +53,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     onState { old, new -> log(Trace, realTag, "\nState:\n--->\n$old\n<---\n$new") }
     onIntent { log(Debug, realTag, "Intent -> $it") }
     onAction { log(Debug, realTag, "Action -> $it") }
-    onException { log(Error, realTag, "Exception:\n ${it.stackTraceToString()}") }
+    onException { log(Error, realTag, "Exception:\n $it") }
     onStart { log(Info, realTag, "Started") }
     onSubscribe { log(Info, realTag, "New subscriber #${it + 1}") }
-    onStop { log(Info, realTag, "Stopped") }
+    onStop { log(Info, realTag, "Stopped with e=$it") }
 }
 
 /**
