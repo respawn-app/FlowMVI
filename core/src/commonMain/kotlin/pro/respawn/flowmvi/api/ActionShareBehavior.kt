@@ -65,7 +65,7 @@ public sealed interface ActionShareBehavior {
      * Attempting to consume or send an action will throw.
      * This is the default behavior when using [Nothing] as a parameter for an action store
      */
-    public object Disabled : ActionShareBehavior
+    public data object Disabled : ActionShareBehavior
 
     public companion object {
 

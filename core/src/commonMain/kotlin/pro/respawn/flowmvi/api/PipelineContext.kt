@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * PipelineContext is an entity that exposes the underlying logic of the [Store] to its [StorePlugin]s.
@@ -33,7 +34,7 @@ import kotlin.coroutines.CoroutineContext
  * **The pipeline context's scope is not necessarily the scope that the [Store] was [Store.start]ed with.**
  */
 @FlowMVIDSL
-public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIAction> :
+public interface PipelineContext<in S : MVIState, in I : MVIIntent, in A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
@@ -44,8 +45,8 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
      * An alias for [Flow.collect] that does not override the context amending it instead.
      * Use as a safer alternative to [Flow.flowOn]
      */
-    public suspend fun <T> Flow<T>.consume(context: CoroutineContext = Dispatchers.Default): Unit =
-        flowOn(this@PipelineContext + Dispatchers.Default).collect()
+    public suspend fun <T> Flow<T>.consume(context: CoroutineContext = EmptyCoroutineContext): Unit =
+        flowOn(this@PipelineContext + context).collect()
 
     /**
      * A key of the [PipelineContext] in the parent coroutine context.

@@ -5,7 +5,8 @@ package pro.respawn.flowmvi.api
  * Actions are collected by the [ActionConsumer].
  * This is most often implemented by a [Store] and exposed through [PipelineContext]
  */
-public interface ActionReceiver<in A : MVIAction> {
+@Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION") // https://youtrack.jetbrains.com/issue/KTIJ-7642
+public fun interface ActionReceiver<in A : MVIAction> {
 
     /**
      * Send a new side-effect to be processed by subscribers, only once.
