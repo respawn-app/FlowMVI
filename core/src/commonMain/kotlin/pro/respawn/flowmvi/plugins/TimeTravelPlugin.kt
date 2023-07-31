@@ -25,13 +25,6 @@ internal class CappedMutableCollection<T>(
  * It keeps references to last `maxStates` (inclusive) states and so on for other properties.
  * Keep a reference to this plugin and use it to enable custom time travel support or validate the store's behavior
  * in tests.
- * @param states last states of the store, put in a stack.
- * @param intents last intents of the store, put in a stack.
- * @param actions last actions of the store, put in a stack.
- * @param exceptions last states of the store, put in a stack.
- * @param subscriptions subscription count of the store. Never decreases.
- * @param launches count the times the store was launched. Never decreases.
- * @param stops count the times the store was stopped. Never decreases.
  */
 @Suppress("KDocUnresolvedReference")
 public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
@@ -43,17 +36,50 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
 ) : AbstractStorePlugin<S, I, A>(name) {
 
     private val _states by atomic(CappedMutableCollection<S>(maxStates))
+
+    /**
+     * States emitted by the store, capped at [maxStates]
+     * The last value is the most recent.
+     */
     public val states: Collection<S> get() = _states
     private val _intents by atomic(CappedMutableCollection<I>(maxIntents))
+
+    /**
+     * Intents processed by the store, capped at [maxIntents].
+     * The last value is the most recent.
+     */
     public val intents: Collection<I> get() = _intents
     private val _actions by atomic(CappedMutableCollection<A>(maxActions))
+
+    /**
+     *  Actions sent by the store, capped at [maxActions].
+     * The last value is the most recent.
+     */
     public val actions: Collection<A> get() = _actions
     private val _exceptions by atomic(CappedMutableCollection<Exception>(maxExceptions))
+
+    /**
+     * Last exceptions caught by store, capped at [maxExceptions].
+     * The last value is the most recent.
+     */
     public val exceptions: Collection<Exception> get() = _exceptions
+
+    /**
+     * Number of subscription events of the store. Never decreases.
+     * The last value is the most recent.
+     */
     public var subscriptions: Int by atomic(0)
         internal set
+
+    /**
+     * Number of times the store was launched. Never decreases.
+     */
     public var launches: Int by atomic(0)
         internal set
+
+    /**
+     * Number of the times the store was stopped. Never decreases.
+     */
     public var stops: Int by atomic(0)
         internal set
 
