@@ -223,14 +223,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
      * Coroutines launched inside [reduce] can fail independently of each other.
      */
     @BuilderInference reduce: Reduce<S, I, A>,
-): MutableStore<S, I, A> = store<S, I, A> {
+): MutableStore<S, I, A> = store<S, I, A>(initial) {
     actionShareBehavior = behavior
     reduce(reduce = reduce)
     recover {
         updateState { recover(it) }
         null
     }
-    initial(initial)
 } as MutableStore<S, I, A>
 
 /**

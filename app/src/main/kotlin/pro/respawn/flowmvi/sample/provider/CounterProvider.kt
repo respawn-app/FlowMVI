@@ -12,6 +12,7 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
+import pro.respawn.flowmvi.sample.provider.CounterState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import kotlin.random.Random
 
@@ -21,7 +22,7 @@ class CounterProvider(
     private val repo: CounterRepo,
 ) {
 
-    val store = store<CounterState, CounterIntent, CounterAction> {
+    val store = store<CounterState, CounterIntent, CounterAction>(Loading) {
         name = "Counter"
         install(androidLoggingPlugin())
         whileSubscribed {
@@ -54,8 +55,6 @@ class CounterProvider(
             }
             null
         }
-
-        initial(CounterState.Loading)
     }
 
     private suspend fun Ctx.produceState(timer: Int) = updateState {

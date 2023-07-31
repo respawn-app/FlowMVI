@@ -79,13 +79,12 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
     @Suppress("UNCHECKED_CAST", "DEPRECATION")
-    protected open val store: MutableStore<S, I, A> by lazyStore<S, I, A>(viewModelScope) {
+    protected open val store: MutableStore<S, I, A> by lazyStore<S, I, A>(initial, viewModelScope) {
         recover {
             updateState { recover(it) }
             null
         }
         reduce { reduce(it) }
-        initial(initial)
     } as Lazy<MutableStore<S, I, A>>
 
     override fun send(intent: I): Unit = store.send(intent)

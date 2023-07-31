@@ -14,28 +14,21 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.CompositePlugin
 import pro.respawn.flowmvi.store.StoreImpl
-import kotlin.jvm.JvmInline
 import kotlin.jvm.JvmName
 
-/**
- * A holder for initial values the store starts with.
- * @param state initial state of the store.
- * @see StoreBuilder.initial
- * @see [Store.initial]
- */
-@JvmInline
-public value class Init<S : MVIState> internal constructor(public val state: S)
-
-public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Init<S>
+public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
 /**
  * A builder DSL for creating a [Store].
  * Cannot be instantiated outside of [store] functions.
  * After building, the [StoreConfiguration] is created and used in the [Store].
  * This configuration must **not** be changed in any way after the store is created through circumvention measures.
+ * @param initial initial state the store will have.
  */
 @FlowMVIDSL
-public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
+public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
+    public val initial: S,
+) {
 
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
 
@@ -108,18 +101,11 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         block: StorePluginBuilder<S, I, A>.() -> Unit
     ): Unit = install(storePlugin(block))
 
-    /**
-     * Create and return an [Init] holder with initial values for the store.
-     * This must be **the last statement** in this store builder's block.
-     */
-    @FlowMVIDSL
-    public fun initial(state: S): Init<S> = Init(state)
-
     @PublishedApi
     @FlowMVIDSL
-    internal fun build(init: Init<S>): Store<S, I, A> = StoreConfiguration(
+    internal fun build(): Store<S, I, A> = StoreConfiguration(
+        initial = initial,
         name = name,
-        initial = init.state,
         parallelIntents = parallelIntents,
         actionShareBehavior = actionShareBehavior,
         intentCapacity = intentCapacity,
@@ -134,9 +120,11 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
+    initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
-): Store<S, I, A> = StoreBuilder<S, I, A>().run {
-    build(configure())
+): Store<S, I, A> = StoreBuilder<S, I, A>(initial).run {
+    configure()
+    build()
 }
 
 /**
@@ -149,11 +137,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
 @FlowMVIDSL
 @JvmName("noActionStore")
 public inline fun <S : MVIState, I : MVIIntent> store(
+    initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, Nothing>,
-): Store<S, I, Nothing> = StoreBuilder<S, I, Nothing>().run {
-    val init = configure()
+): Store<S, I, Nothing> = store<_, _, _>(initial) {
+    configure()
     actionShareBehavior = ActionShareBehavior.Disabled
-    build(init)
 }
 
 /**
@@ -162,8 +150,9 @@ public inline fun <S : MVIState, I : MVIIntent> store(
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
-): Lazy<Store<S, I, A>> = lazy { store(configure) }
+): Lazy<Store<S, I, A>> = lazy { store(initial, configure) }
 
 /**
  * Build a new [Store] using [StoreBuilder].
@@ -171,9 +160,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
+    initial: S,
     scope: CoroutineScope,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
-): Lazy<Store<S, I, A>> = lazy { store(configure).apply { start(scope) } }
+): Lazy<Store<S, I, A>> = lazy { store(initial, configure).apply { start(scope) } }
 
 private fun duplicatePluginMessage(name: String) = """
     You have attempted to install plugin $name which was already installed.
@@ -181,5 +171,5 @@ private fun duplicatePluginMessage(name: String) = """
     You either have installed the same plugin instance twice or have installed two plugins with the same name.
     To fix, please either create a new plugin instance for each installation (when not using names) 
     or override the plugin name to be unique among all plugins for this store.
-    Consult the StorePlugin docs to learn more
+    Consult the StorePlugin docs to learn more.
 """.trimIndent()
