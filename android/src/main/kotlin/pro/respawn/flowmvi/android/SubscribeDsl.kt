@@ -32,11 +32,8 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.su
     crossinline render: suspend (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job = lifecycleScope.launch(Dispatchers.Main.immediate) {
-    // using multiple repeatOnLifecycle instead of flowWithLifecycle to avoid creating hot flows
-
     // https://github.com/Kotlin/kotlinx.coroutines/issues/2886
     // TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
-
     repeatOnLifecycle(lifecycleState) {
         subscribe(store, consume, render)
     }
