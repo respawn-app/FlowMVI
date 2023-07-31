@@ -105,9 +105,9 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
             exception(it)
             it
         }
-        onSubscribe(subscribe)
-        onStart(start)
-        onStop(stop)
+        onSubscribe { subscribe(it) }
+        onStart { start() }
+        onStop { stop(it) }
         // we can safely cast as this plugin can't affect the store in any way
     } as StorePlugin<S, I, A>
 }
