@@ -33,6 +33,12 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
 
     /**
+     * Settings this to true enables additional store validations and debug logging.
+     */
+    @FlowMVIDSL
+    public var debuggable: Boolean = false
+
+    /**
      * Set the future name of the store.
      * See [Store.name] for more info.
      *
@@ -110,6 +116,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         actionShareBehavior = actionShareBehavior,
         intentCapacity = intentCapacity,
         onOverflow = onOverflow,
+        debuggable = debuggable,
         plugin = CompositePlugin(plugins = plugins.toSet()),
     ).let(::StoreImpl)
 }

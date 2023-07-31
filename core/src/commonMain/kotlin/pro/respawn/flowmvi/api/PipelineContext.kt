@@ -53,4 +53,7 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
      */
     @DelicateStoreApi
     public companion object : CoroutineContext.Key<PipelineContext<*, *, *>>
+
+    @OptIn(DelicateStoreApi::class)
+    override val key: CoroutineContext.Key<*> get() = PipelineContext
 }

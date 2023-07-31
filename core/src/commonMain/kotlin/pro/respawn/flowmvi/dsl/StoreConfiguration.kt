@@ -17,4 +17,5 @@ internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIActio
     val plugin: CompositePlugin<S, I, A>,
     val intentCapacity: Int,
     val onOverflow: BufferOverflow,
+    val debuggable: Boolean,
 )

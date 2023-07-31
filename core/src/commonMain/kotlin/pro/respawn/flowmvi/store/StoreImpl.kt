@@ -17,12 +17,12 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
-import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.StoreConfiguration
 import pro.respawn.flowmvi.dsl.pipeline
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
+import pro.respawn.flowmvi.modules.Recoverable
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.actionModule
 import pro.respawn.flowmvi.modules.intentModule
@@ -37,7 +37,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val stateModule: StateModule<S> = stateModule(config.initial),
 ) : MutableStore<S, I, A>,
     Provider<S, I, A>,
-    Recoverable,
+    Recoverable<S, I, A>,
     StateModule<S> by stateModule,
     IntentModule<I> by intentModule,
     ActionModule<A> by actionModule {
@@ -47,8 +47,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private var subscriberCount by atomic(0)
     private var launchJob = atomic<Job?>(null)
 
-    override suspend fun recover(e: Exception): Unit = withPipeline {
-        plugin { onException(e)?.let { throw it } }
+    override suspend fun PipelineContext<S, I, A>.recover(e: Exception): Unit = plugin {
+        onException(e)?.let { throw it }
     }
 
     override suspend fun send(action: A): Unit = withPipeline {
@@ -61,7 +61,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
     }
 
-    override fun start(scope: CoroutineScope) = pipeline(scope, CoroutineStart.LAZY) {
+    override fun start(scope: CoroutineScope) = pipeline(name, scope, CoroutineStart.LAZY) {
         plugin { onStart() }
         while ((this@pipeline as CoroutineScope).isActive) {
             val intent = receive()
@@ -84,11 +84,11 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         start()
     }
 
-    override fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit) = pipeline(this) {
+    override fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit) = pipeline(name, this) {
         plugin { onSubscribe(subscriberCount) }
         ++subscriberCount
         block(this@StoreImpl)
-        error(NonSuspendingSubscriberMessage)
+        if (config.debuggable) error(NonSuspendingSubscriberMessage)
     }.apply {
         invokeOnCompletion { --subscriberCount }
     }
@@ -113,17 +113,17 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         launchJob.getAndSet(null)?.cancel()
     }
 
-    private companion object {
+    companion object {
 
         private const val StartedMessage = "Store is already started"
 
-        private const val NonSuspendingSubscriberMessage = """
+        const val NonSuspendingSubscriberMessage = """
 You have subscribed to the store, but your subscribe() block has returned early (without throwing a
 CancellationException). When you subscribe, make sure to continue collecting values from the store until the Job 
 Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store.
         """
 
-        private const val InvalidContextMessage = """
+        const val InvalidContextMessage = """
 You have overridden the CoroutineContext associated to the store in one of the coroutines, but then attempted to use it.
 This is not allowed because you lose the ability to call store functions in your plugins/jobs.
 Please amend the store context instead. Example:

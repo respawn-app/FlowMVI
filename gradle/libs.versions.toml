@@ -69,6 +69,8 @@ material = { module = "com.google.android.material:material", version.ref = "mat
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [bundles]
 koin = [
@@ -76,6 +78,8 @@ koin = [
     "koin-core",
 ]
 unittest = [
+    "kotlin-coroutines-test",
+    "kotlin-test",
     "koin-test",
     "kotest-assertions",
     "kotest-framework",
