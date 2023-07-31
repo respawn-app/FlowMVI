@@ -97,7 +97,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     @Suppress("UNCHECKED_CAST")
     private suspend inline fun <T> withPipeline(block: PipelineContext<S, I, A>.() -> T): T {
         val pipeline = checkNotNull(
-            coroutineContext[PipelineContext.Key]
+            coroutineContext[PipelineContext]
         ) { InvalidContextMessage } as PipelineContext<S, I, A>
         return with(pipeline, block)
     }

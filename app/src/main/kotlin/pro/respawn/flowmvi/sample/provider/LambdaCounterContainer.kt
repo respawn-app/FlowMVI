@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.sample.repo.CounterRepo
 
 private typealias Context = PipelineContext<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction>
 
-class LambdaCounterProvider(
+class LambdaCounterContainer(
     private val savedStateHandle: SavedStateHandle,
     private val repo: CounterRepo,
 ) {

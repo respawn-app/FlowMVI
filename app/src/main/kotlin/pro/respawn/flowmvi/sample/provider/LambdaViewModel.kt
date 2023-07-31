@@ -12,7 +12,7 @@ class LambdaViewModel(
     savedStateHandle: SavedStateHandle,
     repo: CounterRepo
 ) : StoreViewModel<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction>(
-    LambdaCounterProvider(savedStateHandle, repo).store
+    LambdaCounterContainer(savedStateHandle, repo).store
 ) {
 
     fun onClickCounter() = send {

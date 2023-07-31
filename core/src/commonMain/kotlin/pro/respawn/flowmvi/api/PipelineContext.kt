@@ -34,7 +34,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * **The pipeline context's scope is not necessarily the scope that the [Store] was [Store.start]ed with.**
  */
 @FlowMVIDSL
-public interface PipelineContext<in S : MVIState, in I : MVIIntent, in A : MVIAction> :
+public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
@@ -52,5 +52,5 @@ public interface PipelineContext<in S : MVIState, in I : MVIIntent, in A : MVIAc
      * A key of the [PipelineContext] in the parent coroutine context.
      */
     @DelicateStoreApi
-    public companion object Key : CoroutineContext.Key<PipelineContext<*, *, *>>
+    public companion object : CoroutineContext.Key<PipelineContext<*, *, *>>
 }

@@ -21,7 +21,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 ): Unit = install(recoverPlugin(name, recover))
 
 /**
- * Create a recover plugin that simply invokes [StorePlugin.onException] and decides how to proceed accordingly.
+ * Create a plugin that simply invokes [StorePlugin.onException] and decides how to proceed accordingly.
  * See the parent function for more information.
  */
 @FlowMVIDSL

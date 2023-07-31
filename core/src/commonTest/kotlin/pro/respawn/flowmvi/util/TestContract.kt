@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi
+package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

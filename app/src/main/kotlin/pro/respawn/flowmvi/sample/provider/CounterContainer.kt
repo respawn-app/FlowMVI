@@ -18,7 +18,7 @@ import kotlin.random.Random
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
-class CounterProvider(
+class CounterContainer(
     private val repo: CounterRepo,
 ) {
 

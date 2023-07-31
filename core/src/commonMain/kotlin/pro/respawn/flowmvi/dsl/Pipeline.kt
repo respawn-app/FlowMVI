@@ -23,7 +23,7 @@ import kotlin.coroutines.CoroutineContext
 @Suppress("FunctionName")
 internal fun Recoverable.PipelineExceptionHandler() = CoroutineExceptionHandler { ctx, e ->
     if (e !is Exception) throw e
-    requireNotNull(ctx[PipelineContext.Key]) {
+    requireNotNull(ctx[PipelineContext]) {
         "There is no pipeline context in the exception handler. This is likely an internal issue"
     }.launch { recover(e) }
 }
@@ -40,7 +40,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.pipeline(
         StateReceiver<S> by this,
         ActionReceiver<A> by this {
 
-        override val key: CoroutineContext.Key<*> = PipelineContext.Key
+        override val key: CoroutineContext.Key<*> = PipelineContext
         private val handler = PipelineExceptionHandler()
         override val coroutineContext by lazy { scope.newCoroutineContext(this + handler) }
     }

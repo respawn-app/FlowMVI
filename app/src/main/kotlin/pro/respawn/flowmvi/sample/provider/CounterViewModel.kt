@@ -5,4 +5,4 @@ import pro.respawn.flowmvi.sample.repo.CounterRepo
 
 class CounterViewModel(
     repo: CounterRepo
-) : StoreViewModel<CounterState, CounterIntent, CounterAction>(CounterProvider(repo).store)
+) : StoreViewModel<CounterState, CounterIntent, CounterAction>(CounterContainer(repo).store)
