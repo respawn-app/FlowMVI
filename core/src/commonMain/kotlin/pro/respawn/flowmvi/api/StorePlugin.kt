@@ -5,7 +5,12 @@ package pro.respawn.flowmvi.api
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
  *
  * Plugins can influence subscription, stopping, and all other forms of store behavior.
- * Access the store's context and other functions through the [PipelineContext] receiver
+ * Access the store's context and other functions through the [PipelineContext] receiver.
+ * Plugins are typically made using [pro.respawn.flowmvi.dsl.StorePluginBuilder].
+ *
+ * It is not recommended to implement this interface,
+ * if you really need to, subclass [pro.respawn.flowmvi.plugins.AbstractStorePlugin] instead.
+ * If you do override this interface, you **must** comply with the contract defined above.
  */
 @Suppress("ComplexInterface")
 public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
@@ -39,11 +44,6 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * install(plugin)
      * install(plugin) // -> will throw
      * ```
-     * Plugins are typically made using [pro.respawn.flowmvi.dsl.StorePluginBuilder].
-     *
-     * It is not recommended to implement this interface,
-     * if you really need to, subclass [pro.respawn.flowmvi.plugins.AbstractStorePlugin] instead.
-     * If you do override this interface, you **must** comply with the contract defined above.
      */
     public val name: String?
 
@@ -89,14 +89,16 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
     public suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action
 
     /**
-     * A callback that is invoked when [Recoverable] handles an exception.
+     * A callback that is invoked when [Store] handles an exception.
      * This is invoked **before** the exception is rethrown or otherwise processed.
+     * This is invoked **asynchronously in a background job** and after the job that has thrown was cancelled, meaning
+     * that some time may pass after the job is cancelled and the exception is handled.
      * Handled exceptions do not result in [Store.close].
      * * Return null to signal that the exception has been handled and recovered from, continuing the flow's processing.
      * * Return [e] if the exception was **not** handled and should be passed to other plugins.
      * * Execute other operations using [PipelineContext].
      *
-     * If the last plugin returns null from this function, **the exception is rethrown**.
+     * If none of the plugins handles the exception (returns null), **the exception is rethrown and the store fails**.
      * Register a [pro.respawn.flowmvi.plugins.recoverPlugin] to recover from all exceptions.
      */
     public suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = e
@@ -113,9 +115,9 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * A callback to be executed each time [Store.subscribe] is called.
      * This callback is executed **before** the subscriber gets access to the store and **before** the [subscriberCount]
      * is incremented. This means, for the first subscription, [subscriberCount] will be zero.
-     * * Execute any operations using [PipelineContext]
-     * * Call [PipelineContext.cancel] to prevent the subscriber from subscribing. This will not cancel the store or
-     * throw, the caller will just never be subscribed.
+     *
+     * This function is invoked in the store's scope, not the subscriber's scope.
+     * Execute any operations using [PipelineContext].
      */
     public suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int): Unit = Unit
 

@@ -10,8 +10,6 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
-// TODO: Maybe a better solution would be to keep the block running while any subscriber is present.
-
 /**
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
  */
@@ -25,8 +23,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
  *  Create a new plugin that invokes [onFirstSubscription] the **first time** the store is being subscribed to.
  * Nothing is invoked when a second and next subscribers appear, however, the block will be invoked again
  * if the first subscriber appears again.
- * The block will be canceled when **the first subscriber unsubscribes** i.e the one that triggered the invocation.
+ * The block will be canceled when the store is closed, NOT when the subscriber disappears.
  * You can safely suspend inside [onFirstSubscription] as it's invoked asynchronously.
+ * @see StorePlugin.onSubscribe
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(

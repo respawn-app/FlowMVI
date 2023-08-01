@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.sample.provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
@@ -33,14 +32,8 @@ class CounterContainer(
         reduce {
             when (it) {
                 is CounterIntent.ClickedCounter -> {
-                    action(CounterAction.ShowSnackbar(R.string.started_processing))
-
                     delay(1000)
-
-                    action(CounterAction.ShowSnackbar(R.string.finished_processing))
-                    launch {
-                        require(Random.nextBoolean()) { "Oops, there was an error in a job" }
-                    }
+                    require(Random.nextBoolean()) { "Oops, there was an error in a job" }
                     updateState<CounterState.DisplayingCounter, _> {
                         copy(counter = counter + 1)
                     }
