@@ -7,6 +7,7 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
@@ -25,14 +26,18 @@ class StoreTest : FreeSpec({
         val store = testStore(
             initial = state,
             behavior = ActionShareBehavior.Restrict()
-        ) { updateState { TestState.SomeData("data") } }
+        ) {
+            reduce {
+                updateState { TestState.SomeData("data") }
+            }
+        }
         "then can be launched" - {
             store.test {
                 idle()
                 "and can't be launched twice" {
                     shouldThrowExactly<IllegalArgumentException> {
                         store.test { }
-                        this@test.idle()
+                        idle()
                     }
                 }
                 "and can be canceled" {
@@ -41,19 +46,23 @@ class StoreTest : FreeSpec({
             }
             "and can be launched again" test@{
                 store.test { }
-                this@test.idle()
             }
         }
     }
 
     "given store that sends actions and updates states" - {
         val sub = timeTravelPlugin<TestState, TestIntent, TestAction>()
-        val reduce: Reduce<TestState, TestIntent, TestAction> = { send(TestAction.Some) }
-        val store = testStore(timeTravel = sub, reduce = reduce)
+        val store = testStore(timeTravel = sub) {
+            reduce {
+                send(TestAction.Some)
+            }
+        }
 
         "then can accept actions" {
             store.test {
                 send(TestIntent.Some)
+                subscribe { }
+                idle()
             }
             idle()
             sub.launches shouldBe 1
