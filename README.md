@@ -41,8 +41,6 @@ Supported platforms:
 * iOS: [ X64, Arm64, macOS ],
 * js: [ nodejs, browser ]
 
-## Feature preview:
-
 ### Core:
 
 ```kotlin
@@ -66,14 +64,16 @@ sealed interface CounterAction : MVIAction {
 class CounterContainer(
     private val repo: CounterRepository,
 ) {
-    val store by store<ScreenState, ScreenIntent, ScreenAction>(Loading) { // set initial state
+    val store by store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
         name = "CounterStore"
         parallelIntents = true
-        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute, restrict
+        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute or consume
         intentCapacity = 64
+
         install(consoleLoggingPlugin()) // log to console, logcat, or NSLog
         install(analyticsPlugin(name)) // create custom plugins 
         install(timeTravelPlugin()) // unit test stores and track changes
+
         saveState {  // persist and restore state
             get = { repo.restoreStateFromFile() }
             set = { it: CounterState -> repo.saveToFile(it) }
@@ -98,15 +98,11 @@ class CounterContainer(
         reduce { intent: CounterIntent -> // reduce intents
             when (intent) {
                 is ClickedCounter -> updateState<DisplayingCounter> {
-                    launch {
-                        repo.incrementCounter()
-                    }
                     copy(counter = counter + 1)
                 }
             }
         }
         install { // build and install custom plugins on the fly
-
             onStop { // hook into various store events
                 repo.stopTimer()
             }
@@ -196,7 +192,7 @@ fun CounterScreen() = MVIComposable(
 
 // ViewModel and Model classes have not changed
 
-class ScreenFragment : Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
+class ScreenFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterAction> {
 
     override val provider by viewModel<StoreViewModel>(qualifier<CounterContainer>())
 
@@ -206,11 +202,11 @@ class ScreenFragment : Fragment(), MVIView<ScreenState, ScreenIntent, ScreenActi
         subscribe() // One-liner for store subscription. Lifecycle-aware and efficient.
     }
 
-    override fun render(state: ScreenState) {
+    override fun render(state: CounterState) {
         // update your views
     }
 
-    override fun consume(action: ScreenAction) {
+    override fun consume(action: CounterAction) {
         // handle actions
     }
 }
