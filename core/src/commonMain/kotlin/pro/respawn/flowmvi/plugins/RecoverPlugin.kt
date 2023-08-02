@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.storePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 public typealias Recover<S, I, A> = suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?
 
@@ -28,7 +28,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverPlugin(
     name: String? = null,
     recover: Recover<S, I, A>
-): StorePlugin<S, I, A> = storePlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
     onException(recover)
 }

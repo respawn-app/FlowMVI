@@ -12,8 +12,10 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
+import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.provider.CounterState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
+import pro.respawn.flowmvi.util.withType
 import kotlin.random.Random
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
@@ -35,7 +37,7 @@ class CounterContainer(
                 is CounterIntent.ClickedCounter -> {
                     delay(1000)
                     require(Random.nextBoolean()) { "Oops, there was an error in a job" }
-                    updateState<CounterState.DisplayingCounter, _> {
+                    updateState<DisplayingCounter, _> {
                         copy(counter = counter + 1)
                     }
                 }
@@ -55,7 +57,7 @@ class CounterContainer(
 
     private suspend fun Ctx.produceState(timer: Int) = updateState {
         // remember that you have to merge states when you are running produceState
-        val current = this as? CounterState.DisplayingCounter
-        CounterState.DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
+        val current = this as? DisplayingCounter
+        DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
     }
 }

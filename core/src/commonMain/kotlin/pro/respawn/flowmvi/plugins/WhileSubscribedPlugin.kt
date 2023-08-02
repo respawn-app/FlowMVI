@@ -2,7 +2,6 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -11,7 +10,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.storePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
@@ -34,7 +33,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(
     name: String? = null,
     crossinline onFirstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = storePlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
     var job by atomic<Job?>(null)
     onSubscribe { _, subscribers ->

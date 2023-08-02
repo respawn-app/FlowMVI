@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.storePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * Default name for the SavedStatePlugin
@@ -24,7 +24,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
     name: String = DefaultSavedStatePluginName,
     crossinline get: () -> S?,
     crossinline set: (S) -> Unit,
-): StorePlugin<S, I, A> = storePlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
     onState { _, new ->
         launch { set(new) }

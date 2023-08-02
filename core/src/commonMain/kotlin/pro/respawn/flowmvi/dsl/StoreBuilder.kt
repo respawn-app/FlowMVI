@@ -113,7 +113,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @FlowMVIDSL
     public fun install(
         block: StorePluginBuilder<S, I, A>.() -> Unit
-    ): Unit = install(storePlugin(block))
+    ): Unit = install(plugin(block))
 
     @PublishedApi
     @FlowMVIDSL

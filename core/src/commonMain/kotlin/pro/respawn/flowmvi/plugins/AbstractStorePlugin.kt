@@ -9,9 +9,9 @@ import pro.respawn.flowmvi.api.StorePlugin
  * A base class for creating custom [StorePlugin]s. This class is preferred over implementing the interface.
  * Use this class when you want to build reusable plugins, inject dependencies,
  * or want to have the reference to the plugin's instance and use it outside of its regular pipeline.
- * For all other cases, prefer [pro.respawn.flowmvi.dsl.storePlugin] builder function.
+ * For all other cases, prefer [pro.respawn.flowmvi.dsl.plugin] builder function.
  * @see [StorePlugin]
- * @see [pro.respawn.flowmvi.dsl.storePlugin]
+ * @see [pro.respawn.flowmvi.dsl.plugin]
  */
 public abstract class AbstractStorePlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val name: String? = null,

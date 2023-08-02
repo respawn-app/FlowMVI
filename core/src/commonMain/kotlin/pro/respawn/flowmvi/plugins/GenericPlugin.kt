@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.storePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * A builder of a generic [StorePlugin] that can be used with any store.
@@ -96,7 +96,7 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
 
     @Suppress("UNCHECKED_CAST")
     @PublishedApi
-    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build(): StorePlugin<S, I, A> = storePlugin {
+    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> build(): StorePlugin<S, I, A> = plugin {
         name = this@GenericPluginBuilder.name
         onIntent {
             this@GenericPluginBuilder.intent(it)

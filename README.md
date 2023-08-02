@@ -1,4 +1,5 @@
-# Flow MVI
+# FlowMVI 2.0
+
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)
 [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://javadoc.io/doc/pro.respawn.flowmvi/core)
@@ -9,19 +10,18 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
-FlowMVI is a Kotlin Multiplatform MVI implementation based on coroutines with a few main goals:
+FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
-1. Being simple to understand, implement and use
-2. Following the Principle of Least Responsibility - all communication happens through strictly defined contract
-3. Featuring a clean and readable DSL
-4. Being thread-safe but asynchronous
+1. Being simple to understand and use while staying powerful and flexible.
+2. Featuring a clean and rich DSL.
+3. Being thread-safe but asynchronous by design.
 
-* Documentation is at [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)  
-* KDocs are at [FlowMVI/javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)
+## Quickstart:
 
-## Let's get started:
-
-![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
+* Documentation: [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)
+* KDocs: [https://opensource.respawn.pro/FlowMVI/javadocs/](https://opensource.respawn.pro/FlowMVI/javadocs/)
+* Latest
+  version: ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
 ```toml
 [versions]
@@ -34,57 +34,142 @@ flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flo
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 ```
 
-## Core:
+Supported platforms:
+
+* JVM: [ Android ],
+* Linux [ X64, Mingw64 ],
+* iOS: [ X64, Arm64, macOS ],
+* js: [ nodejs, browser ]
+
+## Feature preview:
+
+### Core:
 
 ```kotlin
-sealed interface ScreenState : MVIState {
-    data object Loading : ScreenState
-    data class Error(e: Exception) : ScreenState
-    data class DisplayingCounter(val counter: Int) : ScreenState
+sealed interface CounterState : MVIState {
+    data object Loading : CounterState
+    data class Error(e: Exception) : CounterState
+    data class DisplayingCounter(
+        val timer: Int,
+        val counter: Int,
+    ) : CounterState
 }
 
-sealed interface ScreenIntent : MVIIntent {
-    data object ClickedCounter : ScreenIntent
+sealed interface CounterIntent : MVIIntent {
+    data object ClickedCounter : CounterIntent
 }
 
-sealed interface ScreenAction : MVIAction {
-    data class ShowMessage(val message: String) : ScreenAction
+sealed interface CounterAction : MVIAction {
+    data class ShowMessage(val message: String) : CounterAction
 }
 
-
-val store by launchedStore<ScreenState, ScreenIntent, ScreenAction>(
-    scope = eventProcessingCoroutineScope,
-    initial = Loading,
-    reduce = { intent -> /*...*/ },
-)
-
-// somewhere in the ui layer...
-store.subscribe(
-    consumerCoroutineScope,
-    consume = { action -> /* ... */ },
-    render = { state -> /* ... */ },
-)
-```
-
-## Android (Compose):
-
-```kotlin
-class ScreenViewModel : MVIViewModel<ScreenState, ScreenIntent, ScreenAction>(initialState = Loading) {
-
-    override suspend fun reduce(intent: ScreenIntent): Unit = when (intent) {
-        is ClickedCounter -> updateState<DisplayingCounter> { //this -> DisplayingCounter
-
-            ShowMessage("Incremented counter").send()
-
-            copy(counter = counter + 1)
+class CounterContainer(
+    private val repo: CounterRepository,
+) {
+    val store by store<ScreenState, ScreenIntent, ScreenAction>(Loading) { // set initial state
+        name = "CounterStore"
+        parallelIntents = true
+        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute, restrict
+        intentCapacity = 64
+        install(consoleLoggingPlugin()) // log to console, logcat, or NSLog
+        install(analyticsPlugin(name)) // create custom plugins 
+        install(timeTravelPlugin()) // unit test stores and track changes
+        saveState {  // persist and restore state
+            get = { repo.restoreStateFromFile() }
+            set = { it: CounterState -> repo.saveToFile(it) }
         }
-        /* ... */
+        init { // run actions when store is launched
+            repo.startTimer()
+        }
+        whileSubscribed { // run a job while any subscribers are present
+            repo.timer.onEach { timer: Int ->
+                updateState<DisplayingCounter> { // update state safely between threads and filter by type
+                    copy(timer = timer)
+                }
+            }.consume()
+        }
+        recover { e: Exception -> // recover from errors both in jobs and plugins
+            send(CounterAction.ShowMessage(e.message)) // send side-effects
+            updateState {
+                Error(e)
+            }
+            null
+        }
+        reduce { intent: CounterIntent -> // reduce intents
+            when (intent) {
+                is ClickedCounter -> updateState<DisplayingCounter> {
+                    launch {
+                        repo.incrementCounter()
+                    }
+                    copy(counter = counter + 1)
+                }
+            }
+        }
+        install { // build and install custom plugins on the fly
+
+            onStop { // hook into various store events
+                repo.stopTimer()
+            }
+            onState { old, new -> // veto changes, modify states, launch jobs, do literally anything
+                new.withType<DisplayingCounter, _> {
+                    if (counter >= 100) {
+                        launch { repo.resetTimer() }
+                        copy(counter = 0, timer = 0)
+                    } else new
+                }
+            }
+        }
     }
 }
 
+// somewhere in the ui layer...
+
+```
+
+Subscribe one-liner:
+
+```kotlin
+store.subscribe(
+    scope = consumerCoroutineScope,
+    consume = { action -> /* process side effects */ },
+    render = { state -> /* render states */ },
+)
+```
+
+Custom plugins:
+
+```kotlin
+// create plugins for any store 
+fun analyticsPlugin(name: String) = genericPlugin {
+        val analytics = Analytics.getInstance()
+        onStart {
+            analytics.log("Screen $name opened")
+        }
+        onIntent {
+            analytics.log(intent.asAnalyticsEvent())
+        }
+        // 5+ more hooks
+    }
+
+// or for a specific one
+val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
+    /*...*/
+}
+
+```
+
+### Android (Compose):
+
+```kotlin
+val module = module {
+    factoryOf(::CounterContainer)
+    // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
+    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>().store) }
+}
+
 @Composable
-fun ComposeScreen() = MVIComposable(
-    provider = getViewModel<ScreenViewModel>(),
+fun CounterScreen() = MVIComposable(
+    provider = getViewModel<StoreViewModel>(qualifier<CounterContainer>()),
 ) { state ->
 
     consume { action ->
@@ -98,21 +183,22 @@ fun ComposeScreen() = MVIComposable(
     when (state) {
         is DisplayingCounter -> {
             Button(onClick = { ClickedCounter.send() }) {
-                Text("Counter: ${state.counter}") // render state,
+                Text("Counter: ${state.counter}")
             }
         }
     }
 }
 ```
-## Android (View):
+
+### Android (View):
 
 ```kotlin
 
 // ViewModel and Model classes have not changed
 
-class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
+class ScreenFragment : Fragment(), MVIView<ScreenState, ScreenIntent, ScreenAction> {
 
-    override val provider by viewModel<ScreenViewModel>()
+    override val provider by viewModel<StoreViewModel>(qualifier<CounterContainer>())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -130,8 +216,7 @@ class ScreenFragment: Fragment(), MVIView<ScreenState, ScreenIntent, ScreenActio
 }
 ```
 
-And that's it!   
-For more information and sample code, see the [Documentation](https://opensource.respawn.pro/FlowMVI).
+Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/quickstart).
 
 ## License
 

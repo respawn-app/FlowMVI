@@ -180,7 +180,7 @@ sealed interface NewsState {
 ```
 
 Use `T.withType<Type>(block: Type.() -> Unit)` to cast your sub-states easier as
-the `(this as? State)?.let{ }` code looks ugly.
+the `(this as? State)?.let { }` code looks ugly.
 
 ### I have an API call or other coroutine I want to run, but I don't have a coroutine scope to launch it in at the time of store creation. How do I do that?
 

@@ -2,6 +2,8 @@ Here's how the library works at a glance:
 
 ![](images/FlowMVI.jpg)
 
+## **These are docs for FlowMVI 1.0, the latest stable release. FlowMVI 2.0 docs are coming soon.**
+
 ## Step 1: Add Dependencies
 
 To start with the library, first declare the dependencies.
@@ -19,13 +21,6 @@ flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flo
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # androidx.compose
 ```
 
-The `core` artifact supports:
-
-* JVM: [ Android ],
-* Linux [ X64, Mingw64 ],
-* iOS: [ X64, Arm64, macOS ],
-* js: [ nodejs, browser ]
-
 ## Step 2: Describe your Contract
 
 It's best to start with looking at the actual UI of what you want to build, some logic that is possible, and build
@@ -34,7 +29,7 @@ start.
 Ask yourself:
 
 1. What can be shown at what times? Can the page be empty? Can it be loading? - this will define your state family
-2. What can be shown on this screen? - this will be your states' properties.
+2. What elements can be shown on this screen? - this will be your states' properties.
 3. What can the user do on this screen? What can happen in the system? - these will be your Intents
 4. In response to given intents, what one-time events may happen? - these are Actions
 
@@ -74,7 +69,7 @@ internal sealed interface ScreenAction : MVIAction {
 3. The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
     * Examples include Snackbars, Popup messages, Sounds and so on.
     * Do not confuse States with Actions! Actions are **one-off, "fire and forget" events**.
-    * Actions are **sent sequentially** and processed (usually) **in parallel**.
+    * Actions are **sent sequentially**.
 
 ## Step 3: Create your business logic
 

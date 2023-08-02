@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.storePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * Default name for [reducePlugin].
@@ -35,7 +35,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 
 /**
  * Create  a new plugin that simply invokes [StorePlugin.onIntent], processes it and does not change the intent.
- * To change the intent, either create your own [storePlugin] or use [PipelineContext] to manage the store.
+ * To change the intent, either create your own [plugin] or use [PipelineContext] to manage the store.
  * Name is hardcoded because usually multiple reducers are not used.
  * Provide your own name if you want to have multiple reducers.
  **/
@@ -43,7 +43,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
     name: String = ReducePluginName,
     crossinline reduce: Reduce<S, I, A>,
-): StorePlugin<S, I, A> = storePlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
     onIntent { it.also { reduce(it) } }
 }
