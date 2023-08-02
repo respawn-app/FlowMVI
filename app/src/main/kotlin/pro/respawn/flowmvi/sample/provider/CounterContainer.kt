@@ -15,7 +15,6 @@ import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.provider.CounterState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
-import pro.respawn.flowmvi.util.withType
 import kotlin.random.Random
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
