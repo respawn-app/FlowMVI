@@ -30,7 +30,7 @@ public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentRecei
      * Starts store intent processing in a new coroutine in the given [scope].
      * Intents are processed as long as the parent scope is active.
      * **Starting store processing when it is already started will result in an exception.**
-     * Although not advised, store can be launched multiple times,
+     * Although not always needed, store can be launched multiple times,
      * assuming you cancel the job used before or call [close].
      * @return a [Job] that the store is running on that can be cancelled later. [close] will cancel that job.
      */

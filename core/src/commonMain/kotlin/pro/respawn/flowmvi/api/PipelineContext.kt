@@ -32,7 +32,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * // this -> PipelineContext<S, I, A>
  * withContext(this + Dispatchers.IO) { }
  * ```
- * **The pipeline context's scope is not necessarily the scope that the [Store] was [Store.start]ed with.**
+ * The pipeline's context is always the context the store was started with.
  */
 @FlowMVIDSL
 public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIAction> :
@@ -48,8 +48,8 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
     public fun close(): Unit = coroutineContext.job.cancel()
 
     /**
-     * An alias for [Flow.collect] that does not override the context amending it instead.
-     * Use as a safer alternative to [Flow.flowOn]
+     * An alias for [Flow.collect] that does not override the context, amending it instead.
+     * Use as a safer alternative to [Flow.flowOn] and then [Flow.collect]
      */
     public suspend fun <T> Flow<T>.consume(context: CoroutineContext = EmptyCoroutineContext): Unit =
         flowOn(this@PipelineContext + context).collect()
@@ -60,6 +60,6 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
     @DelicateStoreApi
     public companion object : CoroutineContext.Key<PipelineContext<*, *, *>>
 
-    @OptIn(DelicateStoreApi::class)
+    @DelicateStoreApi
     override val key: CoroutineContext.Key<*> get() = PipelineContext
 }

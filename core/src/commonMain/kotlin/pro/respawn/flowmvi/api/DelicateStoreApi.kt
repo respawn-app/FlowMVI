@@ -1,7 +1,8 @@
 package pro.respawn.flowmvi.api
 
 private const val Message = """
-This API is low-level and ignores ALL plugins and validations. Use it for performance-critical operations only.
+This API is low-level and ignores ALL plugins, validations and thread synchronization. 
+Use it for performance-critical operations only.
 If you use it, make sure to not introduce races to your state management.
 """
 

@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.dsl
+package pro.respawn.flowmvi.store
 
 import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.api.ActionShareBehavior

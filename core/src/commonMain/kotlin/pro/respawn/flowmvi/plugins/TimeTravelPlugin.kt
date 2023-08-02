@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
-internal class CappedMutableCollection<T>(
+private class CappedMutableCollection<T>(
     private val maxSize: Int,
     private val backing: MutableList<T> = mutableListOf(),
 ) : MutableCollection<T> by backing {
@@ -27,7 +27,6 @@ internal class CappedMutableCollection<T>(
  * Keep a reference to this plugin and use it to enable custom time travel support or validate the store's behavior
  * in tests.
  */
-@Suppress("KDocUnresolvedReference")
 public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     name: String,
     maxStates: Int,

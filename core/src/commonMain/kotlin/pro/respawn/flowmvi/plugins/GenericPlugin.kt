@@ -9,7 +9,7 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.storePlugin
 
 /**
- * A builder of a Generic store plugin that can be used with any store.
+ * A builder of a generic [StorePlugin] that can be used with any store.
  * Due to the risk of mangling with the generic store's properties, this plugin cannot affect the store in any way.
  * The types of intents are also erased.
  */

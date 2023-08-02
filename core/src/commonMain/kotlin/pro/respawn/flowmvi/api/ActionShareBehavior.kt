@@ -45,9 +45,9 @@ public sealed interface ActionShareBehavior {
     ) : ActionShareBehavior
 
     /**
-     * Restricts the count of subscribers to 1.
+     * Restricts the count of subscription events to 1.
      * Attempting to subscribe to a store that has already been subscribed to will result in an exception.
-     * In other words, you will be required to create a new store for each invocation of [subscribe].
+     * In other words, you will be required to create a new store for each invocation of [Store.subscribe].
      *
      * **Repeated subscriptions are not allowed, including lifecycle-aware collection**.
      *

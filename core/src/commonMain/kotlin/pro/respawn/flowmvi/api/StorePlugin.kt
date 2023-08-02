@@ -120,8 +120,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      *
      * This function is invoked in the store's scope, not the subscriber's scope.
      * To launch jobs in the subscriber's scope, use [subscriberScope]. They will be canceled when the subscriber
-     * unsubscribes
-     * Execute any operations using [PipelineContext].
+     * unsubscribes.
      */
     public fun PipelineContext<S, I, A>.onSubscribe(
         subscriberScope: CoroutineScope,

@@ -24,9 +24,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 
 /**
  *  Create a new plugin that invokes [onFirstSubscription] the **first time** the store is being subscribed to.
- * Nothing is invoked when a second and next subscribers appear, however, the block will be invoked again
+ * Nothing is invoked when more subscribers appear, however, the block will be invoked again
  * if the first subscriber appears again.
- * The block will be canceled when the store is closed, NOT when the subscriber disappears.
+ * The block will be canceled when the store is closed, **not** when the subscriber disappears.
  * You can safely suspend inside [onFirstSubscription] as it's invoked asynchronously.
  * @see StorePlugin.onSubscribe
  */

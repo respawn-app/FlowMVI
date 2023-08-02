@@ -2,7 +2,7 @@ package pro.respawn.flowmvi.api
 
 /**
  * An entity that handles [MVIState] updates. This entity modifies the state of the [StateProvider].
- * This is most often implemented as by a [Store] and exposed through [PipelineContext].
+ * This is most often implemented by a [Store] and exposed through [PipelineContext].
  */
 public interface StateReceiver<S : MVIState> {
 
@@ -15,7 +15,6 @@ public interface StateReceiver<S : MVIState> {
      *
      * If you want to operate on a state of particular subtype, use the typed version of this function.
      *
-     * Using the return value of the function is not recommended and may be deprecated in the future.
      * @see [withState]
      */
     @FlowMVIDSL
@@ -26,7 +25,6 @@ public interface StateReceiver<S : MVIState> {
      *
      * This function does NOT update the state, for that, use [updateState].
      * Store allows only one state update at a time, and because of that,
-     *
      * **every coroutine that will invoke [withState] or [updateState]
      * will be suspended until the previous state handler is finished.**
      *
@@ -40,6 +38,8 @@ public interface StateReceiver<S : MVIState> {
      * }
      * ```
      * you should not get a deadlock, but overriding coroutine contexts can still cause problems.
+     * This function has lower performance than [useState] and allows plugins to intercept the state change.
+     * If you really need the additional performance or wish to avoid plugins, use [useState].
      *
      * @returns the value of [R], i.e. the result of the block.
      */
@@ -48,7 +48,7 @@ public interface StateReceiver<S : MVIState> {
 
     /**
      * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in
-     * the coroutine context, which means it can cause races when you want to update states atomically.
+     * the coroutine context, which means it can cause races when you want to update states in parallel.
      * This function is performant, but **circumvents ALL plugins** and is **not thread-safe**.
      * It should only be used for the most critical state updates happening very often.
      */

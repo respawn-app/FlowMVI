@@ -12,6 +12,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.store.StoreConfiguration
 import pro.respawn.flowmvi.store.StoreImpl
 import kotlin.jvm.JvmName
 
@@ -160,7 +161,8 @@ public inline fun <S : MVIState, I : MVIIntent> store(
 
 /**
  * Build a new [Store] using [StoreBuilder].
- * The store is **not** launched and created lazily, with all its plugins.
+ *  The store is created lazily, with all its plugins.
+ *  The store is **not** launched.
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
@@ -170,7 +172,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
 
 /**
  * Build a new [Store] using [StoreBuilder].
- * The store is built **lazily** and launched on **first access** (i.e. after bulding).
+ * The store is built **lazily** and launched on **first access** (i.e. immediately after creation).
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(

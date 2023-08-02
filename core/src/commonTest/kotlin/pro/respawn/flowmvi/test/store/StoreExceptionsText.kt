@@ -23,7 +23,6 @@ import pro.respawn.flowmvi.util.subscribeAndTest
 import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
-import kotlin.coroutines.coroutineContext
 
 class StoreExceptionsText : FreeSpec({
     asUnconfined()

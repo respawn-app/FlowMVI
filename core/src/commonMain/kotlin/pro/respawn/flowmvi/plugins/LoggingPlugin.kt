@@ -14,11 +14,6 @@ import pro.respawn.flowmvi.plugins.StoreLogLevel.Info
 import pro.respawn.flowmvi.plugins.StoreLogLevel.Trace
 
 /**
- * Default tag for the [loggingPlugin]
- */
-public const val DefaultLogTag: String = "StoreLogging"
-
-/**
  * Log level of this store. Override using [logging] or leave as a default for sensible log levels.
  * Not used when the logger does not support levels, such as with [consoleLoggingPlugin].
  */
@@ -42,11 +37,11 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.lo
 /**
  * Create a new [StorePlugin] that prints messages using [log].
  * [tag] is used as a name for the plugin.
- * Tag can be null, in which case, [DefaultLogTag] will be used, but the name will remain null.
+ * Tag can be null, in which case, [name] will be used, will remain null.
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
-    tag: String?,
+    tag: String? = null,
     name: String = "${tag.orEmpty()}Logging",
     crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit,
 ): StorePlugin<S, I, A> = genericPlugin {

@@ -17,7 +17,6 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.dsl.StoreConfiguration
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.PipelineModule

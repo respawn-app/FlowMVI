@@ -12,7 +12,7 @@ import pro.respawn.flowmvi.dsl.storePlugin
 /**
  * Default name for [reducePlugin].
  * This is hardcoded so that multiple [reduce] invocations are not allowed w/o
- * explicit consent of the user as most often multiple reducers are not used.
+ * explicit consent of the user as most often multiple reducers will conflict with each other.
  * Provide your own name if you want to have multiple reducers.
  */
 public const val ReducePluginName: String = "ReducePlugin"
