@@ -2,7 +2,9 @@ package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
@@ -35,6 +37,7 @@ private class IntentModuleImpl<I : MVIIntent>(
 
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         while (isActive) {
+            ensureActive()
             // must always suspend the current scope to wait for intents
             val intent = intents.receive()
             if (parallel) launch {

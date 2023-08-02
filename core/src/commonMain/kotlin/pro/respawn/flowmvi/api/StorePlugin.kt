@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.api
 
+import kotlinx.coroutines.CoroutineScope
+
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
@@ -117,9 +119,21 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * is incremented. This means, for the first subscription, [subscriberCount] will be zero.
      *
      * This function is invoked in the store's scope, not the subscriber's scope.
+     * To launch jobs in the subscriber's scope, use [subscriberScope]. They will be canceled when the subscriber
+     * unsubscribes
      * Execute any operations using [PipelineContext].
      */
-    public suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int): Unit = Unit
+    public fun PipelineContext<S, I, A>.onSubscribe(
+        subscriberScope: CoroutineScope,
+        subscriberCount: Int
+    ): Unit = Unit
+
+    /**
+     * A callback to be executed when the subscriber cancels its subscription job (unsubscribes).
+     * This callback is executed **after** the subscriber has been removed and **after** [subscriberCount] is
+     * decremented. This means, for the last subscriber, the count will be 0.
+     */
+    public fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
 
     /**
      * Invoked when [Store.close] is invoked. This is called **after** the store is already closed, and you cannot

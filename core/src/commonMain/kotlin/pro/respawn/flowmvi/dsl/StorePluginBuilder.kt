@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.dsl
 
+import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -19,7 +20,11 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
     private var action: suspend PipelineContext<S, I, A>.(A) -> A? = { it }
     private var exception: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception? = { it }
     private var start: suspend PipelineContext<S, I, A>.() -> Unit = { }
-    private var subscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
+    private var subscribe: PipelineContext<S, I, A>.(
+        subscriberScope: CoroutineScope,
+        subscriberCount: Int
+    ) -> Unit = { _, _ -> }
+    private var unsubscribe: PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
     private var stop: (e: Exception?) -> Unit = { }
 
     /**
@@ -79,8 +84,19 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
      * @see [StorePlugin.onSubscribe]
      */
     @FlowMVIDSL
-    public fun onSubscribe(block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit) {
+    public fun onSubscribe(
+        block: PipelineContext<S, I, A>.(subscriberScope: CoroutineScope, subscriberCount: Int) -> Unit
+    ) {
         subscribe = block
+    }
+
+    /**
+     * @see StorePlugin.onUnsubscribe
+     */
+    public fun onUnsubscribe(
+        block: PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
+    ) {
+        unsubscribe = block
     }
 
     @FlowMVIDSL
@@ -91,7 +107,12 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
         override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(this, intent)
         override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(this, action)
         override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = exception(e)
-        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) = subscribe(subscriberCount)
+        override fun PipelineContext<S, I, A>.onSubscribe(
+            subscriberScope: CoroutineScope,
+            subscriberCount: Int
+        ) = subscribe(subscriberScope, subscriberCount)
+
+        override fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) = unsubscribe(subscriberCount)
         override fun onStop(e: Exception?): Unit = stop(e)
     }
 }

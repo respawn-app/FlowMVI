@@ -1,9 +1,11 @@
 package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.job
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -39,6 +41,11 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
     ActionReceiver<A>,
     CoroutineScope,
     CoroutineContext.Element {
+
+    /**
+     * Same as [cancel], but for resolving the ambiguity between context.cancel() and scope.cancel()
+     */
+    public fun close(): Unit = coroutineContext.job.cancel()
 
     /**
      * An alias for [Flow.collect] that does not override the context amending it instead.

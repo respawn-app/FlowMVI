@@ -9,6 +9,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.dsl.LambdaIntent
+import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 import pro.respawn.flowmvi.sample.provider.CounterAction
@@ -51,7 +52,7 @@ class CounterActivity :
             is DisplayingCounter -> {
                 with(tvCounter) {
                     isVisible = true
-                    text = state.counter.toString()
+                    text = getString(R.string.counter_template, state.counter)
                 }
                 with(tvParam) {
                     isVisible = true
@@ -59,7 +60,7 @@ class CounterActivity :
                 }
                 with(tvTimer) {
                     isVisible = true
-                    text = state.timer.toString()
+                    text = getString(R.string.timer_template, state.timer)
                 }
                 progress.hide()
                 tvError.isVisible = false

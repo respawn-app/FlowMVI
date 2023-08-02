@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.sample.provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
@@ -41,10 +42,12 @@ class CounterContainer(
             }
         }
         recover {
-            if (it is IllegalArgumentException)
-                send(CounterAction.ShowSnackbar(R.string.error_message))
-            else updateState {
-                CounterState.Error(it)
+            launch {
+                if (it is IllegalArgumentException)
+                    send(CounterAction.ShowSnackbar(R.string.error_message))
+                else updateState {
+                    CounterState.Error(it)
+                }
             }
             null
         }

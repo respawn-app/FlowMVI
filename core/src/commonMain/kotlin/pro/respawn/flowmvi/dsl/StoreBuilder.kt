@@ -69,7 +69,8 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public var actionShareBehavior: ActionShareBehavior = ActionShareBehavior.Distribute()
 
     /**
-     * Designate behavior for when [pro.respawn.flowmvi.api.IntentReceiver]'s [MVIIntent] pool overflows
+     * Designate behavior for when [pro.respawn.flowmvi.api.IntentReceiver]'s [MVIIntent] pool overflows.
+     *
      * [BufferOverflow.DROP_OLDEST] by default
      */
     @FlowMVIDSL
@@ -79,6 +80,13 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      * Designate the maximum capacity of [MVIIntent]s waiting for processing
      * in the [pro.respawn.flowmvi.api.IntentReceiver]'s queue.
      * Intents that overflow this capacity will be processed according to [onOverflow].
+     * This should be either a positive value, or one of:
+     *  * [Channel.UNLIMITED]
+     *  * [Channel.CONFLATED]
+     *  * [Channel.RENDEZVOUS]
+     *  * [Channel.BUFFERED]
+     *
+     *  [Channel.UNLIMITED] by default.
      */
     @FlowMVIDSL
     public var intentCapacity: Int = Channel.UNLIMITED

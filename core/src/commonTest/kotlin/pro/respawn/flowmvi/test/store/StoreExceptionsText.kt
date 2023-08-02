@@ -1,39 +1,28 @@
 package pro.respawn.flowmvi.test.store
 
-import io.kotest.common.ExperimentalKotest
-import io.kotest.core.concurrency.CoroutineDispatcherFactory
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.core.test.TestCase
+import io.kotest.matchers.collections.shouldBeSingleton
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.withContext
+import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
-import pro.respawn.flowmvi.plugins.reduce
-import pro.respawn.flowmvi.plugins.timeTravelPlugin
-import pro.respawn.flowmvi.util.TestAction
-import pro.respawn.flowmvi.util.TestIntent
-import pro.respawn.flowmvi.util.TestState
+import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
-import kotlin.coroutines.coroutineContext
-
-@OptIn(ExperimentalKotest::class)
-fun FreeSpec.asUnconfined() {
-    coroutineDispatcherFactory = object : CoroutineDispatcherFactory {
-        override suspend fun <T> withDispatcher(testCase: TestCase, f: suspend () -> T): T =
-            withContext(coroutineContext + UnconfinedTestDispatcher()) { f() }
-    }
-}
+import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
 class StoreExceptionsText : FreeSpec({
     asUnconfined()
 
-    val plugin = timeTravelPlugin<TestState, TestIntent, TestAction>()
+    val plugin = testTimeTravelPlugin()
     afterEach {
         plugin.reset()
     }
@@ -47,10 +36,8 @@ class StoreExceptionsText : FreeSpec({
                     null
                 }
 
-                install {
-                    onStart {
-                        throw e
-                    }
+                init {
+                    throw e
                 }
             }
             "then store is not closed when thrown" {
@@ -59,18 +46,18 @@ class StoreExceptionsText : FreeSpec({
                 job.isActive shouldBe true
                 job.cancelAndJoin()
                 idle()
-                plugin.launches shouldBe 1
+                plugin.starts shouldBe 1
                 plugin.exceptions.shouldContainExactly(e)
             }
 
             "then exceptions in processing scope do not cancel the pipeline" {
                 val job = store.start(this)
-                store.send(TestIntent.Some)
+                store.send { }
                 idle()
                 job.isActive shouldBe true
                 job.cancelAndJoin()
                 idle()
-                plugin.intents shouldContain TestIntent.Some
+                plugin.intents.shouldBeSingleton()
             }
         }
         "given store that throws on subscribe" - {
@@ -80,7 +67,7 @@ class StoreExceptionsText : FreeSpec({
                         println("recover from $it")
                         null
                     }
-                    onSubscribe {
+                    onSubscribe { _, _ ->
                         throw e
                     }
                 }
@@ -97,28 +84,45 @@ class StoreExceptionsText : FreeSpec({
         }
         "then nested coroutines propagate exceptions to handler" {
             val store = testStore(plugin) {
-                recover {
-                    null
-                }
-                reduce {
-                    launch {
+                recover { null }
+            }
+            store.test {
+                send {
+                    launch a@{
                         println("job 1 started")
-                        launch {
+                        this@a.launch b@{
                             println("job 2 started")
-                            launch {
+                            this@b.launch {
                                 println("job 3 started")
                                 throw e
                             }
                         }
                     }
                 }
-            }
-            store.test {
-                send(TestIntent.Some)
                 idle()
+                plugin.exceptions shouldContain e
+                plugin.intents.shouldBeSingleton()
             }
-            plugin.exceptions shouldContain e
-            plugin.intents shouldContain TestIntent.Some
+        }
+        "and an unhandled exception is thrown" - {
+            val store = testStore(plugin) {
+                init {
+                    launch {
+                        throw e
+                    }
+                }
+            }
+
+            "then exceptions are rethrown".config(enabled = false) {
+                shouldThrowExactly<IllegalArgumentException> {
+                    coroutineScope {
+                        // TODO: cancels the scope, figure out how to not cancel the parent scope
+                        store.start(this).join()
+                    }
+                }
+            }
+            "then store is closed exceptionally" {
+            }
         }
     }
 })

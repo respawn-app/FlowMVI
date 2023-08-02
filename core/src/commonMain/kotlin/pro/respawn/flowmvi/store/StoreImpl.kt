@@ -2,13 +2,10 @@
 package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.MutableStore
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -16,118 +13,98 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.StoreConfiguration
-import pro.respawn.flowmvi.dsl.pipeline
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
-import pro.respawn.flowmvi.modules.Recoverable
+import pro.respawn.flowmvi.modules.PipelineSubscriber
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.actionModule
+import pro.respawn.flowmvi.modules.catch
 import pro.respawn.flowmvi.modules.intentModule
+import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.plugins.CompositePlugin
-import kotlin.coroutines.coroutineContext
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
-    private val actionModule: ActionModule<A> = actionModule(config.actionShareBehavior),
-    private val stateModule: StateModule<S> = stateModule(config.initial),
-    private val intentModule: IntentModule<I> = intentModule(
-        config.parallelIntents,
-        config.intentCapacity,
-        config.onOverflow
-    ),
 ) : MutableStore<S, I, A>,
     Provider<S, I, A>,
-    Recoverable<S, I, A>,
-    StateModule<S> by stateModule,
-    IntentModule<I> by intentModule,
-    ActionModule<A> by actionModule {
+    PipelineSubscriber<S, I, A>,
+    StateModule<S> by stateModule(config.initial),
+    IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
+    ActionModule<A> by actionModule(config.actionShareBehavior) {
 
     override val name by config::name
     override val initial by config::initial
     private var subscriberCount by atomic(0)
     private var pipeline = atomic<PipelineContext<S, I, A>?>(null)
 
-    override fun PipelineContext<S, I, A>.recover(e: Exception): Unit = with(config.plugin) {
-        // add Recoverable to the coroutine context
-        // and handle the exception asynchronously to allow suspending inside onException
-        launch(this@StoreImpl) { onException(e)?.let { throw it } }
-    }
-
-    override suspend fun send(action: A): Unit = withPipeline {
-        plugin { onAction(action)?.let { actionModule.send(it) } }
-    }
-
-    override suspend fun updateState(transform: suspend S.() -> S) = withPipeline {
-        with(config.plugin) {
-            stateModule.updateState state@{
-                onState(this@state, transform()) ?: this
-            }
-        }
-    }
-
-    override fun start(scope: CoroutineScope): Job = pipeline(
-        name = name,
-        parent = scope,
-        onClose = {
-            require(pipeline.getAndSet(null) != null) { "Store is closed but was not started" }
-            config.plugin.onStop(it)
-        },
-        onStart = {
-            require(pipeline.getAndSet(this) == null) { "Store is already started" }
-            launch {
-                plugin { onStart() }
-                awaitIntents {
-                    plugin { onIntent(it) }
-                }
-            }.invokeOnCompletion {
-                // propagate exceptions in this child job to not leave the store in an undefined state
-                it?.let { throw it }
-            }
-        }
-    )
+    override fun start(scope: CoroutineScope): Job = launchPipeline(name, scope)
 
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job {
-        val pipeline = requireNotNull(pipeline.value) { SubscribedToStoppedStoreMessage }
+        val pipeline = checkNotNull(pipeline.value) { SubscribedToStoppedStoreMessage }
         // use the parent scope to not handle exceptions in subscriber's block
         // but add the pipeline to the coroutine's context to retrieve as needed
         return launch(pipeline) {
-            with(pipeline) { plugin { onSubscribe(subscriberCount) } }
+            with(pipeline) { plugin { onSubscribe(this@launch, subscriberCount) } }
             ++subscriberCount
             block(this@StoreImpl)
             if (config.debuggable) error(NonSuspendingSubscriberMessage)
         }.apply {
-            invokeOnCompletion { --subscriberCount }
+            invokeOnCompletion {
+                with(config.plugin) {
+                    pipeline.onUnsubscribe(--subscriberCount)
+                }
+            }
         }
     }
 
-    @OptIn(DelicateStoreApi::class)
-    @Suppress("UNCHECKED_CAST")
-    private suspend inline fun <T> withPipeline(block: PipelineContext<S, I, A>.() -> T): T {
-        val pipeline = checkNotNull(
-            coroutineContext[PipelineContext]
-        ) { InvalidContextMessage } as PipelineContext<S, I, A>
-        return with(pipeline, block)
+    override suspend fun PipelineContext<S, I, A>.recover(e: Exception): Unit = with(config.plugin) {
+        onException(e)?.let { throw it }
     }
 
-    private inline fun PipelineContext<S, I, A>.plugin(block: CompositePlugin<S, I, A>.() -> Unit) = try {
-        with(config.plugin, block)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (expected: Exception) {
-        recover(expected)
+    override suspend fun PipelineContext<S, I, A>.onAction(action: A) {
+        plugin { onAction(action)?.let { this@StoreImpl.send(it) } }
     }
 
-    override fun hashCode() = name.hashCode()
-    override fun equals(other: Any?): Boolean {
-        if (other !is Store<*, *, *>) return false
-        return name == other.name
+    override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) {
+        plugin {
+            this@StoreImpl.updateState {
+                onState(this, transform()) ?: this
+            }
+        }
+    }
+
+    override fun PipelineContext<S, I, A>.onStart() {
+        check(pipeline.getAndSet(this) == null) { "Store is already started" }
+        // add Recoverable to the context because we cannot recover from exceptions in intent processing
+        launch(this@StoreImpl) {
+            plugin { onStart() }
+            awaitIntents {
+                plugin { onIntent(it) }
+            }
+        }
+    }
+
+    private suspend inline fun PipelineContext<S, I, A>.plugin(block: CompositePlugin<S, I, A>.() -> Unit) =
+        catch(this) { with(config.plugin, block) }
+
+    override fun onStop(e: Exception?) {
+        checkNotNull(pipeline.getAndSet(null)) { "Store is closed but was not started" }.close()
+        config.plugin.onStop(e)
     }
 
     override fun close() {
-        (pipeline.getAndSet(null) as? CoroutineScope)?.cancel()
+        // completion handler will cleanup the pipeline later
+        pipeline.value?.close()
+    }
+
+    override fun hashCode() = name?.hashCode() ?: super.hashCode()
+    override fun equals(other: Any?): Boolean {
+        if (other !is Store<*, *, *>) return false
+        if (other.name == null && name == null) return other === this
+        return name == other.name
     }
 
     companion object {
@@ -136,14 +113,6 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 You have subscribed to the store, but your subscribe() block has returned early (without throwing a
 CancellationException). When you subscribe, make sure to continue collecting values from the store until the Job 
 Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store.
-        """
-
-        const val InvalidContextMessage = """
-You have overridden the CoroutineContext associated to the store in one of the coroutines, but then attempted to use it.
-This is not allowed because you lose the ability to call store functions in your plugins/jobs.
-Please amend the store context instead. Example:
-withContext(Dispatchers.Default) - wrong
-withContext(this + Dispatchers.Default) - correct
         """
 
         const val SubscribedToStoppedStoreMessage = """

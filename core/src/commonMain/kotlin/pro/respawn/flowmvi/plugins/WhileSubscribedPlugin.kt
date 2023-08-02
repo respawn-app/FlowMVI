@@ -1,5 +1,8 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -33,7 +36,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     crossinline onFirstSubscription: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = storePlugin {
     this.name = name
-    onSubscribe { subscribers ->
-        if (subscribers == 0) launch { onFirstSubscription() }
+    var job by atomic<Job?>(null)
+    onSubscribe { _, subscribers ->
+        if (subscribers == 0) {
+            job = launch { onFirstSubscription() }
+        }
+    }
+    onUnsubscribe { subscribers ->
+        if (subscribers == 0) job?.cancel()
     }
 }

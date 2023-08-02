@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -16,9 +17,14 @@ internal class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction> inter
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = plugins(intent) { onIntent(it) }
     override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = plugins(action) { onAction(it) }
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = plugins(e) { onException(it) }
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(
+    override fun PipelineContext<S, I, A>.onUnsubscribe(
         subscriberCount: Int
-    ) = plugins { onSubscribe(subscriberCount) }
+    ) = plugins { onUnsubscribe(subscriberCount) }
+
+    override fun PipelineContext<S, I, A>.onSubscribe(
+        subscriberScope: CoroutineScope,
+        subscriberCount: Int
+    ) = plugins { onSubscribe(subscriberScope, subscriberCount) }
 
     private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.forEach(block)
     private inline fun <R> plugins(

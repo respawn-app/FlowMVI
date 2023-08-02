@@ -5,6 +5,7 @@ package pro.respawn.flowmvi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
@@ -31,7 +32,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIView<S, I, A>.subscri
 @Deprecated(
     "Use the new subscribe dsl",
     ReplaceWith(
-        "subscribe",
+        "this.subscribe(scope, ::consume, ::render)",
         "pro.respawn.flowmvi.dsl.subscribe"
     )
 )
@@ -48,7 +49,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVISubscriber<S, A>.subs
 @Deprecated(
     "Use the new subscribe dsl",
     ReplaceWith(
-        "subscribe",
+        "subscribe(scope, consume, render)",
         "pro.respawn.flowmvi.dsl.subscribe"
     )
 )
@@ -77,7 +78,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I,
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "updateState",
+        "this.updateState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
@@ -101,7 +102,7 @@ public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.wit
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "updateState",
+        "this.updateState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
@@ -127,7 +128,7 @@ public suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>
 @Deprecated(
     "Use StateReceiver.updateState",
     ReplaceWith(
-        "updateState",
+        "this.updateState(block)",
         "pro.respawn.flowmvi.dsl.updateState"
     )
 )
@@ -187,6 +188,7 @@ public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { rec
 /**
  * A builder function of [MVIStore]
  */
+@OptIn(DelicateStoreApi::class)
 @Suppress("FunctionName", "TrimMultilineRawString")
 @Deprecated(
     "Use store builders",
@@ -196,7 +198,7 @@ public inline val <S : MVIState> Reducer<S, *>.recover: Recover<S> get() = { rec
         actionShareBehavior = behavior
         reduce(reduce)
         recover {
-            updateState { recover(it) }
+            useState { recover(it) }
             null
         }
     }
@@ -227,7 +229,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     actionShareBehavior = behavior
     reduce(reduce = reduce)
     recover {
-        updateState { recover(it) }
+        useState { recover(it) }
         null
     }
 } as MutableStore<S, I, A>
@@ -245,7 +247,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIStore(
     store(initial) {
         reduce(reduce)
         recover {
-            updateState { recover(it) }
+            useState { recover(it) }
             null
         }
         actionShareBehavior = behavior
@@ -271,12 +273,12 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     ReplaceWith(
         """
     store(initial) {
+        actionShareBehavior = behavior
         reduce(reduce)
         recover {
-            updateState { recover(it) }
+            useState { recover(it) }
             null
         }
-        actionShareBehavior = behavior
 }
 """
     )

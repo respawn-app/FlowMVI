@@ -57,6 +57,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     onException { log(Error, tag ?: name, "Exception:\n $it") }
     onStart { log(Info, tag ?: name, "Started") }
     onSubscribe { log(Info, tag ?: name, "New subscriber #${it + 1}") }
+    onUnsubscribe { log(Info, tag ?: name, "Subscriber #${it + 1} removed") }
     onStop { log(Info, tag ?: name, "Stopped with e=$it") }
 }
 

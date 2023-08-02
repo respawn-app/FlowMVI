@@ -1,6 +1,8 @@
 package pro.respawn.flowmvi.modules
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -15,7 +17,7 @@ internal fun interface Recoverable<S : MVIState, I : MVIIntent, A : MVIAction> :
 
     override val key: CoroutineContext.Key<*> get() = Recoverable
 
-    fun PipelineContext<S, I, A>.recover(e: Exception)
+    suspend fun PipelineContext<S, I, A>.recover(e: Exception)
 
     companion object : CoroutineContext.Key<Recoverable<*, *, *>>
 }
@@ -27,6 +29,19 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.P
     when {
         e !is Exception -> throw e
         ctx[Recoverable] != null -> throw e
-        else -> with(pipeline) { recover(e) }
+        // add Recoverable to the coroutine context
+        // and handle the exception asynchronously to allow suspending inside recover
+        else -> with(pipeline) { launch(this@PipelineExceptionHandler) { recover(e) } }
     }
+}
+
+internal suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.catch(
+    ctx: PipelineContext<S, I, A>,
+    block: () -> Unit
+) = try {
+    block()
+} catch (e: CancellationException) {
+    throw e
+} catch (expected: Exception) {
+    with(ctx) { recover(expected) }
 }

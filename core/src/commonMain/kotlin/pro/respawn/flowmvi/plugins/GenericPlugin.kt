@@ -20,7 +20,8 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
     private var action: suspend (MVIAction) -> Unit = {}
     private var exception: suspend (e: Exception) -> Unit = {}
     private var start: suspend () -> Unit = {}
-    private var subscribe: suspend (subscriptionCount: Int) -> Unit = {}
+    private var subscribe: (subscriptionCount: Int) -> Unit = {}
+    private var unsubscribe: (subscriptionCount: Int) -> Unit = {}
     private var stop: (e: Exception?) -> Unit = {}
 
     /**
@@ -81,8 +82,16 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
      * Same as [StorePlugin.onSubscribe], but for generic plugins
      */
     @FlowMVIDSL
-    public fun onSubscribe(block: suspend (subscriptionCount: Int) -> Unit) {
+    public fun onSubscribe(block: (subscriptionCount: Int) -> Unit) {
         subscribe = block
+    }
+
+    /**
+     * Same as [StorePlugin.onUnsubscribe]
+     */
+    @FlowMVIDSL
+    public fun onUnsubscribe(block: (subscriptionCount: Int) -> Unit) {
+        unsubscribe = block
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -105,7 +114,8 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
             exception(it)
             it
         }
-        onSubscribe { subscribe(it) }
+        onSubscribe { _, it -> subscribe(it) }
+        onUnsubscribe { unsubscribe(it) }
         onStart { start() }
         onStop { stop(it) }
         // we can safely cast as this plugin can't affect the store in any way

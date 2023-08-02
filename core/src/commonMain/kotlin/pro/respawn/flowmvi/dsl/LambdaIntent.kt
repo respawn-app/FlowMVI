@@ -10,11 +10,13 @@ import pro.respawn.flowmvi.plugins.reduce
 import kotlin.jvm.JvmInline
 
 /**
- * An intent that is a holder for a [block] that acts as this intent's action.
+ * An intent that is a holder for a [block] that acts as this intent's logic.
  * LambdaIntents enable MVVM+ -style declaration of your [pro.respawn.flowmvi.api.Store].
- * Use [reduceLambdas] to handle lambda intents in your store.
- * Use [send] to send lambda intents and define a block for them to be processed.
- * **When using lambda intents, some plugins wil not work correctly, and some will become useless,
+ *
+ * * Use [reduceLambdas] to handle lambda intents in your store.
+ * * Use [send] to send lambda intents and define a block for them to be processed.
+ *
+ * **When using lambda intents, some plugins will become useless (as they'll no longer know what's inside the lambda),
  * e.g. logging of lambda intents**
  */
 @JvmInline
@@ -35,6 +37,13 @@ public value class LambdaIntent<S : MVIState, A : MVIAction>(
 public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.send(
     @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ): Unit = intent(LambdaIntent(block))
+
+/**
+ * An alias for [pro.respawn.flowmvi.api.IntentReceiver.intent] ([LambdaIntent] ([block]))
+ */
+public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.intent(
+    @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
+): Unit = send(block)
 
 /**
  * Install a new [pro.respawn.flowmvi.plugins.reducePlugin] that is tailored for [LambdaIntent]s.

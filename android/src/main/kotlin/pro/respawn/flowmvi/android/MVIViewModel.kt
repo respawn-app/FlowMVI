@@ -24,7 +24,6 @@ import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
-import pro.respawn.flowmvi.lazyStore
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.updateState
@@ -70,7 +69,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Delegates to [MVIStore]'s recover block.
      */
 
-    protected open suspend fun recover(e: Exception): S = throw e
+    protected open fun recover(e: Exception): S = throw e
 
     @DelicateStoreApi
     override fun useState(block: S.() -> S): Unit = store.useState(block)
@@ -78,10 +77,11 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
+    @OptIn(DelicateStoreApi::class)
     @Suppress("UNCHECKED_CAST", "DEPRECATION")
     protected open val store: MutableStore<S, I, A> by lazyStore<S, I, A>(initial, viewModelScope) {
         recover {
-            updateState { recover(it) }
+            useState { recover(it) }
             null
         }
         reduce { reduce(it) }

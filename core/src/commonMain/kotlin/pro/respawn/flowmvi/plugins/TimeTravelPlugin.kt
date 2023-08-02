@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -74,7 +75,7 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
     /**
      * Number of times the store was launched. Never decreases.
      */
-    public var launches: Int by atomic(0)
+    public var starts: Int by atomic(0)
         internal set
 
     /**
@@ -82,6 +83,12 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
      */
     public var stops: Int by atomic(0)
         internal set
+
+    /**
+     * Number of times the store has been unsubscribed from. Never decreases.
+     */
+    public var unsubscriptions: Int by atomic(0)
+        private set
 
     /**
      * Reset all values of this plugin and start from scratch.
@@ -92,7 +99,8 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
         _actions.clear()
         _exceptions.clear()
         subscriptions = 0
-        launches = 0
+        unsubscriptions = 0
+        starts = 0
         stops = 0
     }
 
@@ -105,11 +113,15 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception = e.also { _exceptions.add(it) }
 
     override suspend fun PipelineContext<S, I, A>.onStart() {
-        launches += 1
+        starts += 1
     }
 
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
+    override fun PipelineContext<S, I, A>.onSubscribe(subscriberScope: CoroutineScope, subscriberCount: Int) {
         subscriptions += 1
+    }
+
+    override fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
+        unsubscriptions += 1
     }
 
     override fun onStop(e: Exception?) {
