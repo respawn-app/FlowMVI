@@ -44,12 +44,5 @@ class StoreContextTest : FreeSpec({
                 coroutineContext[PipelineContext].shouldBeNull()
             }
         }
-        "then flows collected with consume() have the context" {
-            store.subscribeAndTest {
-                intent {
-
-                }
-            }
-        }
     }
 })

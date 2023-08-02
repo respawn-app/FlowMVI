@@ -76,6 +76,6 @@ class StoreEventsTest : FreeSpec({
             }
         }
     }
-    "Given lambda test store" {
+    "Given store that does not handle events" {
     }
 })

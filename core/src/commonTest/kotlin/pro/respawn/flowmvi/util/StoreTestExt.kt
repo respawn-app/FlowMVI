@@ -11,7 +11,6 @@ import io.kotest.core.spec.style.scopes.FreeSpecTerminalScope
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.testCoroutineScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull

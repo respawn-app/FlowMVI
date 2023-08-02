@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.plugins.CompositePlugin
+import pro.respawn.flowmvi.api.StorePlugin
 
 @FlowMVIDSL
 internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIAction>(
@@ -14,7 +14,7 @@ internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIActio
     val name: String?,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
-    val plugin: CompositePlugin<S, I, A>,
+    val plugins: Set<StorePlugin<S, I, A>>,
     val intentCapacity: Int,
     val onOverflow: BufferOverflow,
     val debuggable: Boolean,

@@ -15,15 +15,15 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
 import kotlin.coroutines.CoroutineContext
 
-internal interface PipelineSubscriber<S : MVIState, I : MVIIntent, A : MVIAction> :
+// TODO: I don't like the api of this
+//   there should be a way to provide pipeline context without creating a separate interface
+internal interface PipelineModule<S : MVIState, I : MVIIntent, A : MVIAction> :
     Recoverable<S, I, A>,
     StateReceiver<S>,
     IntentReceiver<I> {
 
     suspend fun PipelineContext<S, I, A>.onAction(action: A)
     suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S)
-    fun PipelineContext<S, I, A>.onStart()
-    fun onStop(e: Exception?)
 }
 
 /**
@@ -37,9 +37,11 @@ internal interface PipelineSubscriber<S : MVIState, I : MVIIntent, A : MVIAction
  * * using this pipeline instance as the context element
  */
 @Suppress("Indentation")
-internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineSubscriber<S, I, A>.launchPipeline(
+internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<S, I, A>.launchPipeline(
     name: String?,
     parent: CoroutineScope,
+    crossinline onStop: (e: Exception?) -> Unit,
+    onStart: PipelineContext<S, I, A>.() -> Unit,
 ): Job = object :
     PipelineContext<S, I, A>,
     IntentReceiver<I> by this,

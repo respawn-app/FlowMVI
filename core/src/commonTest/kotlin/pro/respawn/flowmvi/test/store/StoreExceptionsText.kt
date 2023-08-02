@@ -5,19 +5,25 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeSingleton
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.modules.Recoverable
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
+import pro.respawn.flowmvi.util.subscribeAndTest
 import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
+import kotlin.coroutines.coroutineContext
 
 class StoreExceptionsText : FreeSpec({
     asUnconfined()
@@ -96,6 +102,8 @@ class StoreExceptionsText : FreeSpec({
                                 println("job 3 started")
                                 throw e
                             }
+                        }.invokeOnCompletion {
+                            it.takeUnless { it is CancellationException }.shouldNotBeNull()
                         }
                     }
                 }
@@ -104,7 +112,7 @@ class StoreExceptionsText : FreeSpec({
                 plugin.intents.shouldBeSingleton()
             }
         }
-        "and an unhandled exception is thrown" - {
+        "and store that does not handle exceptions" - {
             val store = testStore(plugin) {
                 init {
                     launch {
@@ -121,7 +129,20 @@ class StoreExceptionsText : FreeSpec({
                     }
                 }
             }
-            "then store is closed exceptionally" {
+        }
+        "and store that handles exceptions" - {
+            val store = testStore(plugin) {
+                recover {
+                    currentCoroutineContext()[Recoverable].shouldNotBeNull()
+                    null
+                }
+            }
+            "then recover contains Recoverable" {
+                store.subscribeAndTest {
+                    send {
+                        throw e
+                    }
+                }
             }
         }
     }

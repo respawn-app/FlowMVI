@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.api.MVIAction
-import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.LambdaIntent
 

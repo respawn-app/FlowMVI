@@ -3,14 +3,15 @@ package pro.respawn.flowmvi.test.store
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldBeSingleton
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withTimeout
 import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
@@ -66,10 +67,16 @@ class StoreLaunchTest : FreeSpec({
                 }
             }
         }
-        "then if not launched cannot be subscribed to" {
-            shouldThrowExactly<IllegalStateException> {
+        "then if not launched subscribers wait for the pipeline" {
+            shouldThrowExactly<TimeoutCancellationException> {
                 coroutineScope {
-                    with(store) { subscribe { } }
+                    withTimeout(500) {
+                        with(store) {
+                            subscribe {
+                                throw AssertionError("Should not be invoked")
+                            }
+                        }
+                    }
                 }
             }
         }

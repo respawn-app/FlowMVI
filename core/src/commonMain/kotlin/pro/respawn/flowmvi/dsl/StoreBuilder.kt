@@ -12,7 +12,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.plugins.CompositePlugin
 import pro.respawn.flowmvi.store.StoreImpl
 import kotlin.jvm.JvmName
 
@@ -125,7 +124,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         intentCapacity = intentCapacity,
         onOverflow = onOverflow,
         debuggable = debuggable,
-        plugin = CompositePlugin(plugins = plugins.toSet()),
+        plugins = plugins,
     ).let(::StoreImpl)
 }
 
