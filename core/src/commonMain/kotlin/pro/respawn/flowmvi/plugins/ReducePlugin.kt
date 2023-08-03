@@ -45,5 +45,8 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
     crossinline reduce: Reduce<S, I, A>,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    onIntent { it.also { reduce(it) } }
+    onIntent {
+        reduce(it)
+        null
+    }
 }

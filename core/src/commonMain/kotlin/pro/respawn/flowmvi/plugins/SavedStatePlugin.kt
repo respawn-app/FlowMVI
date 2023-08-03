@@ -22,7 +22,7 @@ public const val DefaultSavedStatePluginName: String = "SavedState"
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
     name: String = DefaultSavedStatePluginName,
-    crossinline get: () -> S?,
+    crossinline get: S.() -> S?,
     crossinline set: (S) -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
@@ -43,6 +43,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     name: String = DefaultSavedStatePluginName,
-    crossinline get: () -> S?,
+    crossinline get: S.() -> S?,
     crossinline set: S.() -> Unit,
 ): Unit = install(savedStatePlugin(name, get, set))
