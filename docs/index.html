@@ -17,11 +17,43 @@
        --code-inline-color: var(--theme-color);
        --theme-color: #00d46a;
      }
+     /* custom theme overrides for versioned plugin*/
+    .app-name {
+        display: block;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    .version-selector {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px auto 10px auto;
+  }
+  /* Version selector label */
+  .version-selector-label {
+    margin-right: 10px;
+  }
+  /* Version selector dropdown */
+  .version-selector select {
+    font-size: 14px;
+    padding: 4px 8px;
+    color: var(--theme-color);
+    background-color: var(--background-color);
+    border: 1px solid var(--theme-color);
+    cursor: pointer;
+    border-radius: 2px;
+    max-width: 200px;
+    width: 100%;
+  }
+  .version-selector select:focus {
+    outline: none;
+    border-color: var(--selection-color);
+  }
     </style>
 </head>
 <body>
 <div id="app"></div>
-<script language="javascript">
+<script>
 window.$docsify = {
   name: 'FlowMVI',
   repo: 'https://github.com/respawn-app/flowMVI',
@@ -34,6 +66,11 @@ window.$docsify = {
   nativeEmoji: true,
   themeColor: '#00d46a',
   search: 'auto',
+  versions: [
+    { folder: 'v2', label: 'v2.x', default: true },
+    { folder: 'v1', label: 'v1.x', default: false },
+  ],
+  versionSelectorLabel: 'Version',
   share: {
     reddit: true,
     linkedin: true,
@@ -52,6 +89,35 @@ window.$docsify = {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+</script>
+<script>
+  if (typeof navigator.serviceWorker !== 'undefined') {
+    navigator.serviceWorker.register('sw.js')
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
@@ -62,6 +128,7 @@ window.$docsify = {
 <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-kotlin.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docsify-versioned-plugin@0.0.1/index.js"></script>
 <script src="//unpkg.com/docsify-share/build/index.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
 </body>

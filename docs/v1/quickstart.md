@@ -2,8 +2,6 @@ Here's how the library works at a glance:
 
 ![](images/FlowMVI.jpg)
 
-## **These are docs for FlowMVI 1.0, the latest stable release. FlowMVI 2.0 docs are coming soon.**
-
 ## Step 1: Add Dependencies
 
 To start with the library, first declare the dependencies.
