@@ -1,6 +1,6 @@
 Here's how the library works at a glance:
 
-![](images/FlowMVI.jpg)
+[//]: # (![]&#40;images/FlowMVI.jpg&#41;)
 
 ## Step 1: Add Dependencies
 

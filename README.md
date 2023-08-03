@@ -67,7 +67,7 @@ class CounterContainer(
     val store by store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
         name = "CounterStore"
         parallelIntents = true
-        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute or consume
+        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute or consume side effects
         intentCapacity = 64
 
         install(consoleLoggingPlugin()) // log to console, logcat, or NSLog

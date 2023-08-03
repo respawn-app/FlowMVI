@@ -1,7 +1,6 @@
 * [Home](/)
 * [Quickstart](quickstart.md)
 * [Plugins](plugins.md)
-* [Android](android.md)
 * [Usage | FAQ](faq.md)
 * [Roadmap](roadmap.md)
 * [Contributing](CONTRIBUTING.md)

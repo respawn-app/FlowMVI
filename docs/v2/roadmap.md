@@ -1,5 +1,6 @@
 ## Roadmap for v2.x:
 
+- [ ] Docs for DI
 - [ ] Add tests for plugins
 - [ ] LoC and HoC reporting
 - [ ] Undo/Redo plugin
