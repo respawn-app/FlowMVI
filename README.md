@@ -10,6 +10,8 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
+### This is a readme for FlowMVI 2.0, which is in alpha right now. Please go to the [V1 Docs](https://opensource.respawn.pro/FlowMVI/v1/#/) if you need to see the older version
+
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
 1. Being simple to understand and use while staying powerful and flexible.
@@ -18,7 +20,7 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 
 ## Quickstart:
 
-* Documentation: [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI/)
+* Documentation: [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI)
 * KDocs: [https://opensource.respawn.pro/FlowMVI/javadocs/](https://opensource.respawn.pro/FlowMVI/javadocs/)
 * Latest
   version: ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
