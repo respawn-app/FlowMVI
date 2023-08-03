@@ -4,8 +4,6 @@ Here's how the library works at a glance:
 
 ## Step 1: Add Dependencies
 
-To start with the library, first declare the dependencies.
-
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
 ```toml
@@ -41,10 +39,10 @@ internal sealed interface ScreenState : MVIState {
 }
 
 internal sealed interface ScreenIntent : MVIIntent {
-    data object ClickedCounter : ScreenIntent
+    data object ClickedNext : ScreenIntent
 
     @JvmInline
-    value class ChangedValue(val value: Int) : ScreenIntent
+    value class ChangedCounter(val value: Int) : ScreenIntent
 
     data class GrantedPermission(val granted: Boolean, val permission: String) : ScreenIntent
 }

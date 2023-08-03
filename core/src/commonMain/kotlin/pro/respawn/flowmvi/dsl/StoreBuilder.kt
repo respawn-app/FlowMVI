@@ -105,8 +105,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     }
 
     /**
-     * Install a new [StorePlugin]. See the other overload to build the plugin on the fly.
-     * This installs a prebuilt plugin.
+     * Create and install a new [StorePlugin].
      * Plugins will **preserve** the order of installation and will proceed according to this order.
      * See [StorePlugin] for comprehensive information on the behavior of plugins.
      */
