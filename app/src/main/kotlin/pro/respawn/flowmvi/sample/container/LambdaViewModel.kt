@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.sample.provider
+package pro.respawn.flowmvi.sample.container
 
 import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.android.StoreViewModel

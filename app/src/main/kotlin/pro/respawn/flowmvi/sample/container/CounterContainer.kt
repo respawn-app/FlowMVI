@@ -1,10 +1,11 @@
-package pro.respawn.flowmvi.sample.provider
+package pro.respawn.flowmvi.sample.container
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
@@ -12,8 +13,8 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.provider.CounterState.Loading
+import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.container.CounterState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
 import kotlin.random.Random
 
@@ -21,9 +22,9 @@ private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterActi
 
 class CounterContainer(
     private val repo: CounterRepo,
-) {
+) : Container<CounterState, CounterIntent, CounterAction> {
 
-    val store = store<CounterState, CounterIntent, CounterAction>(Loading) {
+    override val store = store<CounterState, CounterIntent, CounterAction>(Loading) {
         name = "Counter"
         install(androidLoggingPlugin())
         whileSubscribed {

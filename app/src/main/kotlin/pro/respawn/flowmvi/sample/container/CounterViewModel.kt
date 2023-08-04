@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.sample.provider
+package pro.respawn.flowmvi.sample.container
 
 import pro.respawn.flowmvi.android.StoreViewModel
 import pro.respawn.flowmvi.sample.repo.CounterRepo

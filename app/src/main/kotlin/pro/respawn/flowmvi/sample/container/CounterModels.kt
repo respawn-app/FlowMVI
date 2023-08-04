@@ -1,10 +1,11 @@
-package pro.respawn.flowmvi.sample.provider
+package pro.respawn.flowmvi.sample.container
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.dsl.LambdaIntent
 
 sealed interface CounterState : MVIState, Parcelable {
     @Parcelize
@@ -20,6 +21,8 @@ sealed interface CounterState : MVIState, Parcelable {
         val param: String,
     ) : CounterState
 }
+
+typealias CounterLambdaIntent = LambdaIntent<CounterState, CounterAction>
 
 sealed interface CounterIntent : MVIIntent {
     data object ClickedCounter : CounterIntent

@@ -12,11 +12,11 @@ import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
-import pro.respawn.flowmvi.sample.provider.CounterAction
-import pro.respawn.flowmvi.sample.provider.CounterAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.provider.CounterState
-import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.provider.LambdaViewModel
+import pro.respawn.flowmvi.sample.container.CounterAction
+import pro.respawn.flowmvi.sample.container.CounterAction.ShowSnackbar
+import pro.respawn.flowmvi.sample.container.CounterState
+import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.container.LambdaViewModel
 
 // Or use lambdas when calling subscribe()
 class CounterActivity :

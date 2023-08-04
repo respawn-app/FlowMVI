@@ -27,13 +27,13 @@ import pro.respawn.flowmvi.android.compose.MVIComposable
 import pro.respawn.flowmvi.android.compose.StateProvider
 import pro.respawn.flowmvi.android.compose.consume
 import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.provider.CounterAction
-import pro.respawn.flowmvi.sample.provider.CounterAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.provider.CounterIntent
-import pro.respawn.flowmvi.sample.provider.CounterIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.provider.CounterState
-import pro.respawn.flowmvi.sample.provider.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.provider.CounterViewModel
+import pro.respawn.flowmvi.sample.container.CounterAction
+import pro.respawn.flowmvi.sample.container.CounterAction.ShowSnackbar
+import pro.respawn.flowmvi.sample.container.CounterIntent
+import pro.respawn.flowmvi.sample.container.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.container.CounterState
+import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.container.CounterViewModel
 import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
 
 private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
