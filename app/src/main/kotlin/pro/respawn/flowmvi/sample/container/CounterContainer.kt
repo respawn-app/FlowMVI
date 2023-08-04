@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
@@ -22,9 +21,10 @@ private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterActi
 
 class CounterContainer(
     private val repo: CounterRepo,
+    private val param: String,
 ) : Container<CounterState, CounterIntent, CounterAction> {
 
-    override val store = store<CounterState, CounterIntent, CounterAction>(Loading) {
+    override val store = store(Loading) {
         name = "Counter"
         install(androidLoggingPlugin())
         whileSubscribed {
@@ -46,7 +46,7 @@ class CounterContainer(
         recover {
             launch {
                 if (it is IllegalArgumentException)
-                    send(CounterAction.ShowSnackbar(R.string.error_message))
+                    action(CounterAction.ShowSnackbar(R.string.error_message))
                 else updateState {
                     CounterState.Error(it)
                 }
@@ -58,6 +58,6 @@ class CounterContainer(
     private suspend fun Ctx.produceState(timer: Int) = updateState {
         // remember that you have to merge states when you are running produceState
         val current = this as? DisplayingCounter
-        DisplayingCounter(timer, current?.counter ?: 0, "TODO: Implement params")
+        DisplayingCounter(timer, current?.counter ?: 0, param)
     }
 }

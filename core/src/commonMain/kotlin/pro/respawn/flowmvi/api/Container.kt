@@ -1,21 +1,14 @@
 package pro.respawn.flowmvi.api
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import pro.respawn.flowmvi.dsl.BuildStore
 
 /**
  * A simple class that delegates to the [store] property.
  */
-public interface Container<out S : MVIState, in I : MVIIntent, out A : MVIAction> : Store<S, I, A> {
+public interface Container<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     public val store: Store<S, I, A>
 
-    override fun close(): Unit = store.close()
-    override fun send(intent: I): Unit = store.send(intent)
-    override val initial: S get() = store.initial
-    override fun start(scope: CoroutineScope): Job = store.start(scope)
-    override suspend fun emit(intent: I): Unit = store.emit(intent)
-    override fun CoroutineScope.subscribe(
-        block: suspend Provider<S, I, A>.() -> Unit
-    ): Job = with(store) { subscribe(block) }
+    public fun store(initial: S, build: BuildStore<S, I, A>): Store<S, I, A> =
+        pro.respawn.flowmvi.dsl.store(initial, build)
 }

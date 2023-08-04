@@ -5,10 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.android.plugins.parcelizeState
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.reduceLambdas
-import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.container.CounterState.Loading
 import pro.respawn.flowmvi.sample.repo.CounterRepo
@@ -18,9 +18,9 @@ private typealias Context = PipelineContext<CounterState, LambdaIntent<CounterSt
 class LambdaCounterContainer(
     private val savedStateHandle: SavedStateHandle,
     private val repo: CounterRepo,
-) {
+) : Container<CounterState, CounterLambdaIntent, CounterAction> {
 
-    val store = store<CounterState, CounterLambdaIntent, CounterAction>(Loading) {
+    override val store = store(Loading) {
         name = "Counter"
         install(androidLoggingPlugin())
         reduceLambdas()

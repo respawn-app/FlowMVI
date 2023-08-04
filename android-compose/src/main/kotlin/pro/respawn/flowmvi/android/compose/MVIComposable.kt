@@ -30,11 +30,10 @@ import pro.respawn.flowmvi.api.Store
  * @param content the actual screen content. Will be recomposed each time a new state is received.
  */
 @Composable
-@BuilderInference
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
+    @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
 ) {
     val scope = rememberConsumerScope(store, lifecycleState)
     val state by scope.state

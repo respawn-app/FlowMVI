@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
@@ -29,18 +29,21 @@ import pro.respawn.flowmvi.android.compose.consume
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.container.CounterAction
 import pro.respawn.flowmvi.sample.container.CounterAction.ShowSnackbar
+import pro.respawn.flowmvi.sample.container.CounterContainer
 import pro.respawn.flowmvi.sample.container.CounterIntent
 import pro.respawn.flowmvi.sample.container.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.container.CounterState
 import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.container.CounterViewModel
+import pro.respawn.flowmvi.sample.di.storeViewModel
 import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
 
 private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen() = MVIComposable(getViewModel<CounterViewModel>()) { state -> // this -> ConsumerScope
+fun ComposeScreen() = MVIComposable(
+    storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
+) { state: CounterState -> // this -> ConsumerScope
 
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
@@ -84,6 +87,8 @@ private fun Scope.ComposeScreenContent(
                 Text(
                     text = stringResource(id = R.string.counter_template, state.counter),
                 )
+
+                Text(text = state.param)
 
                 Button(onClick = { send(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))

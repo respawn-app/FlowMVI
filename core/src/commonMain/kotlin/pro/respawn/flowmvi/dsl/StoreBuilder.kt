@@ -152,10 +152,16 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
  */
 @FlowMVIDSL
 @JvmName("noActionStore")
+// https://youtrack.jetbrains.com/issue/KT-16255
+@Suppress(
+    "INVISIBLE_MEMBER",
+    "INVISIBLE_REFERENCE",
+)
+@kotlin.internal.LowPriorityInOverloadResolution
 public inline fun <S : MVIState, I : MVIIntent> store(
     initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, Nothing>,
-): Store<S, I, Nothing> = store<_, _, _>(initial) {
+): Store<S, I, Nothing> = store(initial) {
     configure()
     actionShareBehavior = ActionShareBehavior.Disabled
 }
