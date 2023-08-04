@@ -11,13 +11,7 @@ import kotlinx.coroutines.Job
  * Store is an [IntentReceiver] and can be [close]d to stop it.
  */
 @OptIn(ExperimentalStdlibApi::class)
-public interface Store<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I>, AutoCloseable {
-
-    /**
-     *  The name of the store. Used for debugging purposes and when storing multiple stores in a collection.
-     *  Optional and configured through a [pro.respawn.flowmvi.dsl.StoreBuilder]
-     */
-    public val name: String?
+public interface Store<out S : MVIState, in I : MVIIntent, out A : MVIAction> : IntentReceiver<I>, AutoCloseable {
 
     /**
      * An initial [MVIState] this [Store] starts with. This is the value used when the store is created only and will

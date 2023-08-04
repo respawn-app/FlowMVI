@@ -130,7 +130,9 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 
 /**
  * Build a new [Store] using [StoreBuilder].
- * The store is not launched and created eagerly, with all its plugins.
+ * The store is created eagerly, with all its plugins.
+ * However, the store is not launched upon creation until called "launch", which means,
+ * no heavy operations will be performed at creation time.
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
@@ -143,7 +145,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
 
 /**
  * * Build a new [Store] using [StoreBuilder] but disallow using [MVIAction]s.
- * The store is **not** launched and created eagerly, with all its plugins.
+ * The store is **not** launched, but is created eagerly, with all its plugins.
  *
  * If your code doesn't compile, you are looking for another overload with three type parameters, i.e:
  * `store<_, _, _>()`

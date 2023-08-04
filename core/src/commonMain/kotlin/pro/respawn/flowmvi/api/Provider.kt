@@ -8,7 +8,7 @@ package pro.respawn.flowmvi.api
  * * [IntentReceiver]
  * * [ActionProvider]
  */
-public interface Provider<out S : MVIState, in I : MVIIntent, A : MVIAction> :
+public interface Provider<out S : MVIState, in I : MVIIntent, out A : MVIAction> :
     StateProvider<S>,
     IntentReceiver<I>,
     ActionProvider<A>
