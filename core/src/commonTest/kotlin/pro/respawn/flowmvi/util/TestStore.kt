@@ -18,12 +18,12 @@ internal fun testStore(
     initial: TestState = TestState.Some,
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     configure: BuildStore<TestState, LambdaIntent<TestState, TestAction>, TestAction> = {},
-) = store<_, _, _>(initial) {
+) = store(initial) {
     debuggable = false
     name = "TestStore"
     actionShareBehavior = behavior
     install(timeTravel)
-    reduceLambdas()
     install(consoleLoggingPlugin(name))
     configure()
+    reduceLambdas()
 }

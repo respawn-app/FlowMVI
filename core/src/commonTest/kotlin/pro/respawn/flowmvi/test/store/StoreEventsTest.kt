@@ -55,14 +55,14 @@ class StoreEventsTest : FreeSpec({
             val e = IllegalArgumentException()
             val newState = TestState.SomeData(1)
             val store = testStore(plugin) {
-                reduce("reduceThrowing") {
-                    throw e
-                }
                 recover {
                     launch {
                         updateState { newState }
                     }
                     null
+                }
+                reduce("reduceThrowing") {
+                    throw e
                 }
             }
             "then intents result in state change" {
