@@ -48,6 +48,7 @@ Please consult the migration guide or the documentation to learn how to migrate.
 """,
     ReplaceWith("Container<S, I, A>", "pro.respawn.flowmvi.api.Container")
 )
+@Suppress("Deprecation")
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val initial: S,
 ) : ViewModel(), MutableStore<S, I, A>, Container<S, I, A> {

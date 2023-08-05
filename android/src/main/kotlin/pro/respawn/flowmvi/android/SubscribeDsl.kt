@@ -59,6 +59,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
  */
 
 @FlowMVIDSL
+@Deprecated(
+    "Use the new MVIView interface version of the function",
+    ReplaceWith("subscribe(lifecycleState)", "pro.respawn.flowmvi.android.view.MVIView")
+)
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(provider, lifecycleState)
