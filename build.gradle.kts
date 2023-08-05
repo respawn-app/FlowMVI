@@ -43,14 +43,14 @@ subprojects {
     }
 
     tasks {
-        // TODO: https://github.com/Kotlin/dokka/issues/2977
-        val taskClass =
-            "org.jetbrains.kotlin.gradle.targets.native.internal.CInteropMetadataDependencyTransformationTask"
-        withType(Class.forName(taskClass) as Class<Task>) {
-            onlyIf {
-                val executed = gradle.taskGraph.allTasks.none { it is AbstractDokkaTask }
-                if (!executed) println("w: Disabling CInteropCommonization")
-                executed
+        withType<AbstractDokkaTask> {
+            val className =
+                "org.jetbrains.kotlin.gradle.targets.native.internal.CInteropMetadataDependencyTransformationTask"
+
+            @Suppress("UNCHECKED_CAST")
+            val taskClass = Class.forName(className) as Class<Task>
+            parent?.subprojects?.forEach {
+                dependsOn(it.tasks.withType(taskClass))
             }
         }
 
@@ -104,7 +104,6 @@ tasks {
         moduleName.set(rootProject.name)
         outputDirectory.set(buildDir.resolve("dokka"))
     }
-    // needed to generate compose compiler reports. See /scripts
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         buildUponDefaultConfig = true
         parallel = true
