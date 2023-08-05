@@ -1,4 +1,4 @@
-## Learn how to use FlowMVI with Android.
+# Learn how to use FlowMVI with Android
 
 There are multiple options on how to organize your code when working with Android.
 The choice depends on your project's specific needs and each option has certain tradeoffs.
@@ -25,10 +25,13 @@ internal class CounterViewModel(
         initial = Loading,
         scope = viewModelScope,
     ) {
+        // perks of direct approach
         debuggable = BuildConfig.DEBUG
         install(androidLoggingPlugin())
-        parcelizeState(handle) // only supported when not using delegation approach
+        parcelizeState(handle)
+
         /* ... everything else ... */
+        reduceLambdas() // <-- don't forget that lambdas must still be reduced
     }
 
     fun onClickCounter() = store.send {
@@ -40,19 +43,16 @@ internal class CounterViewModel(
 }
 ```
 
-The upside of this approach is that it's easy to implement and has some platform-specific features like `savedState`.
+?> The upside of this approach is that it's easy to implement and has it's easier to use some platform-specific features
+like `savedState` (you can still use them for KMP though)
 The downside is that you completely lose KMP compatibility. If you have plans to make your viewmodels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
-This is the preferred approach, however, when migrating from FlowMVI 1.x as it's easier to handle.
+This one can be the preferred approach, however, when migrating from FlowMVI 1.x as it's easier to handle.
 
 ### Delegated ViewModels
 
-This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
-to subclass ViewModels.
-The biggest downside of this approach is that you'll have to use qualifiers with your DI framework to distinguish
-between different viewmodels.
+A slightly more advanced approach would be to avoid subclassing ViewModels altogether.
 
-This example is also demonstrated in the sample app.
 First, wrap your store in a simple class. You don't have to implement `Container` if you don't want to.
 
 ```kotlin
@@ -84,18 +84,27 @@ val appModule = module {
 }
 ```
 
-## UI Frameworks
+!> Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type. Due to type erasure, you
+must inject the VM by specifying a fully-qualified type
+e.g. `StoreViewModel<CounterState, CounterIntent, CounterAction>`, or it will be replaced with `Store<*, *, *>` and the
+DI framework will fail, likely in runtime.
+
+This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
+to subclass ViewModels.
+The biggest downside of this approach is that you'll have to use qualifiers with your DI framework to distinguish
+between different viewmodels. This example is also demonstrated in the sample app.
+
+## UI Layer
 
 It doesn't matter which UI framework you use. Neither your Contract or your ViewModel will change in any way.
 
 ### Compose
 
-> [!WARNING]
-> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
-> It is highly discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
-> also degrade performance. The Compose DSL of the library does not support MVVM+ because of this.
+!> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
+It is highly discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
+also degrade performance. The Compose DSL of the library does not support MVVM+ because of this.
 
-Don't forget to annotate your state with `@Immutable`. This will improve performance significantly.
+Don't forget to annotate your state with `@Immutable` if you can. This will improve performance significantly.
 
 ```kotlin
 @Immutable
@@ -103,6 +112,8 @@ sealed interface ScreenState {
     /* ... */
 }
 ```
+
+Now you can define your composable:
 
 ```kotlin
 private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
@@ -138,13 +149,14 @@ private fun Scope.CounterScreenContent(
 }
 ```
 
-Compose plays wonderfully with FlowMVI because state changes will trigger recompositions. Just mutate your state,
-and the UI will update to reflect changes.
-
 Under the hood, the `MVIComposable` function will efficiently subscribe to the store (it is lifecycle-aware) and
 use the composition scope to process your events. Event processing will stop in `onPause()` of the parent activity.
 In `onResume()`, the composable will resubscribe. MVIComposable will recompose when state changes, but not
 resubscribe to events. The lifecycle state is customizable.
+
+?> Compose plays well with MVI style because state changes will trigger recompositions. Just mutate your state,
+and the UI will update to reflect changes. Also, the `ConsumerScope` is `@Stable`, so you can safely send intents from
+anywhere without awkward method references and unstable lambdas.
 
 * Use the `consume` block to subscribe to `MVIActions`. Those will be processed as they arrive and the `consume` lambda
   will **suspend** until an action is processed. Use a receiver coroutine scope to
@@ -157,7 +169,8 @@ resubscribe to events. The lifecycle state is customizable.
 
 If you have defined your `*Content` function, you will get a composable that can be easily used in previews.
 That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
-But there's a catch: It has a ConsumerScope<I, A> as a receiver. To deal with this, there is an `EmptyScope` composable.
+But there's a catch: It has a `ConsumerScope<I, A>` as a receiver. To deal with this, there is an `EmptyScope`
+composable.
 EmptyScope introduces a scope that does not collect actions and does nothing when an intent is sent, which is
 exactly what we want for previews. We can now define our `PreviewParameterProvider` and the Preview composable.
 
@@ -171,7 +184,7 @@ private class PreviewProvider : StateProvider<CounterState>(
 @Preview
 private fun CounterScreenPreview(
     @PreviewParameter(PreviewProvider::class) state: CounterState,
-) = EmptyScope { // scope that does nothing 
+) = EmptyScope {
     ComposeScreenContent(state)
 }
 ```
@@ -211,12 +224,12 @@ internal class CounterFragment : Fragment(), MVIView<CounterState, CounterIntent
 }
 ```
 
-1. Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle lifecycle for you.
-2. Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
-3. Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
-   view-based Android API.
-4. You are not required to extend `MVIView` - you can use `subscribe` anyway, just provide
-   the `ViewLifecycleOwner.lifecycleScope` or `Activity.lifecycleScope` as a scope.
+* Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle lifecycle for you.
+* Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
+* Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
+  view-based Android API.
+* You are not required to extend `MVIView` - you can use `subscribe` anyway, just provide
+  the `ViewLifecycleOwner.lifecycleScope` or `Activity.lifecycleScope` as a scope.
 
 See [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicActivity.kt)
 for a more elaborate example.

@@ -1,6 +1,8 @@
+# Get Started with FlowMVI
+
 Here's how the library works at a glance:
 
-[//]: # (![]&#40;images/FlowMVI.jpg&#41;)
+![](images/FlowMVI.jpg)
 
 ## Step 1: Add Dependencies
 
@@ -21,22 +23,21 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref 
 
 FlowMVI supports both MVI (strict model-driven logic) and the MVVM+ (functional, lambda-driven logic) styles.
 It's preferable to choose one style and use it throughout your project.
-
+Each style has its own pros and cons, so choosing can be hard.
 So please consider the following comparison:
 
-### MVI-style:
+### MVI style:
 
-| Upsides 👍                                                                                         | Downsides 👎                                                                                                                      |
-|----------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| Greater separation of concerns as intent handling logic is strictly contained in the store's scope | Boilerplatish: some intents will need to be duplicated for multiple screens, resulting in some amount of copy-paste               |
-| Verbose and readable - easily understand which intent does what judging by the contract            | Hard to navigate in the IDE. You have to jump twice: first to the declaration, and then to usage, to see what a given intent does |
-| Intents can be decomposed into sealed families, subclassed, and have properties or functions       | More and possibly bigger object allocation due to each intent creating a class instance + all params                              |
-| Intent handling can be delegated away to other stores or classes                                   | Class explosion - class for every event may result in 50+ model classes per screen easily                                         |
-| Intents can be resent inside the store - by sending an intent while handling another intent        | Sealed classes work worse for some platforms than functions, for example in Swift, Enums are not used and names are mangled       |
+| Pros 👍                                                                                              | Cons 👎                                                                                                                         |
+|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| Greater separation of concerns as intent handling logic is strictly contained in the store's scope   | Boilerplatish: some intents will need to be duplicated for multiple screens, resulting in some amount of copy-paste             |
+| Verbose and readable - easily understand which intent does what judging by the contract              | Hard to navigate in the IDE. You have to jump twice: first to the declaration, and then to usage, to see the code of the intent |
+| Intents can be decomposed into sealed families, subclassed,  delegated, have properties or functions | Class explosion - class for every event may result in 50+ model classes per screen easily                                       |
+| Intents can be resent inside the store - by sending an intent while handling another intent          | Sealed classes work worse for some platforms, for example, in Swift, Enums are not used and names are mangled                   |
 
-### MVVM+ -style:
+### MVVM+ style:
 
-| Upsides 👍                                                                                              | Downsides 👎                                                                      |
+| Pros 👍                                                                                                 | Cons 👎                                                                           |
 |:--------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------|
 | Elegant declaration - open a lambda block and write your logic there. Store's code remains clean        | Store's context is accessible outside of the store, leading to scope creep        |
 | Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose   |
@@ -45,13 +46,11 @@ So please consider the following comparison:
 
 ## Step 3: Describe your Contract
 
-Describing the contract first makes building the logic easier because you have everything you need at the
-start.
-
 <details>
-<summary>**General advice on how to define a contract**</summary>
+<summary>Click for general advice on how to define a contract if you're a newbie</summary>
 
-To define your contract, ask yourself the following:
+Describing the contract first makes building the logic easier because you have everything you need at the
+start. To define your contract, ask yourself the following:
 
 1. What can be shown at what times? Can the page be empty? Can it be loading? - this will define your state family
 2. What elements can be shown on this screen? - this will be your states' properties.
@@ -173,10 +172,9 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
   `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
-> [!ATTENTION]
-> The order of plugins matters! Changing the order of plugins may completely change how your store works.
-> Plugins can replace, veto, consume or otherwise change anything in the store.
-> They can cancel subscriptions, close the store or swallow exceptions!
+!> The order of plugins matters! Changing the order of plugins may completely change how your store works.
+Plugins can replace, veto, consume or otherwise change anything in the store.
+They can cancel subscriptions, close the store or swallow exceptions!
 
 Consider the following:
 
@@ -204,7 +202,7 @@ That example was simple, but this rule can manifest in other, not so obvious way
 ```kotlin
 val broken = store(Loading) {
 
-    parcelizeState() // ⚠️ restores state from the saved state handle 
+    parcelizeState() // ‼️ restores state from the saved state handle 
 
     init {
         updateState {
@@ -218,7 +216,7 @@ val broken = store(Loading) {
 // or
 val broken = store(Loading) {
 
-    install(customUndocumentedPlugin()) // ⚠️ you don't know what this plugin does
+    install(customUndocumentedPlugin()) // ‼️ you don't know what this plugin does
 
     reduce {
         // ❌ intents are not reduced because the plugin consumed them
@@ -235,12 +233,11 @@ So make sure to consider how your plugins affect the store's logic when using an
 
 The discussion above warrants another note.
 
-> [!NOTE]
-> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
-> you handle intents, but it's possible to create a store like this:
-> `val store = store(Loading) { }`
-> This is a store that does **literally nothing**. If you forget to install the reduce plugin, your intents won't be
-> acted upon.
+!> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
+you handle intents, but it's possible to create a store like this:
+`val store = store(Loading) { }`.
+This is a store that does **literally nothing**. If you forget to install the reduce plugin, your intents won't be
+acted upon.
 
 ### Step 6: Create, inject, and provide dependencies
 

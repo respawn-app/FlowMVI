@@ -41,9 +41,8 @@ Name is optional, when it is missing, the plugins will be compared **by referenc
 If you need to have the same plugin installed multiple times, consider giving plugins different names.
 Plugins that have no name can be installed multiple times, assuming they are different instances of a plugin.
 
-> [!WARNING]
-> If you attempt to install the same plugin multiple times, or different plugins
-> with the same name, **an exception will be thrown**.
+?> If you attempt to install the same plugin multiple times, or different plugins
+with the same name, **an exception will be thrown**.
 
 Consider the following examples:
 

@@ -16,9 +16,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.emptyFlow
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -47,9 +44,11 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
     public fun I.send(): Unit = send(this)
 
     /**
-     * A property that is being delegated to when calling [Store.subscribe] in composition
+     * Collect [MVIAction]s that come from the [Store].
+     * Should only be called once per screen.
      */
-    public val actions: Flow<A>
+    @Composable
+    public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit): Unit
 }
 
 @Composable
@@ -71,9 +70,15 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     private val _actions = Channel<A>(Channel.UNLIMITED)
 
     override fun send(intent: I) = store.send(intent)
-    override val actions = _actions.consumeAsFlow()
     override fun hashCode(): Int = store.hashCode()
     override fun equals(other: Any?) = store == other
+
+    @Composable
+    override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
+        LaunchedEffect(Unit) {
+            for (it in _actions) onAction(it)
+        }
+    }
 
     @Composable
     fun collect(lifecycleState: Lifecycle.State = Lifecycle.State.STARTED) {
@@ -90,17 +95,6 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
 }
 
 /**
- * Basically an alias for [ConsumerScope.actions].collect()
- */
-@Composable
-@FlowMVIDSL
-public fun <A : MVIAction> ConsumerScope<*, A>.consume(
-    onAction: suspend CoroutineScope.(action: A) -> Unit,
-): Unit = LaunchedEffect(Unit) {
-    actions.collect { onAction(it) }
-}
-
-/**
  * A no-op scope for testing and preview purposes.
  * [ConsumerScope.send] and [ConsumerScope.consume] do nothing
  */
@@ -112,6 +106,8 @@ public fun <I : MVIIntent, A : MVIAction> EmptyScope(
 ): Unit = call(
     object : ConsumerScope<I, A> {
         override fun send(intent: I) = Unit
-        override val actions: Flow<A> = emptyFlow()
+
+        @Composable
+        override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = Unit
     }
 )
