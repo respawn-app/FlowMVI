@@ -3,7 +3,7 @@ name: publish
 on:
   push:
     tags:
-      - '1.*'
+      - '2.*'
 
 concurrency:
   group: "publish"
