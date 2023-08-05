@@ -35,7 +35,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * The pipeline's context is always the context the store was started with.
  */
 @FlowMVIDSL
-public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIAction> :
+public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
@@ -53,6 +53,11 @@ public interface PipelineContext<S : MVIState, in I : MVIIntent, in A : MVIActio
      */
     public suspend fun <T> Flow<T>.consume(context: CoroutineContext = EmptyCoroutineContext): Unit =
         flowOn(this@PipelineContext + context).collect()
+
+    /**
+     * Catch exceptions in the upstream flow (everything above this call) and call [PipelineContext.recover] on them.
+     */
+    // public suspend fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { recover(it) }
 
     /**
      * A key of the [PipelineContext] in the parent coroutine context.

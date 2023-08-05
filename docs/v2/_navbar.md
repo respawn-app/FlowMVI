@@ -5,4 +5,5 @@
 * [FAQ](faq.md)
 * [Roadmap](roadmap.md)
 * [Contributing](CONTRIBUTING.md)
+* [Migrating from v1.x](migration.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)

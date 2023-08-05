@@ -11,10 +11,10 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.DelicateStoreApi
+import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.dsl.send
-import pro.respawn.flowmvi.modules.Recoverable
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.util.asUnconfined
@@ -24,6 +24,7 @@ import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
+@OptIn(DelicateStoreApi::class)
 class StoreExceptionsText : FreeSpec({
     asUnconfined()
 

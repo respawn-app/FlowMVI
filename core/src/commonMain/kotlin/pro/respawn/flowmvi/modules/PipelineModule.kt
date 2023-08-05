@@ -1,3 +1,5 @@
+@file:OptIn(DelicateStoreApi::class)
+
 package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.CancellationException
@@ -7,11 +9,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
 import pro.respawn.flowmvi.api.ActionReceiver
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.StateReceiver
 import kotlin.coroutines.CoroutineContext
 
@@ -43,10 +47,12 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<
     crossinline onStop: (e: Exception?) -> Unit,
     onStart: PipelineContext<S, I, A>.() -> Unit,
 ): Job = object :
-    PipelineContext<S, I, A>,
     IntentReceiver<I> by this,
     StateReceiver<S> by this,
+    PipelineContext<S, I, A>,
     ActionReceiver<A> {
+
+    override val key = PipelineContext // recoverable should be separate.
     private val job = SupervisorJob(parent.coroutineContext[Job])
     private val handler = PipelineExceptionHandler(this)
     private val pipelineName = CoroutineName("${name}PipelineContext")

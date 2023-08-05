@@ -13,15 +13,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.MutableStore
-import pro.respawn.flowmvi.api.ActionReceiver
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.DelicateStoreApi
-import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Provider
-import pro.respawn.flowmvi.api.StateReceiver
-import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.recover
@@ -48,11 +45,12 @@ import kotlin.coroutines.cancellation.CancellationException
 MVIViewModel is now deprecated. A better API was designed for MVIViewModels that is multiplatform,
 extensible, and uses composition instead of locking you into a specific base class.
 Please consult the migration guide or the documentation to learn how to migrate.
-"""
+""",
+    ReplaceWith("Container<S, I, A>", "pro.respawn.flowmvi.api.Container")
 )
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val initial: S,
-) : ViewModel(), IntentReceiver<I>, StateReceiver<S>, ActionReceiver<A>, Store<S, I, A> {
+) : ViewModel(), MutableStore<S, I, A>, Container<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -77,9 +75,9 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      */
     @OptIn(DelicateStoreApi::class)
     @Suppress("UNCHECKED_CAST", "DEPRECATION")
-    protected open val store: MutableStore<S, I, A> by lazyStore<S, I, A>(initial, viewModelScope) {
+    override val store: MutableStore<S, I, A> by lazyStore(initial, viewModelScope) {
         recover {
-            useState { recover(it) }
+            useState { this@MVIViewModel.recover(it) }
             null
         }
         reduce { reduce(it) }
@@ -91,6 +89,14 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
      * @see MVIStore.send
      */
     public override suspend fun send(action: A): Unit = store.send(action)
+
+    /**
+     * @see MVIStore.send
+     */
+    public override suspend fun emit(intent: I): Unit = store.emit(intent)
+
+    override fun close(): Unit = store.close()
+    override val name: String? get() = store.name
 
     /**
      * @see MVIStore.updateState

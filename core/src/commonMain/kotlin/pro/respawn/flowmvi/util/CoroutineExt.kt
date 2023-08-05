@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.catch
 
 /**
  * Catches exceptions only, rethrowing any throwables
+ * @see Flow.catch
  */
 public inline fun <T> Flow<T>.catchExceptions(
     crossinline block: suspend FlowCollector<T>.(Exception) -> Unit

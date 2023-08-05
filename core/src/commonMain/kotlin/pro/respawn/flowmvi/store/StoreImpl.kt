@@ -1,4 +1,5 @@
-@file:Suppress("Deprecation") // wil be removed
+@file:Suppress("Deprecation")
+@file:OptIn(DelicateStoreApi::class) // wil be removed
 package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.MutableStore
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
