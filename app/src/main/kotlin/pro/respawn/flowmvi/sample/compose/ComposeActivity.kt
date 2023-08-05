@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.sample.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
+import pro.respawn.flowmvi.sample.compose.theme.MVISampleTheme
 
 class ComposeActivity : ComponentActivity() {
 

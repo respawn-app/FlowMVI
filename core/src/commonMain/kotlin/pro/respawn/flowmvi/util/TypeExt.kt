@@ -13,5 +13,12 @@ public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R):
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return (this as? T)?.let(block) ?: this
+    return typed<T>()?.let(block) ?: this
 }
+
+/**
+ * Cast this to type [T] or return null.
+ *
+ * Just an alias for `(this as? T)`
+ */
+public inline fun <reified T> Any?.typed(): T? = this as? T

@@ -28,7 +28,7 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
 
 ```
 
-Here are all dsl functions of a plugin:
+Here are all the dsl functions of a plugin:
 
 ### Name
 

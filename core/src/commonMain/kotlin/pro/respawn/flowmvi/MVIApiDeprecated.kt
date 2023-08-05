@@ -46,7 +46,7 @@ public typealias Reduce<S, I, A> = suspend ReducerScope<S, I, A>.(intent: I) -> 
 @Deprecated(
     "Moved to plugins package with new signature",
     ReplaceWith(
-        "pro.respawn.flowmvi.plugins.Recover<S, I, A>",
+        "pro.respawn.flowmvi.plugins.Recover",
         "pro.respawn.flowmvi.plugins.Recover",
         "pro.respawn.flowmvi.api.MVIAction",
         "pro.respawn.flowmvi.api.MVIIntent",
@@ -64,10 +64,10 @@ public typealias Recover<S> = (e: Exception) -> S
  * This is usually the business logic unit.
  */
 @Deprecated(
-    "renamed to Provider",
+    "Store now functions as a provider, this class is not needed anymore",
     ReplaceWith(
-        "Provider<S, I, A>",
-        "pro.respawn.flowmvi.api.Provider"
+        "Store<S, I, A>",
+        "pro.respawn.flowmvi.api.Store"
     )
 )
 public typealias MVIProvider<S, I, A> = Provider<S, I, A>
@@ -91,6 +91,10 @@ public interface MVIStore<S : MVIState, I : MVIIntent, A : MVIAction> :
  * @see MVIProvider
  * @See MVISubscriber
  */
+@Deprecated(
+    "This interface has been moved to the android module",
+    ReplaceWith("pro.respawn.flowmvi.android.view.MVIView<S, I, A>")
+)
 public interface MVIView<S : MVIState, I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
 
     /**
@@ -120,9 +124,9 @@ public interface MVIView<S : MVIState, I : MVIIntent, A : MVIAction> : MVISubscr
 @Deprecated(
     "Use StateConsumer, ActionReceiver directly",
     ReplaceWith(
-        "StateConsumer<S>, ActionReceiver<A>",
+        "StateConsumer<S>, ActionConsumer<A>",
         "pro.respawn.flowmvi.api.StateConsumer",
-        "pro.respawn.flowmvi.api.ActionReceiver"
+        "pro.respawn.flowmvi.api.ActionConsumer"
     )
 )
 public interface MVISubscriber<in S : MVIState, in A : MVIAction> : StateConsumer<S>, ActionConsumer<A>
@@ -176,6 +180,7 @@ public fun interface Reducer<S : MVIState, in I : MVIIntent> {
  * Provides a [CoroutineScope] to use.
  * Throwing when in this scope will result in [Reducer.recover] of the store being called.
  */
+@Deprecated("Use PipelineContext directly", ReplaceWith("PipelineContext<S, I, A>"))
 public typealias ReducerScope<S, I, A> = PipelineContext<S, I, A>
 
 /**

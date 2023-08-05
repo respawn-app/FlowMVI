@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.compose.ConsumerScope
@@ -26,18 +28,21 @@ import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
 import pro.respawn.flowmvi.android.compose.StateProvider
 import pro.respawn.flowmvi.android.compose.consume
+import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
+import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
+import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.CounterState
+import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.container.CounterAction
-import pro.respawn.flowmvi.sample.container.CounterAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.container.CounterContainer
-import pro.respawn.flowmvi.sample.container.CounterIntent
-import pro.respawn.flowmvi.sample.container.CounterIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.container.CounterState
-import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.compose.theme.MVISampleTheme
 import pro.respawn.flowmvi.sample.di.storeViewModel
-import pro.respawn.flowmvi.sample.ui.theme.MVISampleTheme
 
 private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
+
+context(CoroutineScope)
+fun ScaffoldState.snackbar(text: String) = launch { snackbarHostState.showSnackbar(text) }
 
 @Composable
 @Suppress("ComposableFunctionName")
@@ -49,13 +54,12 @@ fun ComposeScreen() = MVIComposable(
     val scaffoldState = rememberScaffoldState()
 
     consume { action ->
-        // This block is run in a new coroutine each time we consume a new actions.
+        // This block is run in a new coroutine each time we consume a new action and the lifecycle is RESUMED.
         // You can run suspending (but not blocking) code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
-            is ShowSnackbar -> launch {
-                scaffoldState.snackbarHostState.showSnackbar(context.getString(action.res))
-            }
+            is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
+            is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message))
         }
     }
 

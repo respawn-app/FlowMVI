@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.sample.container
+package pro.respawn.flowmvi.sample.compose
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -7,24 +7,28 @@ import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.android.plugins.androidLoggingPlugin
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
-import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.container.CounterState.Loading
-import pro.respawn.flowmvi.sample.repo.CounterRepo
+import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
+import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterState
+import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.repository.CounterRepository
+import pro.respawn.flowmvi.util.typed
 import kotlin.random.Random
 
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
 class CounterContainer(
-    private val repo: CounterRepo,
+    private val repo: CounterRepository,
     private val param: String,
 ) : Container<CounterState, CounterIntent, CounterAction> {
 
-    override val store = store(Loading) {
+    override val store = store(CounterState.Loading) {
         name = "Counter"
         install(androidLoggingPlugin())
         whileSubscribed {
@@ -46,7 +50,7 @@ class CounterContainer(
         recover {
             launch {
                 if (it is IllegalArgumentException)
-                    action(CounterAction.ShowSnackbar(R.string.error_message))
+                    action(ShowErrorMessage)
                 else updateState {
                     CounterState.Error(it)
                 }
@@ -57,7 +61,7 @@ class CounterContainer(
 
     private suspend fun Ctx.produceState(timer: Int) = updateState {
         // remember that you have to merge states when you are running produceState
-        val current = this as? DisplayingCounter
+        val current = typed<DisplayingCounter>()
         DisplayingCounter(timer, current?.counter ?: 0, param)
     }
 }

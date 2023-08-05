@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.android
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -19,9 +20,11 @@ import pro.respawn.flowmvi.api.Store
  * Most DI frameworks struggle with type erasure when it comes to injecting generic classes, so one of 2 ways outlined
  * above can be used to resolve the conflicts.
  */
-public open class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
+public class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     store: Store<S, I, A>,
-) : ViewModel(), Store<S, I, A> by store {
+) : ViewModel(), Store<S, I, A> by store, Container<S, I, A> {
+
+    override val store: Store<S, I, A> get() = this
 
     init {
         store.start(viewModelScope)

@@ -1,34 +1,31 @@
 package pro.respawn.flowmvi.sample.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import pro.respawn.flowmvi.MVIView
-import pro.respawn.flowmvi.android.subscribe
-import pro.respawn.flowmvi.dsl.LambdaIntent
+import pro.respawn.flowmvi.android.view.MVIView
+import pro.respawn.flowmvi.android.view.subscribe
+import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
+import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
+import pro.respawn.flowmvi.sample.CounterLambdaIntent
+import pro.respawn.flowmvi.sample.CounterState
+import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
-import pro.respawn.flowmvi.sample.container.CounterAction
-import pro.respawn.flowmvi.sample.container.CounterAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.container.CounterState
-import pro.respawn.flowmvi.sample.container.CounterState.DisplayingCounter
-import pro.respawn.flowmvi.sample.container.LambdaViewModel
 
-// Or use lambdas when calling subscribe()
-class CounterActivity :
-    ComponentActivity(),
-    MVIView<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
+class CounterActivity : ComponentActivity(), MVIView<CounterState, CounterLambdaIntent, CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
+    override val container by viewModel<LambdaViewModel>()
 
-    // If your viewModel implements MVIProvider, you can just use by viewModel() on store variable
-    override val provider by viewModel<LambdaViewModel>()
-
+    @SuppressLint("IntentWithNullActionLaunch") // https://issuetracker.google.com/issues/294200850
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _b = ActivityBasicBinding.inflate(layoutInflater)
@@ -39,14 +36,22 @@ class CounterActivity :
         subscribe()
 
         binding.apply {
-            btnIncrement.setOnClickListener { provider.onClickCounter() }
+            btnIncrement.setOnClickListener { container.onClickCounter() }
             btnToCompose.setOnClickListener {
                 startActivity(Intent(this@CounterActivity, ComposeActivity::class.java))
             }
         }
     }
 
-    // Each time state changes, render it here
+    // Handle any side effects of the UI layer here
+    override fun consume(action: CounterAction) {
+        when (action) {
+            is ShowErrorMessage -> Snackbar.make(binding.root, R.string.error_message, Snackbar.LENGTH_SHORT).show()
+            is ShowLambdaMessage -> Snackbar.make(binding.root, R.string.lambda_message, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    // be sure to use ALL views at least once when rendering each state
     override fun render(state: CounterState) = with(binding) {
         when (state) {
             is DisplayingCounter -> {
@@ -84,15 +89,6 @@ class CounterActivity :
                 tvError.isVisible = true
                 btnIncrement.isVisible = false
                 btnToCompose.isVisible = false
-            }
-        }
-    }
-
-    // Handle any side effects of the UI layer here
-    override fun consume(action: CounterAction) {
-        when (action) {
-            is ShowSnackbar -> {
-                Snackbar.make(binding.root, getString(action.res), Snackbar.LENGTH_SHORT).show()
             }
         }
     }

@@ -39,9 +39,9 @@ So please consider the following comparison:
 | Upsides 👍                                                                                              | Downsides 👎                                                                      |
 |:--------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------|
 | Elegant declaration - open a lambda block and write your logic there. Store's code remains clean        | Store's context is accessible outside of the store, leading to scope creep        |
+| Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose   |
 | Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become less useful, such as logging/time travel/analytics       |
-| Get rid of all Intent classes entirely                                                                  | Intents cannot be resent, composed, delegated, reused and organized into families |
-| Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents                                  |
+| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be resent, composed, delegated, reused and organized into families |
 
 ## Step 3: Describe your Contract
 
@@ -78,27 +78,30 @@ To define your contract, ask yourself the following:
 
 ```kotlin
 // Must be comparable and immutable
-internal sealed interface ScreenState : MVIState {
-    data object Loading : ScreenState
-    data class Error(e: Exception) : ScreenState
+internal sealed interface CounterState : MVIState {
+    data object Loading : CounterState
+    data class Error(e: Exception) : CounterState
     data class DisplayingCounter(
         val counter: Int,
-    ) : ScreenState
+    ) : CounterState
 }
 
-// Optional - can use LambdaIntents for MVVM+-style
-internal sealed interface ScreenIntent : MVIIntent {
-    data object ClickedNext : ScreenIntent
+// MVI Style Intents
+internal sealed interface CounterIntent : MVIIntent {
+    data object ClickedNext : CounterIntent
 
     @JvmInline
-    value class ChangedCounter(val value: Int) : ScreenIntent
+    value class ChangedCounter(val value: Int) : CounterIntent
 
-    data class GrantedPermission(val granted: Boolean, val permission: String) : ScreenIntent
+    data class GrantedPermission(val granted: Boolean, val permission: String) : CounterIntent
 }
 
+// MVVM+ Style Intents
+typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
+
 // Optional - can disable by using Nothing as a type
-internal sealed interface ScreenAction : MVIAction {
-    data class ShowMessage(val message: String) : ScreenAction
+internal sealed interface CounterAction : MVIAction {
+    data class ShowMessage(val message: String) : CounterAction
 }
 ```
 
@@ -108,7 +111,7 @@ Here's a full list of things that can be done when configuring the store:
 
 ```kotlin
 
-val store = store<ScreenState, ScreenIntent, ScreenAction>(Loading) { // set initial state
+val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
 
     // Settings this to true enables additional store validations and debug logging.
     // the store will check your subscription events, launches/stops, and plugins for validity
@@ -150,7 +153,7 @@ Some interesting properties of the store:
   the store.
 * Store's subscribers will wait until the store is launched when they subscribe to the store. Don't forget to launch the
   store.
-* Store's plugins are created eagerly, but the store itself can be lazy. There are delegate functions for that.
+* Store's plugins are created eagerly, but the store itself can be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
 
@@ -162,18 +165,18 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
 
 * **Reduce Plugin** - process incoming intents. Install with `reduce { /* ... */ }`
 * **Init Plugin** - do something when store is launched. Install with `init { /* ... */ }`
-* **Recover Plugin** - handle exceptions happens, works for both plugins and jobs. Install with `recover { /* ... */ }`
+* **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { /* ... */ }`
 * **While Subscribed Plugin** - run jobs when the first subscriber of a store appears. Install
   with `whileSubscribed { }`.
 * **LoggingPlugin** (console/android/platform) - log events to a log stream for your chosen platform.
 * **SavedStatePlugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
-  parcelizeState and serializeState plugins build based on this one. Install with `saveState(get = {}, set = {})`.
+  `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 > [!ATTENTION]
 > The order of plugins matters! Changing the order of plugins may completely change how your store works.
 > Plugins can replace, veto, consume or otherwise change anything in the store.
-> They can cancel subscriptions, close the store or swallow exceptions.
+> They can cancel subscriptions, close the store or swallow exceptions!
 
 Consider the following:
 
@@ -228,7 +231,6 @@ val broken = store(Loading) {
     }
 }
 ```
-
 So make sure to consider how your plugins affect the store's logic when using and writing them.
 
 The discussion above warrants another note.
@@ -239,3 +241,39 @@ The discussion above warrants another note.
 > `val store = store(Loading) { }`
 > This is a store that does **literally nothing**. If you forget to install the reduce plugin, your intents won't be
 > acted upon.
+
+### Step 6: Create, inject, and provide dependencies
+
+You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
+putting all code into the store's builder.
+
+The best way to do this is to create a class that acts as a simple wrapper for your store. By convention, it can
+usually be called `Container`[^1]. Feel free to not use the provided interface, it's only purpose is to act as a marker.
+
+```kotlin
+
+private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
+
+class CounterContainer(private val repo: CounterRepository) : Container<CounterState, CounterIntent, CounterAction> {
+
+    override val store = store(Loading) {
+        whileSubscribed {
+            repo.counter
+                .onEach(::produceState)
+                .consume()
+        }
+    }
+
+    // example custom function
+    private fun Ctx.produceState(counter: Int) = updateState { DisplayingCounter(counter) }
+}
+```
+
+Next steps:
+
+* Learn how to create custom [plugins](plugins.md)
+* Learn how to use DI and [Android-specific features](android.md)
+
+[^1]: Although container is a slightly different concept usually, we don't have this kind of separation and we use the
+name "store" for our business logic unit already, so the name was kinda "free" to define what it will mean for
+FlowMVI

@@ -3,6 +3,7 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior
@@ -100,17 +101,33 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      * See [StorePlugin.name] for more info and solutions.
      */
     @FlowMVIDSL
-    public fun install(plugin: StorePlugin<S, I, A>) {
-        require(plugins.add(plugin)) { duplicatePluginMessage(plugin.toString()) }
+    public fun install(plugin: StorePlugin<S, I, A>): Unit = require(plugins.add(plugin)) {
+        duplicatePluginMessage(plugin.toString())
     }
 
     /**
-     * Create and install a new [StorePlugin].
-     * Plugins will **preserve** the order of installation and will proceed according to this order.
-     * See [StorePlugin] for comprehensive information on the behavior of plugins.
+     * Install all [plugins].
+     * Please see documentation for the other overload for more details.
+     * @see install
      */
     @FlowMVIDSL
-    public fun install(
+    public inline fun install(vararg plugins: StorePlugin<S, I, A>): Unit = install(plugins.asIterable())
+
+    /**
+     * Install all [plugins].
+     * Please see documentation for the other overload for more details.
+     * @see install
+     */
+    @FlowMVIDSL
+    public inline fun install(plugins: Iterable<StorePlugin<S, I, A>>): Unit = plugins.forEach { install(it) }
+
+    /**
+     * Create and install a new [StorePlugin].
+     * Please see documentation for the other overload for more details.
+     * @see install
+     */
+    @FlowMVIDSL
+    public inline fun install(
         block: StorePluginBuilder<S, I, A>.() -> Unit
     ): Unit = install(plugin(block))
 
@@ -142,6 +159,17 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
     configure()
     build()
 }
+
+/**
+ * Build a new [Store] using [StoreBuilder].
+ * The store is created eagerly and then launched in the given [scope] immediately.
+ **/
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
+    initial: S,
+    scope: CoroutineScope,
+    @BuilderInference crossinline configure: BuildStore<S, I, A>,
+): Store<S, I, A> = store(initial, configure).apply { start(scope) }
 
 /**
  * * Build a new [Store] using [StoreBuilder] but disallow using [MVIAction]s.

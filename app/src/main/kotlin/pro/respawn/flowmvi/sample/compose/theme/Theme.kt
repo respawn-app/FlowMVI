@@ -1,6 +1,6 @@
 @file:Suppress("Filename")
 
-package pro.respawn.flowmvi.sample.ui.theme
+package pro.respawn.flowmvi.sample.compose.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
