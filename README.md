@@ -1,8 +1,6 @@
 # FlowMVI 2.0
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
-![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)
-[![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://javadoc.io/doc/pro.respawn.flowmvi/core)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
 ![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
@@ -10,7 +8,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
-### This is Readme for FlowMVI 2.0, which is in alpha right now. Please go to the [V1 Docs](https://opensource.respawn.pro/FlowMVI/v1/#/) if you need to see the older version
+### This is Readme for FlowMVI 2.0, which is in alpha right now. Please go to the [V1 Docs](https://opensource.respawn.pro/FlowMVI/#/v1/) if you need to see the older version
 
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
@@ -20,8 +18,10 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 
 ## Quickstart:
 
-* Documentation: [https://opensource.respawn.pro/FlowMVI/](https://opensource.respawn.pro/FlowMVI)
-* KDocs: [https://opensource.respawn.pro/FlowMVI/javadocs/](https://opensource.respawn.pro/FlowMVI/javadocs/)
+* Documentation:
+  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/)
+* KDoc:
+  [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/#/javadocs/)
 * Latest version:
   ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
@@ -217,7 +217,7 @@ class ScreenFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterA
 }
 ```
 
-Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/quickstart).
+Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
 ## License
 

@@ -64,10 +64,9 @@ class CounterViewModel(
 
 
 // ---- new
-
 class CounterViewModel(
     repo: CounterRepo,
-) : Container<ComposeState, ComposeIntent, ComposeAction>
+) : ViewModel(), Container<ComposeState, ComposeIntent, ComposeAction>
 ```
 
 ### 2. Override the new `store` property.
@@ -86,7 +85,7 @@ import pro.respawn.flowmvi.dsl.updateState
 
 class CounterViewModel(
     repo: CounterRepo,
-) : Container<ComposeState, ComposeIntent, ComposeAction> {
+) : ViewModel(), Container<ComposeState, ComposeIntent, ComposeAction> {
 
     override val store by lazyStore(CounterState.Loading) {
 
@@ -112,7 +111,7 @@ class CounterViewModel(
             when (intent) {
                 is CounterIntent.ClickedCounter -> updateState<DisplayingCounter> {
                     incrementCounter(current = counter, timer)
-
+                    
                     CounterState.Loading
                 }
             }
@@ -136,7 +135,7 @@ private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterActi
 
 class CounterViewModel(
     repo: CounterRepository,
-) : Container<CounterState, CounterIntent, CounterAction> {
+) : ViewModel(), Container<ComposeState, ComposeIntent, ComposeAction> {
 
     /* <...> */
 

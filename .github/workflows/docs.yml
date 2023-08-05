@@ -41,7 +41,7 @@ jobs:
         run: echo "$LOCAL_PROPERTIES" > local.properties
 
       - name: Update docs/README.md
-        run: cp ./README.md ./docs/v2/README.md
+        run: cp ./README.md ./docs/README.md
 
       - name: Generate docs
         run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
