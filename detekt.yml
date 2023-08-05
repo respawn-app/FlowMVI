@@ -42,7 +42,7 @@ console-reports:
 
 output-reports:
   active: true
-  exclude: []
+  exclude: null
   # - 'TxtOutputReport'
   # - 'XmlOutputReport'
   # - 'HtmlOutputReport'
@@ -171,6 +171,8 @@ coroutines:
   SleepInsteadOfDelay:
     active: true
   SuspendFunWithFlowReturnType:
+    active: true
+  SuspendFunSwallowedCancellation:
     active: true
 
 empty-blocks:
@@ -427,7 +429,6 @@ naming:
     parameterPattern: '[a-z][A-Za-z0-9]*'
     privateParameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   EnumNaming:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
@@ -449,7 +450,6 @@ naming:
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
     functionPattern: '([a-zA-Z][a-zA-Z0-9]*)|(`.*`)'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
     ignoreAnnotated:
       - 'Composable'
   FunctionParameterNaming:
@@ -457,7 +457,6 @@ naming:
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
   InvalidPackageDeclaration:
     active: true
     excludes: [ '**/*.kts' ]
@@ -503,14 +502,13 @@ naming:
     variablePattern: '[a-z][A-Za-z0-9]*'
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
-    ignoreOverridden: true
 
 performance:
   active: true
   CouldBeSequence:
     active: true
   UnnecessaryPartOfBinaryExpression:
-    active: false # todo: unclear what this is
+    active: true
   ArrayPrimitive:
     active: true
   ForEachOnRange:
@@ -524,6 +522,10 @@ performance:
 
 potential-bugs:
   active: true
+  PropertyUsedBeforeDeclaration:
+    active: true
+  CastNullableToNonNullableType:
+    active: true
   UnnecessaryNotNullCheck:
     active: true
   AvoidReferentialEquality:
@@ -601,6 +603,24 @@ potential-bugs:
 
 style:
   active: true
+  BracesOnIfStatements:
+    active: false
+  UseLet:
+    active: true
+  UnnecessaryBracesAroundTrailingLambda:
+    active: true
+  UnusedPrivateProperty:
+    active: true
+  UnusedParameter:
+    active: true
+  StringShouldBeRawString:
+    active: true
+  ForbiddenAnnotation:
+    active: true
+  DoubleNegativeLambda:
+    active: true
+  BracesOnWhenStatements:
+    active: false
   UseSumOfInsteadOfFlatMapSize:
     active: true
   CanBeNonNullable:
@@ -638,9 +658,11 @@ style:
     includeLineWrapping: true
   ForbiddenComment:
     active: true
-    values:
-      - 'STOPSHIP'
-    allowedPatterns: ''
+    comments:
+      - value: 'FIXME:'
+        reason: 'Forbidden FIXME todo marker in comment, please fix the problem.'
+      - value: 'STOPSHIP:'
+        reason: 'Forbidden STOPSHIP comment, address the problem before shipping the code.'
   ForbiddenImport:
     active: false
     imports: [ ]
@@ -691,8 +713,6 @@ style:
     ignoreEnums: true
     ignoreRanges: true
     ignoreExtensionFunctions: true
-  MandatoryBracesIfStatements:
-    active: false
   MandatoryBracesLoops:
     active: true
   MaxLineLength:
@@ -719,8 +739,6 @@ style:
     active: true
   OptionalUnit:
     active: false
-  OptionalWhenBraces:
-    active: false
   PreferToOverPairSyntax:
     active: true
   ProtectedMemberInFinalClass:
@@ -730,7 +748,7 @@ style:
   RedundantHigherOrderMapUsage:
     active: true
   RedundantVisibilityModifierRule:
-    active: false # explicit api
+    active: false # using ExplicitApi
   ReturnCount:
     active: true
     max: 5

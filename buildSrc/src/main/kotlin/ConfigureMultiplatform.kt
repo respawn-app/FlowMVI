@@ -1,6 +1,5 @@
 @file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction", "LongMethod")
 
-import Config.jvmTarget
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.creating
 import org.gradle.kotlin.dsl.get
@@ -62,7 +61,7 @@ fun Project.configureMultiplatform(
     }
 
     if (android) {
-        android {
+        androidTarget {
             publishLibraryVariants(Config.publishingVariant)
         }
 

@@ -1,4 +1,6 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
+import org.jetbrains.dokka.gradle.AbstractDokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -24,6 +26,13 @@ buildscript {
 allprojects {
     group = Config.artifactId
     version = Config.versionName
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(Config.jvmTarget)
+            languageVersion.set(Config.kotlinVersion)
+            freeCompilerArgs.addAll(Config.compilerArgs)
+        }
+    }
 }
 
 subprojects {
@@ -34,6 +43,17 @@ subprojects {
     }
 
     tasks {
+        // TODO: https://github.com/Kotlin/dokka/issues/2977
+        val taskClass =
+            "org.jetbrains.kotlin.gradle.targets.native.internal.CInteropMetadataDependencyTransformationTask"
+        withType(Class.forName(taskClass) as Class<Task>) {
+            onlyIf {
+                val executed = gradle.taskGraph.allTasks.none { it is AbstractDokkaTask }
+                if (!executed) println("w: Disabling CInteropCommonization")
+                executed
+            }
+        }
+
         register<org.gradle.jvm.tasks.Jar>("dokkaJavadocJar") {
             dependsOn(dokkaJavadoc)
             from(dokkaJavadoc.flatMap { it.outputDirectory })
@@ -118,7 +138,7 @@ tasks {
 
         fun stabilityLevel(version: String): Int {
             Config.stabilityLevels.forEachIndexed { index, postfix ->
-                val regex = ".*[.\\-]$postfix[.\\-\\d]*".toRegex(RegexOption.IGNORE_CASE)
+                val regex = """.*[.\-]$postfix[.\-\d]*""".toRegex(RegexOption.IGNORE_CASE)
                 if (version.matches(regex)) return index
             }
             return Config.stabilityLevels.size

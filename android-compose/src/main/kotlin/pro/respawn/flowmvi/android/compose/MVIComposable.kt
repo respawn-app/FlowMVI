@@ -3,19 +3,18 @@ package pro.respawn.flowmvi.android.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.Dispatchers
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.Store
 
 /**
  * A function that introduces ConsumerScope to the content and ensures safe lifecycle-aware and efficient collection
  * of states and actions.
  * Usage:
- * ```
+ * ```kotlin
  * @Composable
- * fun HomeScreen() = MVIComposable(getViewModel<HomeViewModel>()) { state ->
+ * fun HomeScreen() = MVIComposable(getViewModel<HomeViewModel>()) { // this: ConsumerScope<S, I, A>
  *     consume { action ->
  *         when(action) {
  *             /*...*/
@@ -31,15 +30,12 @@ import pro.respawn.flowmvi.MVIState
  * @param content the actual screen content. Will be recomposed each time a new state is received.
  */
 @Composable
-public fun <S : MVIState, I : MVIIntent, A : MVIAction, VM : MVIProvider<S, I, A>> MVIComposable(
-    provider: VM,
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
+    store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
+    @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
 ) {
-    val scope = rememberConsumerScope(provider, lifecycleState)
-
-    // see [LifecycleOwner.subscribe] in :android for reasoning behind the dispatcher
-    val state by provider.states.collectAsStateOnLifecycle(Dispatchers.Main.immediate, lifecycleState)
-
+    val scope = rememberConsumerScope(store, lifecycleState)
+    val state by scope.state
     content(scope, state)
 }

@@ -1,5 +1,0 @@
-* [Home](/)
-* [Usage Guide](howto.md)
-* [Android](android.md)
-* [Usage | FAQ](usage.md)
-* [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/)

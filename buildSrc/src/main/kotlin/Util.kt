@@ -34,7 +34,7 @@ fun VersionCatalog.requireVersion(alias: String) = findVersion(alias).get().toSt
 
 val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId
 
-fun CommonExtension<*, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
+fun CommonExtension<*, *, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
     (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }
 

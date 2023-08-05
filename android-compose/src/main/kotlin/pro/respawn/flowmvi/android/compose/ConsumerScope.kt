@@ -8,36 +8,33 @@
 package pro.respawn.flowmvi.android.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
-import pro.respawn.flowmvi.FlowMVIDSL
-import pro.respawn.flowmvi.MVIAction
-import pro.respawn.flowmvi.MVIIntent
-import pro.respawn.flowmvi.MVIProvider
-import pro.respawn.flowmvi.MVIState
+import kotlinx.coroutines.channels.Channel
+import pro.respawn.flowmvi.android.subscribe
+import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.Store
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-@FlowMVIDSL
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
 
     /**
-     * Send a new intent for the provider you used in [MVIComposable]
-     * @see MVIProvider.send
+     * Send a new intent for the store you used in [MVIComposable]
+     * @see pro.respawn.flowmvi.api.IntentReceiver.send
      */
     public fun send(intent: I)
-
-    /**
-     * Call this somewhere at the top of your [MVIComposable] to consume actions received from the provider
-     * @see MVIProvider.consume
-     */
-    @Composable
-    public fun consume(consumer: suspend CoroutineScope.(A) -> Unit)
 
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("sendAction")
@@ -45,54 +42,72 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
      * @see send
      */
     public fun I.send(): Unit = send(this)
+
+    /**
+     * Collect [MVIAction]s that come from the [Store].
+     * Should only be called once per screen.
+     */
+    @Composable
+    public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit): Unit
 }
 
 @Composable
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
-    provider: MVIProvider<S, I, A>,
-    lifecycleState: Lifecycle.State,
-): ConsumerScope<I, A> = remember(provider, lifecycleState) { ConsumerScopeImpl(provider, lifecycleState) }
-
-private class ConsumerScopeImpl<in I : MVIIntent, out A : MVIAction>(
-    private val provider: MVIProvider<*, I, A>,
-    private val lifecycleState: Lifecycle.State,
-) : ConsumerScope<I, A> {
-
-    override fun send(intent: I) = provider.send(intent)
-
-    @Composable
-    override fun consume(consumer: suspend CoroutineScope.(A) -> Unit) {
-        provider.consume(lifecycleState, consumer)
-    }
+    store: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): ConsumerScopeImpl<S, I, A> {
+    val scope = remember(store) { ConsumerScopeImpl(store) }
+    scope.collect(lifecycleState)
+    return scope
 }
 
-@Composable
-@FlowMVIDSL
-@Suppress("ComposableParametersOrdering")
-/**
- * @see [ConsumerScope.consume]
- */
-public fun <A : MVIAction> MVIProvider<*, *, A>.consume(
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    onAction: suspend CoroutineScope.(action: A) -> Unit,
-): Unit = actions.collectOnLifecycle(lifecycleState, onAction)
+@Stable
+internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+    private val store: Store<S, I, A>,
+) : ConsumerScope<I, A> {
+
+    internal val state = mutableStateOf(store.initial)
+    private val _actions = Channel<A>(Channel.UNLIMITED)
+
+    override fun send(intent: I) = store.send(intent)
+    override fun hashCode(): Int = store.hashCode()
+    override fun equals(other: Any?) = store == other
+
+    @Composable
+    override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
+        LaunchedEffect(Unit) {
+            for (it in _actions) onAction(it)
+        }
+    }
+
+    @Composable
+    fun collect(lifecycleState: Lifecycle.State = Lifecycle.State.STARTED) {
+        val owner = LocalLifecycleOwner.current
+        LaunchedEffect(owner, lifecycleState) {
+            owner.subscribe(
+                lifecycleState = lifecycleState,
+                store = store,
+                consume = { _actions.send(it) },
+                render = { state.value = it }
+            )
+        }
+    }
+}
 
 /**
  * A no-op scope for testing and preview purposes.
  * [ConsumerScope.send] and [ConsumerScope.consume] do nothing
  */
 @OptIn(ExperimentalTypeInference::class)
-@Suppress("UNCHECKED_CAST")
 @Composable
 @FlowMVIDSL
-public fun <T : MVIIntent, A : MVIAction> EmptyScope(
-    @BuilderInference call: @Composable ConsumerScope<T, A>.() -> Unit,
-): Unit = call(EmptyScopeImpl as ConsumerScope<T, A>)
+public fun <I : MVIIntent, A : MVIAction> EmptyScope(
+    @BuilderInference call: @Composable ConsumerScope<I, A>.() -> Unit,
+): Unit = call(
+    object : ConsumerScope<I, A> {
+        override fun send(intent: I) = Unit
 
-private object EmptyScopeImpl : ConsumerScope<MVIIntent, MVIAction> {
-
-    override fun send(intent: MVIIntent) = Unit
-
-    @Composable
-    override fun consume(consumer: suspend CoroutineScope.(MVIAction) -> Unit) = Unit
-}
+        @Composable
+        override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = Unit
+    }
+)

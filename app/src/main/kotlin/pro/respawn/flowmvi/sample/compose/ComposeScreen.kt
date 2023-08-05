@@ -1,17 +1,15 @@
 package pro.respawn.flowmvi.sample.compose
 
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -21,56 +19,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
+import pro.respawn.flowmvi.android.compose.StateProvider
+import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
+import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
+import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.CounterState
+import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.R
-import pro.respawn.flowmvi.sample.compose.ComposeAction.GoToBasicActivity
-import pro.respawn.flowmvi.sample.compose.ComposeAction.ShowSnackbar
-import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.compose.ComposeIntent.ClickedToBasicActivity
-import pro.respawn.flowmvi.sample.compose.ComposeState.DisplayingContent
-import pro.respawn.flowmvi.sample.compose.ComposeState.Empty
-import pro.respawn.flowmvi.sample.compose.ComposeState.Loading
-import pro.respawn.flowmvi.sample.ui.theme.MVITheme
-import pro.respawn.flowmvi.sample.view.BasicActivity
+import pro.respawn.flowmvi.sample.compose.theme.MVISampleTheme
+import pro.respawn.flowmvi.sample.di.storeViewModel
+
+private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
+
+context(CoroutineScope)
+fun ScaffoldState.snackbar(text: String) = launch { snackbarHostState.showSnackbar(text) }
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen() = MVIComposable(getViewModel<BaseClassViewModel>()) { state ->
-    // this -> ConsumerScope with utility functions available
+fun ComposeScreen() = MVIComposable(
+    storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
+) { state: CounterState -> // this -> ConsumerScope
 
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
 
     consume { action ->
-        // This block is run in a new coroutine each time we consume a new actions.
+        // This block is run in a new coroutine each time we consume a new action and the lifecycle is RESUMED.
         // You can run suspending (but not blocking) code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
-            is GoToBasicActivity -> context.startActivity(Intent(context, BasicActivity::class.java))
-            // snackbar suspends consume(), we do not want to block action consumption here
-            // so we'll launch a new coroutine
-            is ShowSnackbar -> launch {
-                scaffoldState.snackbarHostState.showSnackbar(
-                    message = context.getString(action.res)
-                )
-            }
+            is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
+            is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message))
         }
     }
 
     Scaffold(Modifier.fillMaxSize(), scaffoldState = scaffoldState) {
-        ComposeScreenContent(state, modifier = Modifier.padding(it))
+        ComposeScreenContent(state = state, modifier = Modifier.padding(it))
     }
 }
 
 @Composable
-private fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(
-    state: ComposeState,
+private fun Scope.ComposeScreenContent(
+    state: CounterState,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -78,54 +77,44 @@ private fun ConsumerScope<ComposeIntent, ComposeAction>.ComposeScreenContent(
         contentAlignment = Alignment.Center
     ) {
         when (state) {
-            is DisplayingContent -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceAround,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Column {
-                        Text(
-                            text = stringResource(id = R.string.counter_text, state.counter),
-                            // send() is available in ConsumerScope
-                            modifier = Modifier.clickable { send(ClickedCounter) }
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Text(
-                            text = stringResource(id = R.string.timer_template, state.timer),
-                        )
-                    }
+            is DisplayingCounter -> Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.timer_template, state.timer),
+                    // send() is available in ConsumerScope
+                    modifier = Modifier.clickable { send(ClickedCounter) }
+                )
+                Text(
+                    text = stringResource(id = R.string.counter_template, state.counter),
+                )
 
-                    Button(onClick = { send(ClickedToBasicActivity) }) {
-                        Text(text = stringResource(id = R.string.to_basic_activity))
-                    }
+                Text(text = state.param)
+
+                Button(onClick = { send(ClickedCounter) }) {
+                    Text(text = stringResource(id = R.string.counter_button_label))
                 }
             }
-            Loading -> {
-                CircularProgressIndicator()
-            }
-            Empty -> {
-                Text(text = stringResource(R.string.compose_screen_empty))
-            }
+            is CounterState.Loading -> CircularProgressIndicator()
+            is CounterState.Error -> Text(state.e.message.toString())
         }
     }
 }
 
-private class StateProvider : CollectionPreviewParameterProvider<ComposeState>(
-    listOf(
-        DisplayingContent(1, 1),
-        Loading,
-        Empty,
-    )
+private class PreviewProvider : StateProvider<CounterState>(
+    DisplayingCounter(1, 2, "param"),
+    CounterState.Loading,
 )
 
 @Composable
 @Preview(name = "ComposeScreen", showSystemUi = true, showBackground = true, backgroundColor = 0xFFFFFFFF)
 private fun ComposeScreenPreview(
-    @PreviewParameter(StateProvider::class) state: ComposeState,
-) = MVITheme {
+    @PreviewParameter(PreviewProvider::class) state: CounterState,
+) = MVISampleTheme {
     // Use this helper function to preview functions that use ConsumerScope
     EmptyScope {
-        ComposeScreenContent(state = state)
+        ComposeScreenContent(state)
     }
 }

@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">FlowMVI Sample</string>
-    <string name="error">An error occurred</string>
-    <string name="to_basic_activity">Go to basic activity</string>
-    <string name="counter_text">Counter: %d (click me!)</string>
-    <string name="title_activity_basic">BasicActivity</string>
+    <string name="error_message">An error occurred</string>
+    <string name="counter_button_label">Increment counter</string>
+    <string name="counter_template">Counter: %d</string>
     <string name="started_processing">Started processing your intent</string>
+    <string name="lambda_message">Look, I am a lambda!</string>
     <string name="finished_processing">Finished processing intent</string>
-    <string name="timer_template">Timer value: %d</string>
-    <string name="compose_screen_empty">Oops! Nothing here</string>
+    <string name="timer_template">Timer: %d</string>
+    <string name="empty_message">Oops! Nothing here</string>
+    <string name="to_compose_button_label">To compose screen</string>
 </resources>

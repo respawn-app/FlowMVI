@@ -2,19 +2,21 @@
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
-import gradle.kotlin.dsl.accessors._7fbb8709bc469bf367d4d226f684fde5.kotlin
 import org.gradle.api.Project
 
 fun Project.configureAndroid(
-    commonExtension: CommonExtension<*, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *>,
 ) = commonExtension.apply {
     compileSdk = Config.compileSdk
-    buildToolsVersion = Config.buildToolsVersion
 
     defaultConfig {
         minSdk = Config.minSdk
         testInstrumentationRunner = Config.testRunner
         proguardFiles(getDefaultProguardFile(Config.defaultProguardFile), Config.proguardFile)
+    }
+
+    lint {
+        warning += "AutoboxingStateCreation"
     }
 
     buildTypes {

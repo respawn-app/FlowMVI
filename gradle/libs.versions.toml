@@ -1,32 +1,32 @@
 [versions]
-activity = "1.7.0"
-compose = "1.4.0"
-compose-compiler = "1.4.4"
-composeDetektPlugin = "1.2.2"
-core-ktx = "1.9.0"
-coroutines = "1.6.4"
-dependencyAnalysisPlugin = "1.19.0"
-detekt = "1.22.0"
-detektFormattingPlugin = "1.22.0"
-dokka = "1.8.10"
-flowExt = "0.3.0"
-fragment = "1.5.6"
-gradleAndroid = "8.0.0-rc01"
+activity = "1.7.2"
+compose = "1.5.0-rc01"
+compose-compiler = "1.5.1"
+composeDetektPlugin = "1.3.0"
+core-ktx = "1.10.1"
+coroutines = "1.7.3"
+dependencyAnalysisPlugin = "1.20.0"
+detekt = "1.23.1"
+detektFormattingPlugin = "1.23.1"
+dokka = "1.8.20"
+flowExt = "0.6.1"
+fragment = "1.6.1"
+gradleAndroid = "8.2.0-alpha15"
 gradleDoctorPlugin = "0.8.1"
 junit = "4.13.2"
-koin = "3.4.0"
-koin-compose = "3.4.3"
-kotest = "5.5.5"
-kotest-plugin = "5.5.5"
+koin = "3.4.3"
+koin-compose = "3.4.6"
+kotest = "5.6.2"
+kotest-plugin = "5.6.2"
 # @pin
-kotlin = "1.8.10"
-kotlinx-atomicfu = "0.20.1"
+kotlin = "1.9.0"
+kotlinx-atomicfu = "0.21.0"
 lifecycle = "2.6.1"
-material = "1.8.0"
-mockk = "1.13.2"
-turbine = "0.12.3"
-versionCatalogUpdatePlugin = "0.8.0"
-versionsPlugin = "0.46.0"
+material = "1.9.0"
+mockk = "1.13.5"
+turbine = "1.0.0"
+versionCatalogUpdatePlugin = "0.8.1"
+versionsPlugin = "0.47.0"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -35,6 +35,8 @@ androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+compose-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
@@ -52,8 +54,7 @@ koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-# TODO: Does not support js
-#kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
+kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -65,11 +66,11 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
-mockk-jvm = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 version-gradle = { module = "com.github.ben-manes:gradle-versions-plugin", version.ref = "versionsPlugin" }
+lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [bundles]
 koin = [
@@ -77,9 +78,11 @@ koin = [
     "koin-core",
 ]
 unittest = [
+    "kotlin-coroutines-test",
+    "kotlin-test",
     "koin-test",
     "kotest-assertions",
-    "kotest-junit",
+    "kotest-framework",
     "kotest-property",
     "kotlin-reflect",
     "turbine",

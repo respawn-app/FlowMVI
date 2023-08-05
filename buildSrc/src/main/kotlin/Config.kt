@@ -15,8 +15,8 @@ object Config {
 
     const val artifactId = "$group.$artifact"
 
-    const val majorRelease = 1
-    const val minorRelease = 2
+    const val majorRelease = 2
+    const val minorRelease = 0
     const val patch = 0
     const val postfix = "alpha01"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
@@ -43,8 +43,8 @@ object Config {
 
     val jvmTarget = JvmTarget.JVM_11
     val javaVersion = JavaVersion.VERSION_11
-    val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_8
-    const val compileSdk = 33
+    val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+    const val compileSdk = 34
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
@@ -52,7 +52,6 @@ object Config {
 
     // android
     const val namespace = artifactId
-    const val buildToolsVersion = "33.0.0"
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
     const val isMinifyEnabledRelease = false
     const val isMinifyEnabledDebug = false

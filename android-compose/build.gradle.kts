@@ -21,4 +21,7 @@ dependencies {
 
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
+    implementation(libs.compose.preview)
+    implementation(libs.compose.lifecycle.viewmodel)
+    implementation(libs.compose.lifecycle.runtime)
 }

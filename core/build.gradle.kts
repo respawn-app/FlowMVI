@@ -15,17 +15,10 @@ kotlin {
         linux = true,
         mingw = true,
     )
-
-    sourceSets.apply {
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.bundles.unittest)
-            }
-        }
-    }
 }
 
 dependencies {
     commonMainApi(libs.kotlinx.coroutines.core)
     commonMainImplementation(libs.kotlinx.atomicfu)
+    commonTestImplementation(libs.bundles.unittest)
 }
