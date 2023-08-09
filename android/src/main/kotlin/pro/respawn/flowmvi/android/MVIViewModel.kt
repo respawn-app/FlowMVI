@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "unused")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused", "DEPRECATION")
 
 package pro.respawn.flowmvi.android
 
@@ -8,9 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import pro.respawn.flowmvi.MVIProvider
 import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.MutableStore
 import pro.respawn.flowmvi.api.Container
@@ -51,7 +53,7 @@ Please consult the migration guide or the documentation to learn how to migrate.
 @Suppress("Deprecation")
 public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     final override val initial: S,
-) : ViewModel(), MutableStore<S, I, A>, Container<S, I, A> {
+) : ViewModel(), MutableStore<S, I, A>, Container<S, I, A>, MVIProvider<S, I, A> {
 
     /**
      * [reduce] will be launched sequentially, on main thread, for each intent that comes from the view.
@@ -89,7 +91,9 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * @see MVIStore.send
      */
-    public override suspend fun send(action: A): Unit = store.send(action)
+    @OptIn(DelicateStoreApi::class)
+    public override fun send(action: A): Unit = store.send(action)
+    override suspend fun emit(action: A): Unit = store.emit(action)
 
     /**
      * @see MVIStore.send
@@ -165,6 +169,9 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override fun start(scope: CoroutineScope): Job = error("Store is already started by the ViewModel")
+
+    override val actions: Flow<A> get() = store.actions
+    override val states: StateFlow<S> get() = store.states
 
     public override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit

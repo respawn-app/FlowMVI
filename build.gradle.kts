@@ -1,5 +1,7 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import org.jetbrains.dokka.gradle.AbstractDokkaTask
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("DSL_SCOPE_VIOLATION")
@@ -100,10 +102,6 @@ versionCatalogUpdate {
 // }
 
 tasks {
-    dokkaHtmlMultiModule.configure {
-        moduleName.set(rootProject.name)
-        outputDirectory.set(buildDir.resolve("dokka"))
-    }
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         buildUponDefaultConfig = true
         parallel = true
@@ -147,4 +145,10 @@ tasks {
             stabilityLevel(currentVersion) > stabilityLevel(candidate.version)
         }
     }
+}
+
+extensions.findByType<YarnRootExtension>()?.run {
+    yarnLockMismatchReport = YarnLockMismatchReport.WARNING
+    reportNewYarnLock = true
+    yarnLockAutoReplace = false
 }

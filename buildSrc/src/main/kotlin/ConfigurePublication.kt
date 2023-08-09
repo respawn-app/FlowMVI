@@ -64,7 +64,6 @@ fun Project.publishAndroid() {
             publications {
                 create(Config.publishingVariant, MavenPublication::class.java) {
                     from(components[Config.publishingVariant])
-                    suppressPomMetadataWarningsFor(Config.publishingVariant)
                     groupId = rootProject.group.toString()
                     artifactId = project.name
 

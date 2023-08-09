@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import pro.respawn.flowmvi.api.ActionProvider
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 
 internal interface ActionModule<A : MVIAction> : ActionProvider<A>, ActionReceiver<A>
@@ -20,9 +21,11 @@ internal abstract class ChannelActionModule<A : MVIAction>(
 
     protected val delegate = Channel<A>(bufferSize, overflow)
 
-    override suspend fun send(action: A) {
+    @DelicateStoreApi
+    override fun send(action: A) {
         delegate.trySend(action)
     }
+    override suspend fun emit(action: A) = delegate.send(action)
 }
 
 internal class DistributingModule<A : MVIAction>(
@@ -55,15 +58,21 @@ internal class SharedModule<A : MVIAction>(
 
     override val actions = _actions.asSharedFlow()
 
-    override suspend fun send(action: A) {
+    @DelicateStoreApi
+    override fun send(action: A) {
         _actions.tryEmit(action)
     }
+
+    override suspend fun emit(action: A) = _actions.emit(action)
 }
 
 internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
 
     override val actions get() = error(ActionsDisabledMessage)
-    override suspend fun send(action: A) = error(ActionsDisabledMessage)
+
+    @DelicateStoreApi
+    override fun send(action: A) = error(ActionsDisabledMessage)
+    override suspend fun emit(action: A) = error(ActionsDisabledMessage)
 
     private companion object {
 

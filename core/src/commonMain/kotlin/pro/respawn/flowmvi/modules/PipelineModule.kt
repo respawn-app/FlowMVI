@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -58,7 +59,10 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<
     private val pipelineName = CoroutineName("${name}PipelineContext")
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + this + job + handler
     override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
-    override suspend fun send(action: A) = onAction(action)
+    override suspend fun emit(action: A) = onAction(action)
+    override fun send(action: A) {
+        launch { onAction(action) }
+    }
 }.run {
     onStart()
     coroutineContext.job.apply {
