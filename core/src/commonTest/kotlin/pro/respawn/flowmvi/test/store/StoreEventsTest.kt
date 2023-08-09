@@ -1,9 +1,12 @@
+@file:OptIn(DelicateStoreApi::class)
+
 package pro.respawn.flowmvi.test.store
 
 import app.cash.turbine.test
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.dsl.store
