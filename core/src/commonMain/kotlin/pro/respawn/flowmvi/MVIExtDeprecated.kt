@@ -2,19 +2,26 @@
 
 package pro.respawn.flowmvi
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.dsl.withState
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.util.withType
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.jvm.JvmName
 
 /**
@@ -291,3 +298,26 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> launchedStore(
     @BuilderInference recover: Recover<S> = { throw it },
     @BuilderInference reduce: Reduce<S, I, A>
 ): Lazy<Store<S, I, A>> = lazy(mode) { MVIStore(initial, behavior, recover, reduce).apply { start(scope) } }
+
+/**
+ * Launch a new coroutine using given scope,
+ * and use either provided [recover] block or the [MVIStore]'s recover block.
+ * Exceptions thrown in the [block] or in the nested coroutines will be handled by [recover].
+ * This function does not update or obtain the state, for that, use [withState] or [updateState] inside [block].
+ */
+@Deprecated("launchRecovering is now an extension on PipelineContext")
+@FlowMVIDSL
+public fun CoroutineScope.launchRecovering(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    recover: (Exception) -> Unit = { throw it },
+    block: suspend CoroutineScope.() -> Unit,
+): Job = launch(context, start) {
+    try {
+        supervisorScope(block)
+    } catch (expected: CancellationException) {
+        throw expected
+    } catch (expected: Exception) {
+        recover(expected)
+    }
+}

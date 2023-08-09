@@ -4,10 +4,12 @@ package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.ActionConsumer
+import pro.respawn.flowmvi.api.ActionProvider
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateConsumer
+import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.Store
 import kotlin.jvm.JvmName
@@ -70,7 +72,7 @@ public typealias Recover<S> = (e: Exception) -> S
         "pro.respawn.flowmvi.api.Store"
     )
 )
-public typealias MVIProvider<S, I, A> = Provider<S, I, A>
+public interface MVIProvider<S : MVIState, I : MVIIntent, A : MVIAction> : Provider<S, I, A>, MutableStore<S, I, A>
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
@@ -81,7 +83,7 @@ public typealias MVIProvider<S, I, A> = Provider<S, I, A>
 @Deprecated("Use Store<S, I, A>", ReplaceWith("Store<S, I, A>", "pro.respawn.flowmvi.api.Store"))
 public interface MVIStore<S : MVIState, I : MVIIntent, A : MVIAction> :
     MVIProvider<S, I, A>,
-    Store<S, I, A>,
+    MutableStore<S, I, A>,
     StateReceiver<S>
 
 /**
@@ -195,4 +197,21 @@ This is only used to support MVIViewModel and other Deprecated APIs.
 public interface MutableStore<S : MVIState, I : MVIIntent, A : MVIAction> :
     Store<S, I, A>,
     StateReceiver<S>,
-    ActionReceiver<A>
+    ActionReceiver<A>,
+    ActionProvider<A>,
+    StateProvider<S>
+
+private const val Message = """
+This API is low-level and ignores ALL plugins, validations and thread synchronization. 
+Use it for performance-critical operations only.
+If you use it, make sure to not introduce races to your state management.
+"""
+
+/**
+ * Marker annotation for store apis that are not thread-safe
+ */
+@Deprecated("Moved to api package", ReplaceWith("pro.respawn.flowmvi.api.DelicateStoreApi"))
+@RequiresOptIn(message = Message)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+public annotation class DelicateStoreApi

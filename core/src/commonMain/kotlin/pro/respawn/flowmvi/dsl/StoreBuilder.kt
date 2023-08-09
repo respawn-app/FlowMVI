@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "NOTHING_TO_INLINE")
 
 package pro.respawn.flowmvi.dsl
 

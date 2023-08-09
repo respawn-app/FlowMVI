@@ -47,7 +47,7 @@ class ActionShareBehaviorTest : FreeSpec({
                         val job = store.start(this)
                         with(store) {
                             subscribe {
-                                intent { send(TestAction.Some) }
+                                intent { action(TestAction.Some) }
                             }.join()
                         }
                         job.join()
@@ -73,7 +73,7 @@ class ActionShareBehaviorTest : FreeSpec({
                         }
                     }
                     idle()
-                    val intent = TestIntent { send(TestAction.Some) }
+                    val intent = TestIntent { action(TestAction.Some) }
                     send(intent)
                     joinAll(job1, job2)
                     plugin.intents shouldContain intent
@@ -98,7 +98,7 @@ class ActionShareBehaviorTest : FreeSpec({
                         }
                     }
                     idle()
-                    intent { send(TestAction.Some) }
+                    intent { action(TestAction.Some) }
                     joinAll(job1, job2)
                 }
             }
@@ -120,7 +120,7 @@ class ActionShareBehaviorTest : FreeSpec({
                         }
                     }
                     idle()
-                    intent { send(TestAction.Some) }
+                    intent { action(TestAction.Some) }
                     joinAll(job1, job2)
                 }
             }
