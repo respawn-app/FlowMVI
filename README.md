@@ -32,18 +32,17 @@ flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } 
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
-
-flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test utils
+flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
 ```
 
 Supported platforms:
 
 * JVM: [ `Android`, `JRE 11+` ],
 * Linux [ `x64`, `mingw64` ],
-* Apple: [ `iosX64`, `macOSx64`, 'watchOSx64', 'tvOSx64' ],
+* Apple: [ `iOSx64`, `macOSx64`, `watchOSx64`, `tvOSx64` ],
 * js: [ `nodejs`, `browser` ]
 
-### A quick overview:
+### Feature overview:
 
 Rich, plugin-based store DSL:
 
