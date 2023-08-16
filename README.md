@@ -8,8 +8,6 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
-### This is Readme for FlowMVI 2.0, which is in alpha right now. Please go to the [V1 Docs](https://opensource.respawn.pro/FlowMVI/#/v1/) if you need to see the older version
-
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
 1. Being simple to understand and use while staying powerful and flexible.
@@ -222,20 +220,20 @@ class ScreenFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterA
 ### Testing DSL
 
 ```kotlin
+// using Turbine + Kotest
 testStore().subscribeAndTest {
-    intent {
-        updateState { TestState.SomeData(1) }
-        action(TestAction.Some)
-    } resultsIn {
-        states.test { // using turbine
-            awaitItem() shouldBe TestState.SomeData(1)
+
+    ClickedCounter resultsIn {
+
+        states.test {
+            awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
         }
         actions.test {
-            actions.test {
-                awaitItem() shouldBe TestAction.Some
-            }
+            awaitItem().shouldBeTypeOf<ShowMessage>()
         }
+
     }
+
 }
 ```
 
