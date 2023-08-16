@@ -28,6 +28,7 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
      * This plugin's name.
      * @see StorePlugin.name
      */
+    @FlowMVIDSL
     public var name: String? = null
 
     /**

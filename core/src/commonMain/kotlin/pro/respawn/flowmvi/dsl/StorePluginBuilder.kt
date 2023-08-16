@@ -30,6 +30,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
     /**
      * @see [StorePlugin.name]
      */
+    @FlowMVIDSL
     public var name: String? = null
 
     /**
@@ -93,6 +94,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
     /**
      * @see StorePlugin.onUnsubscribe
      */
+    @FlowMVIDSL
     public fun onUnsubscribe(
         block: PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
     ) {
