@@ -4,10 +4,10 @@
 - [ ] Add tests for plugins
 - [ ] LoC and HoC reporting
 - [ ] Undo/Redo plugin
-- [ ] Implement params support for DI
-- [ ] Implement a better native logging with expect/actual
+- [x] Implement params support for DI
+- [x] Implement a better native logging with expect/actual
 - [ ] DSL for composing stores to seamlessly split responsibilities
-- [ ] More debug checks and optimizations
+- [x] More debug checks and optimizations
 - [ ] Job manager plugin that can be accessed to cancel / start long-running jobs
 - [ ] Consider adding an Analytics plugin
 - [ ] Compose Multiplatform support

@@ -33,6 +33,7 @@ allprojects {
             jvmTarget.set(Config.jvmTarget)
             languageVersion.set(Config.kotlinVersion)
             freeCompilerArgs.addAll(Config.compilerArgs)
+            optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }
     }
 }
@@ -117,6 +118,13 @@ tasks {
             txt.required.set(false)
             sarif.required.set(true)
             md.required.set(false)
+        }
+    }
+
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+        filter {
+            isFailOnNoMatchingTests = false
         }
     }
 

@@ -8,8 +8,6 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
-### This is Readme for FlowMVI 2.0, which is in alpha right now. Please go to the [V1 Docs](https://opensource.respawn.pro/FlowMVI/#/v1/) if you need to see the older version
-
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
 1. Being simple to understand and use while staying powerful and flexible.
@@ -34,13 +32,15 @@ flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } 
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
+
+flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test utils
 ```
 
 Supported platforms:
 
 * JVM: [ `Android`, `JRE 11+` ],
-* Linux [ `X64`, `mingw64` ],
-* iOS: [ `X64`, `Arm64`, `macOS` ],
+* Linux [ `x64`, `mingw64` ],
+* Apple: [ `iosX64`, `macOSx64`, 'watchOSx64', 'tvOSx64' ],
 * js: [ `nodejs`, `browser` ]
 
 ### A quick overview:
@@ -214,6 +214,26 @@ class ScreenFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterA
     override fun consume(action: CounterAction) {
         // handle actions
     }
+}
+```
+
+### Testing DSL
+
+```kotlin
+// using Turbine + Kotest
+testStore().subscribeAndTest {
+
+    ClickedCounter resultsIn {
+
+        states.test {
+            awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
+        }
+        actions.test {
+            awaitItem().shouldBeTypeOf<ShowMessage>()
+        }
+
+    }
+
 }
 ```
 

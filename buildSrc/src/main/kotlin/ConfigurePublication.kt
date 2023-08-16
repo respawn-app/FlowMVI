@@ -9,6 +9,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
@@ -41,16 +42,11 @@ fun Project.publishMultiplatform() {
 /**
  * Publish the android artifact
  */
-fun Project.publishAndroid() {
-    requireNotNull(extensions.findByType<LibraryExtension>()).apply {
-        publishing {
-            singleVariant(Config.publishingVariant) {
-                withSourcesJar()
-                withJavadocJar()
-            }
-        }
-        testFixtures {
-            enable = true
+fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
+    publishing {
+        singleVariant(Config.publishingVariant) {
+            withSourcesJar()
+            withJavadocJar()
         }
     }
 
@@ -62,7 +58,7 @@ fun Project.publishAndroid() {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications {
-                create(Config.publishingVariant, MavenPublication::class.java) {
+                maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
                     from(components[Config.publishingVariant])
                     groupId = rootProject.group.toString()
                     artifactId = project.name

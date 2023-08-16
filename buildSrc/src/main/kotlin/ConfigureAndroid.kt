@@ -8,6 +8,7 @@ fun Project.configureAndroid(
     commonExtension: CommonExtension<*, *, *, *, *>,
 ) = commonExtension.apply {
     compileSdk = Config.compileSdk
+    val libs by versionCatalog
 
     defaultConfig {
         minSdk = Config.minSdk
@@ -33,12 +34,6 @@ fun Project.configureAndroid(
         targetCompatibility = Config.javaVersion
     }
 
-    kotlinOptions {
-        freeCompilerArgs += Config.jvmCompilerArgs
-        jvmTarget = Config.jvmTarget.target
-        languageVersion = Config.kotlinVersion.version
-    }
-
     buildFeatures {
         aidl = false
         buildConfig = false
@@ -50,17 +45,11 @@ fun Project.configureAndroid(
         compose = false
     }
 
-    val libs by versionCatalog
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.requireVersion("compose-compiler")
-    }
-
     packaging {
         resources {
             excludes += setOf(
                 "DebugProbesKt.bin",
                 "/META-INF/{AL2.0,LGPL2.1}",
-                "/META-INF/versions/9/previous-compilation-data.bin"
             )
         }
     }
@@ -71,21 +60,29 @@ fun Project.configureAndroid(
             isReturnDefaultValues = true
             all {
                 it.apply {
-                    useJUnitPlatform()
                     maxHeapSize = "1G"
-                    setForkEvery(100)
+                    forkEvery = 100
                     jvmArgs = listOf("-Xmx1g", "-Xms512m")
                 }
             }
         }
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.findVersion("compose-compiler").get().toString()
+        useLiveLiterals = true
     }
 }
 
 fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
     configureAndroid(this)
 
-    kotlinOptions {
-        freeCompilerArgs += "-Xexplicit-api=strict"
+    testFixtures {
+        enable = true
+    }
+
+    defaultConfig {
+        consumerProguardFiles(file(Config.consumerProguardFile))
     }
 
     buildTypes {
@@ -95,10 +92,6 @@ fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
                 project.name
             )
         }
-    }
-
-    defaultConfig {
-        consumerProguardFiles(file(Config.consumerProguardFile))
     }
 
     libraryVariants.all {

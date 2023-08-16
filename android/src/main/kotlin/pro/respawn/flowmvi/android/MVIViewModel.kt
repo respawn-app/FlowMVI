@@ -114,8 +114,9 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
 
     /**
-     * @see MVIStore.launchRecovering
+     * @see launchRecovering
      */
+    @Deprecated("launchRecovering is no longer needed. As you migrate to Stores, use launch()")
     protected fun launchRecovering(
         context: CoroutineContext = EmptyCoroutineContext,
         start: CoroutineStart = CoroutineStart.DEFAULT,
@@ -170,7 +171,10 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun start(scope: CoroutineScope): Job = error("Store is already started by the ViewModel")
 
+    @Deprecated("Directly using actions/states is deprecated. Use the subscribeDsl", ReplaceWith("subscribe()"))
     override val actions: Flow<A> get() = store.actions
+
+    @Deprecated("Directly using actions/states is deprecated. Use the subscribeDsl", ReplaceWith("subscribe()"))
     override val states: StateFlow<S> get() = store.states
 
     public override fun CoroutineScope.subscribe(

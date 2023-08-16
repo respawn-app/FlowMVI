@@ -48,7 +48,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
      * Should only be called once per screen.
      */
     @Composable
-    public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit): Unit
+    public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit)
 }
 
 @Composable

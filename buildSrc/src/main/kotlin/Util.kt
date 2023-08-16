@@ -5,14 +5,11 @@
     "UndocumentedPublicFunction"
 )
 
-import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.plugin.use.PluginDependency
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.util.Base64
 
 /**
@@ -31,12 +28,7 @@ fun VersionCatalog.requirePlugin(alias: String) = findPlugin(alias).get().toStri
 fun VersionCatalog.requireLib(alias: String) = findLibrary(alias).get()
 fun VersionCatalog.requireBundle(alias: String) = findBundle(alias).get()
 fun VersionCatalog.requireVersion(alias: String) = findVersion(alias).get().toString()
-
 val org.gradle.api.provider.Provider<PluginDependency>.id: String get() = get().pluginId
-
-fun CommonExtension<*, *, *, *, *>.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-    (this as ExtensionAware).extensions.configure("kotlinOptions", block)
-}
 
 /**
  * Creates a java array initializer code for a list of strings.
