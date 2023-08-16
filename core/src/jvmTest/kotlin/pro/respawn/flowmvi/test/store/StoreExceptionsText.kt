@@ -17,10 +17,10 @@ import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
+import pro.respawn.flowmvi.test.subscribeAndTest
+import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
-import pro.respawn.flowmvi.util.subscribeAndTest
-import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 

@@ -60,7 +60,6 @@ fun Project.configureAndroid(
             isReturnDefaultValues = true
             all {
                 it.apply {
-                    useJUnitPlatform()
                     maxHeapSize = "1G"
                     forkEvery = 100
                     jvmArgs = listOf("-Xmx1g", "-Xms512m")
@@ -77,6 +76,10 @@ fun Project.configureAndroid(
 
 fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
     configureAndroid(this)
+
+    testFixtures {
+        enable = true
+    }
 
     defaultConfig {
         consumerProguardFiles(file(Config.consumerProguardFile))

@@ -1,28 +1,17 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    // id(libs.plugins.atomicfu.id)
+    id("pro.respawn.shared-library")
     alias(libs.plugins.kotest)
-    kotlin("multiplatform")
-    id("com.android.library")
-    id("maven-publish")
-    signing
-}
-
-kotlin {
-    configureMultiplatform(this)
 }
 
 android {
     namespace = Config.namespace
-    configureAndroidLibrary(this)
-    publishAndroid(this)
 }
-
-publishMultiplatform()
 
 dependencies {
     commonMainApi(libs.kotlin.coroutines.core)
     commonMainImplementation(libs.kotlin.atomicfu)
-    "kotestTestImplementation"(libs.bundles.unittest)
-    "kotestTestImplementation"(project(":test"))
+    // unfortunately kotest doesn't support all the targets that we support
+    jvmTestImplementation(libs.bundles.unittest)
+    jvmTestImplementation(project(":test"))
 }

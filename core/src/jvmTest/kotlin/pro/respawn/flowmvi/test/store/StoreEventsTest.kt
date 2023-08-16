@@ -9,15 +9,14 @@ import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
-import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
+import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
-import pro.respawn.flowmvi.util.subscribeAndTest
 import pro.respawn.flowmvi.util.testStore
 
 class StoreEventsTest : FreeSpec({

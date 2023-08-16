@@ -11,15 +11,14 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeout
 import pro.respawn.flowmvi.dsl.send
-import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.test.subscribeAndTest
+import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
-import pro.respawn.flowmvi.util.subscribeAndTest
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
-@OptIn(ExperimentalStdlibApi::class)
 class StoreLaunchTest : FreeSpec({
     asUnconfined()
     val plugin = testTimeTravelPlugin()
@@ -83,9 +82,8 @@ class StoreLaunchTest : FreeSpec({
         "and an intent that should not be handled" - {
             val intent = TestIntent { throw IllegalArgumentException("intent was handled") }
             "and if store is launched and closed" - {
-                store.use {
-                    it.start(this)
-                    it.send { println("intent") }
+                store.test {
+                    send { println("intent") }
                     idle()
                 }
                 idle()

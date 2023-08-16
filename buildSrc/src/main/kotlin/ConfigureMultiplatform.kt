@@ -1,7 +1,6 @@
 @file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction", "LongMethod")
 
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -11,32 +10,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
 ) = ext.apply {
-    targetHierarchy.default {
-        group("kotest") {
-            withJvm()
-            withIosX64()
-            withAndroidTarget()
-        }
-    }
+    val libs by versionCatalog
     explicitApi()
 
-    val libs by versionCatalog
-    val commonMain by sourceSets.getting
-    val commonTest by sourceSets.getting
-
-    sourceSets.apply {
-        all {
-            languageSettings {
-                progressiveMode = true
-                languageVersion = Config.kotlinVersion.version
-                Config.optIns.forEach { optIn(it) }
-            }
-        }
-    }
+    targetHierarchy.default()
 
     linuxX64()
     linuxArm64()
-
     mingwX64()
 
     js(IR) {
@@ -61,7 +41,7 @@ fun Project.configureMultiplatform(
     }
 
     androidTarget {
-        publishLibraryVariants(Config.publishingVariant)
+        publishAllLibraryVariants()
     }
 
     jvm {
@@ -69,17 +49,6 @@ fun Project.configureMultiplatform(
             kotlinOptions {
                 jvmTarget = Config.jvmTarget.target
                 freeCompilerArgs += Config.jvmCompilerArgs
-            }
-        }
-        testRuns["test"].executionTask.configure {
-            useJUnitPlatform()
-        }
-    }
-
-    sourceSets.apply {
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.requireLib("kotest-junit"))
             }
         }
     }
@@ -103,5 +72,20 @@ fun Project.configureMultiplatform(
             binaryOption("bundleVersion", Config.versionName)
             baseName = Config.artifactId
         }
-    } // ios
+    }
+
+    sourceSets.apply {
+        val jvmTest by getting {
+            dependencies {
+                implementation(libs.requireLib("kotest-junit"))
+            }
+        }
+        all {
+            languageSettings {
+                progressiveMode = true
+                languageVersion = Config.kotlinVersion.version
+                Config.optIns.forEach { optIn(it) }
+            }
+        }
+    }
 }

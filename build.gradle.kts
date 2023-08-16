@@ -121,6 +121,13 @@ tasks {
         }
     }
 
+    withType<Test>().configureEach {
+        useJUnitPlatform()
+        filter {
+            isFailOnNoMatchingTests = false
+        }
+    }
+
     register<io.gitlab.arturbosch.detekt.Detekt>("detektFormat") {
         description = "Formats whole project."
         autoCorrect = true

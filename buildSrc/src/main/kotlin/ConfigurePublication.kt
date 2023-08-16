@@ -3,13 +3,13 @@
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
-import gradle.kotlin.dsl.accessors._49c46f32d5be065ecf6a6309cc175bfd.publishing
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
@@ -49,9 +49,6 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
             withJavadocJar()
         }
     }
-    testFixtures {
-        enable = true
-    }
 
     afterEvaluate {
         val properties = gradleLocalProperties(rootDir)
@@ -61,7 +58,7 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications {
-                create(Config.publishingVariant, MavenPublication::class.java) {
+                maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
                     from(components[Config.publishingVariant])
                     groupId = rootProject.group.toString()
                     artifactId = project.name

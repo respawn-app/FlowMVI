@@ -68,17 +68,17 @@ comments:
     endOfSentenceFormat: '([.?!][ \t\n\r\f<])|([.?!:]$)'
   UndocumentedPublicClass:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
     searchInNestedClass: true
     searchInInnerClass: true
     searchInInnerObject: true
     searchInInnerInterface: true
   UndocumentedPublicFunction:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
   UndocumentedPublicProperty:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
 
 complexity:
   active: true
@@ -141,14 +141,14 @@ complexity:
     active: false
   StringLiteralDuplication:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     threshold: 5
     ignoreAnnotation: true
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
   TooManyFunctions:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
     thresholdInFiles: 50
     thresholdInClasses: 11
     thresholdInInterfaces: 11
@@ -221,7 +221,7 @@ exceptions:
       - 'finalize'
   InstanceOfCheckForException:
     active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
   NotImplementedDeclaration:
     active: true
   ObjectExtendsThrowable:
@@ -247,7 +247,7 @@ exceptions:
     active: true
   ThrowingExceptionsWithoutMessageOrCause:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/jvmTest/**', '**/jsTest/**', '**/iosTest/**' ]
     exceptions:
       - 'ArrayIndexOutOfBoundsException'
       - 'Error'
@@ -261,7 +261,7 @@ exceptions:
     active: true
   TooGenericExceptionCaught:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     exceptionNames:
       - 'ArrayIndexOutOfBoundsException'
       - 'Error'
@@ -421,40 +421,40 @@ naming:
     active: true
   ClassNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     classPattern: '[A-Z][a-zA-Z0-9]*'
   ConstructorParameterNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     parameterPattern: '[a-z][A-Za-z0-9]*'
     privateParameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
   EnumNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     enumEntryPattern: '[A-Z][_a-zA-Z0-9]*'
   ForbiddenClassName:
     active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     forbiddenName: [ ]
   FunctionMaxLength:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     maximumFunctionNameLength: 40
   FunctionMinLength:
     active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     minimumFunctionNameLength: 3
   FunctionNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     functionPattern: '([a-zA-Z][a-zA-Z0-9]*)|(`.*`)'
     excludeClassPattern: '$^'
     ignoreAnnotated:
       - 'Composable'
   FunctionParameterNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
   InvalidPackageDeclaration:
@@ -471,34 +471,34 @@ naming:
     active: true
   NonBooleanPropertyPrefixedWithIs:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
   ObjectPropertyNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     constantPattern: '[A-Za-z][_A-Za-z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '(_)?[A-Za-z][_A-Za-z0-9]*'
   PackageNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     packagePattern: '[a-z_]+(\.[a-z][A-Za-z0-9_]*)*'
   TopLevelPropertyNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     constantPattern: '[A-Z][_A-Za-z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '_?[A-Za-z][_A-Za-z0-9]*'
   VariableMaxLength:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     maximumVariableNameLength: 64
   VariableMinLength:
     active: false
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     minimumVariableNameLength: 1
   VariableNaming:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     variablePattern: '[a-z][A-Za-z0-9]*'
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
@@ -513,10 +513,10 @@ performance:
     active: true
   ForEachOnRange:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
   SpreadOperator:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
   UnnecessaryTemporaryInstantiation:
     active: true
 
@@ -573,7 +573,7 @@ potential-bugs:
     active: true
   LateinitUsage:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     ignoreAnnotated: [ ]
     ignoreOnClassesPattern: ''
   MapGetWithNotNullAssertionOperator:
@@ -688,7 +688,7 @@ style:
     maxJumpCount: 1
   MagicNumber:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     ignoreAnnotated:
       - 'androidx.compose.ui.tooling.preview.Preview'
     ignoreNumbers:
@@ -831,7 +831,7 @@ style:
     active: true
   WildcardImport:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**' ]
     excludeImports:
       - 'java.util.*'
       - 'kotlinx.android.synthetic.*'

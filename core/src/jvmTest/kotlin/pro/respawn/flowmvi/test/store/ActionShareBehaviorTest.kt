@@ -12,15 +12,14 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
+import pro.respawn.flowmvi.test.subscribeAndTest
+import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
-import pro.respawn.flowmvi.util.subscribeAndTest
-import pro.respawn.flowmvi.util.test
 import pro.respawn.flowmvi.util.testStore
 
 class ActionShareBehaviorTest : FreeSpec({
