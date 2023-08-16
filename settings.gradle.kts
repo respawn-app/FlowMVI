@@ -68,6 +68,7 @@ fun RepositoryHandler.node() {
 fun RepositoryHandler.ivyNative() {
     ivy { url = uri("https://download.jetbrains.com") }
 
+    // TODO: Maybe this is not needed anymore
     exclusiveContent {
         forRepository {
             this@ivyNative.ivy("https://download.jetbrains.com/kotlin/native/builds") {
