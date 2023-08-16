@@ -1,7 +1,6 @@
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     // id(libs.plugins.atomicfu.id)
-    alias(libs.plugins.kotest)
     kotlin("multiplatform")
     id("com.android.library")
     id("maven-publish")
@@ -13,15 +12,16 @@ kotlin {
 }
 
 android {
-    namespace = Config.namespace
+    namespace = "${Config.namespace}.test"
     configureAndroidLibrary(this)
+    publishAndroid(this)
 }
 
-publishAndroid()
 publishMultiplatform()
 
 dependencies {
-    commonMainApi(libs.kotlinx.coroutines.core)
-    commonMainImplementation(libs.kotlinx.atomicfu)
-    "kotestTestImplementation"(libs.bundles.unittest)
+    commonMainApi(project(":core"))
+    commonMainApi(libs.kotlin.coroutines.core)
+    commonMainApi(libs.kotlin.test)
+    commonMainApi(libs.kotlin.coroutines.test)
 }

@@ -21,7 +21,8 @@ android {
 publishMultiplatform()
 
 dependencies {
-    commonMainApi(libs.kotlinx.coroutines.core)
-    commonMainImplementation(libs.kotlinx.atomicfu)
+    commonMainApi(libs.kotlin.coroutines.core)
+    commonMainImplementation(libs.kotlin.atomicfu)
     "kotestTestImplementation"(libs.bundles.unittest)
+    "kotestTestImplementation"(project(":test"))
 }

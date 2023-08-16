@@ -97,6 +97,7 @@ fun RepositoryHandler.ivyNative() {
 rootProject.name = "FlowMVI"
 
 include(":app")
+include(":test")
 include(":core")
 include(":android")
 include(":android-compose")

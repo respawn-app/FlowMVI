@@ -10,6 +10,6 @@ dependencies {
     api(project(":core"))
     api(libs.lifecycle.runtime)
     api(libs.lifecycle.viewmodel)
-    api(libs.kotlinx.coroutines.android)
+    api(libs.kotlin.coroutines.android)
     implementation(libs.lifecycle.savedstate)
 }
