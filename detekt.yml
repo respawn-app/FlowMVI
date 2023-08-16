@@ -68,17 +68,17 @@ comments:
     endOfSentenceFormat: '([.?!][ \t\n\r\f<])|([.?!:]$)'
   UndocumentedPublicClass:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
     searchInNestedClass: true
     searchInInnerClass: true
     searchInInnerObject: true
     searchInInnerInterface: true
   UndocumentedPublicFunction:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
   UndocumentedPublicProperty:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
 
 complexity:
   active: true
@@ -148,7 +148,7 @@ complexity:
     ignoreStringsRegex: '$^'
   TooManyFunctions:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**',  '**.kts', '**/kotestTest/**', '**/app/**' ]
     thresholdInFiles: 50
     thresholdInClasses: 11
     thresholdInInterfaces: 11
