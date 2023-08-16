@@ -6,7 +6,10 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 
-// TODO: Implement logging as expect/actual, this is not extensible.
+public actual fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPlugin(
+    tag: String?,
+    level: StoreLogLevel?,
+): StorePlugin<S, I, A> = nativeLoggingPlugin(tag)
 
 /**
  * Log store's events using [NSLog]

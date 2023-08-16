@@ -15,9 +15,9 @@ kotlin {
 android {
     namespace = Config.namespace
     configureAndroidLibrary(this)
-    publishAndroid(this)
 }
 
+publishAndroid()
 publishMultiplatform()
 
 dependencies {

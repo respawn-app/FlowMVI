@@ -7,6 +7,11 @@ plugins {
 
 android {
     configureAndroidLibrary(this)
-}
+    publishAndroid(this)
 
-publishAndroid()
+    kotlinOptions {
+        freeCompilerArgs += Config.jvmCompilerArgs
+        jvmTarget = Config.jvmTarget.target
+        languageVersion = Config.kotlinVersion.version
+    }
+}

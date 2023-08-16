@@ -14,13 +14,17 @@ android {
         minSdk = Config.appMinSdk
         targetSdk = Config.targetSdk
         versionCode = 1
-        versionName = "1.0"
+        versionName = Config.versionName
     }
-
     buildFeatures {
         buildConfig = true
         compose = true
         viewBinding = true
+    }
+    kotlinOptions {
+        freeCompilerArgs += Config.jvmCompilerArgs
+        jvmTarget = Config.jvmTarget.target
+        languageVersion = Config.kotlinVersion.version
     }
 }
 

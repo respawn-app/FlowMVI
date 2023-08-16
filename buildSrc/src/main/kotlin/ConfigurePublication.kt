@@ -3,6 +3,7 @@
 import com.android.build.api.dsl.LibraryExtension
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
+import gradle.kotlin.dsl.accessors._49c46f32d5be065ecf6a6309cc175bfd.publishing
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -41,17 +42,15 @@ fun Project.publishMultiplatform() {
 /**
  * Publish the android artifact
  */
-fun Project.publishAndroid() {
-    requireNotNull(extensions.findByType<LibraryExtension>()).apply {
-        publishing {
-            singleVariant(Config.publishingVariant) {
-                withSourcesJar()
-                withJavadocJar()
-            }
+fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
+    publishing {
+        singleVariant(Config.publishingVariant) {
+            withSourcesJar()
+            withJavadocJar()
         }
-        testFixtures {
-            enable = true
-        }
+    }
+    testFixtures {
+        enable = true
     }
 
     afterEvaluate {
