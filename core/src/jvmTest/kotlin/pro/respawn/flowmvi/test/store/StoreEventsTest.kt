@@ -63,7 +63,7 @@ class StoreEventsTest : FreeSpec({
                     }
                     null
                 }
-                reduce("reduceThrowing") {
+                reduce(true, "reduceThrowing") {
                     throw e
                 }
             }
