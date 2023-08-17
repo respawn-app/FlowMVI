@@ -8,7 +8,7 @@ Access the store's context and other functions through the `PipelineContext` rec
 It is not recommended to implement the `StorePlugin` interface,
 if you really need to subclass something, extend `AbstractStorePlugin` instead.
 If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
-described below
+described below.
 
 ## Step 1: Choose if your plugin will be generic or store-specific.
 
@@ -99,12 +99,12 @@ or when `state` is obtained directly.
 A callback that is invoked each time an intent is received **and then begun** to be processed.
 
 This callback is invoked **after** the intent is sent and **before** it is received,
-sometimes the time difference can be significant if the store was stopped for some time.
+sometimes the time difference can be significant if the store was stopped for some time
 or even **never** if the store's buffer overflows or store is not ever used again.
 
 * Return null to veto the processing and prevent other plugins from using the intent.
-* Return another intent to replace intent with another one and continue with the chain.
-* Return intent to continue processing, leaving it unmodified.
+* Return another intent to replace `intent` with another one and continue with the chain.
+* Return `intent` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`.
 
 ### onAction
@@ -113,7 +113,7 @@ or even **never** if the store's buffer overflows or store is not ever used agai
  suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action
 ```
 
-A callback that is invoked each time an [MVIAction] has been sent.
+A callback that is invoked each time an `MVIAction` has been sent.
 
 This is invoked **after** the action has been sent, but **before** the store handles it.
 This function will always be invoked, even after the action is later dropped because of `ActionShareBehavior`,
@@ -121,8 +121,8 @@ and it will be invoked before the `send(action: A)` returns, if it has been susp
 parent coroutine that wanted to send the action.
 
 * Return null to veto the processing and prevent other plugins from using the action.
-* Return another action to replace action with another one and continue with the chain.
-* Return the action to continue processing, leaving the it unmodified.
+* Return another action to replace `action` with another one and continue with the chain.
+* Return `action` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`
 
 ### onException
@@ -141,7 +141,9 @@ store throws, or when an exception occurs in any other plugins.
   that some time may pass after the job is cancelled and the exception is handled.
 * Handled exceptions do not result in the store being closed.
 * You cannot prevent the job that threw an exception and all its nested jobs from failing. The job has already been
-  canceled and can no longer continue. This does not apply to the store's context however
+  canceled and can no longer continue. This does not apply to the store's context however.
+
+-----
 
 * Return `null` to signal that the exception has been handled and recovered from, continuing the flow's processing.
 * Return `e` if the exception was **not** handled and should be passed to other plugins.
@@ -169,7 +171,9 @@ This callback is executed **before** the subscriber gets access to the store and
 is incremented. This means, for the first subscription, `subscriberCount` will be `0`.
 
 This function is invoked in the store's scope, not the subscriber's scope.
-To launch jobs in the subscriber's scope, use `subscriberScope`. They will be canceled when the subscriber unsubscribes.
+To launch jobs in the subscriber's scope, use `subscriberScope`.
+They are not affected by store's plugins.
+They will be canceled when the subscriber unsubscribes.
 
 ### onUnsubscribe
 
@@ -181,7 +185,8 @@ A callback to be executed when the subscriber cancels its subscription job (unsu
 
 This callback is executed **after** the subscriber has been removed and **after** `subscriberCount` is
 decremented. This means, for the last subscriber, the count will be `0`.
-You cannot suspend in this function.
+You cannot suspend in this function as the subscriber has already been lost, but you can launch jobs using
+`PipelineContext`
 
 ### onStop
 
@@ -189,8 +194,10 @@ You cannot suspend in this function.
 fun onStop(e: Exception?): Unit = Unit
 ```
 
-Invoked after store is closed. This is called **after** the store is already closed, and you cannot
-influence the outcome. This is invoked for both exceptional stops and normal stops.
-Will not be invoked when an `Error` is thrown.
+Invoked when the store is closed.
 
-* e is the exception the store is closed with. Will be null for normal completions.
+* This is called **after** the store is already closed, and you cannot
+  influence the outcome.
+* This is invoked for both exceptional stops and normal stops.
+* Will not be invoked when an `Error` is thrown.
+* `e` is the exception the store is closed with. Will be null for normal completions.

@@ -14,7 +14,7 @@ Example that uses models from [quickstart](quickstart.md) and MVVM+ style.
 This example is also fully implemented in the sample app.
 
 ```kotlin
-internal class CounterViewModel(
+class CounterViewModel(
     repo: CounterRepository,
     handle: SavedStateHandle,
 ) : ViewModel(), Container<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
@@ -34,16 +34,16 @@ internal class CounterViewModel(
         reduceLambdas() // <-- don't forget that lambdas must still be reduced
     }
 
-    fun onClickCounter() = store.send {
-        action(CounterAction.ShowSnackbar(R.string.lambda_processing))
-        updateState<CounterState.DisplayingCounter, _> {
+    fun onClickCounter() = store.intent {
+        action(ShowSnackbar(R.string.lambda_processing))
+        updateState<DisplayingCounter, _> {
             copy(counter = counter + 1)
         }
     }
 }
 ```
 
-?> The upside of this approach is that it's easy to implement and has it's easier to use some platform-specific features
+?> The upside of this approach is that it's easier to implement and use some platform-specific features
 like `savedState` (you can still use them for KMP though)
 The downside is that you completely lose KMP compatibility. If you have plans to make your viewmodels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
@@ -58,8 +58,8 @@ First, wrap your store in a simple class. You don't have to implement `Container
 ```kotlin
 class CounterContainer(
     private val repo: CounterRepo,
-    private val param: String,
 ) : Container<CounterState, CounterIntent, CounterAction> {
+    
     override val store = store(Loading) {
         /* ... as before ... */
     }
@@ -108,7 +108,7 @@ Don't forget to annotate your state with `@Immutable` if you can. This will impr
 
 ```kotlin
 @Immutable
-sealed interface ScreenState {
+sealed interface CounterState: MVIState {
     /* ... */
 }
 ```
@@ -141,10 +141,11 @@ private fun Scope.CounterScreenContent(
 ) {
     when (state) {
         is DisplayingCounter -> {
-            Button(onClick = { send(ClickedCounter) }) { // send() available from scope
+            Button(onClick = { intent(ClickedCounter) }) { // intent() available from scope
                 Text("Counter: ${state.counter}")
             }
         }
+        /* ... */
     }
 }
 ```
@@ -197,9 +198,9 @@ for a more elaborate example.
 For a View-based project, inheritance rules. Just implement `MVIView` in your Fragment and subscribe to events.
 
 ```kotlin
-internal class CounterFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterAction> {
+class CounterFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterAction> {
+    
     private val binding by viewBinding<CounterFragmentBinding>()
-
     override val container by viewModel<CounterViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -215,6 +216,7 @@ internal class CounterFragment : Fragment(), MVIView<CounterState, CounterIntent
     override fun render(state: ScreenState) = with(binding) {
         with(state) {
             tvCounter.text = counter.toString()
+            /* ... update ALL views every time ... */
         }
     }
 

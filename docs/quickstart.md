@@ -2,7 +2,7 @@
 
 Here's how the library works at a glance:
 
-![](images/FlowMVI.jpg)
+![](images/FlowMVI.png)
 
 ## Step 1: Add Dependencies
 
@@ -37,12 +37,12 @@ So please consider the following comparison:
 
 ### MVVM+ style:
 
-| Pros 👍                                                                                                 | Cons 👎                                                                           |
-|:--------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------|
-| Elegant declaration - open a lambda block and write your logic there. Store's code remains clean        | Store's context is accessible outside of the store, leading to scope creep        |
-| Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose   |
-| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become less useful, such as logging/time travel/analytics       |
-| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be resent, composed, delegated, reused and organized into families |
+| Pros 👍                                                                                                 | Cons 👎                                                                         |
+|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|
+| Elegant declaration - open a lambda block and write your logic there. Store's code remains clean        | Store's context is accessible outside of the store, leading to scope creep      |
+| Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose |
+| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become less useful, such as logging/time travel/analytics     |
+| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated, reused and organized into families       |
 
 ## Step 3: Describe your Contract
 
@@ -60,24 +60,24 @@ start. To define your contract, ask yourself the following:
 * The `MVIState` is what should be displayed or used by the UI layer. Whenever the state changes,
   update **all** of your UI with the current properties of the state.
     * Do **not** make your state mutable. Because FlowMVI uses `StateFlow`s under the hood, your state changes
-      //*won't be reflected** if you mutate your state using `var`s or
+      *won't be reflected** if you mutate your state using `var`s or
       by using mutable properties such as `MutableList`s.
       Use `copy()` of the data classes to mutate your state instead. Even if you use `List`s as the value type,
       for example, make sure those are **new** lists and not just `MutableList`s that were upcasted.
     * It's okay to copy the state very often, modern devices can handle a few garbage collections.
-* The `MVIIntent` is an action that the user or the subscriber takes, for example clicks, permission grants and dialog
+* The `MVIIntent` is an action that the user or the subscriber takes, for example clicks, system broadcasts and dialog
   button presses.
 * The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
-    * Examples include Snackbars, Popup messages, Sounds and so on.
+    * Examples include snackbars, popup messages, sounds and so on.
     * Do not confuse States with Actions! Actions are **one-off, "fire and forget" events**.
-    * Actions are **sent sequentially**.
+    * Actions are **sent and received sequentially**.
     * Actions are sent from Store to the UI. Intents are sent in the other direction.
 
 </details>
 
 ```kotlin
 // Must be comparable and immutable
-internal sealed interface CounterState : MVIState {
+sealed interface CounterState : MVIState {
     data object Loading : CounterState
     data class Error(e: Exception) : CounterState
     data class DisplayingCounter(
@@ -86,7 +86,7 @@ internal sealed interface CounterState : MVIState {
 }
 
 // MVI Style Intents
-internal sealed interface CounterIntent : MVIIntent {
+sealed interface CounterIntent : MVIIntent {
     data object ClickedNext : CounterIntent
 
     @JvmInline
@@ -98,8 +98,8 @@ internal sealed interface CounterIntent : MVIIntent {
 // MVVM+ Style Intents
 typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
 
-// Optional - can disable by using Nothing as a type
-internal sealed interface CounterAction : MVIAction {
+// Optional - can be disabled by using Nothing as a type
+sealed interface CounterAction : MVIAction {
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
@@ -109,7 +109,6 @@ internal sealed interface CounterAction : MVIAction {
 Here's a full list of things that can be done when configuring the store:
 
 ```kotlin
-
 val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
 
     // Settings this to true enables additional store validations and debug logging.
@@ -120,7 +119,6 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
     var name: String? = null
 
     // Declare that intents must be processed in parallel.
-    // All guarantees on the order of intents will be lost.
     // Intents may still be dropped according to the onOverflow param.
     var parallelIntents = false
 
@@ -138,10 +136,10 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 
     // Install a prebuilt plugin. The order of plugins matters!
     // Plugins will preserve the order of installation and will proceed according to this order.
-    // Installation of the same plugin multiple times is **not allowed**.
+    // Installation of the same plugin multiple times is not allowed.
     fun install(plugin: StorePlugin<S, I, A>)
 
-    // Create and install a new StorePlugin. The order of plugins matters!
+    // Create and install a new StorePlugin on the fly.
     fun install(block: StorePluginBuilder<S, I, A>.() -> Unit)
 }
 ```
@@ -162,12 +160,12 @@ FlowMVI is built entirely based on plugins!
 For every store, you'll likely want to install a few plugins.
 Prebuilt plugins come with a nice dsl when building a store. Here's the list of prebuilt plugins:
 
-* **Reduce Plugin** - process incoming intents. Install with `reduce { /* ... */ }`.
-* **Init Plugin** - do something when store is launched. Install with `init { /* ... */ }`.
-* **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { /* ... */ }`.
-* **While Subscribed Plugin** - run jobs when the first subscriber of a store appears. Install
+* **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
+* **Init Plugin** - do something when store is launched. Install with `init { }`.
+* **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
+* **While Subscribed Plugin** - run jobs when the Nth subscriber of a store appears. Install
   with `whileSubscribed { }`.
-* **LoggingPlugin** (console/android/platform) - log events to a log stream for your chosen platform.
+* **LoggingPlugin** - log events to a log stream of the target platform.
 * **SavedStatePlugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
   `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
 * **JobManagerPlugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
@@ -204,7 +202,7 @@ That example was simple, but this rule can manifest in other, not so obvious way
 ```kotlin
 val broken = store(Loading) {
 
-    parcelizeState() // ‼️ restores state from the saved state handle 
+    serializeState() // ‼️ restores state on start
 
     init {
         updateState {
@@ -212,8 +210,8 @@ val broken = store(Loading) {
         }
     }
 
-    // this happened because savedState() uses onStart() under the hood, and init does too.
-    // Init is run after savedState because it was installed later.
+    // this happened because serializeState() uses onStart() under the hood, and init does too.
+    // Init is run after serializeState because it was installed later.
 }
 // or
 val broken = store(Loading) {
@@ -241,30 +239,31 @@ you handle intents, but it's possible to create a store like this:
 This is a store that does **literally nothing**. If you forget to install the reduce plugin, your intents won't be
 acted upon.
 
-### Step 6: Create, inject, and provide dependencies
+### Step 6: Create, inject and provide dependencies
 
 You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
 putting all code into the store's builder.
 
 The best way to do this is to create a class that acts as a simple wrapper for your store. By convention, it can
-usually be called `Container`[^1]. Feel free to not use the provided interface, it's only purpose is to act as a marker.
+usually be called `Container`[^1]. Feel free to not use the provided interface, its only purpose is to act as a marker.
 
 ```kotlin
-
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
-class CounterContainer(private val repo: CounterRepository) : Container<CounterState, CounterIntent, CounterAction> {
+class CounterContainer(
+    private val repo: CounterRepository,
+) : Container<CounterState, CounterIntent, CounterAction> {
 
     override val store = store(Loading) {
         whileSubscribed {
-            repo.counter
+            repo.timer
                 .onEach(::produceState)
                 .consume()
         }
     }
 
     // example custom function
-    private fun Ctx.produceState(counter: Int) = updateState { DisplayingCounter(counter) }
+    private fun Ctx.produceState(timer: Int) = updateState { DisplayingCounter(timer) }
 }
 ```
 

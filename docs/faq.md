@@ -22,6 +22,7 @@
 * There is an ongoing discussion about whether to name your intents starting with the verb or with the noun.
     * Case 1: `ClickedCounter`
     * Case 2: `CounterClicked`
+
       In general, this is up to your personal preference, just make sure you use a single style across all of your
       Contracts. I personally like to name intents starting with the verb (Case 1) for easier autosuggestions from the
       IDE.
@@ -42,9 +43,9 @@ Here's an example of rules we use at [Respawn](https://respawn.pro) to name our 
 ### My intents are not reduced! When I click buttons, nothing happens, the app just hangs.
 
 Did you call `Store.start(scope: CoroutineScope)`?
-Did you call `Store.subscribe()?`
+Did you call `Store.subscribe()`?
 
-### My Actions are not consumed, dropped, or missed.
+### My Actions are not consumed, are dropped or missed.
 
 1. Examine if you have `subscribe`d to the store correctly. Define the lifecycle state as needed.
 2. Check your `ActionShareBehavior`. When using `Share`, if you have multiple subscribers and one of them is not
@@ -69,7 +70,7 @@ Contributions with examples for Hilt setup are welcome.
 ### When I consume an Action, the other actions are delayed or do not come.
 
 Since actions are processed sequentially, make sure you launch a coroutine to not prevent other actions from coming and
-being handled.
+suspending the scope.
 
 ### I want to expose a few public functions in my container for the store. Should I do that?
 
@@ -96,10 +97,9 @@ There are two ways to do this.
 1. First one is using one of the Result wrappers, like `ApiResult`
    from [KMMUtils](https://github.com/respawn-app/kmmutils), a monad from Arrow.io or, as the last resort,
    a `kotlin.Result`.
-2. Second one involves using a provided `recover` function of the store that will be run when an exception is
-   caught in `reduce` or child coroutines, but that works for "critical" errors only, because current state is hard to
-   obtain in that block. Use `state` property at your own risk.
-   You can also pass `recover` to each call of `launchRecovering`.
+2. Second one involves using a provided `recover` plugin that will be run when an exception is
+   caught in plugins or child coroutines, but that works for "critical" errors only, because job's context is not
+   present in that block.
 
 ### But that other library allows me to define 9000 handlers, actors, processors and whatnot - and I can reuse Intents. Why not do the same?
 
@@ -144,8 +144,9 @@ sealed interface NewsState {
 }
 ```
 
-Use `T.withType<Type>(block: Type.() -> Unit)` to cast your sub-states easier as
-the `(this as? State)?.let { }` code can look ugly.
+* Use `T.withType<Type>(block: Type.() -> Unit)` to cast your sub-states easier as
+  the `(this as? State)?.let { }` code can look ugly.
+* Use `T.typed<Type>()` to perform a safe cast to the given state to clean up the code.
 
 ### I want to use a resource or a framework dependency in my store. How can I do that?
 
