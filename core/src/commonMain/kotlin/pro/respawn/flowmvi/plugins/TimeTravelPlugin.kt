@@ -7,19 +7,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
-
-private class CappedMutableCollection<T>(
-    private val maxSize: Int,
-    private val backing: MutableList<T> = mutableListOf(),
-) : MutableCollection<T> by backing {
-
-    override fun add(element: T): Boolean {
-        backing.add(element)
-        val remove = size > maxSize
-        if (remove) backing.removeAt(0)
-        return !remove
-    }
-}
+import pro.respawn.flowmvi.util.CappedMutableList
 
 /**
  * A plugin that keeps track of changes in the store.
@@ -35,28 +23,28 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
     maxExceptions: Int,
 ) : AbstractStorePlugin<S, I, A>(name) {
 
-    private val _states by atomic(CappedMutableCollection<S>(maxStates))
+    private val _states by atomic(CappedMutableList<S>(maxStates))
 
     /**
      * States emitted by the store, capped at [maxStates]
      * The last value is the most recent.
      */
     public val states: Collection<S> get() = _states
-    private val _intents by atomic(CappedMutableCollection<I>(maxIntents))
+    private val _intents by atomic(CappedMutableList<I>(maxIntents))
 
     /**
      * Intents processed by the store, capped at [maxIntents].
      * The last value is the most recent.
      */
     public val intents: Collection<I> get() = _intents
-    private val _actions by atomic(CappedMutableCollection<A>(maxActions))
+    private val _actions by atomic(CappedMutableList<A>(maxActions))
 
     /**
      *  Actions sent by the store, capped at [maxActions].
      * The last value is the most recent.
      */
     public val actions: Collection<A> get() = _actions
-    private val _exceptions by atomic(CappedMutableCollection<Exception>(maxExceptions))
+    private val _exceptions by atomic(CappedMutableList<Exception>(maxExceptions))
 
     /**
      * Last exceptions caught by store, capped at [maxExceptions].

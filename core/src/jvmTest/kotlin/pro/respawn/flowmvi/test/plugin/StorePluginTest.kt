@@ -15,5 +15,5 @@ class StorePluginTest : FreeSpec({
     //   subscriber count is correct
     //   subscriber count decrements correctly
     //   saved state plugin
-    //  while subscribed plugin: job cancelled, multiple subs, single sub
+    //   while subscribed plugin: job cancelled, multiple subs, single sub
 })
