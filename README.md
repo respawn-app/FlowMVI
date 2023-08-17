@@ -73,7 +73,7 @@ class CounterContainer(
         actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute or consume side effects
         intentCapacity = 64
 
-        install(consoleLoggingPlugin()) // log to console, logcat or NSLog
+        install(platformLoggingPlugin()) // log to console, logcat or NSLog
 
         install(analyticsPlugin(name)) // install custom plugins 
 
@@ -83,6 +83,10 @@ class CounterContainer(
             get = { repo.restoreStateFromFile() }
             set = { repo.saveStateToFile(this) }
         }
+
+        val undoRedoPlugin = undoRedo(maxQueueSize = 10) // undo and redo any changes
+
+        val jobManager = manageJobs() // manage named jobs
 
         init { // run actions when store is launched
             repo.startTimer()
@@ -118,7 +122,7 @@ class CounterContainer(
             onState { old, new -> // veto changes, modify states, launch jobs, do literally anything
                 new.withType<DisplayingCounter, _> {
                     if (counter >= 100) {
-                        launch { repo.resetTimer() }
+                        launch { repo.resetTimer() }.register(jobManager, "reset")
                         copy(counter = 0, timer = 0)
                     } else new
                 }
