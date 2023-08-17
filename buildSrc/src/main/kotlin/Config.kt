@@ -18,7 +18,7 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 0
     const val patch = 0
-    const val postfix = "beta01"
+    const val postfix = "beta02"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
 
     // kotlin

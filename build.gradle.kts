@@ -46,6 +46,34 @@ subprojects {
     }
 
     tasks {
+        withType<Test>().configureEach {
+            useJUnitPlatform()
+            filter {
+                isFailOnNoMatchingTests = true
+            }
+            testLogging {
+                events(
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+                    org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
+                )
+                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+                showExceptions = true
+                showCauses = true
+                showStackTraces = true
+                addTestListener(object : TestListener {
+                    override fun beforeSuite(suite: TestDescriptor?) = Unit
+
+                    override fun afterSuite(suite: TestDescriptor?, result: TestResult?) =
+                        logger.info("${result?.testCount} tests completed")
+
+                    override fun beforeTest(testDescriptor: TestDescriptor?) = Unit
+
+                    override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) = Unit
+                })
+            }
+        }
         withType<AbstractDokkaTask> {
             val className =
                 "org.jetbrains.kotlin.gradle.targets.native.internal.CInteropMetadataDependencyTransformationTask"
@@ -118,13 +146,6 @@ tasks {
             txt.required.set(false)
             sarif.required.set(true)
             md.required.set(false)
-        }
-    }
-
-    withType<Test>().configureEach {
-        useJUnitPlatform()
-        filter {
-            isFailOnNoMatchingTests = false
         }
     }
 

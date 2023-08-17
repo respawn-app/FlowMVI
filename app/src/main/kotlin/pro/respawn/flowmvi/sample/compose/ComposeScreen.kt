@@ -32,6 +32,7 @@ import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
 import pro.respawn.flowmvi.sample.CounterIntent
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.R
@@ -95,6 +96,9 @@ private fun Scope.ComposeScreenContent(
 
                 Button(onClick = { send(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))
+                }
+                Button(onClick = { send(ClickedUndo) }) {
+                    Text(text = stringResource(id = R.string.counter_undo_label))
                 }
             }
             is CounterState.Loading -> CircularProgressIndicator()
