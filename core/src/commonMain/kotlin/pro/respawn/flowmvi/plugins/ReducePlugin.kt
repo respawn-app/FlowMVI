@@ -29,9 +29,10 @@ public typealias Reduce<S, I, A> = suspend PipelineContext<S, I, A>.(intent: I) 
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
+    consume: Boolean = true,
     name: String = ReducePluginName,
     crossinline reduce: Reduce<S, I, A>,
-): Unit = install(reducePlugin(name, reduce))
+): Unit = install(reducePlugin(consume, name, reduce))
 
 /**
  * Create  a new plugin that simply invokes [StorePlugin.onIntent], processes it and does not change the intent.
@@ -41,12 +42,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
  **/
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
+    consume: Boolean = true,
     name: String = ReducePluginName,
     crossinline reduce: Reduce<S, I, A>,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onIntent {
         reduce(it)
-        null
+        it.takeUnless { consume }
     }
 }
