@@ -31,8 +31,6 @@ internal class CappedMutableList<T>(
         return added
     }
 
-
-
     private fun removeOverflowing() {
         while (size > maxSize) {
             removeAt(0)

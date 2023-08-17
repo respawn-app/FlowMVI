@@ -31,6 +31,7 @@ typealias CounterLambdaIntent = LambdaIntent<CounterState, CounterAction>
 sealed interface CounterIntent : MVIIntent {
 
     data object ClickedCounter : CounterIntent
+    data object ClickedUndo : CounterIntent
 }
 
 @Immutable

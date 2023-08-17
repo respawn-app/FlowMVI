@@ -124,7 +124,7 @@ public class JobManager {
  * Same as [JobManager.put].
  */
 @FlowMVIDSL
-public inline fun Job.register(manager: JobManager, name: String) {
+public fun Job.register(manager: JobManager, name: String) {
     manager[name] = this
 }
 
@@ -132,7 +132,7 @@ public inline fun Job.register(manager: JobManager, name: String) {
  * Same as [JobManager.putOrReplace].
  */
 @FlowMVIDSL
-public suspend inline fun Job.registerOrReplace(
+public suspend fun Job.registerOrReplace(
     manager: JobManager,
     name: String
 ): Job? = manager.putOrReplace(name, this)

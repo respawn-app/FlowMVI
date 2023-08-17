@@ -39,6 +39,10 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
      */
     public val isQueueEmpty: Boolean get() = queue.isEmpty()
 
+    /**
+     * The current queue size of the plugin.
+     * This queue size does **not** consider current index and allows to get the total amount of events stored
+     */
     public val queueSize: Int get() = queue.size
 
     /**
@@ -64,7 +68,7 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     ): Int = lock.withLock {
         with(queue) {
             if (doImmediately) redo()
-            val range = (index.value.coerceAtLeast(0) + 1)..lastIndex
+            val range = index.value.coerceAtLeast(0) + 1..lastIndex
             if (!range.isEmpty()) removeAll(slice(range))
             add(Event(redo, undo))
             lastIndex.also { _index.value = it }
@@ -89,8 +93,7 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
         if (!canUndo) {
             require(!require) { "Tried to undo but nothing was in the queue" }
             -1
-        }
-        else {
+        } else {
             val i = index.value.coerceIn(queue.indices)
             queue[i].undo()
             (i - 1).also { _index.value = it }
@@ -105,8 +108,7 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
         if (!canRedo) {
             require(!require) { "Tried to redo but queue already at the last index of ${queue.lastIndex}" }
             queue.lastIndex
-        }
-        else {
+        } else {
             val i = index.value.coerceIn(queue.indices)
             queue[i].redo()
             (i + 1).also { _index.value = it }

@@ -8,13 +8,18 @@ import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.plugins.manageJobs
 import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
+import pro.respawn.flowmvi.plugins.register
+import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.repository.CounterRepository
@@ -31,20 +36,34 @@ class CounterContainer(
     override val store = store(CounterState.Loading) {
         name = "Counter"
         install(platformLoggingPlugin())
+        val manager = manageJobs()
+        val undoRedo = undoRedo(10)
         whileSubscribed {
-            repo.getTimer()
-                .onEach { produceState(it) } // set mapped states
-                .consume(Dispatchers.Default)
+            launch {
+                repo.getTimer()
+                    .onEach { produceState(it) } // set mapped states
+                    .consume(Dispatchers.Default)
+            }.register(manager, "timer")
         }
         reduce {
             when (it) {
-                is CounterIntent.ClickedCounter -> {
+                is ClickedCounter -> {
                     delay(1000)
                     require(Random.nextBoolean()) { "Oops, there was an error in a job" }
-                    updateState<DisplayingCounter, _> {
-                        copy(counter = counter + 1)
-                    }
+                    undoRedo(
+                        redo = {
+                            updateState<DisplayingCounter, _> {
+                                copy(counter = counter + 1)
+                            }
+                        },
+                        undo = {
+                            updateState<DisplayingCounter, _> {
+                                copy(counter = counter - 1)
+                            }
+                        }
+                    )
                 }
+                is ClickedUndo -> undoRedo.undo()
             }
         }
         recover {
@@ -54,6 +73,7 @@ class CounterContainer(
                 else updateState {
                     CounterState.Error(it)
                 }
+                manager.cancel("timer")
             }
             null
         }
