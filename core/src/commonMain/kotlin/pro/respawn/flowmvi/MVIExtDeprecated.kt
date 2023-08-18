@@ -85,7 +85,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I,
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "this.updateState(block)",
+        "this.withState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
@@ -109,7 +109,7 @@ public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.withSt
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "this.updateState(block)",
+        "this.withState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
