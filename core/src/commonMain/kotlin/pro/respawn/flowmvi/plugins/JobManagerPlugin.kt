@@ -18,6 +18,7 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
  * An entity that manages running jobs. Used with  [jobManagerPlugin] and [manageJobs].
  * Will cancel and remove all jobs if the parent [pro.respawn.flowmvi.api.Store] is closed
  */
+@Suppress("TooManyFunctions") // jobs have these functions!
 public class JobManager {
 
     internal companion object {
@@ -118,6 +119,25 @@ public class JobManager {
      * @return the job that was cancelled, or null if not found.
      */
     public fun cancel(name: String): Job? = jobs[name]?.apply { cancel() }
+
+    /**
+     * Cancel and join a job named [name] if it is present
+     * @return the job that was cancelled, or null if not found.
+     */
+    public suspend fun cancelAndJoin(name: String): Job? = jobs[name]?.apply { cancelAndJoin() }
+
+    /**
+     * Join the job named [name] if it is present.
+     *
+     * @return the completed job or null if not found
+     */
+    public suspend fun join(name: String): Job? = jobs[name]?.apply { join() }
+
+    /**
+     * Start the job named [name] if it is present.
+     * @return the job tha was started or null if not found.
+     */
+    public fun start(name: String): Job? = jobs[name]?.apply { start() }
 }
 
 /**
