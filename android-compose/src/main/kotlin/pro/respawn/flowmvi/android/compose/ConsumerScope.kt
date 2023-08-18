@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -28,20 +29,7 @@ import kotlin.experimental.ExperimentalTypeInference
  * An interface for the scope that provides magic [send] and [consume] functions inside your composable
  */
 @Stable
-public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> {
-
-    /**
-     * Send a new intent for the store you used in [MVIComposable]
-     * @see pro.respawn.flowmvi.api.IntentReceiver.send
-     */
-    public fun send(intent: I)
-
-    @Suppress("INAPPLICABLE_JVM_NAME")
-    @JvmName("sendAction")
-    /**
-     * @see send
-     */
-    public fun I.send(): Unit = send(this)
+public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentReceiver<I> {
 
     /**
      * Collect [MVIAction]s that come from the [Store].
@@ -70,8 +58,10 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     private val _actions = Channel<A>(Channel.UNLIMITED)
 
     override fun send(intent: I) = store.send(intent)
-    override fun hashCode(): Int = store.hashCode()
+    override suspend fun emit(intent: I) = store.emit(intent)
+
     override fun equals(other: Any?) = store == other
+    override fun hashCode(): Int = store.hashCode()
 
     @Composable
     override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
@@ -106,6 +96,7 @@ public fun <I : MVIIntent, A : MVIAction> EmptyScope(
 ): Unit = call(
     object : ConsumerScope<I, A> {
         override fun send(intent: I) = Unit
+        override suspend fun emit(intent: I) = Unit
 
         @Composable
         override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = Unit
