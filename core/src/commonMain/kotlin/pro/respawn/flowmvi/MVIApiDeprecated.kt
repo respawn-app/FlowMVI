@@ -94,8 +94,8 @@ public interface MVIStore<S : MVIState, I : MVIIntent, A : MVIAction> :
  * @See MVISubscriber
  */
 @Deprecated(
-    "This interface has been moved to the android module",
-    ReplaceWith("pro.respawn.flowmvi.android.view.MVIView<S, I, A>")
+    "Renamed to Consumer",
+    ReplaceWith("Consumer<S, I, A>")
 )
 public interface MVIView<S : MVIState, I : MVIIntent, A : MVIAction> : MVISubscriber<S, A> {
 

@@ -5,6 +5,10 @@ plugins {
     signing
 }
 
+kotlin {
+    explicitApi()
+}
+
 android {
     configureAndroidLibrary(this)
     publishAndroid(this)

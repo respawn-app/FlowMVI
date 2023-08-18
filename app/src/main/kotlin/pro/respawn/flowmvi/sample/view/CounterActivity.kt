@@ -8,8 +8,8 @@ import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import pro.respawn.flowmvi.android.view.MVIView
 import pro.respawn.flowmvi.android.view.subscribe
+import pro.respawn.flowmvi.api.Consumer
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
@@ -20,7 +20,7 @@ import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.ComposeActivity
 import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 
-class CounterActivity : ComponentActivity(), MVIView<CounterState, CounterLambdaIntent, CounterAction> {
+class CounterActivity : ComponentActivity(), Consumer<CounterState, CounterLambdaIntent, CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
