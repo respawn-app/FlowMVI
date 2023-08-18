@@ -44,7 +44,7 @@ public interface StateReceiver<S : MVIState> {
      * @returns the value of [R], i.e. the result of the block.
      */
     @FlowMVIDSL
-    public suspend fun <R> withState(block: suspend S.() -> R): R
+    public suspend fun withState(block: suspend S.() -> Unit)
 
     /**
      * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in
