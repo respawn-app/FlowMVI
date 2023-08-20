@@ -70,7 +70,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override suspend fun PipelineContext<S, I, A>.onAction(action: A) {
-        plugin { onAction(action)?.let { this@StoreImpl.send(it) } }
+        plugin { onAction(action)?.let { action(it) } }
     }
 
     override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) {

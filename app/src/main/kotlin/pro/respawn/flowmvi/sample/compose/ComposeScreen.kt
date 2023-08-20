@@ -55,7 +55,7 @@ fun ComposeScreen() = MVIComposable(
 
     consume { action ->
         // This block is run in a new coroutine each time we consume a new action and the lifecycle is RESUMED.
-        // You can run suspending (but not blocking) code here safely
+        // You can run suspending code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
             is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
@@ -85,8 +85,7 @@ private fun Scope.ComposeScreenContent(
             ) {
                 Text(
                     text = stringResource(id = R.string.timer_template, state.timer),
-                    // send() is available in ConsumerScope
-                    modifier = Modifier.clickable { send(ClickedCounter) }
+                    modifier = Modifier.clickable { intent(ClickedCounter) }
                 )
                 Text(
                     text = stringResource(id = R.string.counter_template, state.counter),
@@ -94,10 +93,10 @@ private fun Scope.ComposeScreenContent(
 
                 Text(text = state.param)
 
-                Button(onClick = { send(ClickedCounter) }) {
+                Button(onClick = { intent(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))
                 }
-                Button(onClick = { send(ClickedUndo) }) {
+                Button(onClick = { intent(ClickedUndo) }) {
                     Text(text = stringResource(id = R.string.counter_undo_label))
                 }
             }

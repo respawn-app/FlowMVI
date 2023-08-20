@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -43,14 +44,11 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): ConsumerScopeImpl<S, I, A> {
-    val scope = remember(store) { ConsumerScopeImpl(store) }
-    scope.collect(lifecycleState)
-    return scope
-}
+): ConsumerScopeImpl<S, I, A> = remember(store) { ConsumerScopeImpl(store) }
+    .apply { collect(lifecycleState) }
 
 @Stable
-internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
 ) : ConsumerScope<I, A> {
 
@@ -60,20 +58,17 @@ internal class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     override fun send(intent: I) = store.send(intent)
     override suspend fun emit(intent: I) = store.emit(intent)
 
-    override fun equals(other: Any?) = store == other
-    override fun hashCode(): Int = store.hashCode()
-
     @Composable
     override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
-        LaunchedEffect(Unit) {
-            for (it in _actions) onAction(it)
+        LaunchedEffect(this) {
+            _actions.consumeAsFlow().collect { onAction(it) }
         }
     }
 
     @Composable
     fun collect(lifecycleState: Lifecycle.State = Lifecycle.State.STARTED) {
         val owner = LocalLifecycleOwner.current
-        LaunchedEffect(owner, lifecycleState) {
+        LaunchedEffect(lifecycleState, this) {
             owner.subscribe(
                 lifecycleState = lifecycleState,
                 store = store,

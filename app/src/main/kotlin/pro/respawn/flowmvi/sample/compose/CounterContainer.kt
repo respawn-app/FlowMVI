@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.compose
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
@@ -47,8 +46,7 @@ class CounterContainer(
         }
         reduce {
             when (it) {
-                is ClickedCounter -> {
-                    delay(1000)
+                is ClickedCounter -> launch {
                     require(Random.nextBoolean()) { "Oops, there was an error in a job" }
                     undoRedo(
                         redo = {
