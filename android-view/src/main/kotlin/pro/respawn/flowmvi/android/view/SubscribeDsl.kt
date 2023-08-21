@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Job
 import pro.respawn.flowmvi.android.subscribe
+import pro.respawn.flowmvi.api.Consumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -42,7 +43,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : Fragment, T : MVIView<S, I, A> =
+): Job where T : Fragment, T : Consumer<S, I, A> =
     viewLifecycleOwner.subscribe(container.store, ::consume, ::render, lifecycleState)
 
 /**
@@ -53,4 +54,4 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(container.store, lifecycleState)
+): Job where T : LifecycleOwner, T : Consumer<S, I, A> = subscribe(container.store, lifecycleState)

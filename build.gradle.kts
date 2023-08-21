@@ -62,16 +62,6 @@ subprojects {
                 showExceptions = true
                 showCauses = true
                 showStackTraces = true
-                addTestListener(object : TestListener {
-                    override fun beforeSuite(suite: TestDescriptor?) = Unit
-
-                    override fun afterSuite(suite: TestDescriptor?, result: TestResult?) =
-                        logger.info("${result?.testCount} tests completed")
-
-                    override fun beforeTest(testDescriptor: TestDescriptor?) = Unit
-
-                    override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) = Unit
-                })
             }
         }
         withType<AbstractDokkaTask> {

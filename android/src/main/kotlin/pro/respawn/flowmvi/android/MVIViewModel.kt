@@ -111,7 +111,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * @see MVIStore.withState
      */
-    override suspend fun <R> withState(block: suspend S.() -> R): R = store.withState(block)
+    override suspend fun withState(block: suspend S.() -> Unit): Unit = store.withState(block)
 
     /**
      * @see launchRecovering

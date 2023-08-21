@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.Consumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -31,4 +32,16 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
             }
         }
     }
+}
+
+/**
+ * Subscribe to the [Consumer.container] and invoke [Consumer.consume] and [Consumer.render] in parallel in the provided scope.
+ * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * @see [Store.subscribe]
+ */
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> Consumer<S, I, A>.subscribe(
+    scope: CoroutineScope
+): Job = with(scope) {
+    subscribe(container.store, ::consume, ::render)
 }

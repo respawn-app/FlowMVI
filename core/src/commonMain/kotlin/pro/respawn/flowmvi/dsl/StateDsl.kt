@@ -9,7 +9,6 @@ import pro.respawn.flowmvi.util.withType
 import pro.respawn.flowmvi.withState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.jvm.JvmName
 
 /**
  * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
@@ -19,13 +18,13 @@ import kotlin.jvm.JvmName
  */
 @OverloadResolutionByLambdaReturnType
 @FlowMVIDSL
-public suspend inline fun <reified T : S, S : MVIState, R> StateReceiver<S>.withState(
-    @BuilderInference crossinline block: suspend T.() -> R
-): R? {
+public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withState(
+    @BuilderInference crossinline block: suspend T.() -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return withState { (this as? T)?.let { it.block() } }
+    withState { (this as? T)?.let { it.block() } }
 }
 
 /**
@@ -36,7 +35,6 @@ public suspend inline fun <reified T : S, S : MVIState, R> StateReceiver<S>.with
  * @see MVIStore.updateState
  * @see [withState]
  */
-@JvmName("updateStateTyped")
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S

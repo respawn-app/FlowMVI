@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.android.plugins.parcelizeState
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.reduceLambdas
-import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.whileSubscribed
@@ -53,7 +53,7 @@ class LambdaViewModel(
         DisplayingCounter(timer, current?.counter ?: 0, param)
     }
 
-    fun onClickCounter() = store.send {
+    fun onClickCounter() = store.intent {
         action(ShowLambdaMessage)
         updateState<DisplayingCounter, _> {
             copy(counter = counter + 1)

@@ -28,7 +28,7 @@ private class StateModuleImpl<S : MVIState>(initial: S) : StateModule<S> {
 
     override val states: StateFlow<S> = _states.asStateFlow()
 
-    override suspend fun <R> withState(block: suspend S.() -> R): R =
+    override suspend fun withState(block: suspend S.() -> Unit) =
         stateMutex.withReentrantLock { block(states.value) }
 
     override suspend fun updateState(transform: suspend S.() -> S) =

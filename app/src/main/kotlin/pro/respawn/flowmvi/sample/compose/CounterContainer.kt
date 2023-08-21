@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.compose
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.Container
@@ -16,8 +15,10 @@ import pro.respawn.flowmvi.plugins.register
 import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
@@ -47,8 +48,7 @@ class CounterContainer(
         }
         reduce {
             when (it) {
-                is ClickedCounter -> {
-                    delay(1000)
+                is ClickedCounter -> launch {
                     require(Random.nextBoolean()) { "Oops, there was an error in a job" }
                     undoRedo(
                         redo = {
@@ -64,6 +64,7 @@ class CounterContainer(
                     )
                 }
                 is ClickedUndo -> undoRedo.undo()
+                is ClickedBack -> action(GoBack)
             }
         }
         recover {

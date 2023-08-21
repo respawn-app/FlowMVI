@@ -32,6 +32,7 @@ sealed interface CounterIntent : MVIIntent {
 
     data object ClickedCounter : CounterIntent
     data object ClickedUndo : CounterIntent
+    data object ClickedBack : CounterIntent
 }
 
 @Immutable
@@ -39,4 +40,5 @@ sealed interface CounterAction : MVIAction {
 
     data object ShowErrorMessage : CounterAction
     data object ShowLambdaMessage : CounterAction
+    data object GoBack : CounterAction
 }

@@ -28,9 +28,11 @@ import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
 import pro.respawn.flowmvi.android.compose.StateProvider
 import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
 import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
@@ -46,7 +48,7 @@ fun ScaffoldState.snackbar(text: String) = launch { snackbarHostState.showSnackb
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen() = MVIComposable(
+fun ComposeScreen(onBack: () -> Unit) = MVIComposable(
     storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
 ) { state: CounterState -> // this -> ConsumerScope
 
@@ -55,11 +57,12 @@ fun ComposeScreen() = MVIComposable(
 
     consume { action ->
         // This block is run in a new coroutine each time we consume a new action and the lifecycle is RESUMED.
-        // You can run suspending (but not blocking) code here safely
+        // You can run suspending code here safely
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
             is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
             is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message))
+            is GoBack -> onBack()
         }
     }
 
@@ -85,8 +88,7 @@ private fun Scope.ComposeScreenContent(
             ) {
                 Text(
                     text = stringResource(id = R.string.timer_template, state.timer),
-                    // send() is available in ConsumerScope
-                    modifier = Modifier.clickable { send(ClickedCounter) }
+                    modifier = Modifier.clickable { intent(ClickedCounter) }
                 )
                 Text(
                     text = stringResource(id = R.string.counter_template, state.counter),
@@ -94,11 +96,14 @@ private fun Scope.ComposeScreenContent(
 
                 Text(text = state.param)
 
-                Button(onClick = { send(ClickedCounter) }) {
+                Button(onClick = { intent(ClickedCounter) }) {
                     Text(text = stringResource(id = R.string.counter_button_label))
                 }
-                Button(onClick = { send(ClickedUndo) }) {
+                Button(onClick = { intent(ClickedUndo) }) {
                     Text(text = stringResource(id = R.string.counter_undo_label))
+                }
+                Button(onClick = { intent(ClickedBack) }) {
+                    Text(text = stringResource(id = R.string.counter_back_label))
                 }
             }
             is CounterState.Loading -> CircularProgressIndicator()

@@ -85,17 +85,17 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIProvider<S, I,
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "this.updateState(block)",
+        "this.withState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
-public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.withState(
-    @BuilderInference crossinline block: suspend T.() -> R
-): R? {
+public suspend inline fun <reified T : S, S : MVIState> MVIStore<S, *, *>.withState(
+    @BuilderInference crossinline block: suspend T.() -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return withState { (this as? T)?.let { it.block() } }
+    withState { (this as? T)?.let { it.block() } }
 }
 
 /**
@@ -109,17 +109,17 @@ public suspend inline fun <reified T : S, S : MVIState, R> MVIStore<S, *, *>.wit
 @Deprecated(
     "Use StateReceiver.withState",
     ReplaceWith(
-        "this.updateState(block)",
+        "this.withState(block)",
         "pro.respawn.flowmvi.dsl.withState"
     )
 )
-public suspend inline fun <reified T : S, S : MVIState, R> ReducerScope<S, *, *>.withState(
-    @BuilderInference crossinline block: suspend T.() -> R
-): R? {
+public suspend inline fun <reified T : S, S : MVIState> ReducerScope<S, *, *>.withState(
+    @BuilderInference crossinline block: suspend T.() -> Unit
+) {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
     }
-    return withState { (this as? T)?.let { it.block() } }
+    withState { (this as? T)?.let { it.block() } }
 }
 
 /**
