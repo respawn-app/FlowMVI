@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -34,6 +33,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
     /**
      * Collect [MVIAction]s that come from the [Store].
      * Should only be called once per screen.
+     * Even if you do not have any Actions in your store you still **must** call this function to subscribe to the store
      */
     @Composable
     public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit)
@@ -43,35 +43,27 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): ConsumerScopeImpl<S, I, A> = remember(store) { ConsumerScopeImpl(store) }
-    .apply { collect(lifecycleState) }
+): ConsumerScopeImpl<S, I, A> = remember(store) { ConsumerScopeImpl(store, lifecycleState) }
 
 @Stable
 internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
+    private val lifecycleState: Lifecycle.State = Lifecycle.State.STARTED
 ) : ConsumerScope<I, A> {
 
     internal val state = mutableStateOf(store.initial)
-    private val _actions = MutableSharedFlow<A>()
 
     override fun send(intent: I) = store.send(intent)
     override suspend fun emit(intent: I) = store.emit(intent)
 
     @Composable
     override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
-        LaunchedEffect(this) {
-            _actions.collect { onAction(it) }
-        }
-    }
-
-    @Composable
-    fun collect(lifecycleState: Lifecycle.State = Lifecycle.State.STARTED) {
         val owner = LocalLifecycleOwner.current
-        LaunchedEffect(lifecycleState, this) {
+        LaunchedEffect(this) {
             owner.subscribe(
                 lifecycleState = lifecycleState,
                 store = store,
-                consume = { _actions.emit(it) },
+                consume = { onAction(it) },
                 render = { state.value = it }
             )
         }
