@@ -28,9 +28,11 @@ import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
 import pro.respawn.flowmvi.android.compose.StateProvider
 import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
 import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
@@ -46,7 +48,7 @@ fun ScaffoldState.snackbar(text: String) = launch { snackbarHostState.showSnackb
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen() = MVIComposable(
+fun ComposeScreen(onBack: () -> Unit) = MVIComposable(
     storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
 ) { state: CounterState -> // this -> ConsumerScope
 
@@ -60,6 +62,7 @@ fun ComposeScreen() = MVIComposable(
         when (action) {
             is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
             is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message))
+            is GoBack -> onBack()
         }
     }
 
@@ -98,6 +101,9 @@ private fun Scope.ComposeScreenContent(
                 }
                 Button(onClick = { intent(ClickedUndo) }) {
                     Text(text = stringResource(id = R.string.counter_undo_label))
+                }
+                Button(onClick = { intent(ClickedBack) }) {
+                    Text(text = stringResource(id = R.string.counter_back_label))
                 }
             }
             is CounterState.Loading -> CircularProgressIndicator()

@@ -15,8 +15,10 @@ import pro.respawn.flowmvi.plugins.register
 import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterIntent
+import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
@@ -62,6 +64,7 @@ class CounterContainer(
                     )
                 }
                 is ClickedUndo -> undoRedo.undo()
+                is ClickedBack -> action(GoBack)
             }
         }
         recover {

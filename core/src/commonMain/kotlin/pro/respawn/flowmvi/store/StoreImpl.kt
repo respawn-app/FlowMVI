@@ -70,7 +70,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override suspend fun PipelineContext<S, I, A>.onAction(action: A) {
-        plugin { onAction(action)?.let { action(it) } }
+        plugin { onAction(action)?.let { this@StoreImpl.action(it) } }
     }
 
     override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) {
@@ -112,6 +112,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         return name == other.name
     }
 
+    @OptIn(DelicateStoreApi::class)
     private suspend inline fun PipelineContext<S, I, A>.plugin(block: StorePlugin<S, I, A>.() -> Unit) =
         catch(this) { pluginModule(block) }
 

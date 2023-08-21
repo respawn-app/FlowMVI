@@ -13,7 +13,7 @@ class ComposeActivity : ComponentActivity() {
 
         setContent {
             MVISampleTheme {
-                ComposeScreen()
+                ComposeScreen { finish() }
             }
         }
     }

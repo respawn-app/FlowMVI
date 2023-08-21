@@ -10,4 +10,5 @@
     <string name="empty_message">Oops! Nothing here</string>
     <string name="to_compose_button_label">To compose screen</string>
     <string name="counter_undo_label">Undo</string>
+    <string name="counter_back_label">Back</string>
 </resources>

@@ -49,6 +49,7 @@ class CounterActivity : ComponentActivity(), Consumer<CounterState, CounterLambd
         when (action) {
             is ShowErrorMessage -> Snackbar.make(binding.root, R.string.error_message, Snackbar.LENGTH_SHORT).show()
             is ShowLambdaMessage -> Snackbar.make(binding.root, R.string.lambda_message, Snackbar.LENGTH_SHORT).show()
+            is CounterAction.GoBack -> finish()
         }
     }
 

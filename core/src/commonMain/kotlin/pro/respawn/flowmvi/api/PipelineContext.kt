@@ -55,11 +55,6 @@ public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
         flowOn(this@PipelineContext + context).collect()
 
     /**
-     * Catch exceptions in the upstream flow (everything above this call) and call [PipelineContext.recover] on them.
-     */
-    // public suspend fun <T> Flow<T>.recover(): Flow<T> = catchExceptions { recover(it) }
-
-    /**
      * A key of the [PipelineContext] in the parent coroutine context.
      */
     @DelicateStoreApi

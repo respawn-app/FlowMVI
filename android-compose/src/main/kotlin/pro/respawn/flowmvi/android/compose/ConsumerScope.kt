@@ -15,8 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -53,7 +52,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAct
 ) : ConsumerScope<I, A> {
 
     internal val state = mutableStateOf(store.initial)
-    private val _actions = Channel<A>(Channel.UNLIMITED)
+    private val _actions = MutableSharedFlow<A>()
 
     override fun send(intent: I) = store.send(intent)
     override suspend fun emit(intent: I) = store.emit(intent)
@@ -61,7 +60,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAct
     @Composable
     override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) {
         LaunchedEffect(this) {
-            _actions.consumeAsFlow().collect { onAction(it) }
+            _actions.collect { onAction(it) }
         }
     }
 
@@ -72,7 +71,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAct
             owner.subscribe(
                 lifecycleState = lifecycleState,
                 store = store,
-                consume = { _actions.send(it) },
+                consume = { _actions.emit(it) },
                 render = { state.value = it }
             )
         }
