@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * An entity that manages running jobs. Used with  [jobManagerPlugin] and [manageJobs].
@@ -167,7 +168,7 @@ public suspend fun Job.registerOrReplace(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugin(
     manager: JobManager,
     name: String? = JobManager.Name, // by default, do not allow duplicates
-): StorePlugin<S, I, A> = genericPlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
     onStop {
         manager.cancelAll()

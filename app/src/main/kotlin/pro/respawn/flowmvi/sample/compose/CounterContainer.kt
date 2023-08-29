@@ -68,6 +68,7 @@ class CounterContainer(
             }
         }
         recover {
+            undoRedo.reset()
             launch {
                 if (it is IllegalArgumentException)
                     action(ShowErrorMessage)

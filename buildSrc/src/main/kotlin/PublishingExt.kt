@@ -20,13 +20,13 @@ internal fun MavenPublication.configureVersion(release: Boolean) {
 
 internal fun MavenPublication.configurePom() = pom {
     name.set(Config.artifact)
-    description.set("A simple, classic KMM MVI implementation based on coroutines")
-    url.set("https://github.com/respawn-app/flowMVI")
+    description.set(Config.description)
+    url.set(Config.url)
 
     licenses {
         license {
-            name.set("The Apache Software License, Version 2.0")
-            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+            name.set(Config.licenseName)
+            url.set(Config.licenseUrl)
             distribution.set("repo")
         }
     }
@@ -41,11 +41,11 @@ internal fun MavenPublication.configurePom() = pom {
         }
     }
     scm {
-        url.set("https://github.com/respawn-app/flowMVI.git")
+        url.set(Config.scmUrl)
     }
 }
 
-internal fun PublishingExtension.sonatypeRepository(release: Boolean, properties: Properties) = repositories {
+internal fun PublishingExtension.sonatypeRepository(release: Boolean, localProps: Properties) = repositories {
     maven {
         name = "sonatype"
         url = URI(
@@ -56,22 +56,20 @@ internal fun PublishingExtension.sonatypeRepository(release: Boolean, properties
             }
         )
         credentials {
-            username = properties["sonatypeUsername"]?.toString()
-            password = properties["sonatypePassword"]?.toString()
+            username = localProps["sonatypeUsername"]?.toString()
+            password = localProps["sonatypePassword"]?.toString()
         }
     }
 }
 
-internal fun Project.signPublications(properties: Properties) =
+internal fun Project.signPublications(isRelease: Boolean, localProps: Properties) =
     requireNotNull(extensions.findByType<SigningExtension>()).apply {
-        val isReleaseBuild = properties["release"]?.toString().toBoolean()
-
         val publishing = requireNotNull(extensions.findByType<PublishingExtension>())
 
-        val signingKey: String? = properties["signing.key"]?.toString()
-        val signingPassword: String? = properties["signing.password"]?.toString()
+        val signingKey: String? = localProps["signing.key"]?.toString()
+        val signingPassword: String? = localProps["signing.password"]?.toString()
 
-        isRequired = isReleaseBuild
+        isRequired = isRelease
 
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
@@ -81,7 +79,7 @@ internal fun Project.signPublications(properties: Properties) =
 
         tasks.run {
             withType<Sign>().configureEach {
-                onlyIf { isReleaseBuild }
+                onlyIf { isRelease }
             }
 
             withType<AbstractPublishToMaven>().configureEach {

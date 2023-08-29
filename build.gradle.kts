@@ -1,5 +1,4 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
-import org.jetbrains.dokka.gradle.AbstractDokkaTask
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -39,6 +38,7 @@ allprojects {
 }
 
 subprojects {
+    if (name == "app") return@subprojects
     apply(plugin = rootProject.libs.plugins.dokka.id)
 
     dependencies {
@@ -48,36 +48,15 @@ subprojects {
     tasks {
         withType<Test>().configureEach {
             useJUnitPlatform()
-            filter {
-                isFailOnNoMatchingTests = true
-            }
-            testLogging {
-                events(
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
-                    org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_OUT,
-                )
-                exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-                showExceptions = true
-                showCauses = true
-                showStackTraces = true
-            }
+            filter { isFailOnNoMatchingTests = true }
         }
-        withType<AbstractDokkaTask> {
-            val className =
-                "org.jetbrains.kotlin.gradle.targets.native.internal.CInteropMetadataDependencyTransformationTask"
-
-            @Suppress("UNCHECKED_CAST")
-            val taskClass = Class.forName(className) as Class<Task>
-            parent?.subprojects?.forEach {
-                dependsOn(it.tasks.withType(taskClass))
-            }
-        }
-
         register<org.gradle.jvm.tasks.Jar>("dokkaJavadocJar") {
             dependsOn(dokkaJavadoc)
             from(dokkaJavadoc.flatMap { it.outputDirectory })
+            archiveClassifier.set("javadoc")
+        }
+
+        register<org.gradle.jvm.tasks.Jar>("emptyJavadocJar") {
             archiveClassifier.set("javadoc")
         }
     }

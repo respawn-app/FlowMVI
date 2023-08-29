@@ -58,6 +58,11 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     public fun send(intent: I): Unit = store.send(intent)
 
     /**
+     * See [pro.respawn.flowmvi.api.IntentReceiver.send]
+     */
+    public fun intent(intent: I): Unit = store.intent(intent)
+
+    /**
      * Stop the store and its coroutine scope. The store **cannot** be used again after this call!
      */
     override fun close(): Unit = scope.cancel()

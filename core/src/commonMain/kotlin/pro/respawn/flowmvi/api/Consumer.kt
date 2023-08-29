@@ -5,10 +5,7 @@ package pro.respawn.flowmvi.api
  * Each [Consumer] needs a container, a way to [send] intents to it,
  * a way to [render] the new state, and a way to [consume] side-effects.
  */
-public interface Consumer<S : MVIState, I : MVIIntent, A : MVIAction> :
-    StateConsumer<S>,
-    ActionConsumer<A>,
-    IntentReceiver<I> {
+public interface Consumer<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I> {
 
     /**
      * Container, an object that wraps a Store.

@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.dsl
 
 import pro.respawn.flowmvi.api.ActionReceiver
-import pro.respawn.flowmvi.api.Consumer
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -29,9 +28,3 @@ public suspend fun <I : MVIIntent> I.emit(): Unit = emit(this)
  */
 context(ActionReceiver<A>)
 public suspend fun <A : MVIAction> A.emit(): Unit = emit(this)
-
-/**
- * An alias for [ActionReceiver.action]
- */
-context(Consumer<*, I, *>)
-public fun <I : MVIIntent> I.send(): Unit = send(this)

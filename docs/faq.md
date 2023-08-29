@@ -98,8 +98,8 @@ There are two ways to do this.
    from [KMMUtils](https://github.com/respawn-app/kmmutils), a monad from Arrow.io or, as the last resort,
    a `kotlin.Result`.
 2. Second one involves using a provided `recover` plugin that will be run when an exception is
-   caught in plugins or child coroutines, but that works for "critical" errors only, because job's context is not
-   present in that block.
+   caught in plugins or child coroutines, but the plugin will be run **after** the job was already cancelled, so you
+   cannot continue the job execution anymore.
 
 ### But that other library allows me to define 9000 handlers, actors, processors and whatnot - and I can reuse Intents. Why not do the same?
 

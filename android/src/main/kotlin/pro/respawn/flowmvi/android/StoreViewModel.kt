@@ -24,6 +24,8 @@ public class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     store: Store<S, I, A>,
 ) : ViewModel(), Store<S, I, A> by store, Container<S, I, A> {
 
+    public constructor(container: Container<S, I, A>) : this(container.store)
+
     override val store: Store<S, I, A> get() = this
 
     init {

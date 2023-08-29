@@ -10,14 +10,6 @@ if you really need to subclass something, extend `AbstractStorePlugin` instead.
 If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
 described below.
 
-## Step 1: Choose if your plugin will be generic or store-specific.
-
-* If you want to create a typed plugin that is specific to a store, use `plugin` builder.
-* If you want to create a plugin that works with any store, use `genericPlugin` builder. Generic plugins have limited
-  functionality.
-
-## Step 2 : Create the plugin.
-
 Plugins are simply built:
 
 ```kotlin
@@ -27,6 +19,8 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
 }
 
 ```
+
+---
 
 Here are all the dsl functions of a plugin:
 
@@ -117,7 +111,7 @@ A callback that is invoked each time an `MVIAction` has been sent.
 
 This is invoked **after** the action has been sent, but **before** the store handles it.
 This function will always be invoked, even after the action is later dropped because of `ActionShareBehavior`,
-and it will be invoked before the `send(action: A)` returns, if it has been suspended, so this handler may suspend the
+and it will be invoked before the `action(action: A)` returns, if it has been suspended, so this handler may suspend the
 parent coroutine that wanted to send the action.
 
 * Return null to veto the processing and prevent other plugins from using the action.

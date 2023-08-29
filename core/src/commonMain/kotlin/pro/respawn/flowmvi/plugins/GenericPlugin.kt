@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -13,6 +15,7 @@ import pro.respawn.flowmvi.dsl.plugin
  * Due to the risk of mangling with the generic store's properties, this plugin cannot affect the store in any way.
  * The types of intents are also erased.
  */
+@Deprecated("Generic plugins do not bring any significant value. Use the regular plugin builder")
 public class GenericPluginBuilder @PublishedApi internal constructor() {
 
     private var intent: suspend (MVIIntent) -> Unit = {}
@@ -127,6 +130,10 @@ public class GenericPluginBuilder @PublishedApi internal constructor() {
  * Create a new [GenericPluginBuilder].
  */
 @FlowMVIDSL
+@Deprecated(
+    "Generic plugins do not bring any significant value. Use the regular plugin builder",
+    ReplaceWith("plugin<S, I, A>(builder)")
+)
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
     @BuilderInference builder: GenericPluginBuilder.() -> Unit,
 ): StorePlugin<S, I, A> = GenericPluginBuilder().apply(builder).build()
@@ -135,6 +142,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> genericPlugin(
  * Create a new [genericPlugin] and install it.
  */
 @FlowMVIDSL
+@Deprecated(
+    "Generic plugins do not bring any significant value. Use the regular plugin builder",
+    ReplaceWith("this.install(plugin)")
+)
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.genericPlugin(
     @BuilderInference plugin: GenericPluginBuilder.() -> Unit,
 ): Unit = install(genericPlugin(builder = plugin))

@@ -128,3 +128,13 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> plugin(
     @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>().apply(builder).build()
+
+/**
+ * Build a new [StorePlugin] using [StorePluginBuilder] lazily.
+ * Plugin will be created upon first usage (i.e. installation).
+ * @see [StorePlugin]
+ */
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyPlugin(
+    @BuilderInference crossinline builder: StorePluginBuilder<S, I, A>.() -> Unit,
+): Lazy<StorePlugin<S, I, A>> = lazy { plugin(builder) }
