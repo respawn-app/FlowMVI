@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.plugins.StoreLogLevel.Debug
 import pro.respawn.flowmvi.plugins.StoreLogLevel.Error
 import pro.respawn.flowmvi.plugins.StoreLogLevel.Info
@@ -44,16 +45,36 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     tag: String? = null,
     name: String = "${tag.orEmpty()}Logging",
     crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit,
-): StorePlugin<S, I, A> = genericPlugin {
+): StorePlugin<S, I, A> = plugin {
     this.name = name
-    onState { old, new -> log(Trace, tag ?: name, "\nState:\n--->\n$old\n<---\n$new") }
-    onIntent { log(Debug, tag ?: name, "Intent -> $it") }
-    onAction { log(Debug, tag ?: name, "Action -> $it") }
-    onException { log(Error, tag ?: name, "Exception:\n $it") }
-    onStart { log(Info, tag ?: name, "Started") }
-    onSubscribe { log(Info, tag ?: name, "New subscriber #${it + 1}") }
-    onUnsubscribe { log(Info, tag ?: name, "Subscriber #${it + 1} removed") }
-    onStop { log(Info, tag ?: name, "Stopped with e=$it") }
+    onState { old, new ->
+        log(Trace, tag ?: name, "\nState:\n--->\n$old\n<---\n$new")
+        new
+    }
+    onIntent {
+        log(Debug, tag ?: name, "Intent -> $it")
+        it
+    }
+    onAction {
+        log(Debug, tag ?: name, "Action -> $it")
+        it
+    }
+    onException {
+        log(Error, tag ?: name, "Exception:\n $it")
+        it
+    }
+    onStart {
+        log(Info, tag ?: name, "Started")
+    }
+    onSubscribe { _, subs ->
+        log(Info, tag ?: name, "New subscriber #${subs + 1}")
+    }
+    onUnsubscribe {
+        log(Info, tag ?: name, "Subscriber #${it + 1} removed")
+    }
+    onStop {
+        log(Info, tag ?: name, "Stopped with e=$it")
+    }
 }
 
 /**
