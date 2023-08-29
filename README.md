@@ -23,7 +23,7 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 * KDoc:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs)
 * Latest version:
-  ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
+  [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 
 ```toml
 [versions]
