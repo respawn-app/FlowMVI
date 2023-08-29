@@ -5,7 +5,7 @@ on:
     types: [ opened ]
 
 jobs:
-  assign author:
+  assign_author:
     runs-on: macos-latest
     steps:
       - uses: samspills/assign-pr-to-author@v1.0.2
