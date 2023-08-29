@@ -117,7 +117,7 @@ A callback that is invoked each time an `MVIAction` has been sent.
 
 This is invoked **after** the action has been sent, but **before** the store handles it.
 This function will always be invoked, even after the action is later dropped because of `ActionShareBehavior`,
-and it will be invoked before the `send(action: A)` returns, if it has been suspended, so this handler may suspend the
+and it will be invoked before the `action(action: A)` returns, if it has been suspended, so this handler may suspend the
 parent coroutine that wanted to send the action.
 
 * Return null to veto the processing and prevent other plugins from using the action.

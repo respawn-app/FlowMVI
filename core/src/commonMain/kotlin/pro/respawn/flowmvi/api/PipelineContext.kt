@@ -24,7 +24,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * To be used, this context **must not be overridden** by the store's logic.
  * Writing the following:
  * ```kotlin
- * withContext(Dispatchers.IO) { send(Intent) }
+ * withContext(Dispatchers.IO) { intent(Intent) }
  * ```
  * **will result in an exception**
  * Instead, if you want to send intents using the context, use it as follows:

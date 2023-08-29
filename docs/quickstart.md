@@ -225,7 +225,7 @@ val broken = store(Loading) {
         updateState {
             // ❌ states are not changed because the plugin veto'd the change
         }
-        send(MyAction) // ❌ actions are replaced with MyAnotherAction
+        action(MyAction) // ❌ actions are replaced with MyAnotherAction
     }
 }
 ```

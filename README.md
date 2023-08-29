@@ -109,7 +109,7 @@ class CounterContainer(
         }
 
         recover { e: Exception -> // recover from errors both in jobs and plugins
-            send(CounterAction.ShowMessage(e.message)) // send side-effects
+            action(ShowMessage(e.message)) // send side-effects
             null
         }
 
