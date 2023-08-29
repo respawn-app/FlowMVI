@@ -10,14 +10,6 @@ if you really need to subclass something, extend `AbstractStorePlugin` instead.
 If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
 described below.
 
-## Step 1: Choose if your plugin will be generic or store-specific.
-
-* If you want to create a typed plugin that is specific to a store, use `plugin` builder.
-* If you want to create a plugin that works with any store, use `genericPlugin` builder. Generic plugins have limited
-  functionality.
-
-## Step 2 : Create the plugin.
-
 Plugins are simply built:
 
 ```kotlin
@@ -27,6 +19,8 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
 }
 
 ```
+
+---
 
 Here are all the dsl functions of a plugin:
 
