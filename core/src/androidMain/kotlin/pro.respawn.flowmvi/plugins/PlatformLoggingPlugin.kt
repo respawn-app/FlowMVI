@@ -53,14 +53,6 @@ internal val StoreLogLevel.asLogPriority
         StoreLogLevel.Error -> Log.ERROR
     }
 
-public class MessageLengthLimitingLogger(
-    private val maxLength: Int = 4000,
-    private val minLength: Int = 3000,
-    private val delegate: (String) -> Unit,
-) {
-
-}
-
 /**
  * Credits to Ktor for the implementation
  */
