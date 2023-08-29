@@ -30,7 +30,7 @@ import pro.respawn.flowmvi.dsl.subscribe
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe(
     store: Store<S, I, A>,
-    crossinline consume: suspend (action: A) -> Unit,
+    noinline consume: (suspend (action: A) -> Unit)?,
     crossinline render: suspend (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job = lifecycleScope.launch(Dispatchers.Main.immediate) {

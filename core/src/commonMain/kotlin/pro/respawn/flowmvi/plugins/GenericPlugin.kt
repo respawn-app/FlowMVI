@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
