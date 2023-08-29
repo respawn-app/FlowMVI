@@ -23,7 +23,6 @@ fun Project.configureMultiplatform(
         browser()
         nodejs()
         binaries.library()
-        binaries.executable()
     }
 
     androidTarget {
