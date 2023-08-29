@@ -20,7 +20,7 @@ fun Project.publishMultiplatform() {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
-    val javadocTask = tasks.named(if (isReleaseBuild) "dokkaJavadocJar" else "emptyJavadocJar")
+    val javadocTask = tasks.named("emptyJavadocJar") // TODO: dokka does not support kmp javadocs yet
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
