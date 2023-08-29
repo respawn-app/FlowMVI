@@ -271,6 +271,8 @@ Next steps:
 
 * Learn how to create custom [plugins](plugins.md)
 * Learn how to use DI and [Android-specific features](android.md)
+* Explore
+  the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/app/src/main/kotlin/pro/respawn/flowmvi/sample)
 
 [^1]: Although container is a slightly different concept usually, we don't have this kind of separation and we use the
 name "store" for our business logic unit already, so the name was kinda "free" to define what it will mean for
