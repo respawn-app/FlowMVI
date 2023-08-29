@@ -1,4 +1,4 @@
-@file:Suppress("MissingPackageDeclaration", "unused", "UNUSED_VARIABLE", "UndocumentedPublicFunction", "LongMethod")
+@file:Suppress("MissingPackageDeclaration", "unused", "UndocumentedPublicFunction", "LongMethod")
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
@@ -24,20 +24,6 @@ fun Project.configureMultiplatform(
         nodejs()
         binaries.library()
         binaries.executable()
-    }
-    // TODO: KMM js <> gradle 8.0 incompatibility
-    tasks.run {
-        val jsLibrary = named("jsProductionLibraryCompileSync")
-        val jsExecutable = named("jsProductionExecutableCompileSync")
-        named("jsBrowserProductionWebpack").configure {
-            dependsOn(jsLibrary)
-        }
-        named("jsBrowserProductionLibraryPrepare").configure {
-            dependsOn(jsExecutable)
-        }
-        named("jsNodeProductionLibraryPrepare").configure {
-            dependsOn(jsExecutable)
-        }
     }
 
     androidTarget {

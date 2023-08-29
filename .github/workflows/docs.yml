@@ -44,10 +44,10 @@ jobs:
         run: cp ./README.md ./docs/README.md
 
       - name: Generate docs
-        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache
+        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache -Pkotlin.mpp.enableCInteropCommonization=false
 
       - name: Move docs to the parent docs dir
-        run: cp -r ./build/dokka ./docs/javadocs/
+        run: cp -r ./build/dokka/htmlMultiModule/ ./docs/javadocs/
 
       - name: Setup Pages
         uses: actions/configure-pages@v3

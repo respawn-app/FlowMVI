@@ -69,7 +69,7 @@ fun Project.configureAndroid(
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.findVersion("compose-compiler").get().toString()
+        kotlinCompilerExtensionVersion = libs.requireVersion("compose-compiler")
         useLiveLiterals = true
     }
 }

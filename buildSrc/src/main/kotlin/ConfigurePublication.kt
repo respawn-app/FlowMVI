@@ -19,23 +19,24 @@ import org.gradle.plugins.signing.Sign
 fun Project.publishMultiplatform() {
     val properties = gradleLocalProperties(rootDir)
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
-    val dokkaJavadocJar = tasks.named("dokkaJavadocJar")
+
+    val javadocTask = tasks.named(if (isReleaseBuild) "dokkaJavadocJar" else "emptyJavadocJar")
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
             sonatypeRepository(isReleaseBuild, properties)
 
             publications.withType<MavenPublication>().configureEach {
-                artifact(dokkaJavadocJar)
+                artifact(javadocTask)
                 configurePom()
                 configureVersion(isReleaseBuild)
             }
         }
-        signPublications(properties)
+        signPublications(isReleaseBuild, properties)
     }
 
     tasks.withType<AbstractPublishToMaven> {
-        dependsOn(dokkaJavadocJar)
+        dependsOn(javadocTask)
     }
 }
 
@@ -68,7 +69,7 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
                 }
             }
         }
-        signPublications(properties)
+        signPublications(isReleaseBuild, properties)
     }
 
     tasks.withType<Sign>().configureEach {
