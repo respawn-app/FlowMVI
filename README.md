@@ -8,6 +8,8 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 
+![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos]
+
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
 1. Being simple to understand and use while staying powerful and flexible.
@@ -34,13 +36,19 @@ flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flo
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
 ```
+-----
+```kotlin
+dependencies {
+    val flowmvi = "<version>"
+    commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
+    commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
-Supported platforms:
-
-* JVM: [ `Android`, `JRE 11+` ],
-* Linux [ `x64`, `mingw64` ],
-* Apple: [ `iOSx64`, `macOSx64`, `watchOSx64`, `tvOSx64` ],
-* js: [ `nodejs`, `browser` ]
+    // android
+    implementation("pro.respawn.flowmvi:android:$flowmvi")
+    implementation("pro.respawn.flowmvi:view:$flowmvi")
+    implementation("pro.respawn.flowmvi:compose:$flowmvi")
+}
+```
 
 ### Feature overview:
 
@@ -260,3 +268,31 @@ Ready to try? Start with reading the [Quickstart Guide](https://opensource.respa
    limitations under the License.
 
 ```
+
+[badge-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
+
+[badge-android-native]: http://img.shields.io/badge/support-[AndroidNative]-6EDB8D.svg?style=flat
+
+[badge-jvm]: http://img.shields.io/badge/-jvm-DB413D.svg?style=flat
+
+[badge-js]: http://img.shields.io/badge/-js-F8DB5D.svg?style=flat
+
+[badge-js-ir]: https://img.shields.io/badge/support-[IR]-AAC4E0.svg?style=flat
+
+[badge-nodejs]: https://img.shields.io/badge/-nodejs-68a063.svg?style=flat
+
+[badge-linux]: http://img.shields.io/badge/-linux-2D3F6C.svg?style=flat
+
+[badge-windows]: http://img.shields.io/badge/-windows-4D76CD.svg?style=flat
+
+[badge-wasm]: https://img.shields.io/badge/-wasm-624FE8.svg?style=flat
+
+[badge-apple-silicon]: http://img.shields.io/badge/support-[AppleSilicon]-43BBFF.svg?style=flat
+
+[badge-ios]: http://img.shields.io/badge/-ios-CDCDCD.svg?style=flat
+
+[badge-mac]: http://img.shields.io/badge/-macos-111111.svg?style=flat
+
+[badge-watchos]: http://img.shields.io/badge/-watchos-C0C0C0.svg?style=flat
+
+[badge-tvos]: http://img.shields.io/badge/-tvos-808080.svg?style=flat
