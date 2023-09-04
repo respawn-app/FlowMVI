@@ -50,7 +50,7 @@ dependencies {
 }
 ```
 
-### Feature overview:
+## Features:
 
 Rich, plugin-based store DSL:
 
@@ -140,7 +140,7 @@ class CounterContainer(
 }
 ```
 
-Subscribe one-liner:
+### Subscribe one-liner:
 
 ```kotlin
 store.subscribe(
@@ -150,41 +150,28 @@ store.subscribe(
 )
 ```
 
-Custom plugins:
+### Custom plugins:
 
 ```kotlin
-// create plugins for any store 
-fun analyticsPlugin(name: String) = genericPlugin {
-        val analytics = Analytics.getInstance()
-        onStart {
-            analytics.log("Screen $name opened")
-        }
-        onIntent {
-            analytics.log(it.asAnalyticsEvent())
-        }
-        // 5+ more hooks
-    }
-
-// or for a specific one
+// Create plugins with a single line of code for any store or a specific one
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
     /*...*/
 }
 ```
 
-### Android (Compose):
+### Android support (Compose):
 
 ```kotlin
 val module = module {
-    factoryOf(::CounterContainer)
-
     // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
+    factoryOf(::CounterContainer)
     viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>().store) }
 }
 
 // collect the store efficiently based on composable's lifecycle
 @Composable
 fun CounterScreen() = MVIComposable(
-    store = getViewModel<StoreViewModel<_, _, _>>(qualifier<CounterContainer>()),
+    store = getViewModel(qualifier<CounterContainer>()),
 ) { state -> // this -> ConsumerScope with send(Intent)  
 
     consume { action -> // consume actions from composables
@@ -205,24 +192,24 @@ fun CounterScreen() = MVIComposable(
 }
 ```
 
-### Android (View):
+### Android support (View):
 
 ```kotlin
-class ScreenFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterAction> {
+class ScreenFragment : Fragment() {
 
-    override val container by viewModel(qualifier<CounterContainer>())
+    private val store by viewModel(qualifier<CounterContainer>())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subscribe() // One-liner for store subscription. Lifecycle-aware and efficient.
+        subscribe(store, ::consume, ::render) // One-liner for store subscription. Lifecycle-aware and efficient.
     }
 
-    override fun render(state: CounterState) {
+    private fun render(state: CounterState) {
         // update your views
     }
 
-    override fun consume(action: CounterAction) {
+    private fun consume(action: CounterAction) {
         // handle actions
     }
 }
