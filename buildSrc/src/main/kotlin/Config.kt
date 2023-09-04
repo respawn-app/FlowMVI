@@ -18,7 +18,7 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 0
     const val patch = 0
-    const val postfix = "beta04"
+    const val postfix = "beta05"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
