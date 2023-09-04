@@ -6,6 +6,8 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
+private const val ConsumeIntentsPluginName: String = "ConsumeIntents"
+
 /**
  * Create a [StorePlugin] that simply consumes intents and does nothing with them.
  * This is useful when you are using [reducePlugin] with `consume = false`
@@ -14,7 +16,9 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
  *
  * @see reducePlugin
  */
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> consumeIntentsPlugin(): StorePlugin<S, I, A> = reducePlugin { }
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> consumeIntentsPlugin(
+    name: String = ConsumeIntentsPluginName,
+): StorePlugin<S, I, A> = reducePlugin(name = name, consume = true) { }
 
 /**
  * Create and install a plugin that consumes intents and does nothing with them.
@@ -25,4 +29,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> consumeIntentsPlugin(): 
  * @see consumeIntents
  * @see reduce
  */
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.consumeIntents(): Unit = reduce { }
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.consumeIntents(
+    name: String = ConsumeIntentsPluginName,
+): Unit = reduce(name = name, consume = true) { }
