@@ -2,13 +2,15 @@
     "ComposableNaming",
     "ComposableEventParameterNaming",
     "TopLevelComposableFunctions",
-    "ComposableFunctionName"
+    "ComposableFunctionName",
+    "NOTHING_TO_INLINE"
 )
 
 package pro.respawn.flowmvi.android.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -17,14 +19,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
-import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.dsl.subscribe
 import kotlin.experimental.ExperimentalTypeInference
 
 /**
@@ -32,6 +35,7 @@ import kotlin.experimental.ExperimentalTypeInference
  */
 @Stable
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentReceiver<I> {
+    // composable functions can't have default parameters, so we'll need two overloads
 
     /**
      * Collect [MVIAction]s that come from the [Store].
@@ -52,51 +56,63 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
 }
 
 /**
- * Equivalent to calling [ConsumerScope.consume]
+ * Equivalent to calling [ConsumerScope.consume].
  */
 @Composable
-@NonRestartableComposable
 @FlowMVIDSL
-public fun ConsumerScope<*, *>.subscribe(): Unit = consume()
+@NonRestartableComposable
+public inline fun ConsumerScope<*, *>.Subscribe(): Unit = consume()
+
+/**
+ * Equivalent to calling [ConsumerScope.consume].
+ */
+@Composable
+@FlowMVIDSL
+@NonRestartableComposable
+public inline fun <A : MVIAction> ConsumerScope<*, A>.Subscribe(
+    noinline onAction: suspend CoroutineScope.(action: A) -> Unit
+): Unit = consume(onAction)
 
 @Composable
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
+@PublishedApi
+internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> rememberConsumerScope(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): ConsumerScopeImpl<S, I, A> = remember(store) { ConsumerScopeImpl(store, lifecycleState) }
 
 @Stable
-internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, A : MVIAction>(
+@PublishedApi
+internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MVIAction>(
     private val store: Store<S, I, A>,
     private val lifecycleState: Lifecycle.State = Lifecycle.State.STARTED
 ) : ConsumerScope<I, A> {
 
-    internal val state = mutableStateOf(store.initial)
+    @PublishedApi
+    internal val state: MutableState<S> = mutableStateOf(store.initial)
 
     override fun send(intent: I) = store.send(intent)
     override suspend fun emit(intent: I) = store.emit(intent)
 
     @Composable
-    @JvmName("consumeInternal")
-    private fun consume(handler: (suspend CoroutineScope.(action: A) -> Unit)?) {
+    private inline fun consumeInternal(noinline onAction: (suspend CoroutineScope.(action: A) -> Unit)?) {
         val owner = LocalLifecycleOwner.current
-        val block by rememberUpdatedState(handler)
-        LaunchedEffect(this) {
-            owner.subscribe(
-                lifecycleState = lifecycleState,
-                store = store,
-                consume = block?.let { { action -> it(action) } },
-                render = { state.value = it }
-            )
+        val block by rememberUpdatedState(onAction)
+        LaunchedEffect(owner, this) {
+            owner.repeatOnLifecycle(lifecycleState) {
+                subscribe(
+                    store = store,
+                    consume = block?.let { block -> { block(it) } },
+                    render = { state.value = it }
+                )
+            }
         }
     }
 
-    // composable functions can't have default parameters
     @Composable
-    override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = consume(handler = onAction)
+    override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = consumeInternal(onAction)
 
     @Composable
-    override fun consume() = consume(null)
+    override fun consume() = consumeInternal(null)
 }
 
 private object EmptyScope : ConsumerScope<MVIIntent, MVIAction> {
