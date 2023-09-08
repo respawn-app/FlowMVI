@@ -25,28 +25,29 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 
+### Version Catalogs
 ```toml
 [versions]
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
+flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
+
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
-flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
 ```
------
+### Kotlin DSL
 ```kotlin
 dependencies {
-    val flowmvi = "<version>"
+    val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
-    // android
-    implementation("pro.respawn.flowmvi:android:$flowmvi")
-    implementation("pro.respawn.flowmvi:view:$flowmvi")
-    implementation("pro.respawn.flowmvi:compose:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:view:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
 }
 ```
 
@@ -57,7 +58,7 @@ Rich, plugin-based store DSL:
 ```kotlin
 sealed interface CounterState : MVIState {
     data object Loading : CounterState
-    data class Error(e: Exception) : CounterState
+    data class Error(val e: Exception) : CounterState
     data class DisplayingCounter(
         val timer: Int,
         val counter: Int,
@@ -75,10 +76,10 @@ sealed interface CounterAction : MVIAction {
 class CounterContainer(
     private val repo: CounterRepository,
 ) {
-    val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
+    val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) { // set initial state
         name = "CounterStore"
         parallelIntents = true
-        actionShareBehavior = ActionShareBehavior.Restrict() // disable, share, distribute or consume side effects
+        actionShareBehavior = ActionShareBehavior.Distribute() // disable, share, distribute or consume side effects
         intentCapacity = 64
 
         install(platformLoggingPlugin()) // log to console, logcat or NSLog
@@ -102,7 +103,7 @@ class CounterContainer(
 
         whileSubscribed { // run a job while any subscribers are present
             repo.timer.onEach { timer: Int ->
-                updateState<DisplayingCounter> { // update state safely between threads and filter by type
+                updateState<DisplayingCounter, _> { // update state safely between threads and filter by type
                     copy(timer = timer)
                 }
             }.consume()
@@ -115,7 +116,7 @@ class CounterContainer(
 
         reduce { intent: CounterIntent -> // reduce intents
             when (intent) {
-                is ClickedCounter -> updateState<DisplayingCounter> {
+                is ClickedCounter -> updateState<DisplayingCounter, _> {
                     copy(counter = counter + 1)
                 }
             }
@@ -130,7 +131,7 @@ class CounterContainer(
             onState { old, new -> // veto changes, modify states, launch jobs, do literally anything
                 new.withType<DisplayingCounter, _> {
                     if (counter >= 100) {
-                        launch { repo.resetTimer() }.register(jobManager, "reset")
+                        launch { repo.resetTimer() }
                         copy(counter = 0, timer = 0)
                     } else new
                 }
@@ -165,16 +166,15 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 val module = module {
     // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
     factoryOf(::CounterContainer)
-    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>().store) }
+    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
 }
 
 // collect the store efficiently based on composable's lifecycle
 @Composable
-fun CounterScreen() = MVIComposable(
-    store = getViewModel(qualifier<CounterContainer>()),
-) { state -> // this -> ConsumerScope with send(Intent)  
+fun CounterScreen() = MVIComposable(getViewModel(qualifier<CounterContainer>())) { state ->
+     // this -> ConsumerScope with intent()
 
-    consume { action -> // consume actions from composables
+    Subscribe { action -> // consume actions from composables
         when (action) {
             is ShowMessage -> {
                 /* ... */
@@ -197,12 +197,12 @@ fun CounterScreen() = MVIComposable(
 ```kotlin
 class ScreenFragment : Fragment() {
 
-    private val store by viewModel(qualifier<CounterContainer>())
+    private val vm by viewModel(qualifier<CounterContainer>())
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        subscribe(store, ::consume, ::render) // One-liner for store subscription. Lifecycle-aware and efficient.
+        // One-liner for store subscription. Lifecycle-aware and efficient.
+        subscribe(vm, ::consume, ::render) 
     }
 
     private fun render(state: CounterState) {
@@ -222,16 +222,13 @@ class ScreenFragment : Fragment() {
 testStore().subscribeAndTest {
 
     ClickedCounter resultsIn {
-
         states.test {
             awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
         }
         actions.test {
             awaitItem().shouldBeTypeOf<ShowMessage>()
         }
-
     }
-
 }
 ```
 
@@ -253,7 +250,6 @@ Ready to try? Start with reading the [Quickstart Guide](https://opensource.respa
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
 ```
 
 [badge-android]: http://img.shields.io/badge/-android-6EDB8D.svg?style=flat
