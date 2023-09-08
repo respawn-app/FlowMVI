@@ -11,6 +11,9 @@ import pro.respawn.flowmvi.api.Store
 /**
  * A function that introduces ConsumerScope to the content and ensures safe lifecycle-aware and efficient collection
  * of states and actions.
+ *
+ * Use [ConsumerScope.consume] to subscribe to the store
+ *
  * Usage:
  * ```kotlin
  * @Composable
@@ -25,12 +28,12 @@ import pro.respawn.flowmvi.api.Store
  *     }
  * }
  * ```
- * @param provider an MVIProvider (usually a viewModel) that handles this screen's logic
+ * @param store a Store (usually a [androidx.lifecycle.ViewModel]) that handles this screen's logic
  * @param lifecycleState the minimum lifecycle state, in which the activity must be to receive actions/states
  * @param content the actual screen content. Will be recomposed each time a new state is received.
  */
 @Composable
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
     store: Store<S, I, A>,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,

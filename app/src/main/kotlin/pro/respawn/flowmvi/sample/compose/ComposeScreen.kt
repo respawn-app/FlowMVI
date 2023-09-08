@@ -27,6 +27,7 @@ import pro.respawn.flowmvi.android.compose.ConsumerScope
 import pro.respawn.flowmvi.android.compose.EmptyScope
 import pro.respawn.flowmvi.android.compose.MVIComposable
 import pro.respawn.flowmvi.android.compose.StateProvider
+import pro.respawn.flowmvi.android.compose.Subscribe
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
@@ -55,9 +56,9 @@ fun ComposeScreen(onBack: () -> Unit) = MVIComposable(
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
 
-    consume { action ->
-        // This block is run in a new coroutine each time we consume a new action and the lifecycle is RESUMED.
-        // You can run suspending code here safely
+    Subscribe { action ->
+        // This block is run in the scope of the subscription each time we consume a new action and the lifecycle is RESUMED.
+        // You can run suspending code here but that will block all other actions' retrieval. Use launch { } to not block.
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
             is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))

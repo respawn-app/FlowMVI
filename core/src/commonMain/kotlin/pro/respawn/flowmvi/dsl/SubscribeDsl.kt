@@ -23,14 +23,14 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
     noinline consume: (suspend (action: A) -> Unit)?,
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
-    subscribe {
+    subscribe outer@{
         coroutineScope inner@{
-            consume?.let {
-                this@inner.launch {
+            consume?.let { consume ->
+                launch {
                     actions.collect { consume(it) }
                 }
             }
-            this@inner.launch {
+            launch {
                 states.collect { render(it) }
             }
         }
