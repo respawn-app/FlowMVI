@@ -18,14 +18,14 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 0
     const val patch = 0
-    const val postfix = "beta05"
+    const val postfix = "beta06"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
     const val description = """
-A Kotlin Multiplatform MVI library based on coroutines that is simple & fast but powerful & flexible
+A Kotlin Multiplatform MVI library based on plugins that is simple, fast, powerful & flexible
 """
     // kotlin
 
