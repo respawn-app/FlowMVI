@@ -82,11 +82,11 @@ class CounterContainer(
         actionShareBehavior = ActionShareBehavior.Distribute() // disable, share, distribute or consume side effects
         intentCapacity = 64
 
-        install(platformLoggingPlugin()) // log to console, logcat or NSLog
-
-        install(analyticsPlugin(name)) // install custom plugins 
-
-        install(timeTravelPlugin()) // unit test stores and track changes
+        install(
+            platformLoggingPlugin(), // log to console, logcat or NSLog
+            analyticsPlugin(name), // create custom plugins
+            timeTravelPlugin(), // unit test stores and track changes
+        )
 
         saveState {  // persist and restore state
             get = { repo.restoreStateFromFile() }
