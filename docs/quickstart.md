@@ -165,11 +165,12 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
 * **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
 * **While Subscribed Plugin** - run jobs when the Nth subscriber of a store appears. Install
   with `whileSubscribed { }`.
-* **LoggingPlugin** - log events to a log stream of the target platform.
-* **SavedStatePlugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
+* **Logging Plugin** - log events to a log stream of the target platform.
+* **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
   `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
-* **JobManagerPlugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
-* **UndoRedoPlugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
+* **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
+* **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its work. Install with `awaitSubscribers()`.
+* **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.
