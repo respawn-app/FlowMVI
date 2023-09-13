@@ -63,7 +63,6 @@ public sealed interface ActionShareBehavior {
     /**
      * Designates that [MVIAction]s are disabled entirely.
      * Attempting to consume or send an action will throw.
-     * This is the default behavior when using [Nothing] as a parameter for an action store
      */
     public data object Disabled : ActionShareBehavior
 
