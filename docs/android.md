@@ -72,10 +72,14 @@ specify your qualifiers. The most basic setup for Koin will look like this:
 
 ```kotlin
 inline fun <reified T : Container<*, *, *>> Module.storeViewModel() {
-    viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }.store) }
-
-    // using type qualifiers, can also use named() and companion objects
+    viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }) }
 }
+
+@Composable
+inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> storeViewModel(
+    noinline params: ParametersDefinition? = null,
+) = getViewModel<StoreViewModel<S, I, A>>(qualifier<T>(), parameters = params)
+
 
 val appModule = module {
     singleOf(::CounterRepository)
@@ -195,43 +199,41 @@ for a more elaborate example.
 
 ## View
 
-For a View-based project, inheritance rules. Just implement `MVIView` in your Fragment and subscribe to events.
+For a View-based project, inheritance rules.
 
 ```kotlin
-class CounterFragment : Fragment(), MVIView<CounterState, CounterIntent, CounterAction> {
-    
+class CounterFragment : Fragment() {
+
     private val binding by viewBinding<CounterFragmentBinding>()
-    override val container by viewModel<CounterViewModel>()
+    private val store by viewModel<CounterViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        subscribe() // one-liner for store subscription. Lifecycle-aware and efficient.
+        subscribe(container, ::consume, ::render)
 
         with(binding) {
-            tvCounter.setOnClickListener(container::onClickCounter) // let's say we are using MVVM+ style.
+            tvCounter.setOnClickListener(store::onClickCounter) // let's say we are using MVVM+ style.
         }
     }
 
-    override fun render(state: ScreenState) = with(binding) {
+    private fun render(state: ScreenState) = with(binding) {
         with(state) {
             tvCounter.text = counter.toString()
-            /* ... update ALL views every time ... */
+            /* ... update ALL views! ... */
         }
     }
 
-    override fun consume(action: ScreenAction) = when (action) {
+    private fun consume(action: ScreenAction) = when (action) {
         is ShowMessage -> Snackbar.make(binding.root, action.message, Snackbar.LENGTH_SHORT).show()
     }
 }
 ```
 
-* Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle lifecycle for you.
+* Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle the lifecycle for you.
 * Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
 * Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
   view-based Android API.
-* You are not required to extend `MVIView` - you can use `subscribe` anyway, just provide
-  the `ViewLifecycleOwner.lifecycleScope` or `Activity.lifecycleScope` as a scope.
 
 See [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicActivity.kt)
 for a more elaborate example.

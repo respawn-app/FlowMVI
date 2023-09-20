@@ -157,15 +157,14 @@ class CounterViewModel(
 ### 4. Migrate your Views
 
 * For Compose, you hopefully won't have to change anything.
-* For views, migrate to the new MVIView interface using auto-replacement. Except for the rename (provider -> container),
-  everything should be the same.
+* For views, remove the MVIVIew interface and make consume and reduce functions private. Pass them to `subscribe()`
 
 ### 5. (Optional) Add new plugins
 
 You can now improve your VM using new features of the library. You now can do the following:
 
 * Add the `parcelizeState` plugin to save state across process death
-* Add the `androidLoggingPlugin` to get logcat logs
+* Add the `platformLoggingPlugin` to get logcat logs
 * Set `debuggable = BuildConfig.DEBUG` to get more validations and logging
 * Set `parallelIntents = true` to make intents faster (make sure you do not depend on the ordering of intents!)
 * Use `whileSubscribed` to avoid resource leaks while the VM is in the background
