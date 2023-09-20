@@ -35,9 +35,10 @@ import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
 import pro.respawn.flowmvi.sample.CounterIntent
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
-import pro.respawn.flowmvi.sample.CounterIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
+import pro.respawn.flowmvi.sample.CounterState.Error
+import pro.respawn.flowmvi.sample.CounterState.Loading
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.theme.MVISampleTheme
 import pro.respawn.flowmvi.sample.di.storeViewModel
@@ -82,6 +83,8 @@ private fun Scope.ComposeScreenContent(
         contentAlignment = Alignment.Center
     ) {
         when (state) {
+            is Loading -> CircularProgressIndicator()
+            is Error -> Text(state.e.message.toString())
             is DisplayingCounter -> Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -94,28 +97,17 @@ private fun Scope.ComposeScreenContent(
                 Text(
                     text = stringResource(id = R.string.counter_template, state.counter),
                 )
-
-                Text(text = state.param)
-
-                Button(onClick = { intent(ClickedCounter) }) {
-                    Text(text = stringResource(id = R.string.counter_button_label))
-                }
-                Button(onClick = { intent(ClickedUndo) }) {
-                    Text(text = stringResource(id = R.string.counter_undo_label))
-                }
                 Button(onClick = { intent(ClickedBack) }) {
                     Text(text = stringResource(id = R.string.counter_back_label))
                 }
             }
-            is CounterState.Loading -> CircularProgressIndicator()
-            is CounterState.Error -> Text(state.e.message.toString())
         }
     }
 }
 
 private class PreviewProvider : StateProvider<CounterState>(
     DisplayingCounter(1, 2, "param"),
-    CounterState.Loading,
+    Loading,
 )
 
 @Composable

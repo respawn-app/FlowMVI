@@ -1,6 +1,6 @@
 ## Roadmap for v2.x:
 
-- [ ] Docs for DI
+- [x] Docs for DI
 - [ ] Add tests for plugins
 - [x] Job manager plugin that can be accessed to cancel / start long-running jobs
 - [x] Undo/Redo plugin

@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.android.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -40,5 +41,23 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
 ) {
     val scope = rememberConsumerScope(store, lifecycleState)
     val state by scope.state
+    content(scope, state)
+}
+
+/**
+ * An overload of [MVIComposable] that accepts a [consume] block to automatically
+ * subscribe to the [store] upon invocation.
+ * @see MVIComposable
+ */
+@Composable
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
+    store: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    noinline consume: (suspend CoroutineScope.(A) -> Unit)?,
+    @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
+) {
+    val scope = rememberConsumerScope(store, lifecycleState)
+    val state by scope.state
+    scope.consume(consume)
     content(scope, state)
 }

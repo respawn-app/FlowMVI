@@ -67,14 +67,14 @@ For example, the library's `reduce` plugin **cannot** be installed multiple time
 ### onState
 
 ```kotlin
- suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = new
+suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = new
 ```
 
 A callback to be invoked each time `updateState` is called.
 This callback is invoked **before** the state changes, but **after** the function's `block` is invoked.
 Any plugin can veto (forbid) or modify the state change.
 
-This callback is **not** invoked at all when state is changed through `useState`
+This callback is **not** invoked at all when state is changed through `useState`, used in `withState`
 or when `state` is obtained directly.
 
 * Return null to cancel the state change. All plugins registered later when building the store will not receive
@@ -87,7 +87,7 @@ or when `state` is obtained directly.
 ### onIntent
 
 ```kotlin
- suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent
+suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent
 ```
 
 A callback that is invoked each time an intent is received **and then begun** to be processed.
@@ -126,7 +126,7 @@ suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = e
 ```
 
 A callback that is invoked when Store catches an exception. It is invoked when either a coroutine launched inside the  
-store throws, or when an exception occurs in any other plugins.
+store throws, or when an exception occurs in any other plugin.
 
 * If none of the plugins handles the exception (returns `null`), **the exception is rethrown and the store fails**.
 * If you throw an exception in this block, **the store will fail**. Do not throw exceptions in this function.
@@ -140,7 +140,7 @@ store throws, or when an exception occurs in any other plugins.
 -----
 
 * Return `null` to signal that the exception has been handled and recovered from, continuing the flow's processing.
-* Return `e` if the exception was **not** handled and should be passed to other plugins.
+* Return `e` if the exception was **not** handled and should be passed to other plugins or rethrown.
 * Execute other operations using `PipelineContext`
 
 ### onStart
@@ -151,7 +151,7 @@ suspend fun PipelineContext<S, I, A>.onStart(): Unit = Unit
 
 A callback that is invoked **each time** `Store.start` is called.
 
-* suspending in this callback will **prevent** the store from starting until the plugin is finished.
+* Suspending in this callback will **prevent** the store from starting until the plugin is finished.
 * Execute any operations using `PipelineContext`.
 
 ### onSubscribe
@@ -161,13 +161,12 @@ fun PipelineContext<S, I, A>.onSubscribe(subscriberScope: CoroutineScope, subscr
 ```
 
 A callback to be executed **each time** `Store.subscribe` is called.
-This callback is executed **before** the subscriber gets access to the store and **before** the `subscriberCount`
-is incremented. This means, for the first subscription, `subscriberCount` will be `0`.
 
-This function is invoked in the store's scope, not the subscriber's scope.
-To launch jobs in the subscriber's scope, use `subscriberScope`.
-They are not affected by store's plugins.
-They will be canceled when the subscriber unsubscribes.
+* This callback is executed **before** the subscriber gets access to the store and **before** the `subscriberCount`
+  is incremented. This means, for the first subscription, `subscriberCount` will be `0`.
+* This function is invoked in the store's scope, not the subscriber's scope.
+* To launch jobs in the subscriber's scope, use `subscriberScope`. They are not affected by store's plugins.
+  They will be canceled when the subscriber unsubscribes.
 
 ### onUnsubscribe
 
@@ -190,8 +189,7 @@ fun onStop(e: Exception?): Unit = Unit
 
 Invoked when the store is closed.
 
-* This is called **after** the store is already closed, and you cannot
-  influence the outcome.
+* This is called **after** the store is already closed, and you cannot influence the outcome.
 * This is invoked for both exceptional stops and normal stops.
-* Will not be invoked when an `Error` is thrown.
-* `e` is the exception the store is closed with. Will be null for normal completions.
+* Will not be invoked when an `Error` is thrown. You should not handle `Error`s.
+* `e` is the exception the store is closed with. Will be `null` for normal completions.

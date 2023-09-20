@@ -52,11 +52,13 @@ Did you call `Store.subscribe()`?
    subscribed yet, or if the View did not manage to subscribe on time, you will miss some Actions.
    This is a limitation of the Flow API and there are no potential
    resolutions at the moment of writing. Try to use `Distribute` instead.
+3. If one of the subscribers doesn't need to handle Actions, you can pass `null` to the `Store.subscribe` function to
+   skip consumption of events.
 
 ### I made my store, but I want to wrap it in a ViewModel. How can I do that?
 
 In the sample app, there is an example of how you can set up your DI with Koin.
-Use `StoreViewModel` for a simple wrapper for the built Store, which you can inject using DI.
+Use `StoreViewModel` as a simple wrapper for the built Store, which you can inject using DI.
 The biggest problem with this is that your generic types will be erased, and the only solution is to use qualifiers
 to resolve your ViewModels/Stores.  
 Contributions with examples for Hilt setup are welcome.
@@ -65,7 +67,7 @@ Contributions with examples for Hilt setup are welcome.
 
 * Intents: FIFO or Parallel based on configuration parameter `parallelIntents`.
 * Actions: FIFO.
-* States: FIFO, but can be Parallel if using `useState`.
+* States: FIFO, but can be "parallel" if using `useState`.
 
 ### When I consume an Action, the other actions are delayed or do not come.
 
@@ -84,6 +86,11 @@ This is not good, because the state becomes mutable and non-stable, but there's 
 but it does its job, as long as you are careful not to recreate the flow and pass it around between states.
 If you have an idea or a working Paging setup, let us know and we can add it to the library!
 
+The Paging library also relies on the `cachedIn` operator which is tricky to use in `whileSubscribed`, because that
+block is rerun on every subscription, recreating and re-caching the flow.
+To fix this issue, use `cachePlugin` to cache the paginated flow, and then pass it to the `whileSubscribed`.
+This will prevent any leaks that you would otherwise get if you created a new flow each time a subscriber appears.
+
 ### I have like a half-dozen various flows or coroutines and I want to make my state from those data streams. Do I subscribe to all of those flows in my store?
 
 It's preferable to create a single flow using `combine(vararg flows...)` and produce your state based on that.
@@ -101,20 +108,20 @@ There are two ways to do this.
    caught in plugins or child coroutines, but the plugin will be run **after** the job was already cancelled, so you
    cannot continue the job execution anymore.
 
-### But that other library allows me to define 9000 handlers, actors, processors and whatnot - and I can reuse Intents. Why not do the same?
+### But that other library allows me to define 9000 handlers, actors, processors and whatnot - and I can reuse reducers. Why not do the same?
 
 In general, a little boilerplate when duplicating intents is worth it to keep the consistency of actions and intents
 of screens intact.
 You usually don't want to reuse your actions and intents because they are specific to a given screen or flow.
-That makes your logic way simpler, and the rest can be easily moved to your repository layer, usecases or just plain
+That makes your logic way simpler, and the rest can be easily moved to your repository layer, use cases or just plain
 top-level functions. This is where this library is opinionated, and where one of its main advantages - simplicity, comes
-from.
+from. Everything you want to achieve by composing stores can also be achieved using plugins.
 
 ### How to avoid class explosion?
 
 1. Modularize your app. The library allows you to do that easily.
 2. Use nested classes. For example, you can define an `object ScreenContract` and nest your state, intents, and actions
-   inside, to make autocompletion easier.
+   inside to make autocompletion easier.
 3. Use `LambdaIntent`s. They don't require subclassing MVIIntent.
 4. Disallow Actions for your store. Side effects are sometimes considered an anti-pattern, and you may want to disable
    them if you care about the architecture this much.
@@ -145,7 +152,7 @@ sealed interface NewsState {
 ```
 
 * Use `T.withType<Type>(block: Type.() -> Unit)` to cast your sub-states easier as
-  the `(this as? State)?.let { }` code can look ugly.
+  the `(this as? State)?.let { } ?: this` code can look ugly.
 * Use `T.typed<Type>()` to perform a safe cast to the given state to clean up the code.
 
 ### I want to use a resource or a framework dependency in my store. How can I do that?

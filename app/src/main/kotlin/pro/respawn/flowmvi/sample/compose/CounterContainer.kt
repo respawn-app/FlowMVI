@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.plugins.disallowRestartPlugin
 import pro.respawn.flowmvi.plugins.manageJobs
 import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.recover
@@ -36,7 +37,10 @@ class CounterContainer(
 
     override val store = store(CounterState.Loading) {
         name = "Counter"
-        install(platformLoggingPlugin())
+        install(
+            platformLoggingPlugin(),
+            disallowRestartPlugin() // store does not restart when it is in a viewmodel
+        )
         val manager = manageJobs()
         val undoRedo = undoRedo(10)
         whileSubscribed {

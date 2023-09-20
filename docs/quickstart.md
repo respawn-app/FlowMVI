@@ -52,26 +52,29 @@ So please consider the following comparison:
 Describing the contract first makes building the logic easier because you have everything you need at the
 start. To define your contract, ask yourself the following:
 
-1. What can be shown at what times? Can the page be empty? Can it be loading? - this will define your state family
-2. What elements can be shown on this screen? - this will be your states' properties.
-3. What can the user do on this screen? What can happen in the system? - these will be your Intents
-4. In response to given intents, what one-time events may happen? - these are Actions
+1. What can be shown at what times? Can the page be empty? Can it be loading? Can errors happen? -
+   this will define your state family.
+2. What elements can be shown on this screen, for each state? - this will be your state properties.
+3. What can the user do on this screen? What can happen in the system? - these will be your Intents.
+4. In response to given intents, what one-time events may happen? - these are Actions.
 
 * The `MVIState` is what should be displayed or used by the UI layer. Whenever the state changes,
   update **all** of your UI with the current properties of the state.
     * Do **not** make your state mutable. Because FlowMVI uses `StateFlow`s under the hood, your state changes
-      *won't be reflected** if you mutate your state using `var`s or
+      **won't be reflected** if you mutate your state using `var`s or
       by using mutable properties such as `MutableList`s.
       Use `copy()` of the data classes to mutate your state instead. Even if you use `List`s as the value type,
       for example, make sure those are **new** lists and not just `MutableList`s that were upcasted.
     * It's okay to copy the state very often, modern devices can handle a few garbage collections.
-* The `MVIIntent` is an action that the user or the subscriber takes, for example clicks, system broadcasts and dialog
+* The `MVIIntent` is an action that the user or the subscriber takes, for example, clicks, system broadcasts and dialog
   button presses.
 * The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
     * Examples include snackbars, popup messages, sounds and so on.
     * Do not confuse States with Actions! Actions are **one-off, "fire and forget" events**.
     * Actions are **sent and received sequentially**.
     * Actions are sent from Store to the UI. Intents are sent in the other direction.
+    * Actions are not strictly guaranteed to be received by the subscriber, so do not use them for crucial elements of
+      the logic.
 
 </details>
 
@@ -150,7 +153,7 @@ Some interesting properties of the store:
   the store.
 * Store's subscribers will wait until the store is launched when they subscribe to the store. Don't forget to launch the
   store.
-* Store's plugins are created eagerly, but the store itself can be lazy. There is `lazyStore()` for that.
+* Stores are created eagerly, but the store *can* be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
 
@@ -169,9 +172,16 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
   `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
-* **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its work. Install with `awaitSubscribers()`.
+* **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
+  work. Install with `awaitSubscribers()`.
 * **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
+* **Disallow Restart Plugin** - disallow restarting store if you do not plan to reuse it.
+  Install with `disallowRestart`.
+* **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
+  lifecycle. Install with `val value by cache { } `
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
+
+Consult the javadocs of the plugins to learn how to use them.
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume or otherwise change anything in the store.
@@ -226,7 +236,7 @@ val broken = store(Loading) {
         updateState {
             // ❌ states are not changed because the plugin veto'd the change
         }
-        action(MyAction) // ❌ actions are replaced with MyAnotherAction
+        action(MyAction) // ❌ actions are replaced with something else
     }
 }
 ```
@@ -237,8 +247,7 @@ The discussion above warrants another note.
 !> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
 you handle intents, but it's possible to create a store like this:
 `val store = store(Loading) { }`.
-This is a store that does **literally nothing**. If you forget to install the reduce plugin, your intents won't be
-acted upon.
+This is a store that does **literally nothing**. If you forget to install a plugin, it will never run.
 
 ### Step 6: Create, inject and provide dependencies
 
@@ -272,8 +281,12 @@ Next steps:
 
 * Learn how to create custom [plugins](plugins.md)
 * Learn how to use DI and [Android-specific features](android.md)
+* [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
+  about how our team has used the library to improve performance and stability of our app, with practical examples.
 * Explore
   the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/app/src/main/kotlin/pro/respawn/flowmvi/sample)
+
+--- 
 
 [^1]: Although container is a slightly different concept usually, we don't have this kind of separation and we use the
 name "store" for our business logic unit already, so the name was kinda "free" to define what it will mean for
