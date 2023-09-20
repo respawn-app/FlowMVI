@@ -44,7 +44,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
-    public fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit)
+    public fun consume(onAction: (suspend CoroutineScope.(action: A) -> Unit)?)
 
     /**
      * Collect [MVIState]s emitted by the [Store]
@@ -52,7 +52,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
-    public fun consume()
+    public fun consume(): Unit = consume(null)
 }
 
 /**
@@ -94,7 +94,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
     override suspend fun emit(intent: I) = store.emit(intent)
 
     @Composable
-    private inline fun consumeInternal(noinline onAction: (suspend CoroutineScope.(action: A) -> Unit)?) {
+    override fun consume(onAction: (suspend CoroutineScope.(action: A) -> Unit)?) {
         val owner = LocalLifecycleOwner.current
         val block by rememberUpdatedState(onAction)
         LaunchedEffect(owner, this) {
@@ -107,12 +107,6 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
             }
         }
     }
-
-    @Composable
-    override fun consume(onAction: suspend CoroutineScope.(action: A) -> Unit) = consumeInternal(onAction)
-
-    @Composable
-    override fun consume() = consumeInternal(null)
 }
 
 private object EmptyScope : ConsumerScope<MVIIntent, MVIAction> {
@@ -121,10 +115,7 @@ private object EmptyScope : ConsumerScope<MVIIntent, MVIAction> {
     override suspend fun emit(intent: MVIIntent) = Unit
 
     @Composable
-    override fun consume(onAction: suspend CoroutineScope.(action: MVIAction) -> Unit) = Unit
-
-    @Composable
-    override fun consume() = Unit
+    override fun consume(onAction: (suspend CoroutineScope.(action: MVIAction) -> Unit)?) = Unit
 }
 
 /**
