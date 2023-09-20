@@ -44,6 +44,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
     content(scope, state)
 }
 
+/**
+ * An overload of [MVIComposable] that accepts a [consume] block to automatically
+ * subscribe to the [store] upon invocation.
+ * @see MVIComposable
+ */
 @Composable
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
     store: Store<S, I, A>,
