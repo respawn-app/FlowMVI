@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import org.koin.androidx.compose.defaultExtras
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.compose.LocalKoinScope
+import org.koin.compose.getKoinScope
 import org.koin.core.module.Module
 import org.koin.core.parameter.ParametersDefinition
 import org.koin.core.qualifier.qualifier
@@ -29,6 +29,6 @@ inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVI
     },
     key: String? = null,
     extras: CreationExtras = defaultExtras(viewModelStoreOwner),
-    scope: Scope = LocalKoinScope.current,
+    scope: Scope = getKoinScope(),
     noinline parameters: ParametersDefinition? = null,
 ): StoreViewModel<S, I, A> = getViewModel(qualifier<T>(), viewModelStoreOwner, key, extras, scope, parameters)
