@@ -20,13 +20,13 @@ import pro.respawn.flowmvi.api.Store
  * Most DI frameworks struggle with type erasure when it comes to injecting generic classes, so one of 2 ways outlined
  * above can be used to resolve the conflicts.
  */
-public class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
+public open class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     store: Store<S, I, A>,
 ) : ViewModel(), Store<S, I, A> by store, Container<S, I, A> {
 
     public constructor(container: Container<S, I, A>) : this(container.store)
 
-    override val store: Store<S, I, A> get() = this
+    final override val store: Store<S, I, A> get() = this
 
     init {
         store.start(viewModelScope)
