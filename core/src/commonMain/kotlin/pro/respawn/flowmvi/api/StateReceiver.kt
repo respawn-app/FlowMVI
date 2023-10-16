@@ -53,6 +53,5 @@ public interface StateReceiver<S : MVIState> {
      * It should only be used for the most critical state updates happening very often.
      */
     @FlowMVIDSL
-    @DelicateStoreApi
-    public fun useState(block: S.() -> S)
+    public fun useState(block: S.() -> S): S
 }

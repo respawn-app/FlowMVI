@@ -70,13 +70,11 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     protected open fun recover(e: Exception): S = throw e
 
-    @DelicateStoreApi
-    override fun useState(block: S.() -> S): Unit = store.useState(block)
+    override fun useState(block: S.() -> S): S = store.useState(block)
 
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.
      */
-    @OptIn(DelicateStoreApi::class)
     @Suppress("UNCHECKED_CAST", "DEPRECATION")
     override val store: MutableStore<S, I, A> by lazyStore(initial, viewModelScope) {
         recover {
