@@ -9,6 +9,7 @@ android {
 }
 
 dependencies {
+    commonMainCompileOnly(project(":annotations"))
     commonMainApi(libs.kotlin.coroutines.core)
     commonMainImplementation(libs.kotlin.atomicfu)
     // unfortunately kotest doesn't support all the targets that we support

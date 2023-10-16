@@ -22,7 +22,15 @@ android {
         viewBinding = true
     }
     kotlinOptions {
-        freeCompilerArgs += Config.jvmCompilerArgs
+        freeCompilerArgs += buildList {
+            addAll(Config.jvmCompilerArgs)
+            if (project.findProperty("enableComposeCompilerReports") == "true") {
+                add("-P")
+                add("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.get()}/compose_metrics")
+                add("-P")
+                add("plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.get()}/compose_metrics")
+            }
+        }
         jvmTarget = Config.jvmTarget.target
         languageVersion = Config.kotlinVersion.version
     }

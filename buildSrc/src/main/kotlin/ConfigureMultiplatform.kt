@@ -27,6 +27,12 @@ fun Project.configureMultiplatform(
 
     androidTarget {
         publishAllLibraryVariants()
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = Config.jvmTarget.target
+                freeCompilerArgs += Config.jvmCompilerArgs
+            }
+        }
     }
 
     jvm {

@@ -44,6 +44,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
+    @Stable
     public fun consume(onAction: (suspend CoroutineScope.(action: A) -> Unit)?)
 
     /**
@@ -52,6 +53,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
+    @Stable
     public fun consume(): Unit = consume(null)
 }
 

@@ -2,6 +2,8 @@
 
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
+import gradle.kotlin.dsl.accessors._3b641d770f24f39f98303fbbdf1a8d7e.kotlin
+import gradle.kotlin.dsl.accessors._49c46f32d5be065ecf6a6309cc175bfd.kotlinOptions
 import org.gradle.api.Project
 
 fun Project.configureAndroid(
