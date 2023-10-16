@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.api
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
@@ -8,6 +10,7 @@ import kotlinx.coroutines.Job
  * @see Store
  */
 @OptIn(ExperimentalStdlibApi::class)
+@Immutable
 public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> : AutoCloseable {
 
     /**
@@ -51,6 +54,7 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
  * The store can be mutated only through [MVIIntent].
  * Store is an [IntentReceiver] and can be [close]d to stop it.
  */
+@Stable
 public interface Store<out S : MVIState, in I : MVIIntent, out A : MVIAction> :
     ImmutableStore<S, I, A>,
     IntentReceiver<I>

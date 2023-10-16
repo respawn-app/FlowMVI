@@ -19,7 +19,6 @@ import kotlin.contracts.contract
  * @see MVIStore.useState
  * @see MVIStore.updateState
  */
-@OverloadResolutionByLambdaReturnType
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withState(
     @BuilderInference crossinline block: suspend T.() -> Unit

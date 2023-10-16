@@ -29,10 +29,10 @@ public enum class StoreLogLevel {
  * [pro.respawn.flowmvi.api.Store.name] is used as a tag by default.
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.logging(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.logging(
     tag: String? = this.name,
     name: String = "${tag.orEmpty()}Logging",
-    log: (level: StoreLogLevel, tag: String, msg: String) -> Unit
+    crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit
 ): Unit = install(loggingPlugin(tag, name, log))
 
 /**

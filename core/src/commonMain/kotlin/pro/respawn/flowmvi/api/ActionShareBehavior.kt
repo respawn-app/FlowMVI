@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.api
 
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.channels.BufferOverflow
 
 /**
@@ -10,6 +11,7 @@ import kotlinx.coroutines.channels.BufferOverflow
  * @see ActionReceiver
  * @see ActionConsumer
  */
+@Immutable
 public sealed interface ActionShareBehavior {
 
     /**

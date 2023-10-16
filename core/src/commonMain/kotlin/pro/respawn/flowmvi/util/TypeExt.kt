@@ -7,7 +7,6 @@ import kotlin.contracts.contract
 /**
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
-@OverloadResolutionByLambdaReturnType
 @FlowMVIDSL
 public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
@@ -21,4 +20,5 @@ public inline fun <reified T, R> R.withType(@BuilderInference block: T.() -> R):
  *
  * Just an alias for `(this as? T)`
  */
+@FlowMVIDSL
 public inline fun <reified T> Any?.typed(): T? = this as? T

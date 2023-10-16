@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -133,6 +134,7 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
  * Create a new [TimeTravelPlugin]. Keep a reference to the plugin to use its properties.
  * @return the plugin.
  */
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
     name: String = TimeTravelPlugin.Name,
     maxStates: Int = TimeTravelPlugin.DefaultHistorySize,
@@ -145,6 +147,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
  * Create a new [TimeTravelPlugin] and installs it. Keep a reference to the plugin to use its properties.
  * @return the plugin.
  */
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
     name: String = TimeTravelPlugin.Name,
     maxStates: Int = TimeTravelPlugin.DefaultHistorySize,

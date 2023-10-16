@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -83,6 +84,7 @@ public class CachePlugin<out T, S : MVIState, I : MVIIntent, A : MVIAction> inte
  * Creates and returns a new [CachePlugin] without installing it.
  * @see CachePlugin
  */
+@FlowMVIDSL
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
     name: String? = null,
     @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
@@ -95,6 +97,7 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
  * @return A [ReadOnlyProperty] granting access to the value returned from [init]
  * @see cachePlugin
  */
+@FlowMVIDSL
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.cache(
     name: String? = null,
     @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,

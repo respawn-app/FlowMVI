@@ -60,7 +60,6 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
      * If [doImmediately] is true, then [redo] will be executed **before** the queue is modified!
      * **You cannot call [UndoRedoPlugin.undo] or [UndoRedoPlugin.redo] in [redo] or [undo]!**
      */
-    @FlowMVIDSL
     public suspend operator fun invoke(
         doImmediately: Boolean = true,
         redo: suspend () -> Unit,
@@ -79,7 +78,6 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Add the [intent] to the queue with specified [undo] and **immediately** execute the [intent].
      * **You cannot call [UndoRedoPlugin.undo] or [UndoRedoPlugin.redo] in [intent] or [undo]!**
      */
-    @FlowMVIDSL
     public suspend operator fun PipelineContext<S, I, A>.invoke(
         intent: I,
         undo: suspend () -> Unit,

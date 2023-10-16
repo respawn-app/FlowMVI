@@ -35,7 +35,7 @@ public typealias Reduce<S, I, A> = suspend PipelineContext<S, I, A>.(intent: I) 
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
     consume: Boolean = true,
     name: String = ReducePluginName,
-    crossinline reduce: Reduce<S, I, A>,
+    @BuilderInference crossinline reduce: Reduce<S, I, A>,
 ): Unit = install(reducePlugin(consume, name, reduce))
 
 /**
@@ -53,7 +53,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
     consume: Boolean = true,
     name: String = ReducePluginName,
-    crossinline reduce: Reduce<S, I, A>,
+    @BuilderInference crossinline reduce: Reduce<S, I, A>,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onIntent {
