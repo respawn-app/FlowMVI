@@ -3,7 +3,9 @@
     "ComposableEventParameterNaming",
     "TopLevelComposableFunctions",
     "ComposableFunctionName",
-    "NOTHING_TO_INLINE"
+    "NOTHING_TO_INLINE",
+    "DEPRECATION",
+    "DeprecatedCallableAddReplaceWith"
 )
 
 package pro.respawn.flowmvi.android.compose
@@ -42,64 +44,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 
 private const val Package = "pro.respawn.flowmvi.android.compose.dsl"
-
-// credits: https://proandroiddev.com/how-to-collect-flows-lifecycle-aware-in-jetpack-compose-babd53582d0b
-
-/**
- * Create and remember a new [Flow] that is only collected when [lifecycleOwner] is in [lifecycleState]
- */
-@Deprecated("Use AndroidX collectAsStateWithLifecycle or a LaunchedEffect directly instead")
-@Composable
-public fun <T> rememberLifecycleFlow(
-    flow: Flow<T>,
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-): Flow<T> = remember(flow, lifecycleOwner, lifecycleState) {
-    flow.flowWithLifecycle(lifecycleOwner.lifecycle, lifecycleState)
-}
-
-/**
- * Create and collect a [Flow] that is only collected when [LocalLifecycleOwner] is in [lifecycleState]
- */
-@Composable
-@Deprecated("Use AndroidX collectAsStateWithLifecycle instead")
-public fun <T : R, R> Flow<T>.collectAsStateOnLifecycle(
-    initial: R,
-    context: CoroutineContext = EmptyCoroutineContext,
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): State<R> = collectAsStateWithLifecycle(initialValue = initial, minActiveState = lifecycleState, context = context)
-
-/**
- * Create and collect a [Flow] that is only collected when [LocalLifecycleOwner] is in [lifecycleState]
- */
-@Suppress("StateFlowValueCalledInComposition")
-@Composable
-@Deprecated("Use Androidx collectAsStateWithLifecycle instead")
-public fun <T> StateFlow<T>.collectAsStateOnLifecycle(
-    context: CoroutineContext = EmptyCoroutineContext,
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): State<T> = collectAsStateWithLifecycle(minActiveState = lifecycleState, context = context)
-
-/**
- * Create and collect a [Flow] that is only collected when [LocalLifecycleOwner] is in [lifecycleState]
- */
-@Composable
-@Suppress("ComposableParametersOrdering", "ComposableNaming", "ComposableFunctionName")
-@Deprecated("Use Androidx collectAsStateWithLifecycle instead")
-public fun <T> Flow<T>.collectOnLifecycle(
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    collector: suspend CoroutineScope.(T) -> Unit,
-) {
-    val lifecycleFlow = rememberLifecycleFlow(this, lifecycleState)
-    LaunchedEffect(lifecycleFlow) {
-        // see [LifecycleOwner.subscribe] in :android for reasoning
-        withContext(Dispatchers.Main.immediate) {
-            lifecycleFlow.collect {
-                collector(it)
-            }
-        }
-    }
-}
 
 /**
  * An interface for the scope that provides [send] and [consume] functions inside your composable

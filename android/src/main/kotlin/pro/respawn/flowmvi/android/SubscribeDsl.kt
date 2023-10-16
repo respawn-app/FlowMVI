@@ -9,7 +9,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.MVIView
 import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -53,18 +52,3 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job where T : LifecycleOwner, T : StateConsumer<S>, T : ActionConsumer<A> =
     subscribe(provider, ::consume, ::render, lifecycleState)
-
-/**
- * Subscribe to the store lifecycle-aware.
- * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
- * @see repeatOnLifecycle
- */
-
-@FlowMVIDSL
-@Deprecated(
-    "Use the new MVIView interface version of the function",
-    ReplaceWith("subscribe(lifecycleState)", "pro.respawn.flowmvi.android.view.MVIView")
-)
-public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
-    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : MVIView<S, I, A> = subscribe(provider, lifecycleState)

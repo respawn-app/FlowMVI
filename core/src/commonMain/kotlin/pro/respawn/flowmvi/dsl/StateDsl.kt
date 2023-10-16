@@ -1,13 +1,10 @@
 package pro.respawn.flowmvi.dsl
 
-import pro.respawn.flowmvi.MVIStore
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StateReceiver
-import pro.respawn.flowmvi.updateState
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.flowmvi.util.withType
-import pro.respawn.flowmvi.withState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
