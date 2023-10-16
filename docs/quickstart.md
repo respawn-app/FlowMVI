@@ -8,6 +8,8 @@ Here's how the library works at a glance:
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
+### Version catalogs
+
 ```toml
 [versions]
 flowmvi = "< Badge above 👆🏻 >"
@@ -17,6 +19,20 @@ flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } 
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # androidx.compose
+```
+
+### Kotlin DSL
+
+```kotlin
+dependencies {
+    val flowmvi = "< Badge above 👆🏻 >"
+    commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
+    commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
+
+    androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:android-compose:$flowmvi")
+}
 ```
 
 ## Step 2: Choose your style
@@ -65,7 +81,7 @@ start. To define your contract, ask yourself the following:
       by using mutable properties such as `MutableList`s.
       Use `copy()` of the data classes to mutate your state instead. Even if you use `List`s as the value type,
       for example, make sure those are **new** lists and not just `MutableList`s that were upcasted.
-    * It's okay to copy the state very often, modern devices can handle a few garbage collections.
+    * It's okay to copy the state often, modern devices can handle a few garbage collections.
 * The `MVIIntent` is an action that the user or the subscriber takes, for example, clicks, system broadcasts and dialog
   button presses.
 * The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
@@ -153,7 +169,7 @@ Some interesting properties of the store:
   the store.
 * Store's subscribers will wait until the store is launched when they subscribe to the store. Don't forget to launch the
   store.
-* Stores are created eagerly, but the store *can* be lazy. There is `lazyStore()` for that.
+* Stores are created eagerly usually, but the store *can* be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
 
@@ -267,7 +283,7 @@ class CounterContainer(
     override val store = store(Loading) {
         whileSubscribed {
             repo.timer
-                .onEach(::produceState)
+                .onEach { produceState(it) } 
                 .consume()
         }
     }

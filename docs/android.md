@@ -77,9 +77,14 @@ inline fun <reified T : Container<*, *, *>> Module.storeViewModel() {
 
 @Composable
 inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> storeViewModel(
-    noinline params: ParametersDefinition? = null,
-) = getViewModel<StoreViewModel<S, I, A>>(qualifier<T>(), parameters = params)
-
+    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    },
+    key: String? = null,
+    extras: CreationExtras = defaultExtras(viewModelStoreOwner),
+    scope: Scope = getKoinScope(),
+    noinline parameters: ParametersDefinition? = null,
+): StoreViewModel<S, I, A> = getViewModel(qualifier<T>(), viewModelStoreOwner, key, extras, scope, parameters)
 
 val appModule = module {
     singleOf(::CounterRepository)
@@ -100,52 +105,37 @@ between different viewmodels. This example is also demonstrated in the sample ap
 
 ## UI Layer
 
-It doesn't matter which UI framework you use. Neither your Contract or your ViewModel will change in any way.
+It doesn't matter which UI framework you use. Neither your Contract or your Container/ViewModel will change in any way.
 
 ### Compose
 
 !> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
-It is highly discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
+It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
 also degrade performance. The Compose DSL of the library does not support MVVM+ because of this.
 
-Don't forget to annotate your state with `@Immutable` if you can. This will improve performance significantly.
+You don't have to annotate your state with `@Immutable` as `MVIState` is already marked immutable.
 
 ```kotlin
-@Immutable
-sealed interface CounterState: MVIState {
-    /* ... */
-}
-```
-
-Now you can define your composable:
-
-```kotlin
-private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
-
 @Composable
-internal fun CounterScreen() = MVIComposable(
-    // this doesn't look as cool as everything else, but you can write a dsl to make this a little better
-    // see an example in the sample app
-    getViewModel<StoreViewModel<CounterState, CounterIntent, CounterAction>>(qualifier<CounterContainer>()),
-) { state -> // this -> Scope
+internal fun CounterScreen() {
+    // using Koin DSL from above
+    val store = storeViewModel<CounterContainer, _, _, _>()
 
-    consume { action ->
+    val state by store.subscribe { action ->
         when (action) {
             is ShowMessage -> {
                 /* ... */
             }
         }
     }
-    CounterScreenContent(state)
+    CounterScreenContent(store, state)
 }
 
 @Composable
-private fun Scope.CounterScreenContent(
-    state: CounterState,
-) {
+private fun IntentReceiver<CounterIntent>.CounterScreenContent(state: CounterState) {
     when (state) {
         is DisplayingCounter -> {
-            Button(onClick = { intent(ClickedCounter) }) { // intent() available from scope
+            Button(onClick = { intent(ClickedCounter) }) { // intent() available from the receiver parameter
                 Text("Counter: ${state.counter}")
             }
         }
@@ -154,30 +144,28 @@ private fun Scope.CounterScreenContent(
 }
 ```
 
-Under the hood, the `MVIComposable` function will efficiently subscribe to the store (it is lifecycle-aware) and
+Under the hood, the `subscribe` function will efficiently subscribe to the store (it is lifecycle-aware) and
 use the composition scope to process your events. Event processing will stop in `onPause()` of the parent activity.
-In `onResume()`, the composable will resubscribe. MVIComposable will recompose when state changes, but not
+In `onResume()`, the composable will resubscribe. Your composable will recompose when state changes, but not
 resubscribe to events. The lifecycle state is customizable.
 
 ?> Compose plays well with MVI style because state changes will trigger recompositions. Just mutate your state,
-and the UI will update to reflect changes. Also, the `ConsumerScope` is `@Stable`, so you can safely send intents from
+and the UI will update to reflect changes. Also, the `IntentReceiver` is `@Stable`, so you can safely send intents from
 anywhere without awkward method references and unstable lambdas.
 
-* Use the `consume` block to subscribe to `MVIActions`. Those will be processed as they arrive and the `consume` lambda
+* Use the lambda parameter of `subscribe` to subscribe to `MVIActions`.
+  Those will be processed as they arrive and the `consume` lambda
   will **suspend** until an action is processed. Use a receiver coroutine scope to
   launch new coroutines that will parallelize your flow (e.g. for snackbars).
 * A best practice is to make your state handling (UI redraw composable) a pure function and extract it to a separate
   Composable such as `ScreenContent(state: ScreenState)` to keep your `*Screen` function clean, as shown above.
-* If you want to send `MVIIntent`s from a nested composable, just use `ConsumerScope` as a context:
-  `ConsumerScope<ScreenIntent, ScreenAction>.ScreenContent(state: ScreenState)`. Use type aliases to clean up the
-  declaration of the function.
+* If you want to send `MVIIntent`s from a nested composable, just use `IntentReceiver` as a context.
 
 If you have defined your `*Content` function, you will get a composable that can be easily used in previews.
 That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
-But there's a catch: It has a `ConsumerScope<I, A>` as a receiver. To deal with this, there is an `EmptyScope`
-composable.
-EmptyScope introduces a scope that does not collect actions and does nothing when an intent is sent, which is
-exactly what we want for previews. We can now define our `PreviewParameterProvider` and the Preview composable.
+But there's a catch: It has an `IntentReceiver<I>` as a parameter. To deal with this, there is an `EmptyReceiver`
+composable. EmptyReceiver does nothing when an intent is sent, which
+is exactly what we want for previews. We can now define our `PreviewParameterProvider` and the Preview composable.
 
 ```kotlin
 private class PreviewProvider : StateProvider<CounterState>(
@@ -189,23 +177,29 @@ private class PreviewProvider : StateProvider<CounterState>(
 @Preview
 private fun CounterScreenPreview(
     @PreviewParameter(PreviewProvider::class) state: CounterState,
-) = EmptyScope {
+) = EmptyReceiver {
     ComposeScreenContent(state)
 }
 ```
 
-See [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/compose/ComposeScreen.kt)
+See
+the [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/compose/ComposeScreen.kt)
 for a more elaborate example.
 
 ## View
 
-For a View-based project, inheritance rules.
+For a View-based project, the logic is essentially the same.
+
+* Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle the lifecycle for you.
+* Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
+* Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
+  view-based Android API.
 
 ```kotlin
 class CounterFragment : Fragment() {
 
     private val binding by viewBinding<CounterFragmentBinding>()
-    private val store by viewModel<CounterViewModel>()
+    private val store by storeViewModel<CounterContainer, _, _, _>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -217,23 +211,18 @@ class CounterFragment : Fragment() {
         }
     }
 
-    private fun render(state: ScreenState) = with(binding) {
+    private fun render(state: ScreenState): Unit = with(binding) {
         with(state) {
             tvCounter.text = counter.toString()
             /* ... update ALL views! ... */
         }
     }
 
-    private fun consume(action: ScreenAction) = when (action) {
+    private fun consume(action: ScreenAction): Unit = when (action) {
         is ShowMessage -> Snackbar.make(binding.root, action.message, Snackbar.LENGTH_SHORT).show()
     }
 }
 ```
 
-* Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle the lifecycle for you.
-* Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
-* Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
-  view-based Android API.
-
-See [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicActivity.kt)
+See the [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicActivity.kt)
 for a more elaborate example.

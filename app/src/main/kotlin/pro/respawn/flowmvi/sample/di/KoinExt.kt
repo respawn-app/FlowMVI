@@ -19,7 +19,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 
 inline fun <reified T : Container<*, *, *>> Module.storeViewModel() {
-    viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }.store) }
+    viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }) }
 }
 
 @Composable
