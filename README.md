@@ -46,8 +46,8 @@ dependencies {
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:view:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
+    androidMainImplementation("pro.respawn.flowmvi:android-compose:$flowmvi")
 }
 ```
 
@@ -156,7 +156,12 @@ store.subscribe(
 ```kotlin
 // Create plugins with a single line of code for any store or a specific one
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
-    /*...*/
+    onStart {
+        /*...*/
+    }
+    onIntent { intent ->
+        /*...*/
+    }
 }
 ```
 
@@ -171,10 +176,10 @@ val module = module {
 
 // collect the store efficiently based on composable's lifecycle
 @Composable
-fun CounterScreen() = MVIComposable(getViewModel(qualifier<CounterContainer>())) { state ->
-     // this -> ConsumerScope with intent()
+fun CounterScreen() {
+    val store = getViewModel(qualifier<CounterContainer>())
 
-    Subscribe { action -> // consume actions from composables
+    val state by store.subscribe { action -> // collect actions/states from composables
         when (action) {
             is ShowMessage -> {
                 /* ... */
@@ -184,7 +189,7 @@ fun CounterScreen() = MVIComposable(getViewModel(qualifier<CounterContainer>()))
 
     when (state) {
         is DisplayingCounter -> {
-            Button(onClick = { intent(ClickedCounter) }) {
+            Button(onClick = { store.intent(ClickedCounter) }) {
                 Text("Counter: ${state.counter}")
             }
         }
