@@ -70,7 +70,7 @@ public abstract class MVIViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     protected open fun recover(e: Exception): S = throw e
 
-    override fun useState(block: S.() -> S): S = store.useState(block)
+    override fun useState(block: S.() -> S): Unit = store.useState(block)
 
     /**
      * Overriding this field, don't forget to call [MVIStore.start] yourself.

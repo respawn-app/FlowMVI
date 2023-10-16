@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample
 
 import android.os.Parcelable
-import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

@@ -4,6 +4,8 @@ plugins {
     id("kotlin-parcelize")
 }
 
+private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+
 android {
     configureAndroid(this)
     namespace = "${Config.artifactId}.sample"
@@ -26,9 +28,9 @@ android {
             addAll(Config.jvmCompilerArgs)
             if (project.findProperty("enableComposeCompilerReports") == "true") {
                 add("-P")
-                add("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.get()}/compose_metrics")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
                 add("-P")
-                add("plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.get()}/compose_metrics")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
             }
         }
         jvmTarget = Config.jvmTarget.target

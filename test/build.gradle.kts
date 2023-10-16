@@ -6,6 +6,7 @@ android {
     namespace = "${Config.namespace}.test"
 }
 dependencies {
+    commonMainCompileOnly(project(":annotations"))
     commonMainApi(project(":core"))
     commonMainImplementation(kotlin("test"))
     commonMainApi(libs.kotlin.coroutines.core)

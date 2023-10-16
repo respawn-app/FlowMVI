@@ -6,13 +6,16 @@ import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 
 @Immutable
-public object EmptyReceiver : IntentReceiver<MVIIntent> {
+private object EmptyReceiver : IntentReceiver<MVIIntent> {
 
     override fun send(intent: MVIIntent): Unit = Unit
     override suspend fun emit(intent: MVIIntent): Unit = Unit
 }
 
+/**
+ * An [IntentReceiver] that does nothing and ignores all intents. Most often used for Composable previews.
+ */
 @Composable
-public inline fun <I : MVIIntent> EmptyReceiver(
+public fun <I : MVIIntent> EmptyReceiver(
     @BuilderInference call: @Composable IntentReceiver<I>.() -> Unit,
 ): Unit = call(EmptyReceiver as IntentReceiver<I>)

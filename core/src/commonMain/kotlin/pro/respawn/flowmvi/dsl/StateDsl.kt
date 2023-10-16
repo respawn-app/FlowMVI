@@ -63,4 +63,4 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateS
 @FlowMVIDSL
 public inline fun <reified T : S, S : MVIState> StateReceiver<S>.useState(
     @BuilderInference crossinline transform: T.() -> S
-): S = useState { withType<T, _> { transform() } }
+): Unit = useState { withType<T, _> { transform() } }

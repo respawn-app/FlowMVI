@@ -2,6 +2,8 @@ plugins {
     id("pro.respawn.android-library")
 }
 
+private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+
 android {
     namespace = "${Config.artifactId}.android.compose"
 
@@ -19,9 +21,9 @@ android {
             addAll(Config.jvmCompilerArgs)
             if (project.findProperty("enableComposeCompilerReports") == "true") {
                 add("-P")
-                add("plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.get()}/compose_metrics")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
                 add("-P")
-                add("plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.get()}/compose_metrics")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
             }
         }
         jvmTarget = Config.jvmTarget.target

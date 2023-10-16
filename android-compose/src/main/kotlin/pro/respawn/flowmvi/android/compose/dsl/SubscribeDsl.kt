@@ -18,6 +18,19 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
 
+/**
+ * A function to subscribe to the store that follows the system lifecycle.
+ * This function will assign the store a new subscriber when invoked,
+ * then populate the returned [State] with new states.
+ * Provided [consume] parameter will be used to consume actions that come from the store.
+ * [consume] can be null (by default) if you have your actions disabled or don't want to receive them.
+ *
+ * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
+ *   upon leaving that state, the function will unsubscribe.
+ * @param consume a lambda to consume actions with.
+ *
+ * @see Store.subscribe
+ */
 @Composable
 @FlowMVIDSL
 @Suppress("NOTHING_TO_INLINE")
