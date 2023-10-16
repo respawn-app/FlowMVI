@@ -72,9 +72,11 @@ public class CachePlugin<out T, S : MVIState, I : MVIIntent, A : MVIAction> inte
 
     override fun onStop(e: Exception?): Unit = _value.update { UNINITIALIZED }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T =
-        @Suppress("UNCHECKED_CAST")
-        requireNotNull(_value.value as? T) { AccessBeforeCachingMessage }
+    @Suppress("UNCHECKED_CAST")
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        require(isCached) { AccessBeforeCachingMessage }
+        return _value.value as T
+    }
 }
 
 /**
@@ -83,7 +85,7 @@ public class CachePlugin<out T, S : MVIState, I : MVIIntent, A : MVIAction> inte
  */
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
     name: String? = null,
-    init: suspend PipelineContext<S, I, A>.() -> T,
+    @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
 ): CachePlugin<T, S, I, A> = CachePlugin(name, init)
 
 /**
@@ -95,5 +97,5 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
  */
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.cache(
     name: String? = null,
-    init: suspend PipelineContext<S, I, A>.() -> T,
+    @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
 ): ReadOnlyProperty<Any?, T> = cachePlugin(name, init).also { install(it) }
