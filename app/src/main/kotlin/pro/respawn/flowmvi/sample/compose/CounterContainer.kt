@@ -43,15 +43,29 @@ class CounterContainer(
         )
         val manager = manageJobs()
         val undoRedo = undoRedo(10)
+        recover {
+            undoRedo.reset()
+            launch {
+                if (it is IllegalArgumentException)
+                    action(ShowErrorMessage)
+                else updateState {
+                    CounterState.Error(it)
+                }
+                manager.cancelAndJoin("timer")
+            }
+            null
+        }
         whileSubscribed {
             launch {
                 repo.getTimer()
-                    .onEach { produceState(it) } // set mapped states
+                    .onEach { produceState(it) }
                     .consume(Dispatchers.Default)
             }.register(manager, "timer")
         }
         reduce {
             when (it) {
+                is ClickedUndo -> undoRedo.undo()
+                is ClickedBack -> action(GoBack)
                 is ClickedCounter -> launch {
                     require(Random.nextBoolean()) { "Oops, there was an error in a job" }
                     undoRedo(
@@ -67,21 +81,7 @@ class CounterContainer(
                         }
                     )
                 }
-                is ClickedUndo -> undoRedo.undo()
-                is ClickedBack -> action(GoBack)
             }
-        }
-        recover {
-            undoRedo.reset()
-            launch {
-                if (it is IllegalArgumentException)
-                    action(ShowErrorMessage)
-                else updateState {
-                    CounterState.Error(it)
-                }
-                manager.cancel("timer")
-            }
-            null
         }
     }
 

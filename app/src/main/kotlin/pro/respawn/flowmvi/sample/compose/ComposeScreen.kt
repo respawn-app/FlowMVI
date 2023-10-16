@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.sample.compose
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,12 +23,10 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
-import pro.respawn.flowmvi.android.compose.ConsumerScope
-import pro.respawn.flowmvi.android.compose.EmptyScope
-import pro.respawn.flowmvi.android.compose.MVIComposable
-import pro.respawn.flowmvi.android.compose.StateProvider
-import pro.respawn.flowmvi.android.compose.Subscribe
-import pro.respawn.flowmvi.sample.CounterAction
+import pro.respawn.flowmvi.android.compose.preview.StateProvider
+import pro.respawn.flowmvi.android.compose.dsl.subscribe
+import pro.respawn.flowmvi.android.compose.preview.EmptyReceiver
+import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
@@ -43,21 +41,17 @@ import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.compose.theme.MVISampleTheme
 import pro.respawn.flowmvi.sample.di.storeViewModel
 
-private typealias Scope = ConsumerScope<CounterIntent, CounterAction>
-
 context(CoroutineScope)
 fun ScaffoldState.snackbar(text: String) = launch { snackbarHostState.showSnackbar(text) }
 
 @Composable
 @Suppress("ComposableFunctionName")
-fun ComposeScreen(onBack: () -> Unit) = MVIComposable(
-    storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
-) { state: CounterState -> // this -> ConsumerScope
-
+fun ComposeScreen(onBack: () -> Unit) {
+    val store = storeViewModel<CounterContainer, _, _, _> { parametersOf("I am a parameter") }
     val context = LocalContext.current // we can't use composable functions in consume()
     val scaffoldState = rememberScaffoldState()
 
-    Subscribe { action ->
+    val state by store.subscribe { action ->
         // This block is run in the scope of the subscription each time we consume a new action and the lifecycle is RESUMED.
         // You can run suspending code here but that will block all other actions' retrieval. Use launch { } to not block.
         // consume() block will only be called when a new action is emitted (independent of recompositions)
@@ -69,12 +63,12 @@ fun ComposeScreen(onBack: () -> Unit) = MVIComposable(
     }
 
     Scaffold(Modifier.fillMaxSize(), scaffoldState = scaffoldState) {
-        ComposeScreenContent(state = state, modifier = Modifier.padding(it))
+        store.ComposeScreenContent(state = state, modifier = Modifier.padding(it))
     }
 }
 
 @Composable
-private fun Scope.ComposeScreenContent(
+private fun IntentReceiver<CounterIntent>.ComposeScreenContent(
     state: CounterState,
     modifier: Modifier = Modifier
 ) {
@@ -92,11 +86,13 @@ private fun Scope.ComposeScreenContent(
             ) {
                 Text(
                     text = stringResource(id = R.string.timer_template, state.timer),
-                    modifier = Modifier.clickable { intent(ClickedCounter) }
                 )
                 Text(
                     text = stringResource(id = R.string.counter_template, state.counter),
                 )
+                Button(onClick = { intent(ClickedCounter) }) {
+                    Text(text = stringResource(id = R.string.counter_button_label))
+                }
                 Button(onClick = { intent(ClickedBack) }) {
                     Text(text = stringResource(id = R.string.counter_back_label))
                 }
@@ -116,7 +112,7 @@ private fun ComposeScreenPreview(
     @PreviewParameter(PreviewProvider::class) state: CounterState,
 ) = MVISampleTheme {
     // Use this helper function to preview functions that use ConsumerScope
-    EmptyScope {
+    EmptyReceiver {
         ComposeScreenContent(state)
     }
 }

@@ -1,8 +1,11 @@
 package pro.respawn.flowmvi.api
 
+import androidx.compose.runtime.Stable
+
 /**
  * An entity that can receive and process [MVIIntent]s. Usually, this is a [Store].
  */
+@Stable
 public interface IntentReceiver<in I : MVIIntent> {
 
     /**
