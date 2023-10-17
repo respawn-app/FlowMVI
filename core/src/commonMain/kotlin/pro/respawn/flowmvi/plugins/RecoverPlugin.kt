@@ -17,7 +17,7 @@ public typealias Recover<S, I, A> = suspend PipelineContext<S, I, A>.(e: Excepti
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.recover(
     name: String? = null,
-    recover: Recover<S, I, A>,
+    @BuilderInference recover: Recover<S, I, A>,
 ): Unit = install(recoverPlugin(name, recover))
 
 /**
@@ -27,7 +27,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverPlugin(
     name: String? = null,
-    recover: Recover<S, I, A>
+    @BuilderInference recover: Recover<S, I, A>
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onException(recover)

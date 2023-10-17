@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.MutableStore
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -32,7 +31,7 @@ import pro.respawn.flowmvi.modules.stateModule
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
-) : MutableStore<S, I, A>,
+) : Store<S, I, A>,
     Provider<S, I, A>,
     PipelineModule<S, I, A>,
     StateModule<S> by stateModule(config.initial),

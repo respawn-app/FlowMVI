@@ -7,8 +7,8 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
-    api(project(":android"))
+    api(projects.core)
+    api(projects.android)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity)
 }

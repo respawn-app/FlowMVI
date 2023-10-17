@@ -23,7 +23,6 @@ private class StateModuleImpl<S : MVIState>(initial: S) : StateModule<S> {
     @DelicateStoreApi
     override val state by _states::value
 
-    @DelicateStoreApi
     override fun useState(block: S.() -> S) = _states.update(block)
 
     override val states: StateFlow<S> = _states.asStateFlow()

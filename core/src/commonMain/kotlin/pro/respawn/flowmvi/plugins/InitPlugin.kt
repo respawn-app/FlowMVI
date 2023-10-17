@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.dsl.plugin
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.init(
-    block: suspend PipelineContext<S, I, A>.() -> Unit
+    @BuilderInference block: suspend PipelineContext<S, I, A>.() -> Unit
 ): Unit = install(initPlugin(block))
 
 /**
@@ -24,5 +24,5 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.in
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> initPlugin(
-    block: suspend PipelineContext<S, I, A>.() -> Unit,
+    @BuilderInference block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = plugin { onStart(block) }

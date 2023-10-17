@@ -113,7 +113,6 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
             subscriberScope: CoroutineScope,
             subscriberCount: Int
         ) = subscribe(subscriberScope, subscriberCount)
-
         override fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) = unsubscribe(subscriberCount)
         override fun onStop(e: Exception?): Unit = stop(e)
     }

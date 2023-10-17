@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -14,6 +15,7 @@ import pro.respawn.flowmvi.api.StorePlugin
  * * stdout on mingw/native
  * * System.out on JVM.
  */
+@FlowMVIDSL
 public expect fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPlugin(
     tag: String? = null,
     level: StoreLogLevel? = null

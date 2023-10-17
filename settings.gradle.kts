@@ -94,11 +94,14 @@ fun RepositoryHandler.ivyNative() {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "FlowMVI"
 
 include(":app")
 include(":test")
 include(":core")
+include(":annotations")
 include(":android")
 include(":android-compose")
 include(":android-view")

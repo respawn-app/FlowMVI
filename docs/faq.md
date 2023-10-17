@@ -4,12 +4,10 @@
   but also prevents developers from putting excessive logic into their states and/or making private/protected
   properties. State is a simple typed data holder, so if you want to use protected properties or override functions,
   it is likely that something is wrong with your architecture.
-* Use `data object`s instead of regular objects to make debugging easier and improve readability.
-* Use nested class imports and import aliases to clean up your code, as Contract class names can be long sometimes.
+* Use nested class imports and import aliases to clean up your code, as contract class names can be long sometimes.
 * Use value classes to reduce object allocations if your Intents are being sent frequently, such as for text field
   value changes or scroll events.
     * You can use the `useState` function to optimize the performance of the store by bypassing all checks and plugins.
-      Use for performance-critical operations only.
     * Overall, there are cases when changes are so frequent that you'll want to just leave some logic on the UI layer to
       avoid polluting the heap with garbage collected objects and keep the UI performant.
 * Avoid subscribing to a bunch of flows in your Store. The best way to implement a reactive UI pattern is to
@@ -18,11 +16,10 @@
     * With this, you can be sure that your state is consistent even if you have 20 parallel data streams from different
       sources e.g. database cache, network, websockets and other objects.
 * Avoid using platform-level imports and code in your Store/Container/ViewModel whenever possible. This is optional, but
-  if you follow this rule, your **ViewModels can be multiplatform**! This is also very good for the architecture.
+  if you follow this rule, your **Business logic can be multiplatform**! This is also very good for the architecture.
 * There is an ongoing discussion about whether to name your intents starting with the verb or with the noun.
     * Case 1: `ClickedCounter`
-    * Case 2: `CounterClicked`
-
+    * Case 2: `CounterClicked`  
       In general, this is up to your personal preference, just make sure you use a single style across all of your
       Contracts. I personally like to name intents starting with the verb (Case 1) for easier autosuggestions from the
       IDE.
@@ -32,7 +29,7 @@
 Here's an example of rules we use at [Respawn](https://respawn.pro) to name our Contract classes:
 
 * `MVIIntent` naming should be `<TypeOfActionInPastTense><Meaning>`.
-  Example: `ClickedCounter`, `SwipedDismiss` (~~CounterClicked~~).
+  Example: `ClickedCounter`, `SwipedDismiss` (~~CounterClick~~).
 * `MVIAction`s should be named using verbs in present tense. Example: `ShowConfirmationPopup`, `GoBack`.
     * Navigation actions should be using the `GoTo` verb (~~NavigateTo, Open...~~) Example: `GoToHome`.
       Do not include `Screen` postfix. `GoToHome`~~Screen~~.
@@ -55,19 +52,12 @@ Did you call `Store.subscribe()`?
 3. If one of the subscribers doesn't need to handle Actions, you can pass `null` to the `Store.subscribe` function to
    skip consumption of events.
 
-### I made my store, but I want to wrap it in a ViewModel. How can I do that?
-
-In the sample app, there is an example of how you can set up your DI with Koin.
-Use `StoreViewModel` as a simple wrapper for the built Store, which you can inject using DI.
-The biggest problem with this is that your generic types will be erased, and the only solution is to use qualifiers
-to resolve your ViewModels/Stores.  
-Contributions with examples for Hilt setup are welcome.
-
-### In what order are intents and actions processed?
+### In what order are intents, plugins and actions processed?
 
 * Intents: FIFO or Parallel based on configuration parameter `parallelIntents`.
 * Actions: FIFO.
-* States: FIFO, but can be "parallel" if using `useState`.
+* States: FIFO.
+* Plugins: Chain of Responsibility.
 
 ### When I consume an Action, the other actions are delayed or do not come.
 
@@ -132,8 +122,8 @@ Create nested classes and host them in your parent state.
 Example:
 
 ```kotlin
-sealed interface NewsState {
-    data class Loading : NewsState
+sealed interface NewsState : MVIState {
+    data object Loading : NewsState
     data class DisplayingNews(
         val suggestionsState: SuggestionsState,
         val feedState: FeedState,

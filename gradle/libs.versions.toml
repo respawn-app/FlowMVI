@@ -1,32 +1,31 @@
 [versions]
-activity = "1.7.2"
-compose = "1.5.1"
+activity = "1.8.0"
+compose = "1.5.3"
 compose-compiler = "1.5.3"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.7.3"
-dependencyAnalysisPlugin = "1.22.0"
+dependencyAnalysisPlugin = "1.25.0"
 detekt = "1.23.1"
 detektFormattingPlugin = "1.23.1"
-dokka = "1.8.20"
+dokka = "1.9.10"
 flowExt = "0.7.1"
 fragment = "1.6.1"
-gradleAndroid = "8.2.0-beta02"
+gradleAndroid = "8.2.0-beta06"
 gradleDoctorPlugin = "0.8.1"
 junit = "4.13.2"
 koin = "3.5.0"
 koin-compose = "3.5.0"
 kotest = "5.7.2"
-kotest-plugin = "5.6.2"
+kotest-plugin = "5.7.2"
 # @pin
 kotlin = "1.9.10"
 kotlinx-atomicfu = "0.22.0"
 lifecycle = "2.6.2"
-material = "1.9.0"
-mockk = "1.13.5"
+material = "1.10.0"
 turbine = "1.0.0"
 versionCatalogUpdatePlugin = "0.8.1"
-versionsPlugin = "0.48.0"
+versionsPlugin = "0.49.0"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -57,14 +56,14 @@ kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref =
 kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }

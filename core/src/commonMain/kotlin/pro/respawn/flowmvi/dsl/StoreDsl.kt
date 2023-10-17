@@ -18,7 +18,7 @@ import kotlin.jvm.JvmName
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
     initial: S,
-    @BuilderInference crossinline configure: BuildStore<S, I, A>,
+    @BuilderInference configure: BuildStore<S, I, A>,
 ): Store<S, I, A> = StoreBuilder<S, I, A>(initial).run {
     configure()
     build()
@@ -32,7 +32,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
     initial: S,
     scope: CoroutineScope,
-    @BuilderInference crossinline configure: BuildStore<S, I, A>,
+    @BuilderInference configure: BuildStore<S, I, A>,
 ): Store<S, I, A> = store(initial, configure).apply { start(scope) }
 
 /**
@@ -52,7 +52,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
 @kotlin.internal.LowPriorityInOverloadResolution
 public inline fun <S : MVIState, I : MVIIntent> store(
     initial: S,
-    @BuilderInference crossinline configure: BuildStore<S, I, Nothing>,
+    @BuilderInference configure: BuildStore<S, I, Nothing>,
 ): Store<S, I, Nothing> = store(initial) {
     configure()
     actionShareBehavior = ActionShareBehavior.Disabled

@@ -19,7 +19,7 @@ import pro.respawn.flowmvi.dsl.plugin
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
     name: String? = null,
     minSubscriptions: Int = 1,
-    crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
+    @BuilderInference crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): Unit = install(whileSubscribedPlugin(name, minSubscriptions, block))
 
 /**
@@ -34,7 +34,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(
     name: String? = null,
     minSubscriptions: Int = 1,
-    crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
+    @BuilderInference crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     var job by atomic<Job?>(null)

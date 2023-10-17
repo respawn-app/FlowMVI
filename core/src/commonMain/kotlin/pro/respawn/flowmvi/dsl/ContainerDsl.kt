@@ -9,7 +9,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 
-// these extensions are needed to auto-resolve types to the Container class. They do literally nothing
+// these extensions are needed to auto-resolve types to the Container class.
 
 /**
  * Alias for [pro.respawn.flowmvi.dsl.lazyStore] (with a scope)
@@ -17,7 +17,7 @@ import pro.respawn.flowmvi.api.Store
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A>.lazyStore(
     initial: S,
     scope: CoroutineScope,
-    crossinline configure: BuildStore<S, I, A>
+    @BuilderInference crossinline configure: BuildStore<S, I, A>
 ): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, scope, configure)
 
 /**
@@ -25,7 +25,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A
  */
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A>.lazyStore(
     initial: S,
-    crossinline configure: BuildStore<S, I, A>
+    @BuilderInference crossinline configure: BuildStore<S, I, A>
 ): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, configure)
 
 /**
@@ -34,7 +34,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A>.store(
     initial: S,
     scope: CoroutineScope,
-    crossinline configure: BuildStore<S, I, A>
+    @BuilderInference crossinline configure: BuildStore<S, I, A>
 ): Store<S, I, A> = pro.respawn.flowmvi.dsl.store(initial, scope, configure)
 
 /**
@@ -42,5 +42,5 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A
  */
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Container<S, I, A>.store(
     initial: S,
-    crossinline configure: BuildStore<S, I, A>
+    @BuilderInference crossinline configure: BuildStore<S, I, A>
 ): Store<S, I, A> = pro.respawn.flowmvi.dsl.store(initial, configure)

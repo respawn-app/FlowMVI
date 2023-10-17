@@ -1,14 +1,12 @@
 package pro.respawn.flowmvi.sample
 
 import android.os.Parcelable
-import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.LambdaIntent
 
-@Immutable
 sealed interface CounterState : MVIState, Parcelable {
 
     @Parcelize
@@ -27,7 +25,6 @@ sealed interface CounterState : MVIState, Parcelable {
 
 typealias CounterLambdaIntent = LambdaIntent<CounterState, CounterAction>
 
-@Immutable
 sealed interface CounterIntent : MVIIntent {
 
     data object ClickedCounter : CounterIntent
@@ -35,7 +32,6 @@ sealed interface CounterIntent : MVIIntent {
     data object ClickedBack : CounterIntent
 }
 
-@Immutable
 sealed interface CounterAction : MVIAction {
 
     data object ShowErrorMessage : CounterAction

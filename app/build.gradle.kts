@@ -4,6 +4,8 @@ plugins {
     id("kotlin-parcelize")
 }
 
+private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+
 android {
     configureAndroid(this)
     namespace = "${Config.artifactId}.sample"
@@ -22,16 +24,24 @@ android {
         viewBinding = true
     }
     kotlinOptions {
-        freeCompilerArgs += Config.jvmCompilerArgs
+        freeCompilerArgs += buildList {
+            addAll(Config.jvmCompilerArgs)
+            if (project.findProperty("enableComposeCompilerReports") == "true") {
+                add("-P")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
+                add("-P")
+                add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")
+            }
+        }
         jvmTarget = Config.jvmTarget.target
         languageVersion = Config.kotlinVersion.version
     }
 }
 
 dependencies {
-    implementation(project(":android"))
-    implementation(project(":android-compose"))
-    implementation(project(":android-view"))
+    implementation(projects.android)
+    implementation(projects.androidCompose)
+    implementation(projects.androidView)
 
     implementation(libs.bundles.koin)
     implementation(libs.koin.compose)

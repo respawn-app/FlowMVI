@@ -13,4 +13,4 @@ import kotlin.coroutines.coroutineContext
 @Suppress("UNCHECKED_CAST")
 @DelicateStoreApi
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> pipelineContext(): PipelineContext<S, I, A>? =
-    coroutineContext[PipelineContext] as? PipelineContext<S, I, A>
+    coroutineContext[PipelineContext] as? PipelineContext<S, I, A>?

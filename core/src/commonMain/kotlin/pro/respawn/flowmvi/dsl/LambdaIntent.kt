@@ -1,11 +1,13 @@
 package pro.respawn.flowmvi.dsl
 
+import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.plugins.ReducePluginName
 import pro.respawn.flowmvi.plugins.reduce
 import kotlin.jvm.JvmInline
 
@@ -20,6 +22,7 @@ import kotlin.jvm.JvmInline
  * e.g. logging of lambda intents**
  */
 @JvmInline
+@Immutable
 public value class LambdaIntent<S : MVIState, A : MVIAction>(
     private val block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ) : MVIIntent {
@@ -49,6 +52,7 @@ public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.inte
  * Install a new [pro.respawn.flowmvi.plugins.reducePlugin] that is tailored for [LambdaIntent]s.
  */
 @FlowMVIDSL
-public fun <S : MVIState, A : MVIAction> StoreBuilder<S, LambdaIntent<S, A>, A>.reduceLambdas(): Unit = reduce {
-    with(it) { invoke() }
-}
+public fun <S : MVIState, A : MVIAction> StoreBuilder<S, LambdaIntent<S, A>, A>.reduceLambdas(
+    name: String = ReducePluginName,
+    consume: Boolean = true,
+): Unit = reduce(consume, name) { with(it) { invoke() } }

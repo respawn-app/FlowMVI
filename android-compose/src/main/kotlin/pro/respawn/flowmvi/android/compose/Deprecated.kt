@@ -3,7 +3,9 @@
     "ComposableEventParameterNaming",
     "TopLevelComposableFunctions",
     "ComposableFunctionName",
-    "NOTHING_TO_INLINE"
+    "NOTHING_TO_INLINE",
+    "DEPRECATION",
+    "DeprecatedCallableAddReplaceWith"
 )
 
 package pro.respawn.flowmvi.android.compose
@@ -18,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
@@ -30,10 +33,13 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
 import kotlin.experimental.ExperimentalTypeInference
 
+private const val Package = "pro.respawn.flowmvi.android.compose.dsl"
+
 /**
- * An interface for the scope that provides magic [send] and [consume] functions inside your composable
+ * An interface for the scope that provides [send] and [consume] functions inside your composable
  */
 @Stable
+@Deprecated("This interface is no longer needed. Use the new subscribe extension instead")
 public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentReceiver<I> {
     // composable functions can't have default parameters, so we'll need two overloads
 
@@ -44,6 +50,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
+    @Stable
     public fun consume(onAction: (suspend CoroutineScope.(action: A) -> Unit)?)
 
     /**
@@ -52,6 +59,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
      */
     @Composable
     @FlowMVIDSL
+    @Stable
     public fun consume(): Unit = consume(null)
 }
 
@@ -61,6 +69,7 @@ public interface ConsumerScope<in I : MVIIntent, out A : MVIAction> : IntentRece
 @Composable
 @FlowMVIDSL
 @NonRestartableComposable
+@Deprecated("This call is error-prone. Please use the new subscribe dsl with a required parameter")
 public inline fun ConsumerScope<*, *>.Subscribe(): Unit = consume()
 
 /**
@@ -69,6 +78,7 @@ public inline fun ConsumerScope<*, *>.Subscribe(): Unit = consume()
 @Composable
 @FlowMVIDSL
 @NonRestartableComposable
+@Deprecated("This call is error-prone. Please use the new subscribe dsl with a required parameter")
 public inline fun <A : MVIAction> ConsumerScope<*, A>.Subscribe(
     noinline onAction: suspend CoroutineScope.(action: A) -> Unit
 ): Unit = consume(onAction)
@@ -126,6 +136,92 @@ private object EmptyScope : ConsumerScope<MVIIntent, MVIAction> {
 @OptIn(ExperimentalTypeInference::class)
 @Composable
 @FlowMVIDSL
+@Deprecated(
+    "Please use EmptyReceiver with the new dsl",
+    ReplaceWith("EmptyReceiver", Package)
+)
 public fun <I : MVIIntent, A : MVIAction> EmptyScope(
     @BuilderInference call: @Composable ConsumerScope<I, A>.() -> Unit,
 ): Unit = call(EmptyScope as ConsumerScope<I, A>)
+
+/**
+ * A function that introduces ConsumerScope to the content and ensures safe lifecycle-aware and efficient collection
+ * of states and actions.
+ *
+ * Use [ConsumerScope.consume] to subscribe to the store
+ *
+ * Usage:
+ * ```kotlin
+ * @Composable
+ * fun HomeScreen() = MVIComposable(getViewModel<HomeViewModel>()) { // this: ConsumerScope<S, I, A>
+ *     consume { action ->
+ *         when(action) {
+ *             /*...*/
+ *         }
+ *     }
+ *     when(state) {
+ *         //use state to render content
+ *     }
+ * }
+ * ```
+ * @param store a Store (usually a [androidx.lifecycle.ViewModel]) that handles this screen's logic
+ * @param lifecycleState the minimum lifecycle state, in which the activity must be to receive actions/states
+ * @param content the actual screen content. Will be recomposed each time a new state is received.
+ */
+@Composable
+@Deprecated(
+    "This call is error-prone. Please use the new subscribe dsl with a required parameter",
+    ReplaceWith(
+        "val state by store.subscribe(lifecycleState, consume)",
+        Package,
+    )
+)
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
+    store: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
+) {
+    val scope = rememberConsumerScope(store, lifecycleState)
+    val state by scope.state
+    content(scope, state)
+}
+
+/**
+ * An overload of [MVIComposable] that accepts a [consume] block to automatically
+ * subscribe to the [store] upon invocation.
+ * @see MVIComposable
+ */
+@Composable
+@Deprecated(
+    "This call is error-prone. Please use the new subscribe dsl with a required parameter",
+    ReplaceWith(
+        "val state by store.subscribe(lifecycleState, consume)",
+        Package,
+    )
+)
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> MVIComposable(
+    store: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    noinline consume: (suspend CoroutineScope.(A) -> Unit)?,
+    @BuilderInference content: @Composable ConsumerScope<I, A>.(state: S) -> Unit,
+) {
+    val scope = rememberConsumerScope(store, lifecycleState)
+    val state by scope.state
+    scope.consume(consume)
+    content(scope, state)
+}
+
+/**
+ * A collection preview param provider that provides [MVIState]
+ * Created to avoid boilerplate related to Preview parameters.
+ */
+@Deprecated(
+    "Moved to the \"preview\" package",
+    ReplaceWith(
+        "StateProvider(states)",
+        "pro.respawn.flowmvi.android.compose.preview"
+    )
+)
+public open class StateProvider<S>(
+    vararg states: S,
+) : CollectionPreviewParameterProvider<S>(states.toList())
