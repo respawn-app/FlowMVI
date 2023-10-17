@@ -32,8 +32,8 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
-    api(project(":android"))
+    api(projects.core)
+    api(projects.android)
 
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)

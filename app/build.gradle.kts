@@ -39,9 +39,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":android"))
-    implementation(project(":android-compose"))
-    implementation(project(":android-view"))
+    implementation(projects.android)
+    implementation(projects.androidCompose)
+    implementation(projects.androidView)
 
     implementation(libs.bundles.koin)
     implementation(libs.koin.compose)

@@ -7,7 +7,7 @@ android {
 }
 
 dependencies {
-    api(project(":core"))
+    api(projects.core)
     api(libs.lifecycle.runtime)
     api(libs.lifecycle.viewmodel)
     api(libs.kotlin.coroutines.android)

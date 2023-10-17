@@ -94,6 +94,8 @@ fun RepositoryHandler.ivyNative() {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "FlowMVI"
 
 include(":app")
