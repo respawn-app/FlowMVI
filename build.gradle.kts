@@ -10,8 +10,7 @@ plugins {
     alias(libs.plugins.versions)
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.dokka)
-    // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/281
-    // alias(libs.plugins.atomicfu)
+    alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
 }
 
@@ -92,12 +91,12 @@ versionCatalogUpdate {
     }
 }
 
-// atomicfu {
-//     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
-//     transformJvm = false
-//     jvmVariant = "VH"
-//     transformJs = false
-// }
+atomicfu {
+    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+    transformJvm = true
+    jvmVariant = "VH"
+    transformJs = true
+}
 
 tasks {
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {

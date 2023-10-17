@@ -1,5 +1,4 @@
 plugins {
-    // id(libs.plugins.atomicfu.id)
     kotlin("multiplatform")
     id("com.android.library")
 }
