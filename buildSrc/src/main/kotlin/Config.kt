@@ -16,7 +16,7 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 2
-    const val minorRelease = 0
+    const val minorRelease = 1
     const val patch = 0
     const val postfix = "rc01"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
