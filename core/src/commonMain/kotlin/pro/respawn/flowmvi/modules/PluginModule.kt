@@ -32,6 +32,8 @@ internal class PluginModule<S : MVIState, I : MVIIntent, A : MVIAction>(
         initial: R,
         block: StorePlugin<S, I, A>.(R) -> R?
     ) = plugins.fold<_, R?>(initial) { acc, it -> it.block(acc ?: return@plugins acc) }
-
-    inline operator fun invoke(block: StorePlugin<S, I, A>.() -> Unit) = block()
 }
+
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> pluginModule(
+    plugins: Set<StorePlugin<S, I, A>>
+): StorePlugin<S, I, A> = PluginModule(plugins)

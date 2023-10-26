@@ -25,7 +25,7 @@ internal class CappedMutableList<T>(
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        require(elements.size < maxSize)
+        require(elements.size <= maxSize)
         val added = backing.addAll(elements)
         removeOverflowing()
         return added

@@ -28,7 +28,7 @@ private class IntentModuleImpl<I : MVIIntent>(
     private val intents = Channel<I>(capacity, overflow)
 
     override suspend fun emit(intent: I) = intents.send(intent)
-    override fun send(intent: I) {
+    override fun intent(intent: I) {
         intents.trySend(intent)
     }
 

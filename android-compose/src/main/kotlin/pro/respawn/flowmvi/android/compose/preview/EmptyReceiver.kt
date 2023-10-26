@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 @Immutable
 private object EmptyReceiver : IntentReceiver<MVIIntent> {
 
-    override fun send(intent: MVIIntent): Unit = Unit
+    override fun intent(intent: MVIIntent): Unit = Unit
     override suspend fun emit(intent: MVIIntent): Unit = Unit
 }
 

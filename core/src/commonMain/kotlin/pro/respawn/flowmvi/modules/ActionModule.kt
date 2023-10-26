@@ -25,7 +25,8 @@ internal abstract class ChannelActionModule<A : MVIAction>(
     override fun send(action: A) {
         delegate.trySend(action)
     }
-    override suspend fun emit(action: A) = delegate.send(action)
+
+    override suspend fun action(action: A) = delegate.send(action)
 }
 
 internal class DistributingModule<A : MVIAction>(
@@ -63,7 +64,7 @@ internal class SharedModule<A : MVIAction>(
         _actions.tryEmit(action)
     }
 
-    override suspend fun emit(action: A) = _actions.emit(action)
+    override suspend fun action(action: A) = _actions.emit(action)
 }
 
 internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
@@ -72,7 +73,7 @@ internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
 
     @DelicateStoreApi
     override fun send(action: A) = error(ActionsDisabledMessage)
-    override suspend fun emit(action: A) = error(ActionsDisabledMessage)
+    override suspend fun action(action: A) = error(ActionsDisabledMessage)
 
     private companion object {
 

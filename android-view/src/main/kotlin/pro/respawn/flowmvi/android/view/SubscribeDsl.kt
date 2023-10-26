@@ -25,10 +25,10 @@ import pro.respawn.flowmvi.api.Store
  *  @see repeatOnLifecycle
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Fragment.subscribe(
     store: Store<S, I, A>,
-    consume: (action: A) -> Unit,
-    render: (state: S) -> Unit,
+    noinline consume: (suspend (action: A) -> Unit)?,
+    crossinline render: suspend (state: S) -> Unit,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): Job = viewLifecycleOwner.subscribe(
     store = store,
@@ -56,5 +56,17 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): Job where T : LifecycleOwner, T : Consumer<S, I, A>, T : StateConsumer<S>, T : ActionConsumer<A> =
-    subscribe(container.store, lifecycleState)
+): Job where T : LifecycleOwner, T : Consumer<S, I, A> =
+    subscribe(container.store, null, ::render, lifecycleState)
+
+/**
+ * Subscribe to the store lifecycle-aware.
+ * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ * @see repeatOnLifecycle
+ */
+@FlowMVIDSL
+@JvmName("subscribeAndConsume")
+public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): Job where T : LifecycleOwner, T : Consumer<S, I, A>, T : ActionConsumer<A> =
+    subscribe(container.store, ::consume, ::render, lifecycleState)

@@ -1,6 +1,6 @@
 package pro.respawn.flowmvi.api
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 
@@ -9,7 +9,7 @@ import kotlinx.coroutines.Job
  * @see Store
  */
 @OptIn(ExperimentalStdlibApi::class)
-@Immutable
+@Stable
 public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> : AutoCloseable {
 
     /**
@@ -17,13 +17,6 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      *  Optional and configured through a [pro.respawn.flowmvi.dsl.StoreBuilder]
      */
     public val name: String?
-
-    /**
-     * An initial [MVIState] this [Store] starts with. This is the value used when the store is created only and will
-     * **not** be restored upon [close] ing the store or [subscribe]ing to it.
-     * Mandatory and configured through [pro.respawn.flowmvi.dsl.StoreBuilder].
-     */
-    public val initial: S
 
     /**
      * Starts store intent processing in a new coroutine in the given [scope].

@@ -1,5 +1,3 @@
-@file:Suppress("Deprecation")
-@file:OptIn(DelicateStoreApi::class) // wil be removed
 package pro.respawn.flowmvi.store
 
 import kotlinx.atomicfu.atomic
@@ -10,6 +8,8 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -21,14 +21,15 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.PipelineModule
-import pro.respawn.flowmvi.modules.PluginModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.actionModule
 import pro.respawn.flowmvi.modules.catch
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
+import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
 
+@OptIn(DelicateStoreApi::class)
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
@@ -39,44 +40,41 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     ActionModule<A> by actionModule(config.actionShareBehavior) {
 
     override val name by config::name
-    override val initial by config::initial
-    private val pluginModule = PluginModule(config.plugins)
+    private val pluginModule = pluginModule(config.plugins)
     private var subscriberCount by atomic(0)
     private val pipeline = MutableStateFlow<PipelineContext<S, I, A>?>(null)
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(
-        name = name, parent = scope,
+        name = name,
+        parent = scope + config.coroutineContext,
         onStop = {
             checkNotNull(pipeline.getAndUpdate { null }) { "Store is closed but was not started" }.close()
-            pluginModule { onStop(it) }
+            pluginModule.onStop(it)
         }
     ) {
         check(pipeline.compareAndSet(null, this)) { "Store is already started" }
-        // add Recoverable to the context because we cannot recover from exceptions in intent processing
-        launch(this@StoreImpl) {
+        launch {
             plugin { onStart() }
             awaitIntents {
                 plugin {
-                    val unhandled = onIntent(it)
-                    check(unhandled == null || !config.debuggable) { UnhandledIntentMessage }
+                    check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage }
                 }
             }
         }
     }
 
-    override suspend fun PipelineContext<S, I, A>.recover(e: Exception) = pluginModule {
-        onException(e)?.let { throw it }
+    override suspend fun PipelineContext<S, I, A>.recover(e: Exception): Unit = with(pluginModule) {
+        withContext(this@StoreImpl) { // add Recoverable to the context
+            onException(e)?.let { throw it }
+        }
     }
 
-    override suspend fun PipelineContext<S, I, A>.onAction(action: A) {
+    override suspend fun PipelineContext<S, I, A>.onAction(action: A) =
         plugin { onAction(action)?.let { this@StoreImpl.action(it) } }
-    }
 
-    override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) {
-        plugin {
-            this@StoreImpl.updateState {
-                onState(this, transform()) ?: this
-            }
+    override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) = plugin {
+        this@StoreImpl.updateState {
+            onState(this, transform()) ?: this
         }
     }
 
@@ -84,17 +82,16 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job = launch {
         // await the next available pipeline
-        val pipeline = pipeline.filterNotNull().first()
-        try {
-            // use the parent scope to not handle exceptions in subscriber's block
-            // but add the pipeline to the coroutine's context to retrieve as needed
-            with(pipeline) { plugin { onSubscribe(this@launch, subscriberCount) } }
-            ++subscriberCount
-            block(this@StoreImpl)
-            check(!config.debuggable) { NonSuspendingSubscriberMessage }
-        } finally {
-            pluginModule {
-                pipeline.onUnsubscribe(--subscriberCount)
+        with(pipeline.filterNotNull().first()) {
+            try {
+                // use the parent scope to not handle exceptions in subscriber's block
+                // but add the pipeline to the coroutine's context to retrieve as needed
+                plugin { onSubscribe(this@launch, subscriberCount) }
+                ++subscriberCount
+                block(this@StoreImpl)
+                check(!config.debuggable) { NonSuspendingSubscriberMessage }
+            } finally {
+                plugin { onUnsubscribe(--subscriberCount) }
             }
         }
     }
@@ -111,9 +108,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         return name == other.name
     }
 
-    @OptIn(DelicateStoreApi::class)
     private suspend inline fun PipelineContext<S, I, A>.plugin(block: StorePlugin<S, I, A>.() -> Unit) =
-        catch(this) { pluginModule(block) }
+        catch(this) { pluginModule.block() }
 
     companion object {
 

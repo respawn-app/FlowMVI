@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.sample.view
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +10,6 @@ import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.view.subscribe
 import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.Consumer
-import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
@@ -25,14 +23,12 @@ import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 class CounterActivity :
     ComponentActivity(),
     Consumer<CounterState, CounterLambdaIntent, CounterAction>,
-    ActionConsumer<CounterAction>,
-    StateConsumer<CounterState> {
+    ActionConsumer<CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
     override val container by viewModel<LambdaViewModel> { parametersOf("I am a parameter") }
 
-    @SuppressLint("IntentWithNullActionLaunch") // https://issuetracker.google.com/issues/294200850
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _b = ActivityBasicBinding.inflate(layoutInflater)

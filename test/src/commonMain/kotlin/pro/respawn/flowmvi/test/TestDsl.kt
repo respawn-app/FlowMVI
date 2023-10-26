@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.withTimeout
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -24,6 +25,8 @@ public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @Publish
     public val timeoutMs: Long = 3000L,
 ) : Store<S, I, A> by store, Provider<S, I, A> by provider {
 
+    @OptIn(DelicateStoreApi::class)
+    override val state: S by store::state
     override fun send(intent: I): Unit = store.send(intent)
     override suspend fun emit(intent: I): Unit = store.send(intent)
     override fun intent(intent: I): Unit = store.send(intent)

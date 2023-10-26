@@ -20,11 +20,11 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.P
         ctx[Recoverable] != null -> throw e
         // add Recoverable to the coroutine context
         // and handle the exception asynchronously to allow suspending inside recover
-        else -> with(pipeline) { launch(this@PipelineExceptionHandler) { recover(e) } }
+        else -> with(pipeline) { launch { recover(e) } }
     }
 }
 
-@DelicateStoreApi
+@OptIn(DelicateStoreApi::class)
 internal suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.catch(
     ctx: PipelineContext<S, I, A>,
     block: () -> Unit
