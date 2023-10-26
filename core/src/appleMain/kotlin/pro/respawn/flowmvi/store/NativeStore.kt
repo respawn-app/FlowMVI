@@ -18,18 +18,11 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @param autoStart whether to start the store immediately, false by default.
  */
 @OptIn(ExperimentalStdlibApi::class)
-@DelicateStoreApi
 public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
     autoStart: Boolean = false,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
 ) : AutoCloseable {
-
-    private val scope = CoroutineScope(Dispatchers.Main)
-
-    /**
-     * Get the initial state of the store. Changed using [pro.respawn.flowmvi.dsl.StoreBuilder]
-     */
-    public val initial: S = store.initial
 
     /**
      * Get the name of the store. Changed using [pro.respawn.flowmvi.dsl.StoreBuilder]
@@ -41,14 +34,14 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     /**
-     * Same as [Store.subscribe] but does not manage the scope for you. [close] the store manually.
+     * Same as [Store.subscribe] but does not manage the scope for you. [close] the subscription job manually.
      * @return an [AutoCloseable] that you can close when you want to unsubscribe from the store.
      */
     public fun subscribe(
         onAction: (action: A) -> Unit,
         onState: (state: S) -> Unit,
     ): AutoCloseable = object : AutoCloseable {
-        val job: Job = scope.subscribe(store, onAction, onState)
+        private val job: Job = scope.subscribe(store, onAction, onState)
         override fun close() = job.cancel()
     }
 
@@ -63,7 +56,13 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     public fun intent(intent: I): Unit = store.intent(intent)
 
     /**
-     * Stop the store and its coroutine scope. The store **cannot** be used again after this call!
+     * Stop the store, but do not cancel the scope
      */
-    override fun close(): Unit = scope.cancel()
+    override fun close(): Unit = store.close()
+
+    /**
+     * Close the store, all subscribers, and the parent scope. NativeStore object **cannot** be used after this!
+     * @see close
+     */
+    public fun cancel(): Unit = scope.cancel()
 }
