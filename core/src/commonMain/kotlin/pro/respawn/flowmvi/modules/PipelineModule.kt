@@ -41,6 +41,7 @@ internal interface PipelineModule<S : MVIState, I : MVIIntent, A : MVIAction> :
  * * using exception handler that uses the scope itself to recover from unhandled exceptions
  * * using this pipeline instance as the context element
  */
+@OptIn(DelicateStoreApi::class)
 @Suppress("Indentation")
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<S, I, A>.launchPipeline(
     name: String?,
@@ -59,7 +60,10 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<
     private val pipelineName = CoroutineName("${name}PipelineContext")
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + this + job + handler
     override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
-    override suspend fun emit(action: A) = onAction(action)
+    override suspend fun emit(action: A) {
+        onAction(action)
+    }
+
     override fun send(action: A) {
         launch { onAction(action) }
     }

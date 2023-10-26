@@ -13,6 +13,8 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.store.StoreConfiguration
 import pro.respawn.flowmvi.store.StoreImpl
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
@@ -29,6 +31,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 ) {
 
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
+
+    /**
+     *  A coroutine context overrides for the store.
+     *  This context will be merged with the one the store was launched with (e.g. viewModelScope).
+     *  All store operations will be launched in that context by default
+     */
+    @FlowMVIDSL
+    public var coroutineContext: CoroutineContext = EmptyCoroutineContext
 
     /**
      * Settings this to true enables additional store validations and debug logging.
@@ -139,6 +149,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         onOverflow = onOverflow,
         debuggable = debuggable,
         plugins = plugins,
+        coroutineContext = coroutineContext,
     ).let(::StoreImpl)
 }
 

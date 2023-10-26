@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
@@ -97,8 +98,9 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
     private val lifecycleState: Lifecycle.State = Lifecycle.State.STARTED
 ) : ConsumerScope<I, A> {
 
+    @OptIn(DelicateStoreApi::class)
     @PublishedApi
-    internal val state: MutableState<S> = mutableStateOf(store.initial)
+    internal val state: MutableState<S> = mutableStateOf(store.state)
 
     override fun send(intent: I) = store.send(intent)
     override suspend fun emit(intent: I) = store.emit(intent)

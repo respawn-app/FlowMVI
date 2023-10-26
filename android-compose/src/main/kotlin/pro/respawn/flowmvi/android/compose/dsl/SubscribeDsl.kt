@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -31,17 +32,18 @@ import pro.respawn.flowmvi.dsl.subscribe
  *
  * @see Store.subscribe
  */
+@OptIn(DelicateStoreApi::class)
+@Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
-@Suppress("NOTHING_TO_INLINE")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     noinline consume: (suspend CoroutineScope.(action: A) -> Unit)? = null
 ): State<S> {
     val owner = LocalLifecycleOwner.current
-    val state = remember(this) { mutableStateOf(initial) }
+    val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(owner, this, state) {
+    LaunchedEffect(this, lifecycleState) {
         owner.repeatOnLifecycle(lifecycleState) {
             subscribe(
                 store = this@subscribe,

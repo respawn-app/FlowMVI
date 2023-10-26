@@ -8,11 +8,9 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.disallowRestartPlugin
-import pro.respawn.flowmvi.plugins.manageJobs
 import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
-import pro.respawn.flowmvi.plugins.register
 import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.CounterAction
@@ -41,7 +39,6 @@ class CounterContainer(
             platformLoggingPlugin(),
             disallowRestartPlugin() // store does not restart when it is in a viewmodel
         )
-        val manager = manageJobs()
         val undoRedo = undoRedo(10)
         recover {
             undoRedo.reset()
@@ -51,16 +48,13 @@ class CounterContainer(
                 else updateState {
                     CounterState.Error(it)
                 }
-                manager.cancelAndJoin("timer")
             }
             null
         }
         whileSubscribed {
-            launch {
-                repo.getTimer()
-                    .onEach { produceState(it) }
-                    .consume(Dispatchers.Default)
-            }.register(manager, "timer")
+            repo.getTimer()
+                .onEach { produceState(it) }
+                .consume(Dispatchers.Default)
         }
         reduce {
             when (it) {

@@ -24,7 +24,7 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.P
     }
 }
 
-@DelicateStoreApi
+@OptIn(DelicateStoreApi::class)
 internal suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.catch(
     ctx: PipelineContext<S, I, A>,
     block: () -> Unit

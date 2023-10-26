@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
+import kotlin.coroutines.CoroutineContext
 
 @FlowMVIDSL
 internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIAction>(
@@ -18,4 +19,5 @@ internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIActio
     val intentCapacity: Int,
     val onOverflow: BufferOverflow,
     val debuggable: Boolean,
+    val coroutineContext: CoroutineContext,
 )
