@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.sample.view
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +10,6 @@ import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.android.view.subscribe
 import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.Consumer
-import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -63,7 +64,9 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception): Unit = with(pluginModule) {
-        onException(e)?.let { throw it }
+        withContext(this@StoreImpl) { // add Recoverable to the context
+            onException(e)?.let { throw it }
+        }
     }
 
     override suspend fun PipelineContext<S, I, A>.onAction(action: A) =

@@ -14,6 +14,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.Recoverable
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
@@ -115,9 +116,7 @@ class StoreExceptionsText : FreeSpec({
         "and store that does not handle exceptions" - {
             val store = testStore(plugin) {
                 init {
-                    launch {
-                        throw e
-                    }
+                    launch { throw e }
                 }
             }
 
@@ -139,9 +138,7 @@ class StoreExceptionsText : FreeSpec({
             }
             "then recover contains Recoverable" {
                 store.subscribeAndTest {
-                    send {
-                        throw e
-                    }
+                    intent { throw e }
                 }
             }
         }
