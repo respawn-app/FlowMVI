@@ -60,7 +60,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<
     private val pipelineName = CoroutineName("${name}PipelineContext")
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + this + job + handler
     override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
-    override suspend fun emit(action: A) {
+    override suspend fun action(action: A) {
         onAction(action)
     }
 

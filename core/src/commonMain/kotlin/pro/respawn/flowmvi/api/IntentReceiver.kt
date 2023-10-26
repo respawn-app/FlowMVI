@@ -17,7 +17,7 @@ public interface IntentReceiver<in I : MVIIntent> {
      * once the store is started**.
      * @See MVIIntent
      */
-    public fun send(intent: I)
+    public fun send(intent: I): Unit = intent(intent)
 
     /**
      * Alias for [send] with one difference - this function will suspend if
@@ -28,5 +28,5 @@ public interface IntentReceiver<in I : MVIIntent> {
     /**
      * Alias for [send]
      */
-    public fun intent(intent: I): Unit = send(intent)
+    public fun intent(intent: I)
 }

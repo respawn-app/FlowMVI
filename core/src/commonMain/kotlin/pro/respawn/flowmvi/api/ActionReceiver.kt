@@ -19,10 +19,10 @@ public interface ActionReceiver<in A : MVIAction> {
     /**
      * Alias for [send] for parity with [IntentReceiver.send]
      */
-    public suspend fun emit(action: A)
+    public suspend fun emit(action: A): Unit = action(action)
 
     /**
      * Alias for [send]
      */
-    public suspend fun action(action: A): Unit = emit(action)
+    public suspend fun action(action: A)
 }

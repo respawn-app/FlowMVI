@@ -25,14 +25,12 @@ import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 class CounterActivity :
     ComponentActivity(),
     Consumer<CounterState, CounterLambdaIntent, CounterAction>,
-    ActionConsumer<CounterAction>,
-    StateConsumer<CounterState> {
+    ActionConsumer<CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
     override val container by viewModel<LambdaViewModel> { parametersOf("I am a parameter") }
 
-    @SuppressLint("IntentWithNullActionLaunch") // https://issuetracker.google.com/issues/294200850
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _b = ActivityBasicBinding.inflate(layoutInflater)
