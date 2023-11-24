@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import android.util.Log
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -19,6 +20,7 @@ private const val MinLogcatMessageLength = 3000
  * * stdout on mingw/native
  * * System.out on JVM.
  */
+@FlowMVIDSL
 public actual fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPlugin(
     tag: String?,
     level: StoreLogLevel?
@@ -27,6 +29,7 @@ public actual fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPl
 /**
  * Create a new [loggingPlugin] that prints using android's [Log].
  */
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> androidLoggingPlugin(
     tag: String? = null,
     level: Int? = null,
@@ -37,6 +40,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> androidLoggingPlugin(
 /**
  * Create a new [loggingPlugin] that prints using android's [Log].
  */
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.androidLoggingPlugin(
     name: String? = this.name,
     level: Int? = null,
