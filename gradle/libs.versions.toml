@@ -5,27 +5,27 @@ compose-compiler = "1.5.4"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.7.3"
-dependencyAnalysisPlugin = "1.25.0"
-detekt = "1.23.1"
-detektFormattingPlugin = "1.23.1"
+dependencyAnalysisPlugin = "1.26.0"
+detekt = "1.23.3"
+detektFormattingPlugin = "1.23.3"
 dokka = "1.9.10"
 flowExt = "0.7.1"
 fragment = "1.6.2"
 gradleAndroid = "8.2.0-rc03"
-gradleDoctorPlugin = "0.8.1"
+gradleDoctorPlugin = "0.9.1"
 junit = "4.13.2"
 koin = "3.5.0"
 koin-compose = "3.5.0"
-kotest = "5.7.2"
-kotest-plugin = "5.7.2"
+kotest = "5.8.0"
+kotest-plugin = "5.8.0"
 # @pin
 kotlin = "1.9.20"
-kotlinx-atomicfu = "0.22.0"
+kotlinx-atomicfu = "0.23.0"
 lifecycle = "2.6.2"
 material = "1.10.0"
 turbine = "1.0.0"
 versionCatalogUpdatePlugin = "0.8.1"
-versionsPlugin = "0.49.0"
+versionsPlugin = "0.50.0"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -88,7 +88,7 @@ unittest = [
 ]
 
 [plugins]
-atomicfu = { id = "kotlinx-atomicfu", version.ref = "kotlinx-atomicfu" }
+atomicfu = "kotlinx-atomicfu:0.23.0"
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
