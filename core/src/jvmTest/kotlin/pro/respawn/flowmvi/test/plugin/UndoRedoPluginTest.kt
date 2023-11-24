@@ -17,7 +17,6 @@ import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
-@OptIn(DelicateStoreApi::class)
 class UndoRedoPluginTest : FreeSpec({
     asUnconfined()
     val timeTravel = testTimeTravelPlugin()
