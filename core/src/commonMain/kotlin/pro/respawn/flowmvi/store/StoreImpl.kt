@@ -29,7 +29,6 @@ import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
 
-@OptIn(DelicateStoreApi::class)
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
@@ -108,6 +107,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         return name == other.name
     }
 
+    @OptIn(DelicateStoreApi::class)
     private suspend inline fun PipelineContext<S, I, A>.plugin(block: StorePlugin<S, I, A>.() -> Unit) =
         catch(this) { pluginModule.block() }
 

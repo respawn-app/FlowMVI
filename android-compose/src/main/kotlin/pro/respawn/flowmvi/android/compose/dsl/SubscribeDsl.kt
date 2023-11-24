@@ -40,17 +40,51 @@ import pro.respawn.flowmvi.dsl.subscribe
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    noinline consume: (suspend CoroutineScope.(action: A) -> Unit)? = null
+    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
     val owner = LocalLifecycleOwner.current
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, lifecycleState, owner) {
+    LaunchedEffect(this@subscribe, lifecycleState) {
         withContext(Dispatchers.Main.immediate) {
             owner.repeatOnLifecycle(lifecycleState) {
                 subscribe(
                     store = this@subscribe,
-                    consume = block?.let { block -> { block(it) } },
+                    consume = { block(it) },
+                    render = { state.value = it }
+                ).join()
+            }
+        }
+    }
+    return state
+}
+
+/**
+ * A function to subscribe to the store that follows the system lifecycle.
+ * This function will assign the store a new subscriber when invoked,
+ * then populate the returned [State] with new states.
+ *
+ * This function will not collect [MVIAction]s.
+ *
+ * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
+ *   upon leaving that state, the function will unsubscribe.
+ * @return the [State] that contains the [Store.state].
+ * @see Store.subscribe
+ */
+@OptIn(DelicateStoreApi::class)
+@Suppress("NOTHING_TO_INLINE")
+@Composable
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): State<S> {
+    val owner = LocalLifecycleOwner.current
+    val state = remember(this) { mutableStateOf(state) }
+    LaunchedEffect(this@subscribe, lifecycleState) {
+        withContext(Dispatchers.Main.immediate) {
+            owner.repeatOnLifecycle(lifecycleState) {
+                subscribe(
+                    store = this@subscribe,
                     render = { state.value = it }
                 ).join()
             }

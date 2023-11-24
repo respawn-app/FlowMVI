@@ -20,20 +20,33 @@ import pro.respawn.flowmvi.api.Store
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
     store: Store<S, I, A>,
-    noinline consume: (suspend (action: A) -> Unit)?,
+    crossinline consume: suspend (action: A) -> Unit,
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
     subscribe outer@{
         coroutineScope inner@{
-            consume?.let { consume ->
-                launch {
-                    actions.collect { consume(it) }
-                }
+            launch {
+                actions.collect { consume(it) }
             }
             launch {
                 states.collect { render(it) }
             }
         }
+    }
+}
+
+/**
+ * Subscribe to the [store] and invoke [render]. This does not collect store's actions.
+ * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * @see [Store.subscribe]
+ */
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
+    store: Store<S, I, A>,
+    crossinline render: suspend (state: S) -> Unit,
+): Job = with(store) {
+    subscribe {
+        states.collect { render(it) }
     }
 }
 
@@ -59,6 +72,4 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> StateConsumer<S>.subscribe(
     store: Store<S, I, A>,
     scope: CoroutineScope
-): Job where T : StateConsumer<S> = with(scope) {
-    subscribe(store, null, ::render)
-}
+): Job where T : StateConsumer<S> = with(scope) { subscribe(store, ::render) }

@@ -24,6 +24,8 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -110,12 +112,12 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
         val owner = LocalLifecycleOwner.current
         val block by rememberUpdatedState(onAction)
         LaunchedEffect(owner, this) {
-            owner.repeatOnLifecycle(lifecycleState) {
-                subscribe(
-                    store = store,
-                    consume = block?.let { block -> { block(it) } },
-                    render = { state.value = it }
-                )
+            withContext(Dispatchers.Main.immediate) {
+                owner.repeatOnLifecycle(lifecycleState) {
+                    block?.let { block ->
+                        subscribe(store, { block(it) }) { state.value = it }
+                    } ?: subscribe(store) { state.value = it }
+                }
             }
         }
     }
