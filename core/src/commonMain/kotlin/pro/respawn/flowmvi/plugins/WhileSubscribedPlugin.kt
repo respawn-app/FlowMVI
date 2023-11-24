@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.update
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -23,11 +24,15 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 ): Unit = install(whileSubscribedPlugin(name, minSubscriptions, block))
 
 /**
- *  Create a new plugin that invokes [block] the **first time** the store is being subscribed to.
+ * Create a new plugin that invokes [block] the **first time** the subscriber count reaches [minSubscriptions].
  * Nothing is invoked when more subscribers appear, however, the block will be invoked again
- * if the first subscriber appears again.
- * The block will be canceled when the store is closed, **not** when the subscriber disappears.
- * You can safely suspend inside [block] as it's invoked asynchronously.
+ * if the subscriber count drops below [minSubscriptions] and then reaches the new value again.
+ * The block will be canceled when the subscription count drops below [minSubscriptions].
+ *
+ * You can safely suspend inside [block] as it's invoked asynchronously,
+ * but be aware that jobs launched inside [block] will be launched in the [PipelineContext] of the store, not the subscriber scope
+ *
+ * If you want to launch jobs in the scope of the subscription lifecycle, use [kotlinx.coroutines.coroutineScope].
  * @see StorePlugin.onSubscribe
  */
 @FlowMVIDSL
@@ -37,13 +42,16 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     @BuilderInference crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    var job by atomic<Job?>(null)
+    val job = atomic<Job?>(null)
     onSubscribe { _, subscribers ->
-        if (subscribers == minSubscriptions - 1) {
-            job = launch { block() }
+        if (subscribers + 1 >= minSubscriptions && job.value?.isActive != true) {
+            job.getAndSet(launch { block() })?.cancel()
         }
     }
     onUnsubscribe { subscribers ->
-        if (subscribers == minSubscriptions - 1) job?.cancel()
+        if (subscribers < minSubscriptions) job.update {
+            it?.cancel()
+            null
+        }
     }
 }
