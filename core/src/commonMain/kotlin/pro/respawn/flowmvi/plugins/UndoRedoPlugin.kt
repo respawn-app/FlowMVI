@@ -22,6 +22,7 @@ import pro.respawn.flowmvi.util.CappedMutableList
 public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val maxQueueSize: Int,
     name: String? = null,
+    private val resetOnException: Boolean,
 ) : AbstractStorePlugin<S, I, A>(name) {
 
     init {
@@ -131,6 +132,8 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     // reset because pipeline context captured in Events is no longer running
     override suspend fun PipelineContext<S, I, A>.onStart(): Unit = reset()
     override fun onStop(e: Exception?): Unit = reset()
+    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception =
+        e.also { if (resetOnException) reset() }
 
     /**
      * An event happened in the [UndoRedoPlugin].
@@ -151,7 +154,8 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
     maxQueueSize: Int,
     name: String? = null,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin(maxQueueSize, name)
+    resetOnException: Boolean = true,
+): UndoRedoPlugin<S, I, A> = UndoRedoPlugin(maxQueueSize, name, resetOnException)
 
 /**
  * Creates and installs a new [UndoRedoPlugin]
@@ -161,4 +165,5 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.undoRedo(
     maxQueueSize: Int,
     name: String? = null,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin<S, I, A>(maxQueueSize, name).also { install(it) }
+    resetOnException: Boolean = true,
+): UndoRedoPlugin<S, I, A> = UndoRedoPlugin<S, I, A>(maxQueueSize, name, resetOnException).also { install(it) }
