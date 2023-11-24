@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/detekt.yml" />
       </list>
     </option>
+    <option name="enableDetekt" value="true" />
     <option name="enableFormatting" value="true" />
   </component>
 </project>

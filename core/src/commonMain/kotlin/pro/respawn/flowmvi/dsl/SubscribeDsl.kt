@@ -6,6 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -19,7 +20,7 @@ import pro.respawn.flowmvi.api.Store
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
-    store: Store<S, I, A>,
+    store: ImmutableStore<S, I, A>,
     crossinline consume: suspend (action: A) -> Unit,
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
@@ -42,7 +43,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
-    store: Store<S, I, A>,
+    store: ImmutableStore<S, I, A>,
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
     subscribe {
@@ -57,7 +58,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
-    store: Store<S, I, A>,
+    store: ImmutableStore<S, I, A>,
     scope: CoroutineScope
 ): Job where T : ActionConsumer<A>, T : StateConsumer<S> = with(scope) {
     subscribe(store, ::consume, ::render)
@@ -69,7 +70,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
  * @see [Store.subscribe]
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> StateConsumer<S>.subscribe(
-    store: Store<S, I, A>,
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StateConsumer<S>.subscribe(
+    store: ImmutableStore<S, I, A>,
     scope: CoroutineScope
-): Job where T : StateConsumer<S> = with(scope) { subscribe(store, ::render) }
+): Job = with(scope) { subscribe(store, ::render) }

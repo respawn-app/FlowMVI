@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.api
 
 import androidx.compose.runtime.Stable
-import kotlinx.coroutines.flow.Flow
 
 /**
  * A central business logic unit for handling [MVIIntent]s, [MVIAction]s, and [MVIState]s.
@@ -13,16 +12,4 @@ import kotlinx.coroutines.flow.Flow
 @Stable
 public interface Store<out S : MVIState, in I : MVIIntent, out A : MVIAction> :
     ImmutableStore<S, I, A>,
-    IntentReceiver<I> {
-
-    /**
-     * Obtain the current state in an unsafe manner.
-     * This property is not thread-safe and parallel state updates will introduce a race condition when not
-     * handled properly.
-     * Such race conditions arise when using multiple data streams such as [Flow]s.
-     *
-     * Accessing and modifying the state this way will **circumvent ALL plugins** and will not make state updates atomic.
-     */
-    @DelicateStoreApi
-    public val state: S
-}
+    IntentReceiver<I>

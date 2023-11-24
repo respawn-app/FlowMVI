@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -38,7 +39,7 @@ import pro.respawn.flowmvi.dsl.subscribe
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
@@ -75,7 +76,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.su
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): State<S> {
     val owner = LocalLifecycleOwner.current
