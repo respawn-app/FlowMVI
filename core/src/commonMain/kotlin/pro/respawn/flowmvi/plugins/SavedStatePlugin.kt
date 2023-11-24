@@ -1,6 +1,8 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -8,6 +10,8 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Default name for the SavedStatePlugin
@@ -22,17 +26,20 @@ public const val DefaultSavedStatePluginName: String = "SavedState"
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
     name: String = DefaultSavedStatePluginName,
+    context: CoroutineContext = EmptyCoroutineContext,
     @BuilderInference crossinline get: S.() -> S?,
     @BuilderInference crossinline set: (S) -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onState { _, new ->
-        launch { set(new) }
+        launch(context) { set(new) }
         new
     }
     onStart {
-        updateState {
-            get() ?: this
+        withContext(context) {
+            updateState {
+                get() ?: this
+            }
         }
     }
 }
@@ -43,6 +50,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     name: String = DefaultSavedStatePluginName,
+    context: CoroutineContext = EmptyCoroutineContext,
     @BuilderInference crossinline get: S.() -> S?,
     @BuilderInference crossinline set: S.() -> Unit,
-): Unit = install(savedStatePlugin(name, get, set))
+): Unit = install(savedStatePlugin(name, context, get, set))
