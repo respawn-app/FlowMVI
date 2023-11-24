@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.plugins
 
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

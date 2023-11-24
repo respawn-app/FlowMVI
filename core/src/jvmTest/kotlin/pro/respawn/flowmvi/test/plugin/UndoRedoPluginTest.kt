@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.undoRedoPlugin
 import pro.respawn.flowmvi.test.subscribeAndTest

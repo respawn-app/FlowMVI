@@ -36,7 +36,7 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @see Store.subscribe
  */
 @OptIn(DelicateStoreApi::class)
-@Suppress("NOTHING_TO_INLINE")
+@Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(

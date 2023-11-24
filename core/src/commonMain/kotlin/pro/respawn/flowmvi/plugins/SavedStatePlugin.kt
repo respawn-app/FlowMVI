@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.plugins
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.FlowMVIDSL

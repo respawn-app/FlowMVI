@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.test
 import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSize
 import pro.respawn.flowmvi.util.CappedMutableList
 
 class CappedMutableListTest : FreeSpec({
