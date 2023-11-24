@@ -11,6 +11,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -43,13 +45,15 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.su
     val owner = LocalLifecycleOwner.current
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this, lifecycleState) {
-        owner.repeatOnLifecycle(lifecycleState) {
-            subscribe(
-                store = this@subscribe,
-                consume = block?.let { block -> { block(it) } },
-                render = { state.value = it }
-            )
+    LaunchedEffect(this@subscribe, lifecycleState, owner) {
+        withContext(Dispatchers.Main.immediate) {
+            owner.repeatOnLifecycle(lifecycleState) {
+                subscribe(
+                    store = this@subscribe,
+                    consume = block?.let { block -> { block(it) } },
+                    render = { state.value = it }
+                ).join()
+            }
         }
     }
     return state
