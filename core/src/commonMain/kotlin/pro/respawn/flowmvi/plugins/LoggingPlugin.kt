@@ -79,7 +79,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
 
 /**
  * A logging plugin that prints logs to the console using [println]. Tag is not used except for naming the plugin.
- * For android, use androidLoggingPlugin.
+ * For platform logging, use [platformLoggingPlugin].
  * @see loggingPlugin
  */
 @FlowMVIDSL
