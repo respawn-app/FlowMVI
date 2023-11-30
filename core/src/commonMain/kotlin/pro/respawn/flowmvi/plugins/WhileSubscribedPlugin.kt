@@ -25,15 +25,19 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 ): Unit = install(whileSubscribedPlugin(name, minSubscriptions, block))
 
 /**
- * Create a new plugin that invokes [block] the **first time** the subscriber count reaches [minSubscriptions].
- * Nothing is invoked when more subscribers appear, however, the block will be invoked again
+ * Create a new plugin that invokes [block] **each time** the subscriber count reaches [minSubscriptions].
+ * Nothing is invoked when more subscribers than [minSubscriptions] appear, however, the block will be invoked again
  * if the subscriber count drops below [minSubscriptions] and then reaches the new value again.
  * The block will be canceled when the subscription count drops below [minSubscriptions].
  *
  * You can safely suspend inside [block] as it's invoked asynchronously,
  * but be aware that jobs launched inside [block] will be launched in the [PipelineContext] of the store, not the subscriber scope
  *
- * If you want to launch jobs in the scope of the subscription lifecycle, use [kotlinx.coroutines.coroutineScope].
+ * There is no guarantee that this will be invoked when a new subscriber appears
+ * It may be so that a second subscriber appears before the first one disappears (due to the parallel nature of
+ * coroutines). In that case, the [block] will continue instead of being canceled and relaunched.
+ *
+ * If you want to launch jobs in the scope of the [block], use [kotlinx.coroutines.coroutineScope].
  * @see StorePlugin.onSubscribe
  */
 @FlowMVIDSL
