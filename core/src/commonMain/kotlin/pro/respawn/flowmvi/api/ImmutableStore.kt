@@ -9,9 +9,8 @@ import kotlinx.coroutines.flow.Flow
  * A [Store] that does not allow sending intents.
  * @see Store
  */
-@OptIn(ExperimentalStdlibApi::class)
 @Stable
-public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> : AutoCloseable {
+public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
      *  The name of the store. Used for debugging purposes and when storing multiple stores in a collection.

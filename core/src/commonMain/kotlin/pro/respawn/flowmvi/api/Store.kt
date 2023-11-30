@@ -9,7 +9,9 @@ import androidx.compose.runtime.Stable
  * The store can be mutated only through [MVIIntent].
  * Store is an [IntentReceiver] and can be [close]d to stop it.
  */
+@OptIn(ExperimentalStdlibApi::class)
 @Stable
 public interface Store<out S : MVIState, in I : MVIIntent, out A : MVIAction> :
     ImmutableStore<S, I, A>,
-    IntentReceiver<I>
+    IntentReceiver<I>,
+    AutoCloseable
