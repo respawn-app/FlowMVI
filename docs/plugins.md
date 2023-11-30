@@ -152,34 +152,44 @@ suspend fun PipelineContext<S, I, A>.onStart(): Unit = Unit
 A callback that is invoked **each time** `Store.start` is called.
 
 * Suspending in this callback will **prevent** the store from starting until the plugin is finished.
+* Plugins that use `onSubscribe` will also not get their events until this is run.
 * Execute any operations using `PipelineContext`.
 
 ### onSubscribe
 
 ```kotlin
-fun PipelineContext<S, I, A>.onSubscribe(subscriberScope: CoroutineScope, subscriberCount: Int): Unit = Unit
+suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int): Unit = Unit
 ```
 
 A callback to be executed **each time** `Store.subscribe` is called.
 
-* This callback is executed **before** the subscriber gets access to the store and **before** the `subscriberCount`
-  is incremented. This means, for the first subscription, `subscriberCount` will be `0`.
+* This callback is executed **before** the `subscriberCount` is incremented.
+  This means, for the first subscription, `subscriberCount` will be zero.
+* There is no guarantee that the subscribers will not be able to subscribe when the store has not been started yet.
+  But this function will be invoked as soon as the store is started, with the most recent subscriber count.
 * This function is invoked in the store's scope, not the subscriber's scope.
-* To launch jobs in the subscriber's scope, use `subscriberScope`. They are not affected by store's plugins.
-  They will be canceled when the subscriber unsubscribes.
-
-### onUnsubscribe
+* There is no guarantee that this will be invoked exactly before a subscriber reappears.
+  It may be so that a second subscriber, for example,
+  appears before the first one disappears (due to the parallel nature of
+  coroutines). In that case, `onSubscribe` will be invoked first as if it was a second subscriber, and then
+  `onUnsubscribe` will be invoked, as if there were more subscribers for a moment.
+* Suspending in this function will prevent other plugins from receiving the subscription event (i.e. next plugins
+  that use `onSubscribe` will wait for this one to complete.### onUnsubscribe
 
 ```kotlin
-fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
+suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
 ```
 
 A callback to be executed when the subscriber cancels its subscription job (unsubscribes).
 
-This callback is executed **after** the subscriber has been removed and **after** `subscriberCount` is
-decremented. This means, for the last subscriber, the count will be `0`.
-You cannot suspend in this function as the subscriber has already been lost, but you can launch jobs using
-`PipelineContext`
+* This callback is executed **after** the subscriber has been removed and **after** `subscriberCount` is
+  decremented. This means, for the last subscriber, the count will be 0.
+* There is no guarantee that this will be invoked exactly before a subscriber reappears.
+  It may be so that a second subscriber appears before the first one disappears (due to the parallel nature of
+  coroutines). In that case, `onSubscribe` will be invoked first as if it was a second subscriber, and then
+  `onUnsubscribe` will be invoked, as if there were more subscribers for a moment.
+* Suspending in this function will prevent other plugins from receiving the unsubscription event (i.e. next plugins
+  that use `onUnsubscribe` will wait for this one to complete.
 
 ### onStop
 

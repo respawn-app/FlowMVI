@@ -10,6 +10,10 @@ import pro.respawn.flowmvi.api.StorePlugin
  * Use this class when you want to build reusable plugins, inject dependencies,
  * or want to have the reference to the plugin's instance and use it outside of its regular pipeline.
  * For all other cases, prefer [pro.respawn.flowmvi.dsl.plugin] builder function.
+ *
+ * It is preferred to use composition instead of inheriting this class however.
+ * For an example, see how a [jobManagerPlugin] ([JobManager] is implemented.
+ *
  * @see [StorePlugin]
  * @see [pro.respawn.flowmvi.dsl.plugin]
  */

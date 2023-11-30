@@ -27,6 +27,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * withContext(Dispatchers.IO) { intent(Intent) }
  * ```
  * **will result in an exception**
+ *
  * Instead, if you want to send intents using the context, use it as follows:
  * ```kotlin
  * // this -> PipelineContext<S, I, A>

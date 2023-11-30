@@ -11,8 +11,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -21,10 +24,11 @@ import pro.respawn.flowmvi.dsl.subscribe
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
- * This function will assign the store a new subscriber when invoked,
- * then populate the returned [State] with new states.
- * Provided [consume] parameter will be used to consume actions that come from the store.
- * [consume] can be null (by default) if you have your actions disabled or don't want to receive them.
+ *
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Provided [consume] parameter will be used to consume actions that come from the store.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  *
  * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
  *   upon leaving that state, the function will unsubscribe.
@@ -33,23 +37,59 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @see Store.subscribe
  */
 @OptIn(DelicateStoreApi::class)
-@Suppress("NOTHING_TO_INLINE")
+@Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribe(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    noinline consume: (suspend CoroutineScope.(action: A) -> Unit)? = null
+    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
     val owner = LocalLifecycleOwner.current
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this, lifecycleState) {
-        owner.repeatOnLifecycle(lifecycleState) {
-            subscribe(
-                store = this@subscribe,
-                consume = block?.let { block -> { block(it) } },
-                render = { state.value = it }
-            )
+    LaunchedEffect(this@subscribe, lifecycleState, owner) {
+        withContext(Dispatchers.Main.immediate) {
+            owner.repeatOnLifecycle(lifecycleState) {
+                subscribe(
+                    store = this@subscribe,
+                    consume = { block(it) },
+                    render = { state.value = it }
+                ).join()
+            }
+        }
+    }
+    return state
+}
+
+/**
+ * A function to subscribe to the store that follows the system lifecycle.
+ *
+ * * This function will not collect [MVIAction]s.
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
+ * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
+ *   upon leaving that state, the function will unsubscribe.
+ * @return the [State] that contains the [Store.state].
+ * @see Store.subscribe
+ */
+@OptIn(DelicateStoreApi::class)
+@Suppress("NOTHING_TO_INLINE")
+@Composable
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): State<S> {
+    val owner = LocalLifecycleOwner.current
+    val state = remember(this) { mutableStateOf(state) }
+    LaunchedEffect(this@subscribe, lifecycleState, owner) {
+        withContext(Dispatchers.Main.immediate) {
+            owner.repeatOnLifecycle(lifecycleState) {
+                subscribe(
+                    store = this@subscribe,
+                    render = { state.value = it }
+                ).join()
+            }
         }
     }
     return state

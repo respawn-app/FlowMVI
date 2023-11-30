@@ -76,7 +76,7 @@ sealed interface CounterAction : MVIAction {
 class CounterContainer(
     private val repo: CounterRepository,
 ) {
-    val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) { // set initial state
+    val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
         name = "CounterStore"
         parallelIntents = true
         actionShareBehavior = ActionShareBehavior.Distribute() // disable, share, distribute or consume side effects
@@ -119,6 +119,12 @@ class CounterContainer(
                 is ClickedCounter -> updateState<DisplayingCounter, _> {
                     copy(counter = counter + 1)
                 }
+            }
+        }
+
+        parentStore(repo.store) { state -> // one-liner to attach to any other store.
+            updateState {
+                copy(timer = state.timer)
             }
         }
 

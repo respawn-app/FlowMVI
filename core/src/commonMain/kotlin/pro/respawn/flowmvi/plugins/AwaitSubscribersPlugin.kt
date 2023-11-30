@@ -108,7 +108,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
     onStop {
         manager.complete()
     }
-    onSubscribe { _, subscriberCount ->
+    onSubscribe { subscriberCount ->
         if (minSubs == subscriberCount + 1) manager.complete()
     }
 }

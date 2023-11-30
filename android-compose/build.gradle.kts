@@ -18,7 +18,6 @@ android {
 
     kotlinOptions {
         freeCompilerArgs += buildList {
-            addAll(Config.jvmCompilerArgs)
             if (project.findProperty("enableComposeCompilerReports") == "true") {
                 add("-P")
                 add("$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics")

@@ -41,7 +41,6 @@ class CounterContainer(
         )
         val undoRedo = undoRedo(10)
         recover {
-            undoRedo.reset()
             launch {
                 if (it is IllegalArgumentException)
                     action(ShowErrorMessage)

@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -23,11 +24,19 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 ): Unit = install(whileSubscribedPlugin(name, minSubscriptions, block))
 
 /**
- *  Create a new plugin that invokes [block] the **first time** the store is being subscribed to.
- * Nothing is invoked when more subscribers appear, however, the block will be invoked again
- * if the first subscriber appears again.
- * The block will be canceled when the store is closed, **not** when the subscriber disappears.
- * You can safely suspend inside [block] as it's invoked asynchronously.
+ * Create a new plugin that invokes [block] **each time** the subscriber count reaches [minSubscriptions].
+ * Nothing is invoked when more subscribers than [minSubscriptions] appear, however, the block will be invoked again
+ * if the subscriber count drops below [minSubscriptions] and then reaches the new value again.
+ * The block will be canceled when the subscription count drops below [minSubscriptions].
+ *
+ * You can safely suspend inside [block] as it's invoked asynchronously,
+ * but be aware that jobs launched inside [block] will be launched in the [PipelineContext] of the store, not the subscriber scope
+ *
+ * There is no guarantee that this will be invoked when a new subscriber appears
+ * It may be so that a second subscriber appears before the first one disappears (due to the parallel nature of
+ * coroutines). In that case, the [block] will continue instead of being canceled and relaunched.
+ *
+ * If you want to launch jobs in the scope of the [block], use [kotlinx.coroutines.coroutineScope].
  * @see StorePlugin.onSubscribe
  */
 @FlowMVIDSL
@@ -37,13 +46,15 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     @BuilderInference crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    var job by atomic<Job?>(null)
-    onSubscribe { _, subscribers ->
-        if (subscribers == minSubscriptions - 1) {
-            job = launch { block() }
+    val job = atomic<Job?>(null)
+    onSubscribe { previous ->
+        val newSubscribers = previous + 1
+        when {
+            job.value?.isActive == true -> return@onSubscribe // condition was already satisfied
+            newSubscribers >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
         }
     }
-    onUnsubscribe { subscribers ->
-        if (subscribers == minSubscriptions - 1) job?.cancel()
+    onUnsubscribe { current ->
+        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
     }
 }

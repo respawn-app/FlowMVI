@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.plugins
 
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -14,20 +13,21 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.util.concurrentMutableMap
 
 /**
  * An entity that manages running jobs. Used with  [jobManagerPlugin] and [manageJobs].
  * Will cancel and remove all jobs if the parent [pro.respawn.flowmvi.api.Store] is closed
  */
 @Suppress("TooManyFunctions") // jobs have these functions!
-public class JobManager {
+public class JobManager<K : Any> {
 
     internal companion object {
 
         internal const val Name = "JobManagerPlugin"
     }
 
-    private val jobs by atomic(mutableMapOf<String, Job>())
+    private val jobs = concurrentMutableMap<K, Job>()
 
     /**
      * Cancels all jobs without suspending
@@ -65,98 +65,98 @@ public class JobManager {
      *
      * Does **not** start the job that was put.
      */
-    public suspend fun putOrReplace(name: String, job: Job): Job? {
+    public suspend fun putOrReplace(key: K, job: Job): Job? {
         // do not put the job until we join it to not trigger completion
         // handler after we put another job at the same spot
-        val previous = jobs[name]
+        val previous = jobs[key]
         previous?.cancelAndJoin()
 
-        jobs[name] = job.apply {
+        jobs[key] = job.apply {
             invokeOnCompletion {
-                jobs.remove(name)
+                jobs.remove(key)
             }
         }
         return previous
     }
 
     /**
-     * Put a job into the container and throw [IllegalArgumentException] if the job with the same name is already running.
+     * Put a job into the container and throw [IllegalArgumentException] if the job with the same key is already running.
      *
      * Does **not** start the job that was put.
      */
-    public fun put(name: String, job: Job) {
-        require(jobs.put(name, job)?.takeIf { it.isActive } == null) { "Job with the same name is already running!" }
+    public fun put(key: K, job: Job) {
+        require(jobs.put(key, job)?.takeIf { it.isActive } == null) { "Job with the same key $key is already running!" }
         job.invokeOnCompletion {
-            jobs.remove(name)
+            jobs.remove(key)
         }
     }
 
     /**
-     * Get a job with the specified [name].
+     * Get a job for the specified [key].
      */
-    public operator fun get(name: String): Job? = jobs[name]
+    public operator fun get(key: K): Job? = jobs[key]
 
     /**
      * Alias for [put].
-     * Will throw if a job with the same name already exists.
+     * Will throw if a job with the same key already exists.
      */
-    public operator fun set(name: String, value: Job): Unit = put(name, value)
+    public operator fun set(key: K, value: Job): Unit = put(key, value)
 
     /**
      * Alias for [set] and [put].
      */
-    public operator fun invoke(name: String, job: Job): Unit = put(name, job)
+    public operator fun invoke(key: K, job: Job): Unit = put(key, job)
 
     /**
      * Put all [jobs] into the storage.
      */
-    public fun putAll(vararg jobs: Pair<String, Job>) {
+    public fun putAll(vararg jobs: Pair<K, Job>) {
         jobs.forEach { put(it.first, it.second) }
     }
 
     /**
-     * Cancel a job with the specified [name]
+     * Cancel a job with the specified [key]
      *
      * @return the job that was cancelled, or null if not found.
      */
-    public fun cancel(name: String): Job? = jobs[name]?.apply { cancel() }
+    public fun cancel(key: K): Job? = jobs[key]?.apply { cancel() }
 
     /**
-     * Cancel and join a job named [name] if it is present
+     * Cancel and join a job for [key] if it is present
      * @return the job that was cancelled, or null if not found.
      */
-    public suspend fun cancelAndJoin(name: String): Job? = jobs[name]?.apply { cancelAndJoin() }
+    public suspend fun cancelAndJoin(key: K): Job? = jobs[key]?.apply { cancelAndJoin() }
 
     /**
-     * Join the job named [name] if it is present.
+     * Join the job for [key] if it is present.
      *
      * @return the completed job or null if not found
      */
-    public suspend fun join(name: String): Job? = jobs[name]?.apply { join() }
+    public suspend fun join(key: K): Job? = jobs[key]?.apply { join() }
 
     /**
-     * Start the job named [name] if it is present.
+     * Start the job with [key] if it is present.
      * @return the job tha was started or null if not found.
      */
-    public fun start(name: String): Job? = jobs[name]?.apply { start() }
+    public fun start(key: K): Job? = jobs[key]?.apply { start() }
 }
 
 /**
  * Same as [JobManager.put].
  */
 @FlowMVIDSL
-public fun Job.register(manager: JobManager, name: String) {
-    manager[name] = this
+public fun <K : Any> Job.register(manager: JobManager<K>, key: K) {
+    manager[key] = this
 }
 
 /**
  * Same as [JobManager.putOrReplace].
  */
 @FlowMVIDSL
-public suspend fun Job.registerOrReplace(
-    manager: JobManager,
-    name: String
-): Job? = manager.putOrReplace(name, this)
+public suspend fun <K : Any> Job.registerOrReplace(
+    manager: JobManager<K>,
+    key: K,
+): Job? = manager.putOrReplace(key, this)
 
 /**
  * Create a new plugin that uses [manager] to manage jobs.
@@ -165,8 +165,8 @@ public suspend fun Job.registerOrReplace(
  * By default, job managers can't be reused without overriding [name]
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugin(
-    manager: JobManager,
+public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugin(
+    manager: JobManager<K>,
     name: String? = JobManager.Name, // by default, do not allow duplicates
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
@@ -181,11 +181,14 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugin(
  *
  * By default, job managers can't be reused without overriding [name]
  *
+ * This version creates a basic job manager of type [String]. If you want to assign other types to your keys,
+ * please use [jobManagerPlugin] builder function.
+ *
  * @return the [JobManager] instance that was created for this plugin.
  */
 @FlowMVIDSL
 public fun <A : MVIAction, I : MVIIntent, S : MVIState> StoreBuilder<S, I, A>.manageJobs(
     name: String = JobManager.Name
-): JobManager = JobManager().also {
+): JobManager<String> = JobManager<String>().also {
     install(jobManagerPlugin(it, name))
 }

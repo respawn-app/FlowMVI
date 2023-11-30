@@ -18,14 +18,14 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 1
     const val patch = 0
-    const val postfix = "rc02"
+    const val postfix = "rc03"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
     const val description = """
-A Kotlin Multiplatform MVI library based on plugins that is simple, fast, powerful & flexible
+A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & flexible
 """
     // kotlin
 
@@ -43,7 +43,9 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, fast, powerf
         addAll(compilerArgs)
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
-        // add("-Xuse-k2")
+        add("-Xstring-concat=inline")
+        add("-P")
+        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=false")
         addAll(optIns.map { "-opt-in=$it" })
     }
 

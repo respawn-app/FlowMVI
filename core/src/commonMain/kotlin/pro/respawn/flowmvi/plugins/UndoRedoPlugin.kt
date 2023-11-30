@@ -22,7 +22,12 @@ import pro.respawn.flowmvi.util.CappedMutableList
 public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val maxQueueSize: Int,
     name: String? = null,
+    private val resetOnException: Boolean,
 ) : AbstractStorePlugin<S, I, A>(name) {
+
+    init {
+        require(maxQueueSize > 0) { "Queue size less than 1 is not possible, you provided: $maxQueueSize" }
+    }
 
     private val queue by atomic<CappedMutableList<Event>>(CappedMutableList(maxQueueSize))
     private val _index = MutableStateFlow(-1)
@@ -30,12 +35,15 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     /**
      * Current index of the queue.
-     * Larger value means newer, but not larger than [maxQueueSize]
+     * Larger value means newer, but not larger than [maxQueueSize].
+     *
+     * When the index is equal to -1, the undo queue is empty.
+     * An index of 0 means that there is one event to undo.
      */
     public val index: StateFlow<Int> = _index.asStateFlow()
 
     /**
-     * Whether the intent queue is empty. Does not take [index] into account
+     * Whether the event queue is empty. Does not take [index] into account
      */
     public val isQueueEmpty: Boolean get() = queue.isEmpty()
 
@@ -48,12 +56,12 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Whether the plugin can [undo] at this moment.
      */
-    public val canUndo: Boolean get() = !isQueueEmpty && index.value != -1
+    public val canUndo: Boolean get() = !isQueueEmpty && index.value >= 0
 
     /**
      * Whether the plugin can [redo] at this moment.
      */
-    public val canRedo: Boolean get() = !isQueueEmpty && index.value != queue.lastIndex
+    public val canRedo: Boolean get() = !isQueueEmpty && index.value < queue.lastIndex
 
     /**
      * Add a given [undo] and [redo] to the queue.
@@ -89,7 +97,7 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
      */
     public suspend fun undo(require: Boolean = false): Int = lock.withLock {
         if (!canUndo) {
-            require(!require) { "Tried to undo but nothing was in the queue" }
+            require(!require) { "Tried to undo action #${index.value} but nothing was in the queue" }
             -1
         } else {
             val i = index.value.coerceIn(queue.indices)
@@ -124,6 +132,8 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     // reset because pipeline context captured in Events is no longer running
     override suspend fun PipelineContext<S, I, A>.onStart(): Unit = reset()
     override fun onStop(e: Exception?): Unit = reset()
+    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception =
+        e.also { if (resetOnException) reset() }
 
     /**
      * An event happened in the [UndoRedoPlugin].
@@ -144,7 +154,8 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
     maxQueueSize: Int,
     name: String? = null,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin(maxQueueSize, name)
+    resetOnException: Boolean = true,
+): UndoRedoPlugin<S, I, A> = UndoRedoPlugin(maxQueueSize, name, resetOnException)
 
 /**
  * Creates and installs a new [UndoRedoPlugin]
@@ -154,4 +165,5 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.undoRedo(
     maxQueueSize: Int,
     name: String? = null,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin<S, I, A>(maxQueueSize, name).also { install(it) }
+    resetOnException: Boolean = true,
+): UndoRedoPlugin<S, I, A> = UndoRedoPlugin<S, I, A>(maxQueueSize, name, resetOnException).also { install(it) }

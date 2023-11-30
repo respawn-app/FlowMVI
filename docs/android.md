@@ -17,7 +17,7 @@ This example is also fully implemented in the sample app.
 class CounterViewModel(
     repo: CounterRepository,
     handle: SavedStateHandle,
-) : ViewModel(), Container<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
+) : ViewModel(), ImmutableContainer<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
 
     // the store is lazy here, which is good for performance if you use other properties of the VM.
     // if you don't want a lazy store, use the regular store() function here
@@ -43,11 +43,14 @@ class CounterViewModel(
 }
 ```
 
+Prefer to extend `ImmutableContainer` as that will hide the `intent` function from outside code, otherwise you'll leak
+the `PipelineContext` of the store to subscribers.
+
 ?> The upside of this approach is that it's easier to implement and use some platform-specific features
 like `savedState` (you can still use them for KMP though)
 The downside is that you completely lose KMP compatibility. If you have plans to make your viewmodels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
-This one can be the preferred approach, however, when migrating from FlowMVI 1.x as it's easier to handle.
+
 
 ### Delegated ViewModels
 

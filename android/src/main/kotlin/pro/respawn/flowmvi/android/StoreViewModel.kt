@@ -22,13 +22,14 @@ import pro.respawn.flowmvi.api.Store
  */
 public open class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     store: Store<S, I, A>,
+    start: Boolean = true,
 ) : ViewModel(), Store<S, I, A> by store, Container<S, I, A> {
 
-    public constructor(container: Container<S, I, A>) : this(container.store)
+    public constructor(container: Container<S, I, A>, start: Boolean = true) : this(container.store, start)
 
     final override val store: Store<S, I, A> get() = this
 
     init {
-        store.start(viewModelScope)
+        if (start) store.start(viewModelScope)
     }
 }

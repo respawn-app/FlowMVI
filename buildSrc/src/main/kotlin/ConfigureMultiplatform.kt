@@ -3,17 +3,16 @@
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-@OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
 ) = ext.apply {
     val libs by versionCatalog
     explicitApi()
 
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
+    withSourcesJar(true)
 
     linuxX64()
     linuxArm64()
@@ -30,7 +29,6 @@ fun Project.configureMultiplatform(
         compilations.all {
             kotlinOptions {
                 jvmTarget = Config.jvmTarget.target
-                freeCompilerArgs += Config.jvmCompilerArgs
             }
         }
     }
@@ -39,7 +37,6 @@ fun Project.configureMultiplatform(
         compilations.all {
             kotlinOptions {
                 jvmTarget = Config.jvmTarget.target
-                freeCompilerArgs += Config.jvmCompilerArgs
             }
         }
     }

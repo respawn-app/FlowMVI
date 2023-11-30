@@ -3,14 +3,14 @@ package pro.respawn.flowmvi.api
 import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A [Store] that does not allow sending intents.
  * @see Store
  */
-@OptIn(ExperimentalStdlibApi::class)
 @Stable
-public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> : AutoCloseable {
+public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**
      *  The name of the store. Used for debugging purposes and when storing multiple stores in a collection.
@@ -37,4 +37,15 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      * For more, see [StorePlugin]
      */
     public fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit): Job
+
+    /**
+     * Obtain the current state in an unsafe manner.
+     * This property is not thread-safe and parallel state updates will introduce a race condition when not
+     * handled properly.
+     * Such race conditions arise when using multiple data streams such as [Flow]s.
+     *
+     * Accessing the state this way will **circumvent ALL plugins**.
+     */
+    @DelicateStoreApi
+    public val state: S
 }

@@ -16,5 +16,5 @@ class CoreTestConfig : AbstractProjectConfig() {
     override val concurrentSpecs = 10
     override val coroutineDebugProbes: Boolean = true
     override val invocationTimeout = 5000L
-    override val parallelism: Int = 1
+    override val parallelism: Int = 8
 }

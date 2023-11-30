@@ -37,6 +37,7 @@ public value class LambdaIntent<S : MVIState, A : MVIAction>(
 /**
  * An alias for [pro.respawn.flowmvi.api.IntentReceiver.send] ([LambdaIntent] ([block]))
  */
+@FlowMVIDSL
 public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.send(
     @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ): Unit = intent(LambdaIntent(block))
@@ -44,6 +45,7 @@ public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.send
 /**
  * An alias for [pro.respawn.flowmvi.api.IntentReceiver.intent] ([LambdaIntent] ([block]))
  */
+@FlowMVIDSL
 public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.intent(
     @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ): Unit = send(block)
