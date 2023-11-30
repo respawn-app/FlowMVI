@@ -20,17 +20,6 @@ import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.StateReceiver
 import kotlin.coroutines.CoroutineContext
 
-// TODO: I don't like the api of this
-//   there should be a way to provide pipeline context without creating a separate interface
-internal interface PipelineModule<S : MVIState, I : MVIIntent, A : MVIAction> :
-    Recoverable<S, I, A>,
-    StateReceiver<S>,
-    IntentReceiver<I> {
-
-    suspend fun PipelineContext<S, I, A>.onAction(action: A)
-    suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S)
-}
-
 /**
  * Coroutine context consists of the following: job, name, handler, dispatcher.
  * here we create a new child coroutine context:
@@ -43,12 +32,14 @@ internal interface PipelineModule<S : MVIState, I : MVIIntent, A : MVIAction> :
  */
 @OptIn(DelicateStoreApi::class)
 @Suppress("Indentation")
-internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<S, I, A>.launchPipeline(
+internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipeline(
     name: String?,
     parent: CoroutineScope,
     crossinline onStop: (e: Exception?) -> Unit,
+    crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
+    crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
     onStart: PipelineContext<S, I, A>.() -> Unit,
-): Job = object :
+): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : Recoverable<S, I, A> = object :
     IntentReceiver<I> by this,
     StateReceiver<S> by this,
     PipelineContext<S, I, A>,
@@ -57,13 +48,10 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineModule<
     override val key = PipelineContext // recoverable should be separate.
     private val job = SupervisorJob(parent.coroutineContext[Job])
     private val handler = PipelineExceptionHandler(this)
-    private val pipelineName = CoroutineName("${name}PipelineContext")
-    override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + this + job + handler
+    private val pipelineName = CoroutineName("${name.orEmpty()}PipelineContext")
+    override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + job + handler + this
     override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
-    override suspend fun action(action: A) {
-        onAction(action)
-    }
-
+    override suspend fun action(action: A) = onAction(action)
     override fun send(action: A) {
         launch { onAction(action) }
     }

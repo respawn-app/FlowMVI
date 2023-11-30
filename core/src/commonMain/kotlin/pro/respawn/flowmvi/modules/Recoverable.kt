@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.modules
 
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
@@ -22,16 +21,4 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.P
         // and handle the exception asynchronously to allow suspending inside recover
         else -> with(pipeline) { launch { recover(e) } }
     }
-}
-
-@OptIn(DelicateStoreApi::class)
-internal suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Recoverable<S, I, A>.catch(
-    ctx: PipelineContext<S, I, A>,
-    block: () -> Unit
-) = try {
-    block()
-} catch (e: CancellationException) {
-    throw e
-} catch (expected: Exception) {
-    with(ctx) { recover(expected) }
 }

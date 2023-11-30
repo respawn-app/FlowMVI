@@ -1,109 +1,95 @@
 package pro.respawn.flowmvi.store
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.getAndUpdate
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
+import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
-import pro.respawn.flowmvi.modules.PipelineModule
 import pro.respawn.flowmvi.modules.StateModule
+import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
-import pro.respawn.flowmvi.modules.catch
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
+import pro.respawn.flowmvi.modules.subscribersModule
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
     Provider<S, I, A>,
-    PipelineModule<S, I, A>,
+    Recoverable<S, I, A>,
+    StorePlugin<S, I, A> by pluginModule(config.plugins), // store is a plugin to itself that manages other plugins
+    SubscribersModule by subscribersModule(),
     StateModule<S> by stateModule(config.initial),
     IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
     ActionModule<A> by actionModule(config.actionShareBehavior) {
 
+    private var launchJob = atomic<Job?>(null)
     override val name by config::name
-    private val pluginModule = pluginModule(config.plugins)
-    private var subscribers = MutableStateFlow(0 to 0) // previous, current
-    private val pipeline = MutableStateFlow<PipelineContext<S, I, A>?>(null)
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(
         name = name,
         parent = scope + config.coroutineContext,
-        onStop = {
-            checkNotNull(pipeline.getAndUpdate { null }) { "Store is closed but was not started" }.close()
-            pluginModule.onStop(it)
-        }
-    ) pipeline@{
-        launch intents@{
-            // run onStart plugins first to not let subscribers appear before the store is started fully
-            plugin { onStart() }
-            subscribers.onEach { (previous, new) ->
-                require(new >= 0 && previous >= 0)
-                plugin {
-                    when {
-                        new > previous -> onSubscribe(new)
-                        new < previous -> onUnsubscribe(new)
-                    }
+        onAction = {
+            catch { onAction(it)?.let { this@StoreImpl.action(it) } }
+        },
+        onTransformState = { transform ->
+            catch {
+                this@StoreImpl.updateState {
+                    onState(this, transform()) ?: this
                 }
-            }.launchIn(this@pipeline)
-            // make pipeline available for subs
-            check(pipeline.compareAndSet(null, this@pipeline)) { "Store is already started" }
-            // suspend until store is closed, handling intents
-            awaitIntents {
-                plugin { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
+            }
+        },
+        onStop = {
+            checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
+            onStop(it)
+        },
+        onStart = pipeline@{
+            check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
+            launch intents@{
+                // run onStart plugins first to not let subscribers appear before the store is started fully
+                catch { onStart() }
+                observeSubscribers(
+                    onSubscribe = { catch { onSubscribe(it) } },
+                    onUnsubscribe = { catch { onUnsubscribe(it) } }
+                )
+                // suspend until store is closed, handling intents
+                awaitIntents {
+                    catch { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
+                }
             }
         }
-    }
+    )
 
-    override suspend fun PipelineContext<S, I, A>.recover(e: Exception): Unit = with(pluginModule) {
-        withContext(this@StoreImpl) { // add Recoverable to the context
-            onException(e)?.let { throw it }
-        }
-    }
-
-    override suspend fun PipelineContext<S, I, A>.onAction(action: A) =
-        plugin { onAction(action)?.let { this@StoreImpl.action(it) } }
-
-    override suspend fun PipelineContext<S, I, A>.onTransformState(transform: suspend S.() -> S) = plugin {
-        this@StoreImpl.updateState {
-            onState(this, transform()) ?: this
-        }
+    override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
+        onException(e)?.let { throw it }
     }
 
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
-    ): Job {
-        subscribers.update { (_, current) -> current to current + 1 }
-        return launch {
-            block(this@StoreImpl)
-            check(!config.debuggable) { NonSuspendingSubscriberMessage }
-        }.apply {
-            invokeOnCompletion {
-                subscribers.update { (_, current) -> current to current - 1 }
-            }
-        }
+    ): Job = launch {
+        newSubscriber()
+        block(this@StoreImpl)
+        check(!config.debuggable) { NonSuspendingSubscriberMessage }
+    }.apply {
+        invokeOnCompletion { removeSubscriber() }
     }
 
     override fun close() {
         // completion handler will cleanup the pipeline later
-        pipeline.value?.close()
+        launchJob.value?.cancel()
     }
 
     override fun hashCode() = name?.hashCode() ?: super.hashCode()
@@ -112,10 +98,6 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         if (other.name == null && name == null) return other === this
         return name == other.name
     }
-
-    @OptIn(DelicateStoreApi::class)
-    private suspend inline fun PipelineContext<S, I, A>.plugin(block: StorePlugin<S, I, A>.() -> Unit) =
-        catch(this) { pluginModule.block() }
 
     companion object {
 

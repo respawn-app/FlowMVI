@@ -1,7 +1,5 @@
 package pro.respawn.flowmvi.api
 
-import kotlinx.coroutines.CoroutineScope
-
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
