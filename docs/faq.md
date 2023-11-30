@@ -49,8 +49,8 @@ Did you call `Store.subscribe()`?
    subscribed yet, or if the View did not manage to subscribe on time, you will miss some Actions.
    This is a limitation of the Flow API and there are no potential
    resolutions at the moment of writing. Try to use `Distribute` instead.
-3. If one of the subscribers doesn't need to handle Actions, you can pass `null` to the `Store.subscribe` function to
-   skip consumption of events.
+3. If one of the subscribers doesn't need to handle Actions, you can use another overload of `subscribe` that does not
+   subscribe to actions.
 
 ### In what order are intents, plugins and actions processed?
 
@@ -67,10 +67,11 @@ suspending the scope.
 ### I want to expose a few public functions in my container for the store. Should I do that?
 
 You shouldn't. Use an Intent / Action to follow the contract, unless you are using `LambdaIntent`s.
+In that case, implement `ImmutableContainer` to hide the `intent` function from subscribers.
 
 ### How to use paging?
 
-Well, this is a tricky one. `androidx.paging` breaks the architecture by invading all layers of your app with the UI
+Well, this is a tricky one. `androidx.paging` breaks the architecture by invading all layers of your app with UI
 logic. The best solution we could come up with is just passing a PagingFlow as a property in the state.
 This is not good, because the state becomes mutable and non-stable, but there's nothing better we could come up with,
 but it does its job, as long as you are careful not to recreate the flow and pass it around between states.
@@ -78,14 +79,14 @@ If you have an idea or a working Paging setup, let us know and we can add it to 
 
 The Paging library also relies on the `cachedIn` operator which is tricky to use in `whileSubscribed`, because that
 block is rerun on every subscription, recreating and re-caching the flow.
-To fix this issue, use `cachePlugin` to cache the paginated flow, and then pass it to the `whileSubscribed`.
+To fix this issue, use `cachePlugin` to cache the paginated flow, and then pass it to `whileSubscribed` block.
 This will prevent any leaks that you would otherwise get if you created a new flow each time a subscriber appears.
 
 ### I have like a half-dozen various flows or coroutines and I want to make my state from those data streams. Do I subscribe to all of those flows in my store?
 
 It's preferable to create a single flow using `combine(vararg flows...)` and produce your state based on that.
 This will ensure that your state is consistent and that there are no unnecessary races in your logic.
-As flows add up, it will be harder and harder to keep track of things if you use `updateState` and `collect`.
+As flows add up, it will become harder and harder to keep track of things if you use `updateState` and `collect`.
 
 ### How do I handle errors?
 
@@ -103,7 +104,7 @@ There are two ways to do this.
 In general, a little boilerplate when duplicating intents is worth it to keep the consistency of actions and intents
 of screens intact.
 You usually don't want to reuse your actions and intents because they are specific to a given screen or flow.
-That makes your logic way simpler, and the rest can be easily moved to your repository layer, use cases or just plain
+That makes your logic simpler, and the rest can be easily moved to your repository layer, use cases or just plain
 top-level functions. This is where this library is opinionated, and where one of its main advantages - simplicity, comes
 from. Everything you want to achieve by composing stores can also be achieved using plugins.
 

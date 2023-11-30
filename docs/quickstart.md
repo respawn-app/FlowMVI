@@ -60,6 +60,9 @@ So please consider the following comparison:
 | Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become less useful, such as logging/time travel/analytics     |
 | Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated, reused and organized into families       |
 
+If you decide to use MVVM+ style, consider using `ImmutableStore` interface that won't let external code send 
+intents. This will prevent leaking the context of the store to subscribers.
+
 ## Step 3: Describe your Contract
 
 <details>
@@ -95,7 +98,7 @@ start. To define your contract, ask yourself the following:
 </details>
 
 ```kotlin
-// Must be comparable and immutable
+// Must be comparable and immutable. Automatically marked as stable in Compose
 sealed interface CounterState : MVIState {
     data object Loading : CounterState
     data class Error(e: Exception) : CounterState
@@ -141,6 +144,11 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
     // Intents may still be dropped according to the onOverflow param.
     var parallelIntents = false
 
+    // A coroutine context override for the store.
+    // This context will be merged with the one the store was launched with (e.g. viewModelScope).
+    // All store operations will be launched in that context by default
+    var coroutineContext: CoroutineContext = EmptyCoroutineContext
+
     // Define how the store handles and sends actions.
     // Choose one of the following: Share, Distribute, Restrict, Disable
     var actionShareBehavior = ActionShareBehavior.Distribute()
@@ -165,10 +173,10 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 
 Some interesting properties of the store:
 
-* Store can be launched, stopped, and relaunched again as many times as you want. Use close(), or cancel the job to stop
-  the store.
-* Store's subscribers will wait until the store is launched when they subscribe to the store. Don't forget to launch the
-  store.
+* Store can be launched, stopped, and relaunched again as many times as you want.
+  Use `close()`, or cancel the job to stop the store.
+* Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+  Such subscribers will not receive state updates or actions. Don't forget to launch the store.
 * Stores are created eagerly usually, but the store *can* be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
@@ -195,13 +203,15 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
   Install with `disallowRestart`.
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { } `
+* **Parent Store Plugin** - attach to another store and follow the subscription lifecycle. Install
+  with `parentStore(otherStore) { state ->  } `
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 Consult the javadocs of the plugins to learn how to use them.
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume or otherwise change anything in the store.
-They can cancel subscriptions, close the store or swallow exceptions!
+They can close the store or swallow exceptions!
 
 Consider the following:
 
@@ -263,7 +273,7 @@ The discussion above warrants another note.
 !> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
 you handle intents, but it's possible to create a store like this:
 `val store = store(Loading) { }`.
-This is a store that does **literally nothing**. If you forget to install a plugin, it will never run.
+This is a store that does **literally nothing**. If you forget to install a plugin, it will never be run.
 
 ### Step 6: Create, inject and provide dependencies
 

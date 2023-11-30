@@ -15,7 +15,10 @@ import pro.respawn.flowmvi.api.Store
 
 /**
  * Subscribe to the [store] and invoke [consume] and [render] in parallel in the provided scope.
- * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ *
+ * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
 @FlowMVIDSL
@@ -38,7 +41,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
 
 /**
  * Subscribe to the [store] and invoke [render]. This does not collect store's actions.
- * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ *
+ * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
 @FlowMVIDSL
@@ -53,7 +59,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
 
 /**
  * Subscribe to the [store] and invoke [ActionConsumer.consume] and [StateConsumer.render] in parallel in the provided scope.
- * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ *
+ * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
 @FlowMVIDSL
@@ -66,7 +75,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
 
 /**
  * Subscribe to the [store] and invoke [StateConsumer.render] in the provided scope.
- * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ *
+ * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
 @FlowMVIDSL

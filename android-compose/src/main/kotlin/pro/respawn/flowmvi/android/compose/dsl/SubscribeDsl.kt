@@ -24,10 +24,11 @@ import pro.respawn.flowmvi.dsl.subscribe
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
- * This function will assign the store a new subscriber when invoked,
- * then populate the returned [State] with new states.
- * Provided [consume] parameter will be used to consume actions that come from the store.
- * [consume] can be null (by default) if you have your actions disabled or don't want to receive them.
+ *
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Provided [consume] parameter will be used to consume actions that come from the store.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  *
  * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
  *   upon leaving that state, the function will unsubscribe.
@@ -62,11 +63,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
- * This function will assign the store a new subscriber when invoked,
- * then populate the returned [State] with new states.
  *
- * This function will not collect [MVIAction]s.
- *
+ * * This function will not collect [MVIAction]s.
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
  *   upon leaving that state, the function will unsubscribe.
  * @return the [State] that contains the [Store.state].
