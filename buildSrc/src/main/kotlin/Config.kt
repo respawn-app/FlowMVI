@@ -25,7 +25,7 @@ object Config {
     const val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
     const val description = """
-A Kotlin Multiplatform MVI library based on plugins that is simple, fast, powerful & flexible
+A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & flexible
 """
     // kotlin
 
@@ -43,7 +43,9 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, fast, powerf
         addAll(compilerArgs)
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
-        // add("-Xuse-k2")
+        add("-Xstring-concat=inline")
+        add("-P")
+        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true")
         addAll(optIns.map { "-opt-in=$it" })
     }
 

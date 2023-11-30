@@ -29,7 +29,6 @@ fun Project.configureMultiplatform(
         compilations.all {
             kotlinOptions {
                 jvmTarget = Config.jvmTarget.target
-                freeCompilerArgs += Config.jvmCompilerArgs
             }
         }
     }
@@ -38,7 +37,6 @@ fun Project.configureMultiplatform(
         compilations.all {
             kotlinOptions {
                 jvmTarget = Config.jvmTarget.target
-                freeCompilerArgs += Config.jvmCompilerArgs
             }
         }
     }

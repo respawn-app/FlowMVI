@@ -1,7 +1,7 @@
 [versions]
 activity = "1.8.1"
-compose = "1.6.0-beta01"
-compose-compiler = "1.5.4"
+compose = "1.6.0-beta02"
+compose-compiler = "1.5.5"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.7.3"

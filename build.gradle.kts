@@ -30,7 +30,7 @@ allprojects {
         compilerOptions {
             jvmTarget.set(Config.jvmTarget)
             languageVersion.set(Config.kotlinVersion)
-            freeCompilerArgs.addAll(Config.compilerArgs)
+            freeCompilerArgs.addAll(Config.jvmCompilerArgs)
             optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }
     }
