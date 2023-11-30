@@ -13,8 +13,8 @@ class CoreTestConfig : AbstractProjectConfig() {
     override val includeTestScopePrefixes: Boolean = true
     override val failOnEmptyTestSuite: Boolean = true
     override val defaultTestCaseConfig = TestCaseConfig(timeout = 3.seconds)
-    override val concurrentSpecs = 1
+    override val concurrentSpecs = 10
     override val coroutineDebugProbes: Boolean = true
     override val invocationTimeout = 5000L
-    override val parallelism: Int = 1
+    override val parallelism: Int = 8
 }
