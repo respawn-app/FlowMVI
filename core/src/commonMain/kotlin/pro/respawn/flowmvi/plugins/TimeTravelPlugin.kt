@@ -104,11 +104,11 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
         starts += 1
     }
 
-    override fun PipelineContext<S, I, A>.onSubscribe(subscriberScope: CoroutineScope, subscriberCount: Int) {
+    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
         subscriptions += 1
     }
 
-    override fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
+    override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
         unsubscriptions += 1
     }
 

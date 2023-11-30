@@ -74,7 +74,7 @@ class StoreExceptionsText : FreeSpec({
                         println("recover from $it")
                         null
                     }
-                    onSubscribe { _, _ ->
+                    onSubscribe { _ ->
                         throw e
                     }
                 }

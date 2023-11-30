@@ -46,7 +46,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
     val owner = LocalLifecycleOwner.current
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, lifecycleState) {
+    LaunchedEffect(this@subscribe, lifecycleState, owner) {
         withContext(Dispatchers.Main.immediate) {
             owner.repeatOnLifecycle(lifecycleState) {
                 subscribe(
@@ -81,7 +81,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 ): State<S> {
     val owner = LocalLifecycleOwner.current
     val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, lifecycleState) {
+    LaunchedEffect(this@subscribe, lifecycleState, owner) {
         withContext(Dispatchers.Main.immediate) {
             owner.repeatOnLifecycle(lifecycleState) {
                 subscribe(

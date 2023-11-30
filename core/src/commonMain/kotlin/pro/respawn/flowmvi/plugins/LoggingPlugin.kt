@@ -66,7 +66,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     onStart {
         log(Info, tag ?: name, "Started")
     }
-    onSubscribe { _, subs ->
+    onSubscribe { subs ->
         log(Info, tag ?: name, "New subscriber #${subs + 1}")
     }
     onUnsubscribe {

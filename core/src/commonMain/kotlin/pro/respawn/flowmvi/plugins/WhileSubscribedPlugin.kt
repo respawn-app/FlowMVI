@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.plugins
 import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -43,15 +44,14 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     val job = atomic<Job?>(null)
-    onSubscribe { _, subscribers ->
-        if (subscribers + 1 >= minSubscriptions && job.value?.isActive != true) {
-            job.getAndSet(launch { block() })?.cancel()
+    onSubscribe { previous ->
+        val newSubscribers = previous + 1
+        when {
+            job.value?.isActive == true -> return@onSubscribe // condition was already satisfied
+            newSubscribers >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
         }
     }
-    onUnsubscribe { subscribers ->
-        if (subscribers < minSubscriptions) job.update {
-            it?.cancel()
-            null
-        }
+    onUnsubscribe { current ->
+        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
     }
 }

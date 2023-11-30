@@ -1,12 +1,12 @@
 package pro.respawn.flowmvi.store
 
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.getAndUpdate
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
@@ -40,7 +40,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override val name by config::name
     private val pluginModule = pluginModule(config.plugins)
-    private var subscriberCount by atomic(0)
+    private var subscribers = MutableStateFlow(0 to 0) // previous, current
     private val pipeline = MutableStateFlow<PipelineContext<S, I, A>?>(null)
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(
@@ -50,14 +50,24 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             checkNotNull(pipeline.getAndUpdate { null }) { "Store is closed but was not started" }.close()
             pluginModule.onStop(it)
         }
-    ) {
-        check(pipeline.compareAndSet(null, this)) { "Store is already started" }
-        launch {
+    ) pipeline@{
+        launch intents@{
+            // run onStart plugins first to not let subscribers appear before the store is started fully
             plugin { onStart() }
-            awaitIntents {
+            subscribers.onEach { (previous, new) ->
+                require(new >= 0 && previous >= 0)
                 plugin {
-                    check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage }
+                    when {
+                        new > previous -> onSubscribe(new)
+                        new < previous -> onUnsubscribe(new)
+                    }
                 }
+            }.launchIn(this@pipeline)
+            // make pipeline available for subs
+            check(pipeline.compareAndSet(null, this@pipeline)) { "Store is already started" }
+            // suspend until store is closed, handling intents
+            awaitIntents {
+                plugin { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
             }
         }
     }
@@ -79,18 +89,14 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
-    ): Job = launch {
-        // await the next available pipeline
-        with(pipeline.filterNotNull().first()) {
-            try {
-                // use the parent scope to not handle exceptions in subscriber's block
-                // but add the pipeline to the coroutine's context to retrieve as needed
-                plugin { onSubscribe(this@launch, subscriberCount) }
-                ++subscriberCount
-                block(this@StoreImpl)
-                check(!config.debuggable) { NonSuspendingSubscriberMessage }
-            } finally {
-                plugin { onUnsubscribe(--subscriberCount) }
+    ): Job {
+        subscribers.update { (_, current) -> current to current + 1 }
+        return launch {
+            block(this@StoreImpl)
+            check(!config.debuggable) { NonSuspendingSubscriberMessage }
+        }.apply {
+            invokeOnCompletion {
+                subscribers.update { (_, current) -> current to current - 1 }
             }
         }
     }
@@ -116,7 +122,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         const val NonSuspendingSubscriberMessage = """
 You have subscribed to the store, but your subscribe() block has returned early (without throwing a
 CancellationException). When you subscribe, make sure to continue collecting values from the store until the Job 
-Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store.
+Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store
+(i.e. complete the subscription job on your own).
         """
 
         const val UnhandledIntentMessage = """

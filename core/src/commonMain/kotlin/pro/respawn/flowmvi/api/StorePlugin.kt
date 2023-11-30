@@ -122,8 +122,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * To launch jobs in the subscriber's scope, use [subscriberScope]. They will be canceled when the subscriber
      * unsubscribes.
      */
-    public fun PipelineContext<S, I, A>.onSubscribe(
-        subscriberScope: CoroutineScope,
+    public suspend fun PipelineContext<S, I, A>.onSubscribe(
         subscriberCount: Int
     ): Unit = Unit
 
@@ -132,7 +131,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * This callback is executed **after** the subscriber has been removed and **after** [subscriberCount] is
      * decremented. This means, for the last subscriber, the count will be 0.
      */
-    public fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
+    public suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
 
     /**
      * Invoked when [Store.close] is invoked. This is called **after** the store is already closed, and you cannot
