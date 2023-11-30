@@ -6,6 +6,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.withContext
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -73,8 +75,12 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
     )
 
+    @OptIn(DelicateStoreApi::class)
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
-        onException(e)?.let { throw it }
+        if (coroutineContext[Recoverable] != null) throw e
+        withContext(this@StoreImpl) { // add recoverable to the context
+            onException(e)?.let { throw it }
+        }
     }
 
     override fun CoroutineScope.subscribe(

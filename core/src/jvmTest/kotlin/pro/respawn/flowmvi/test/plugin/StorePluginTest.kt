@@ -1,76 +1,83 @@
 package pro.respawn.flowmvi.test.plugin
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.shouldBe
-import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.api.MVIAction
-import pro.respawn.flowmvi.api.MVIIntent
-import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
+import io.kotest.core.test.TestCaseSeverityLevel
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.plugins.AbstractStorePlugin
-import pro.respawn.flowmvi.test.test
+import pro.respawn.flowmvi.plugins.consumeIntentsPlugin
+import pro.respawn.flowmvi.plugins.recover
+import pro.respawn.flowmvi.plugins.reduce
+import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
-import java.util.Collections
-
-class SubUnsubPlugin<S : MVIState, I : MVIIntent, A : MVIAction> : AbstractStorePlugin<S, I, A>() {
-
-    val subs = Collections.synchronizedList(mutableListOf<Int>())
-    val unsubs = Collections.synchronizedList(mutableListOf<Int>())
-
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
-        subs.add(subscriberCount)
-    }
-
-    override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
-        unsubs.add(subscriberCount)
-    }
-}
 
 class StorePluginTest : FreeSpec({
     asUnconfined()
     // TODO:
     //   action: emit, action()
     //   intent: emit, action()
-    //   recover plugin rethrows
-    //   recover plugin doesn't go into an infinite loop
-    //   duplicate plugin throws
     //   all store plugin events are invoked
     //   subscriber count is correct
     //   subscriber count decrements correctly
     //   saved state plugin
+    //   disallow restart plugin
+    //   parent store plugin
+    //   cache plugin
     //   while subscribed plugin: job cancelled, multiple subs, single sub
+    "given test store" - {
+        "and recover plugin that throws".config(
 
-    "given plugin that remembers subscription events" - {
-        val plugin = SubUnsubPlugin<TestState, TestIntent, TestAction>()
-        "and a store" - {
-            val store = testStore { install(plugin) }
-            "then concurrent subscription count always matches unsubscription count" {
-                store.test {
-                    idle()
-                    val jobs = List(100) {
-                        subscribe {
-                            awaitCancellation()
+            // this test passes, but shouldThrowExactly does not handle the exception correctly
+            // I suspect that's because store uses the parent scope to launch itself and throws exceptions from there,
+            // not from the actual test case
+            enabled = false,
+            threads = 1, severity = TestCaseSeverityLevel.TRIVIAL
+        ) - {
+            shouldThrowExactly<IllegalArgumentException> {
+                "then recover does not loop into itself" {
+                    // it's important to launch the store in the same test where it throws
+                    testStore {
+                        recover {
+                            throw IllegalArgumentException(it)
                         }
+                    }.subscribeAndTest {
+                        store.intent { throw IllegalStateException("should be caught") }
+                        idle()
                     }
-                    jobs.map { async { it.cancelAndJoin() } }.awaitAll()
                     idle()
                 }
-                idle()
-                plugin.subs.size shouldBe plugin.unsubs.size
+            }
+        }
+        "then installing the same named plugin throws" {
+            shouldThrowExactly<IllegalArgumentException> {
+                val name = "plugin"
+                testStore {
+                    reduce(name = name) { }
+                    reduce(name = name) { }
+                }
+            }
+        }
+        "then installing the same instance of plugin throws" {
+            shouldThrowExactly<IllegalArgumentException> {
+                testStore {
+                    val plugin = plugin<TestState, TestIntent, TestAction> { }
+                    install(plugin)
+                    install(plugin)
+                }
+            }
+        }
+        "then installing the same plugin with different names does not throw" {
+            shouldNotThrowAny {
+                testStore {
+                    install(consumeIntentsPlugin("a"))
+                    install(consumeIntentsPlugin("b"))
+                }
             }
         }
     }

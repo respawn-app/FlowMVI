@@ -18,11 +18,13 @@ public fun interface Recoverable<S : MVIState, I : MVIIntent, A : MVIAction> : C
      */
     public suspend fun PipelineContext<S, I, A>.recover(e: Exception)
 
+    @OptIn(DelicateStoreApi::class)
     public suspend fun PipelineContext<S, I, A>.catch(block: suspend () -> Unit): Unit = try {
         block()
     } catch (e: CancellationException) {
         throw e
     } catch (expected: Exception) {
+        if (coroutineContext[Recoverable] != null) throw expected
         withContext(this@Recoverable) {
             recover(expected)
         }
