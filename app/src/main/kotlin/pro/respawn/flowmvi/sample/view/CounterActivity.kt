@@ -7,13 +7,12 @@ import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import pro.respawn.flowmvi.android.view.subscribe
+import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.ActionConsumer
-import pro.respawn.flowmvi.api.Consumer
+import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
-import pro.respawn.flowmvi.sample.CounterLambdaIntent
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.R
@@ -22,12 +21,12 @@ import pro.respawn.flowmvi.sample.databinding.ActivityBasicBinding
 
 class CounterActivity :
     ComponentActivity(),
-    Consumer<CounterState, CounterLambdaIntent, CounterAction>,
+    StateConsumer<CounterState>,
     ActionConsumer<CounterAction> {
 
     private var _b: ActivityBasicBinding? = null
     private val binding get() = requireNotNull(_b)
-    override val container by viewModel<LambdaViewModel> { parametersOf("I am a parameter") }
+    private val container by viewModel<LambdaViewModel> { parametersOf("I am a parameter") }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +35,7 @@ class CounterActivity :
 
         // Subscribe to the store
         // for fragments, call this in onViewCreated()
-        subscribe()
+        subscribe(container.store)
 
         binding.apply {
             btnIncrement.setOnClickListener { container.onClickCounter() }

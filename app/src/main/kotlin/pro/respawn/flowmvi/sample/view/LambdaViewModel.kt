@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.android.plugins.parcelizeState
-import pro.respawn.flowmvi.api.Container
+import pro.respawn.flowmvi.api.ImmutableContainer
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.lazyStore
@@ -29,7 +29,7 @@ class LambdaViewModel(
     repo: CounterRepository,
     savedStateHandle: SavedStateHandle,
     private val param: String,
-) : ViewModel(), Container<CounterState, CounterLambdaIntent, CounterAction> {
+) : ViewModel(), ImmutableContainer<CounterState, CounterLambdaIntent, CounterAction> {
 
     override val store by lazyStore(
         initial = CounterState.Loading,
