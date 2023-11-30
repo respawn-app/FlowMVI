@@ -31,6 +31,11 @@ allprojects {
             jvmTarget.set(Config.jvmTarget)
             languageVersion.set(Config.kotlinVersion)
             freeCompilerArgs.addAll(Config.jvmCompilerArgs)
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                        rootProject.rootDir.absolutePath + "/stability_definitions.txt"
+            )
             optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }
     }

@@ -3,6 +3,7 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmutableContainer
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -14,6 +15,7 @@ import pro.respawn.flowmvi.api.Store
 /**
  * Alias for [pro.respawn.flowmvi.dsl.lazyStore] (with a scope)
  */
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
     initial: S,
     scope: CoroutineScope,
@@ -23,6 +25,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 /**
  * Alias for [pro.respawn.flowmvi.dsl.lazyStore]
  */
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
     initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, A>
@@ -31,6 +34,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 /**
  * Alias for [pro.respawn.flowmvi.dsl.store]
  */
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.store(
     initial: S,
     scope: CoroutineScope,
@@ -40,6 +44,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 /**
  * Alias for [pro.respawn.flowmvi.dsl.store]
  */
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.store(
     initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, A>

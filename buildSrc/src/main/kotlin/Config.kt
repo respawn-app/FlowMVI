@@ -45,7 +45,7 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & f
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
         add("-P")
-        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true")
+        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=false")
         addAll(optIns.map { "-opt-in=$it" })
     }
 
