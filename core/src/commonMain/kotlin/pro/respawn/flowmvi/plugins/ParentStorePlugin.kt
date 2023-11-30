@@ -22,13 +22,13 @@ import pro.respawn.flowmvi.dsl.subscribe
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        A2 : MVIAction
-        > parentStorePlugin(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    A2 : MVIAction
+    > parentStorePlugin(
     parent: Store<S2, I2, A2>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,
@@ -75,12 +75,12 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction, S2 : MVIState, I2
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        > StoreBuilder<S, I, A>.parentStore(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    > StoreBuilder<S, I, A>.parentStore(
     parent: Store<S2, I2, *>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,
@@ -94,13 +94,13 @@ public inline fun <
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        A2 : MVIAction,
-        > StoreBuilder<S, I, A>.parentStore(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    A2 : MVIAction,
+    > StoreBuilder<S, I, A>.parentStore(
     parent: Store<S2, I2, A2>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,

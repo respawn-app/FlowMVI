@@ -34,7 +34,7 @@ allprojects {
             freeCompilerArgs.addAll(
                 "-P",
                 "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                        rootProject.rootDir.absolutePath + "/stability_definitions.txt"
+                    rootProject.rootDir.absolutePath + "/stability_definitions.txt"
             )
             optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }

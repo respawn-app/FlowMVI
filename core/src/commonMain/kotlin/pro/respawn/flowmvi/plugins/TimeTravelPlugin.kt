@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

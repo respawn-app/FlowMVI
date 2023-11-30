@@ -18,6 +18,10 @@ public fun interface Recoverable<S : MVIState, I : MVIIntent, A : MVIAction> : C
      */
     public suspend fun PipelineContext<S, I, A>.recover(e: Exception)
 
+    /**
+     * Run [block] catching any exceptions and invoking [recover]. This will add this [Recoverable] key to the coroutine
+     * context of the [recover] block.
+     */
     @OptIn(DelicateStoreApi::class)
     public suspend fun PipelineContext<S, I, A>.catch(block: suspend () -> Unit): Unit = try {
         block()
