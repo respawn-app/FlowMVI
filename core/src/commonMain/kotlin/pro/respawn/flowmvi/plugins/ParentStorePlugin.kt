@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.coroutines.coroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -35,7 +36,10 @@ public inline fun <
     @BuilderInference crossinline consume: suspend PipelineContext<S, I, A>.(action: A2) -> Unit,
     @BuilderInference crossinline render: suspend PipelineContext<S, I, A>.(state: S2) -> Unit,
 ): StorePlugin<S, I, A> = whileSubscribedPlugin(name = name, minSubscriptions = minExternalSubscriptions) {
-    subscribe(parent, { consume(it) }, { render(it) }).join()
+    // do not use pipeline context to cancel subscription properly, suspend instead
+    coroutineScope {
+        subscribe(parent, { consume(it) }, { render(it) }).join()
+    }
 }
 
 /**
@@ -65,7 +69,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction, S2 : MVIState, I2
     minExternalSubscriptions: Int = 1,
     @BuilderInference crossinline render: suspend PipelineContext<S, I, A>.(state: S2) -> Unit,
 ): StorePlugin<S, I, A> = whileSubscribedPlugin(name = name, minSubscriptions = minExternalSubscriptions) {
-    subscribe(parent) { render(it) }.join()
+    coroutineScope {
+        subscribe(parent) { render(it) }.join()
+    }
 }
 
 /**
