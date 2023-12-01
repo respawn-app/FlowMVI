@@ -45,6 +45,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     minSubscriptions: Int = 1,
     @BuilderInference crossinline block: suspend PipelineContext<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = plugin {
+    require(minSubscriptions > 0) { "Minimum number of subscribers must be greater than 0" }
     this.name = name
     val job = atomic<Job?>(null)
     onSubscribe { previous ->
