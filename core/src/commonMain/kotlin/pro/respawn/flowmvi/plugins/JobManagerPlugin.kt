@@ -187,8 +187,8 @@ public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugi
  * @return the [JobManager] instance that was created for this plugin.
  */
 @FlowMVIDSL
-public fun <A : MVIAction, I : MVIIntent, S : MVIState, T : Any> StoreBuilder<S, I, A>.manageJobs(
+public fun <A : MVIAction, I : MVIIntent, S : MVIState> StoreBuilder<S, I, A>.manageJobs(
     name: String = JobManager.Name
-): JobManager<T> = JobManager<T>().also {
+): JobManager<String> = JobManager<String>().also {
     install(jobManagerPlugin(it, name))
 }
