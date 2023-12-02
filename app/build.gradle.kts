@@ -39,7 +39,7 @@ android {
 
 dependencies {
     implementation(projects.android)
-    implementation(projects.androidCompose)
+    implementation(projects.compose)
     implementation(projects.androidView)
 
     implementation(libs.bundles.koin)

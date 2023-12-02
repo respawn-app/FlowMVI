@@ -8,6 +8,14 @@ android {
     buildFeatures {
         compose = true
     }
+
+    kotlinOptions {
+        freeCompilerArgs += listOf(
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                rootProject.rootDir.absolutePath + "/stability_definitions.txt"
+        )
+    }
 }
 
 dependencies {

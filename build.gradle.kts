@@ -29,11 +29,6 @@ allprojects {
             languageVersion.set(Config.kotlinVersion)
             freeCompilerArgs.apply {
                 addAll(Config.jvmCompilerArgs)
-                addAll(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                            rootProject.rootDir.absolutePath + "/stability_definitions.txt"
-                )
                 if (project.findProperty("enableComposeCompilerReports") == "true") {
                     addAll(
                         "-P",

@@ -35,7 +35,7 @@ kotlin {
             api(projects.core)
         }
         jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.common)
         }
     }
 }
