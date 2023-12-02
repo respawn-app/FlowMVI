@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.compose.dsl.preview
+package pro.respawn.flowmvi.compose.preview
 
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import pro.respawn.flowmvi.api.MVIState
