@@ -7,65 +7,81 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
+    jvm: Boolean = true,
+    android: Boolean = true,
+    linux: Boolean = true,
+    iOs: Boolean = true,
+    js: Boolean = true,
+    tvOs: Boolean = true,
+    macOs: Boolean = true,
+    watchOs: Boolean = true
 ) = ext.apply {
     val libs by versionCatalog
     explicitApi()
-
     applyDefaultHierarchyTemplate()
     withSourcesJar(true)
 
-    linuxX64()
-    linuxArm64()
-    mingwX64()
-
-    js(IR) {
-        browser()
-        nodejs()
-        binaries.library()
+    if (linux) {
+        linuxX64()
+        linuxArm64()
+        mingwX64()
     }
 
-    androidTarget {
-        publishAllLibraryVariants()
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = Config.jvmTarget.target
-            }
+    if (js) {
+        js(IR) {
+            browser()
+            nodejs()
+            binaries.library()
         }
     }
 
-    jvm {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = Config.jvmTarget.target
-            }
+    if (android) {
+        androidTarget {
+            publishAllLibraryVariants()
         }
     }
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64(),
-        macosArm64(),
-        macosX64(),
-        tvosX64(),
-        tvosArm64(),
-        tvosSimulatorArm64(),
-        watchosX64(),
-        watchosArm64(),
-        watchosDeviceArm64(),
-        watchosSimulatorArm64(),
-    ).forEach {
-        it.binaries.framework {
-            binaryOption("bundleId", Config.artifactId)
-            binaryOption("bundleVersion", Config.versionName)
-            baseName = Config.artifactId
+    if (jvm) {
+        jvm()
+    }
+
+    if (iOs) {
+        sequence {
+            if (iOs) {
+                yield(iosX64())
+                yield(iosArm64())
+                yield(iosSimulatorArm64())
+            }
+            if (macOs) {
+                yield(macosArm64())
+                yield(macosX64())
+            }
+            if (tvOs) {
+                yield(tvosX64())
+                yield(tvosArm64())
+                yield(tvosSimulatorArm64())
+            }
+            if (watchOs) {
+                yield(watchosX64())
+                yield(watchosArm64())
+                yield(watchosDeviceArm64())
+                yield(watchosSimulatorArm64())
+            }
+        }.forEach {
+            it.binaries.framework {
+                binaryOption("bundleId", Config.artifactId)
+                binaryOption("bundleVersion", Config.versionName)
+                baseName = Config.artifactId
+            }
         }
     }
 
     sourceSets.apply {
-        val jvmTest by getting {
-            dependencies {
-                implementation(libs.requireLib("kotest-junit"))
+        if (jvm) {
+            val jvmTest by getting {
+                dependencies {
+                    implementation(libs.requireLib("kotest-junit"))
+                }
             }
         }
         all {
