@@ -77,7 +77,7 @@ public class SubscriberManager {
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.awaitSubscribers(
     manager: SubscriberManager,
     minSubs: Int = 1,
-    suspendStore: Boolean,
+    suspendStore: Boolean = true,
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
 ): Unit = install(awaitSubscribersPlugin(manager, minSubs, suspendStore, timeout, name))
@@ -102,13 +102,25 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
     onStart {
         with(manager) {
             launch(timeout)
-            if (suspendStore) await()
         }
+    }
+    onState { _, new ->
+        if (suspendStore) manager.await()
+        new
+    }
+    onAction {
+        if (suspendStore) manager.await()
+        it
+    }
+    onIntent {
+        if (suspendStore) manager.await()
+        it
     }
     onStop {
         manager.complete()
     }
     onSubscribe { subscriberCount ->
-        if (minSubs == subscriberCount + 1) manager.complete()
+        val currentSubs = subscriberCount + 1
+        if (minSubs >= currentSubs) manager.completeAndWait()
     }
 }
