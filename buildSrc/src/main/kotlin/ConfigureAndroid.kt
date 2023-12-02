@@ -46,12 +46,11 @@ fun Project.configureAndroid(
     }
 
     packaging {
-        resources {
-            excludes += setOf(
-                "DebugProbesKt.bin",
-                "/META-INF/{AL2.0,LGPL2.1}",
-            )
-        }
+        resources.excludes += listOf(
+            "/META-INF/{AL2.0,LGPL2.1}",
+            "DebugProbesKt.bin",
+            "META-INF/versions/9/previous-compilation-data.bin"
+        )
     }
 
     testOptions {

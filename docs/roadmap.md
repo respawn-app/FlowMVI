@@ -10,7 +10,6 @@
 - [x] DSL for composing stores to seamlessly split responsibilities
 - [x] More debug checks and optimizations
 - [ ] Consider adding an Analytics plugin
-- [ ] Compose Multiplatform support
+- [x] Compose Multiplatform support
 - [ ] Better iOS support
 - [ ] Better JS support
-- [ ] LoC and HoC reporting

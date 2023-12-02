@@ -1,8 +1,11 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         google()
         gradlePluginPortal()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
     // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/56
@@ -19,14 +22,6 @@ pluginManagement {
     }
 }
 
-buildscript {
-    repositories {
-        google()
-        gradlePluginPortal()
-        mavenCentral()
-    }
-}
-
 dependencyResolutionManagement {
     // kmm plugin adds "ivy" repo as part of the apply block
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
@@ -36,6 +31,7 @@ dependencyResolutionManagement {
         ivyNative()
         node()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
@@ -94,8 +90,6 @@ fun RepositoryHandler.ivyNative() {
     }
 }
 
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 rootProject.name = "FlowMVI"
 
 include(":app")
@@ -105,3 +99,4 @@ include(":annotations")
 include(":android")
 include(":android-compose")
 include(":android-view")
+include(":compose")

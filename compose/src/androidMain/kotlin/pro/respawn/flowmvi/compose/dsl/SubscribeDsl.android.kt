@@ -1,4 +1,6 @@
-package pro.respawn.flowmvi.android.compose.dsl
+@file:Suppress("NOTHING_TO_INLINE")
+
+package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,14 +15,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.android.compose.ComposeArtifactMessage
+import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
 
 /**
@@ -34,14 +35,14 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
  *   upon leaving that state, the function will unsubscribe.
  * @param consume a lambda to consume actions with.
- *
- * @see Store.subscribe
+ * @return the [State] that contains the current state.
+ * @see ImmutableStore.subscribe
+ * @see subscribe
  */
 @OptIn(DelicateStoreApi::class)
 @Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
-@Deprecated(ComposeArtifactMessage)
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
@@ -72,14 +73,14 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
  *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @param lifecycleState the minimum lifecycle state that should be reached in order to subscribe to the store,
  *   upon leaving that state, the function will unsubscribe.
- * @return the [State] that contains the [Store.state].
- * @see Store.subscribe
+ * @return the [State] that contains the current state.
+ * @see ImmutableStore.subscribe
+ * @see subscribe
  */
 @OptIn(DelicateStoreApi::class)
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
-@Deprecated(ComposeArtifactMessage)
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
 ): State<S> {
@@ -97,3 +98,21 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
     }
     return state
 }
+
+/**
+ * Alias for [pro.respawn.flowmvi.compose.dsl.subscribe] with [Lifecycle.State.STARTED].
+ **/
+@FlowMVIDSL
+@Composable
+public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(): State<S> =
+    subscribe(Lifecycle.State.STARTED)
+
+/**
+ * Alias for [pro.respawn.flowmvi.compose.dsl.subscribe] with [Lifecycle.State.STARTED].
+ **/
+@FlowMVIDSL
+@Composable
+@Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
+public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+    noinline consume: suspend CoroutineScope.(action: A) -> Unit
+): State<S> = subscribe(Lifecycle.State.STARTED, consume)

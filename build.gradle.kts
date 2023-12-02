@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@Suppress("DSL_SCOPE_VIOLATION")
+private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+
 plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gradleDoctor)
@@ -12,15 +13,11 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
-}
-
-buildscript {
-    dependencies {
-        classpath(libs.android.gradle)
-        classpath(libs.kotlin.gradle)
-        classpath(libs.version.gradle)
-        classpath(libs.detekt.gradle)
-    }
+    alias(libs.plugins.jetbrainsCompose) apply false
+    // plugins already on a classpath (conventions)
+    // alias(libs.plugins.androidApplication) apply false
+    // alias(libs.plugins.androidLibrary) apply false
+    // alias(libs.plugins.kotlinMultiplatform) apply false
 }
 
 allprojects {
@@ -30,12 +27,17 @@ allprojects {
         compilerOptions {
             jvmTarget.set(Config.jvmTarget)
             languageVersion.set(Config.kotlinVersion)
-            freeCompilerArgs.addAll(Config.jvmCompilerArgs)
-            freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                    rootProject.rootDir.absolutePath + "/stability_definitions.txt"
-            )
+            freeCompilerArgs.apply {
+                addAll(Config.jvmCompilerArgs)
+                if (project.findProperty("enableComposeCompilerReports") == "true") {
+                    addAll(
+                        "-P",
+                        "$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics",
+                        "-P",
+                        "$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics",
+                    )
+                }
+            }
             optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }
     }

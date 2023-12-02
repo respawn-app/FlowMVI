@@ -37,6 +37,10 @@ import pro.respawn.flowmvi.dsl.subscribe
 import kotlin.experimental.ExperimentalTypeInference
 
 private const val Package = "pro.respawn.flowmvi.android.compose.dsl"
+internal const val ComposeArtifactMessage = """
+android-compose module is redundant, because new "compose" module has been made which supports Compose Multiplatform.
+Please just replace android-compose with just "compose" and change the package name to "pro.respawn.flowmvi.compose"
+"""
 
 /**
  * An interface for the scope that provides [send] and [consume] functions inside your composable

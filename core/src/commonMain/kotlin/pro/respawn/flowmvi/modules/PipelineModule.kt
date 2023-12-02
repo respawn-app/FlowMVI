@@ -46,7 +46,15 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     ActionReceiver<A> {
 
     override val key = PipelineContext // recoverable should be separate.
-    private val job = SupervisorJob(parent.coroutineContext[Job])
+    private val job = SupervisorJob(parent.coroutineContext[Job]).apply {
+        invokeOnCompletion {
+            when (it) {
+                null, is CancellationException -> onStop(null)
+                !is Exception -> throw it
+                else -> onStop(it)
+            }
+        }
+    }
     private val handler = PipelineExceptionHandler(this)
     private val pipelineName = CoroutineName("${name.orEmpty()}PipelineContext")
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + job + handler + this
@@ -57,13 +65,5 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     }
 }.run {
     onStart()
-    coroutineContext.job.apply {
-        invokeOnCompletion {
-            when (it) {
-                null, is CancellationException -> onStop(null)
-                !is Exception -> throw it
-                else -> onStop(it)
-            }
-        }
-    }
+    coroutineContext.job
 }
