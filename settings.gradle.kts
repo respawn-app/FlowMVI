@@ -28,8 +28,8 @@ dependencyResolutionManagement {
 
     repositories {
         google()
-        // ivyNative()
-        // node()
+        ivyNative()
+        node()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
