@@ -34,20 +34,20 @@ flowmvi = "< Badge above 👆🏻 >"
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
 
+flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }  # compose multiplatform
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
-flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # compose
 ```
 ### Kotlin DSL
 ```kotlin
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:android-compose:$flowmvi")
 }
 ```
 
@@ -79,6 +79,7 @@ class CounterContainer(
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
         name = "CounterStore"
         parallelIntents = true
+        coroutineContext = Dispatchers.Default // run all operations on background threads if needed
         actionShareBehavior = ActionShareBehavior.Distribute() // disable, share, distribute or consume side effects
         intentCapacity = 64
 
@@ -171,21 +172,17 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 }
 ```
 
-### Android support (Compose):
+### Compose Multiplatform:
+
+![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm]  
 
 ```kotlin
-val module = module {
-    // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
-    factoryOf(::CounterContainer)
-    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
-}
-
-// collect the store efficiently based on composable's lifecycle
 @Composable
 fun CounterScreen() {
-    val store = getViewModel(qualifier<CounterContainer>())
+    val store = remember { CounterContainer() } // or use a DI framework
 
-    val state by store.subscribe { action -> // collect actions/states from composables
+    // collect the state and handle events efficiently based on system lifecycle, whether it's iOS or Desktop
+    val state by store.subscribe { action ->
         when (action) {
             is ShowMessage -> {
                 /* ... */
@@ -203,9 +200,15 @@ fun CounterScreen() {
 }
 ```
 
-### Android support (View):
+### Android support:
 
 ```kotlin
+val module = module {
+    // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
+    factoryOf(::CounterContainer)
+    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
+}
+
 class ScreenFragment : Fragment() {
 
     private val vm by viewModel(qualifier<CounterContainer>())
@@ -213,7 +216,7 @@ class ScreenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // One-liner for store subscription. Lifecycle-aware and efficient.
-        subscribe(vm, ::consume, ::render) 
+        subscribe(vm, ::consume, ::render)
     }
 
     private fun render(state: CounterState) {
