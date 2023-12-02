@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.store
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -23,6 +24,7 @@ import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
+import pro.respawn.flowmvi.modules.observeSubscribers
 import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscribersModule
@@ -44,9 +46,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun start(scope: CoroutineScope): Job = launchPipeline(
         name = name,
         parent = scope + config.coroutineContext,
-        onAction = {
-            catch { onAction(it)?.let { this@StoreImpl.action(it) } }
-        },
+        onAction = { catch { onAction(it)?.let { this@StoreImpl.action(it) } } },
         onTransformState = { transform ->
             catch {
                 this@StoreImpl.updateState {
@@ -57,23 +57,27 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         onStop = {
             checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
             onStop(it)
-        },
-        onStart = pipeline@{
-            check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
-            launch intents@{
+        }
+    ) pipeline@{
+        check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
+        launch intents@{
+            coroutineScope {
                 // run onStart plugins first to not let subscribers appear before the store is started fully
                 catch { onStart() }
-                observeSubscribers(
-                    onSubscribe = { catch { onSubscribe(it) } },
-                    onUnsubscribe = { catch { onUnsubscribe(it) } }
-                )
-                // suspend until store is closed, handling intents
-                awaitIntents {
-                    catch { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
+                launch {
+                    observeSubscribers(
+                        onSubscribe = { catch { onSubscribe(it) } },
+                        onUnsubscribe = { catch { onUnsubscribe(it) } }
+                    )
+                }
+                launch {
+                    awaitIntents {
+                        catch { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
+                    }
                 }
             }
         }
-    )
+    }
 
     @OptIn(DelicateStoreApi::class)
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
