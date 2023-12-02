@@ -16,9 +16,9 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 2
-    const val minorRelease = 1
+    const val minorRelease = 2
     const val patch = 0
-    const val postfix = "rc03"
+    const val postfix = "rc"
     const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
