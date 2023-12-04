@@ -18,3 +18,4 @@
 *.db binary
 
 .idea/* linguist-vendored
+scripts/* linguist-vendored
