@@ -16,9 +16,9 @@ flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
+flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }  # compose multiplatform
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
-flowmvi-compose = { module = "pro.respawn.flowmvi:android-compose", version.ref = "flowmvi" }  # androidx.compose
 ```
 
 ### Kotlin DSL
@@ -28,10 +28,10 @@ dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:android-compose:$flowmvi")
 }
 ```
 
@@ -55,12 +55,12 @@ So please consider the following comparison:
 
 | Pros 👍                                                                                                 | Cons 👎                                                                         |
 |:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|
-| Elegant declaration - open a lambda block and write your logic there. Store's code remains clean        | Store's context is accessible outside of the store, leading to scope creep      |
+| Elegant sytax - open a lambda block and write your logic there. Store's code remains clean              | You have to use `ImmutableStore` interface to not leak the store's context      |
 | Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose |
-| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become less useful, such as logging/time travel/analytics     |
-| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated, reused and organized into families       |
+| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become useless, such as logging/time travel/analytics         |
+| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated and organized into families               |
 
-If you decide to use MVVM+ style, consider using `ImmutableStore` interface that won't let external code send 
+If you decide to use the MVVM+ style, consider using `ImmutableStore` interface that won't let external code send 
 intents. This will prevent leaking the context of the store to subscribers.
 
 ## Step 3: Describe your Contract
@@ -89,7 +89,8 @@ start. To define your contract, ask yourself the following:
   button presses.
 * The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
     * Examples include snackbars, popup messages, sounds and so on.
-    * Do not confuse States with Actions! Actions are **one-off, "fire and forget" events**.
+    * Prefer using state instead of events if possible if you are able to declaratively handle an event. [Read more here](https://proandroiddev.com/viewmodel-events-as-state-are-an-antipattern-35ff4fbc6fb6).
+    * Do not confuse States with Actions! Actions are **one-off, "fire and forget" events** that cannot be tracked after being sent.
     * Actions are **sent and received sequentially**.
     * Actions are sent from Store to the UI. Intents are sent in the other direction.
     * Actions are not strictly guaranteed to be received by the subscriber, so do not use them for crucial elements of
@@ -174,7 +175,7 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 Some interesting properties of the store:
 
 * Store can be launched, stopped, and relaunched again as many times as you want.
-  Use `close()`, or cancel the job to stop the store.
+  Use `close()`, or cancel the job returned from `start()` to stop the store.
 * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
 * Stores are created eagerly usually, but the store *can* be lazy. There is `lazyStore()` for that.
@@ -202,9 +203,9 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
 * **Disallow Restart Plugin** - disallow restarting store if you do not plan to reuse it.
   Install with `disallowRestart`.
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
-  lifecycle. Install with `val value by cache { } `
+  lifecycle. Install with `val value by cache { }`
 * **Parent Store Plugin** - attach to another store and follow the subscription lifecycle. Install
-  with `parentStore(otherStore) { state ->  } `
+  with `parentStore(otherStore) { state ->  }`
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 Consult the javadocs of the plugins to learn how to use them.
@@ -315,5 +316,5 @@ Next steps:
 --- 
 
 [^1]: Although container is a slightly different concept usually, we don't have this kind of separation and we use the
-name "store" for our business logic unit already, so the name was kinda "free" to define what it will mean for
+name "store" for our business logic unit already, so the name was "free" to define what it will mean for
 FlowMVI
