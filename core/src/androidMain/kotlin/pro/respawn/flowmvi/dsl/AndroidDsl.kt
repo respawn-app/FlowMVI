@@ -6,6 +6,8 @@ import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 
+// TODO: KMP Does not support sharing code between Android and JVM, hence the duplicate
+
 /**
  * An alias for [IntentReceiver.send]
  */
