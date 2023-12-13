@@ -10,7 +10,10 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.plugin.use.PluginDependency
+import java.io.File
+import java.io.FileInputStream
 import java.util.Base64
+import java.util.Properties
 
 /**
  * Load version catalog for usage in places where it is not available yet with gradle 7.x.
@@ -50,3 +53,10 @@ fun List<String>.toJavaArrayString() = buildString {
 }
 
 fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
+
+val Project.localProperties
+    get() = lazy {
+        Properties().apply {
+            load(FileInputStream(File(rootProject.rootDir, "local.properties")))
+        }
+    }

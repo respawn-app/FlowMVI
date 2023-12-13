@@ -1,3 +1,4 @@
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
@@ -75,10 +76,8 @@ doctor {
 }
 
 dependencyAnalysis {
-    issues {
-        all {
-            ignoreKtx(true)
-        }
+    structure {
+        ignoreKtx(true)
     }
 }
 
@@ -134,7 +133,7 @@ tasks {
         autoCorrect = false
     }
 
-    withType<com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask>().configureEach {
+    withType<DependencyUpdatesTask>().configureEach {
         outputFormatter = "json"
 
         fun stabilityLevel(version: String): Int {
