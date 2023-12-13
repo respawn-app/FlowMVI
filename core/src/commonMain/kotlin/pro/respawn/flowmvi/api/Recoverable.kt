@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.api
 
-import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -29,9 +28,7 @@ public fun interface Recoverable<S : MVIState, I : MVIIntent, A : MVIAction> : C
         throw e
     } catch (expected: Exception) {
         if (coroutineContext[Recoverable] != null) throw expected
-        withContext(this@Recoverable) {
-            recover(expected)
-        }
+        recover(expected)
     }
 
     @DelicateStoreApi
