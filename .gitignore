@@ -170,3 +170,4 @@ hs_err_pid*
 # yarn.lock location & other
 /kotlin-js-store/**
 /.idea/appInsightsSettings.xml
+/.idea/deploymentTargetSelector.xml

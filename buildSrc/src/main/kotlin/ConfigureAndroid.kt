@@ -5,7 +5,7 @@ import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 
 fun Project.configureAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *, *>,
 ) = commonExtension.apply {
     compileSdk = Config.compileSdk
     val libs by versionCatalog

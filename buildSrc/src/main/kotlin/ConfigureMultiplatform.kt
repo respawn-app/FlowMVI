@@ -45,34 +45,32 @@ fun Project.configureMultiplatform(
         jvm()
     }
 
-    if (iOs) {
-        sequence {
-            if (iOs) {
-                yield(iosX64())
-                yield(iosArm64())
-                yield(iosSimulatorArm64())
-            }
-            if (macOs) {
-                yield(macosArm64())
-                yield(macosX64())
-            }
-            if (tvOs) {
-                yield(tvosX64())
-                yield(tvosArm64())
-                yield(tvosSimulatorArm64())
-            }
-            if (watchOs) {
-                yield(watchosX64())
-                yield(watchosArm64())
-                yield(watchosDeviceArm64())
-                yield(watchosSimulatorArm64())
-            }
-        }.forEach {
-            it.binaries.framework {
-                binaryOption("bundleId", Config.artifactId)
-                binaryOption("bundleVersion", Config.versionName)
-                baseName = Config.artifactId
-            }
+    sequence {
+        if (iOs) {
+            yield(iosX64())
+            yield(iosArm64())
+            yield(iosSimulatorArm64())
+        }
+        if (macOs) {
+            yield(macosArm64())
+            yield(macosX64())
+        }
+        if (tvOs) {
+            yield(tvosX64())
+            yield(tvosArm64())
+            yield(tvosSimulatorArm64())
+        }
+        if (watchOs) {
+            yield(watchosX64())
+            yield(watchosArm64())
+            yield(watchosDeviceArm64())
+            yield(watchosSimulatorArm64())
+        }
+    }.forEach {
+        it.binaries.framework {
+            binaryOption("bundleId", Config.artifactId)
+            binaryOption("bundleVersion", Config.versionName)
+            baseName = Config.artifactId
         }
     }
 

@@ -1,7 +1,6 @@
 @file:Suppress("MissingPackageDeclaration", "unused")
 
 import com.android.build.api.dsl.LibraryExtension
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.build.gradle.tasks.BundleAar
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -17,7 +16,7 @@ import org.gradle.plugins.signing.Sign
  * Configures Maven publishing to sonatype for this project
  */
 fun Project.publishMultiplatform() {
-    val properties = gradleLocalProperties(rootDir)
+    val properties by localProperties
     val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
     val javadocTask = tasks.named("emptyJavadocJar") // TODO: dokka does not support kmp javadocs yet
@@ -52,7 +51,7 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
     }
 
     afterEvaluate {
-        val properties = gradleLocalProperties(rootDir)
+        val properties by localProperties
         val isReleaseBuild = properties["release"]?.toString().toBoolean()
 
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
