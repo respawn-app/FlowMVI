@@ -24,7 +24,6 @@ import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
-import pro.respawn.flowmvi.modules.alreadyRecovered
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
@@ -83,7 +82,6 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
-        if (alreadyRecovered()) throw e
         withContext(this@StoreImpl) {
             onException(e)?.let { throw UnhandledStoreException(it) }
         }

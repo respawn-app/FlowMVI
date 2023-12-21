@@ -35,8 +35,8 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
         withContext(this@RecoverModule) { block() }
     } catch (expected: Exception) {
         when {
-            alreadyRecovered() -> throw RecursiveRecoverException(expected)
             expected is CancellationException || expected is UnrecoverableException -> throw expected
+            alreadyRecovered() -> throw RecursiveRecoverException(expected)
             else -> recover(expected)
         }
     }
