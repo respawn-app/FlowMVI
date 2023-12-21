@@ -48,7 +48,11 @@ class CounterActivity :
     // Handle any side effects of the UI layer here
     override fun consume(action: CounterAction) {
         when (action) {
-            is ShowErrorMessage -> Snackbar.make(binding.root, R.string.error_message, Snackbar.LENGTH_SHORT).show()
+            is ShowErrorMessage -> Snackbar.make(
+                binding.root,
+                getString(R.string.error_message, action.message),
+                Snackbar.LENGTH_SHORT
+            ).show()
             is ShowLambdaMessage -> Snackbar.make(binding.root, R.string.lambda_message, Snackbar.LENGTH_SHORT).show()
             is CounterAction.GoBack -> finish()
         }

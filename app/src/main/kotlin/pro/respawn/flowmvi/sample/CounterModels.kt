@@ -34,7 +34,7 @@ sealed interface CounterIntent : MVIIntent {
 
 sealed interface CounterAction : MVIAction {
 
-    data object ShowErrorMessage : CounterAction
+    data class ShowErrorMessage(val message: String?) : CounterAction
     data object ShowLambdaMessage : CounterAction
     data object GoBack : CounterAction
 }

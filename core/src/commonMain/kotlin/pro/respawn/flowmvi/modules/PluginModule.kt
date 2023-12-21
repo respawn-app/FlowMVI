@@ -7,7 +7,11 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.AbstractStorePlugin
 
-internal class PluginModule<S : MVIState, I : MVIIntent, A : MVIAction>(
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> pluginModule(
+    plugins: Set<StorePlugin<S, I, A>>
+): StorePlugin<S, I, A> = PluginModule(plugins)
+
+private class PluginModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val plugins: Set<StorePlugin<S, I, A>>,
 ) : AbstractStorePlugin<S, I, A>(null) {
 
@@ -30,7 +34,3 @@ internal class PluginModule<S : MVIState, I : MVIIntent, A : MVIAction>(
         block: StorePlugin<S, I, A>.(R) -> R?
     ) = plugins.fold<_, R?>(initial) { acc, it -> it.block(acc ?: return@plugins acc) }
 }
-
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction> pluginModule(
-    plugins: Set<StorePlugin<S, I, A>>
-): StorePlugin<S, I, A> = PluginModule(plugins)

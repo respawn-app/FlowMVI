@@ -8,16 +8,16 @@ import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 
-internal interface IntentModule<I : MVIIntent> : IntentReceiver<I> {
-
-    suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit)
-}
-
 internal fun <I : MVIIntent> intentModule(
     parallel: Boolean,
     capacity: Int,
     overflow: BufferOverflow,
 ): IntentModule<I> = IntentModuleImpl(parallel, capacity, overflow)
+
+internal interface IntentModule<I : MVIIntent> : IntentReceiver<I> {
+
+    suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit)
+}
 
 private class IntentModuleImpl<I : MVIIntent>(
     private val parallel: Boolean,

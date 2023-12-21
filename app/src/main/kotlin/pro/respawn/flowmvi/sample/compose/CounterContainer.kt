@@ -41,12 +41,10 @@ class CounterContainer(
         )
         val undoRedo = undoRedo(10)
         recover {
-            launch {
-                if (it is IllegalArgumentException)
-                    action(ShowErrorMessage)
-                else updateState {
-                    CounterState.Error(it)
-                }
+            if (it is IllegalArgumentException)
+                action(ShowErrorMessage(it.message))
+            else updateState {
+                CounterState.Error(it)
             }
             null
         }

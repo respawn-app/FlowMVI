@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.test
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.firstOrNull
@@ -70,11 +71,11 @@ public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @Publish
  * Call [Store.start] and then execute [block], cancelling the store afterwards
  */
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.test(
-    crossinline block: suspend Store<S, I, A>.() -> Unit
-): Unit = coroutineScope {
+    crossinline block: suspend Store<S, I, A>.(job: Job) -> Unit
+): Job = coroutineScope {
     val job = start(this)
-    block()
-    job.cancelAndJoin()
+    block(job)
+    job.apply { cancelAndJoin() }
 }
 
 /**
@@ -83,12 +84,10 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, 
  */
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribeAndTest(
     crossinline block: suspend StoreTestScope<S, I, A>.() -> Unit,
-): Unit = test {
+): Job = test {
     coroutineScope {
         subscribe {
-            StoreTestScope(this, this@subscribeAndTest).run {
-                block()
-            }
+            StoreTestScope(this, this@subscribeAndTest).run { block() }
         }
     }
 }
