@@ -8,14 +8,11 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.api.DelicateStoreApi
-import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.test.subscribeAndTest
@@ -25,7 +22,6 @@ import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
-@OptIn(DelicateStoreApi::class)
 class StoreExceptionsText : FreeSpec({
     asUnconfined()
 
@@ -48,23 +44,21 @@ class StoreExceptionsText : FreeSpec({
                 }
             }
             "then store is not closed when thrown" {
-                val job = store.start(this)
-                idle()
-                job.isActive shouldBe true
-                job.cancelAndJoin()
-                idle()
-                plugin.starts shouldBe 1
-                plugin.exceptions.shouldContainExactly(e)
+                store.test { job ->
+                    job.isActive shouldBe true
+                    idle()
+                    plugin.starts shouldBe 1
+                    plugin.exceptions.shouldContainExactly(e)
+                }
             }
 
             "then exceptions in processing scope do not cancel the pipeline" {
-                val job = store.start(this)
-                store.send { }
-                idle()
-                job.isActive shouldBe true
-                job.cancelAndJoin()
-                idle()
-                plugin.intents.shouldBeSingleton()
+                store.test { job ->
+                    send { }
+                    idle()
+                    job.isActive shouldBe true
+                    plugin.intents.shouldBeSingleton()
+                }
             }
         }
         "given store that throws on subscribe" - {
@@ -80,20 +74,18 @@ class StoreExceptionsText : FreeSpec({
                 }
             }
             "then exceptions in subscriber scope do not cancel the pipeline" {
-                store.test {
-                    subscribe {
-                        println("Subscribed")
-                    }.cancelAndJoin()
+                store.subscribeAndTest {
+                    println("Subscribed")
                 }
-                println("should have stopped")
                 idle()
+                println("should have stopped")
             }
         }
         "then nested coroutines propagate exceptions to handler" {
             val store = testStore(plugin) {
                 recover { null }
             }
-            store.test {
+            store.test { job ->
                 send {
                     launch a@{
                         println("job 1 started")
@@ -109,22 +101,22 @@ class StoreExceptionsText : FreeSpec({
                     }
                 }
                 idle()
-                plugin.exceptions shouldContain e
-                plugin.intents.shouldBeSingleton()
+                job.isActive shouldBe true
             }
+            idle()
+            plugin.intents.shouldBeSingleton()
+            plugin.exceptions shouldContain e
         }
-        "and store that does not handle exceptions" - {
-            val store = testStore(plugin) {
-                init {
-                    launch { throw e }
-                }
-            }
-
-            "then exceptions are rethrown".config(enabled = false) {
+        // this test crashes the whole test suite because we can't catch exceptions in coroutine exception handlers
+        "and store that does not handle exceptions".config(enabled = false) - {
+            "then exceptions are rethrown" {
                 shouldThrowExactly<IllegalArgumentException> {
-                    coroutineScope {
-                        // TODO: cancels the scope, figure out how to not cancel the parent scope
-                        store.start(this).join()
+                    val store = testStore(plugin) {
+                        recover { it }
+                    }
+                    store.test {
+                        intent { throw e }
+                        idle()
                     }
                 }
             }
@@ -132,13 +124,33 @@ class StoreExceptionsText : FreeSpec({
         "and store that handles exceptions" - {
             val store = testStore(plugin) {
                 recover {
-                    currentCoroutineContext()[Recoverable].shouldNotBeNull()
+                    currentCoroutineContext()[RecoverModule].shouldNotBeNull()
                     null
                 }
             }
             "then recover contains Recoverable" {
                 store.subscribeAndTest {
                     intent { throw e }
+                }
+            }
+        }
+        // this test passes (verified manually), but the execution leads to the whole test suite crashing as the
+        // assertion does not catch exceptions correctly
+        "and store that throws in recover()".config(enabled = false) - {
+            val store = testStore(plugin) {
+                recover {
+                    throw IllegalStateException(it)
+                }
+            }
+            "then exceptions in that store are rethrown" {
+                shouldThrowExactly<IllegalStateException> {
+                    store.test {
+                        intent {
+                            throw e
+                        }
+                        idle()
+                    }
+                    idle()
                 }
             }
         }

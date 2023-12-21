@@ -16,7 +16,6 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.StateReceiver
 import kotlin.coroutines.CoroutineContext
 
@@ -39,12 +38,13 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
     onStart: PipelineContext<S, I, A>.() -> Unit,
-): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : Recoverable<S, I, A> = object :
+): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : RecoverModule<S, I, A> = object :
     IntentReceiver<I> by this,
     StateReceiver<S> by this,
     PipelineContext<S, I, A>,
     ActionReceiver<A> {
 
+    override fun toString(): String = "${name.orEmpty()}PipelineContext"
     override val key = PipelineContext // recoverable should be separate.
     private val job = SupervisorJob(parent.coroutineContext[Job]).apply {
         invokeOnCompletion {
@@ -55,8 +55,8 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
             }
         }
     }
-    private val handler = PipelineExceptionHandler(this)
-    private val pipelineName = CoroutineName("${name.orEmpty()}PipelineContext")
+    private val handler = PipelineExceptionHandler()
+    private val pipelineName = CoroutineName(toString())
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + job + handler + this
     override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
     override suspend fun action(action: A) = onAction(action)

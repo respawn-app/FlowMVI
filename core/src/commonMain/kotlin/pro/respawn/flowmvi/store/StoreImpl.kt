@@ -8,20 +8,23 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
-import pro.respawn.flowmvi.api.Recoverable
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
+import pro.respawn.flowmvi.exceptions.UnhandledIntentException
+import pro.respawn.flowmvi.exceptions.UnhandledStoreException
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
+import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
+import pro.respawn.flowmvi.modules.alreadyRecovered
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
@@ -33,8 +36,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
     Provider<S, I, A>,
-    Recoverable<S, I, A>,
-    StorePlugin<S, I, A> by pluginModule(config.plugins), // store is a plugin to itself that manages other plugins
+    RecoverModule<S, I, A>,
+    StorePlugin<S, I, A> by pluginModule(config.plugins),
     SubscribersModule by subscribersModule(),
     StateModule<S> by stateModule(config.initial),
     IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
@@ -72,18 +75,17 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
                 }
                 launch {
                     awaitIntents {
-                        catch { check(onIntent(it) == null || !config.debuggable) { UnhandledIntentMessage } }
+                        catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
                     }
                 }
             }
         }
     }
 
-    @OptIn(DelicateStoreApi::class)
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
-        if (coroutineContext[Recoverable] != null) throw e
-        withContext(this@StoreImpl) { // add recoverable to the context
-            onException(e)?.let { throw it }
+        if (alreadyRecovered()) throw e
+        withContext(this@StoreImpl) {
+            onException(e)?.let { throw UnhandledStoreException(it) }
         }
     }
 
@@ -92,7 +94,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     ): Job = launch {
         newSubscriber()
         block(this@StoreImpl)
-        check(!config.debuggable) { NonSuspendingSubscriberMessage }
+        if (config.debuggable) throw NonSuspendingSubscriberException()
     }.apply {
         invokeOnCompletion { removeSubscriber() }
     }
@@ -103,25 +105,10 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override fun hashCode() = name?.hashCode() ?: super.hashCode()
+    override fun toString(): String = name ?: super.toString()
     override fun equals(other: Any?): Boolean {
         if (other !is Store<*, *, *>) return false
         if (other.name == null && name == null) return other === this
         return name == other.name
-    }
-
-    companion object {
-
-        const val NonSuspendingSubscriberMessage = """
-You have subscribed to the store, but your subscribe() block has returned early (without throwing a
-CancellationException). When you subscribe, make sure to continue collecting values from the store until the Job 
-Returned from the subscribe() is cancelled as you likely don't want to stop being subscribed to the store
-(i.e. complete the subscription job on your own).
-        """
-
-        const val UnhandledIntentMessage = """
-An intent has not been handled after calling all plugins. 
-You likely don't want this to happen because intents are supposed to be acted upon.
-Make sure you have at least one plugin that handles intents, such as reducePlugin().
-        """
     }
 }
