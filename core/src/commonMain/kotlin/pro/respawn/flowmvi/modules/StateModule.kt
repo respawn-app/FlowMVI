@@ -11,9 +11,9 @@ import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.util.withReentrantLock
 
-internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
-
 internal fun <S : MVIState> stateModule(initial: S): StateModule<S> = StateModuleImpl(initial)
+
+internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
 
 private class StateModuleImpl<S : MVIState>(initial: S) : StateModule<S> {
 

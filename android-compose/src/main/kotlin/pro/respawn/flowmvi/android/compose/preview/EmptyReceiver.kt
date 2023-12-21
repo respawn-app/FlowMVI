@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package pro.respawn.flowmvi.android.compose.preview
 
 import androidx.compose.runtime.Composable

@@ -24,9 +24,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.preview.StateProvider
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.compose.preview.EmptyReceiver
+import pro.respawn.flowmvi.compose.preview.StateProvider
 import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
 import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
@@ -57,7 +57,7 @@ fun ComposeScreen(onBack: () -> Unit) {
         // consume() block will only be called when a new action is emitted (independent of recompositions)
         when (action) {
             is ShowLambdaMessage -> scaffoldState.snackbar(context.getString(R.string.lambda_message))
-            is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message))
+            is ShowErrorMessage -> scaffoldState.snackbar(context.getString(R.string.error_message, action.message))
             is GoBack -> onBack()
         }
     }
