@@ -174,7 +174,9 @@ A callback to be executed **each time** `Store.subscribe` is called.
   coroutines). In that case, `onSubscribe` will be invoked first as if it was a second subscriber, and then
   `onUnsubscribe` will be invoked, as if there were more subscribers for a moment.
 * Suspending in this function will prevent other plugins from receiving the subscription event (i.e. next plugins
-  that use `onSubscribe` will wait for this one to complete.### onUnsubscribe
+  that use `onSubscribe` will wait for this one to complete.
+
+### onUnsubscribe
 
 ```kotlin
 suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit

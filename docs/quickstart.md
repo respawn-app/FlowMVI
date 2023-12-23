@@ -27,8 +27,8 @@ flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flo
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
-    commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
@@ -53,12 +53,12 @@ So please consider the following comparison:
 
 ### MVVM+ style:
 
-| Pros 👍                                                                                                 | Cons 👎                                                                         |
-|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------|
-| Elegant sytax - open a lambda block and write your logic there. Store's code remains clean              | You have to use `ImmutableStore` interface to not leak the store's context      |
-| Easily navigate to and see what intent does in one click                                                | Lambdas are less performant than regular intents, especially when using Compose |
-| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become useless, such as logging/time travel/analytics         |
-| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated and organized into families               |
+| Pros 👍                                                                                                 | Cons 👎                                                                    |
+|:--------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------|
+| Elegant syntax - open a lambda block and write your logic there. Store's code remains clean             | You have to use `ImmutableStore` interface to not leak the store's context |
+| Easily navigate to and see what an intent does in one click                                             | Lambdas are less performant than regular intents                           |
+| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become useless, such as logging/time travel/analytics    |
+| Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated and organized into families          |
 
 If you decide to use the MVVM+ style, consider using `ImmutableStore` interface that won't let external code send 
 intents. This will prevent leaking the context of the store to subscribers.
@@ -102,7 +102,7 @@ start. To define your contract, ask yourself the following:
 // Must be comparable and immutable. Automatically marked as stable in Compose
 sealed interface CounterState : MVIState {
     data object Loading : CounterState
-    data class Error(e: Exception) : CounterState
+    data class Error(val e: Exception) : CounterState
     data class DisplayingCounter(
         val counter: Int,
     ) : CounterState
@@ -126,6 +126,9 @@ sealed interface CounterAction : MVIAction {
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
+
+* If your store does not have a `State`, you can use an `EmptyState` object.
+*
 
 ## Step 4: Define your store
 
@@ -189,18 +192,18 @@ For every store, you'll likely want to install a few plugins.
 Prebuilt plugins come with a nice dsl when building a store. Here's the list of prebuilt plugins:
 
 * **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
-* **Init Plugin** - do something when store is launched. Install with `init { }`.
+* **Init Plugin** - do something when the store is launched. Install with `init { }`.
 * **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
 * **While Subscribed Plugin** - run jobs when the Nth subscriber of a store appears. Install
   with `whileSubscribed { }`.
-* **Logging Plugin** - log events to a log stream of the target platform.
+* **Logging Plugin** - log events to a log stream of the target platform. Install with `platformLoggingPlugin()`
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
   `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
   work. Install with `awaitSubscribers()`.
 * **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
-* **Disallow Restart Plugin** - disallow restarting store if you do not plan to reuse it.
+* **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
   Install with `disallowRestart`.
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { }`

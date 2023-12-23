@@ -4,6 +4,6 @@
 * [Android](android.md)
 * [FAQ](faq.md)
 * [Roadmap](roadmap.md)
-* [Javadocs](javadocs/index.html)
+* [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * [Contributing](CONTRIBUTING.md)
 * [Migrating from v1](migration.md)

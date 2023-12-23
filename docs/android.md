@@ -35,7 +35,7 @@ class CounterViewModel(
     }
 
     fun onClickCounter() = store.intent {
-        action(ShowSnackbar(R.string.lambda_processing))
+        action(ShowCounterIncrementedMessage)
         updateState<DisplayingCounter, _> {
             copy(counter = counter + 1)
         }
@@ -48,9 +48,8 @@ the `PipelineContext` of the store to subscribers.
 
 ?> The upside of this approach is that it's easier to implement and use some platform-specific features
 like `savedState` (you can still use them for KMP though)
-The downside is that you completely lose KMP compatibility. If you have plans to make your viewmodels multiplatform,
+The downside is that you completely lose KMP compatibility. If you have plans to make your ViewModels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
-
 
 ### Delegated ViewModels
 
@@ -96,15 +95,15 @@ val appModule = module {
 }
 ```
 
-!> Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type. Due to type erasure, you
-must inject the VM by specifying a fully-qualified type
+!> Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type of the container. Due to
+type erasure, you must inject the VM by specifying a fully-qualified type
 e.g. `StoreViewModel<CounterState, CounterIntent, CounterAction>`, or it will be replaced with `Store<*, *, *>` and the
 DI framework will fail, likely in runtime.
 
 This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
 to subclass ViewModels.
 The biggest downside of this approach is that you'll have to use qualifiers with your DI framework to distinguish
-between different viewmodels. This example is also demonstrated in the sample app.
+between different ViewModels. This example is also demonstrated in the sample app.
 
 ## UI Layer
 
@@ -114,13 +113,13 @@ It doesn't matter which UI framework you use. Neither your Contract or your Cont
 
 !> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
 It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
-also degrade performance. The Compose DSL of the library does not support MVVM+ because of this.
+also degrade performance.
 
 You don't have to annotate your state with `@Immutable` as `MVIState` is already marked immutable.
 
 ```kotlin
 @Composable
-internal fun CounterScreen() {
+fun CounterScreen() {
     // using Koin DSL from above
     val store = storeViewModel<CounterContainer, _, _, _>()
 
@@ -162,7 +161,8 @@ anywhere without awkward method references and unstable lambdas.
   launch new coroutines that will parallelize your flow (e.g. for snackbars).
 * A best practice is to make your state handling (UI redraw composable) a pure function and extract it to a separate
   Composable such as `ScreenContent(state: ScreenState)` to keep your `*Screen` function clean, as shown above.
-* If you want to send `MVIIntent`s from a nested composable, just use `IntentReceiver` as a context.
+* If you want to send `MVIIntent`s from a nested composable, just use `IntentReceiver` as a context or pass a function
+  reference.
 
 If you have defined your `*Content` function, you will get a composable that can be easily used in previews.
 That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
@@ -214,14 +214,14 @@ class CounterFragment : Fragment() {
         }
     }
 
-    private fun render(state: ScreenState): Unit = with(binding) {
+    private fun render(state: CounterState): Unit = with(binding) {
         with(state) {
             tvCounter.text = counter.toString()
             /* ... update ALL views! ... */
         }
     }
 
-    private fun consume(action: ScreenAction): Unit = when (action) {
+    private fun consume(action: CounterAction): Unit = when (action) {
         is ShowMessage -> Snackbar.make(binding.root, action.message, Snackbar.LENGTH_SHORT).show()
     }
 }

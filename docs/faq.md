@@ -54,10 +54,10 @@ Did you call `Store.subscribe()`?
 
 ### In what order are intents, plugins and actions processed?
 
-* Intents: FIFO or Parallel based on configuration parameter `parallelIntents`.
+* Intents: FIFO or undefined based on the configuration parameter `parallelIntents`.
 * Actions: FIFO.
 * States: FIFO.
-* Plugins: Chain of Responsibility.
+* Plugins: FIFO (Chain of Responsibility) based on installation order.
 
 ### When I consume an Action, the other actions are delayed or do not come.
 
@@ -67,7 +67,8 @@ suspending the scope.
 ### I want to expose a few public functions in my container for the store. Should I do that?
 
 You shouldn't. Use an Intent / Action to follow the contract, unless you are using `LambdaIntent`s.
-In that case, implement `ImmutableContainer` to hide the `intent` function from subscribers.
+In that case, expose the parent `ImmutableContainer` / `ImmutableStore` type to hide the `intent` function from
+subscribers.
 
 ### How to use paging?
 
@@ -82,6 +83,12 @@ block is rerun on every subscription, recreating and re-caching the flow.
 To fix this issue, use `cachePlugin` to cache the paginated flow, and then pass it to `whileSubscribed` block.
 This will prevent any leaks that you would otherwise get if you created a new flow each time a subscriber appears.
 
+```kotlin
+val timeline by cache {
+    repo.getPagingDataFlow().cachedIn(this)
+}
+```
+
 ### I have like a half-dozen various flows or coroutines and I want to make my state from those data streams. Do I subscribe to all of those flows in my store?
 
 It's preferable to create a single flow using `combine(vararg flows...)` and produce your state based on that.
@@ -92,9 +99,8 @@ As flows add up, it will become harder and harder to keep track of things if you
 
 There are two ways to do this.
 
-1. First one is using one of the Result wrappers, like `ApiResult`
-   from [KMMUtils](https://github.com/respawn-app/kmmutils), a monad from Arrow.io or, as the last resort,
-   a `kotlin.Result`.
+1. First one is using one of the Result wrappers, like [ApiResult](https://github.com/respawn-app/apiresult), a monad
+   from Arrow.io or, as the last resort, a `kotlin.Result`.
 2. Second one involves using a provided `recover` plugin that will be run when an exception is
    caught in plugins or child coroutines, but the plugin will be run **after** the job was already cancelled, so you
    cannot continue the job execution anymore.
@@ -106,14 +112,15 @@ of screens intact.
 You usually don't want to reuse your actions and intents because they are specific to a given screen or flow.
 That makes your logic simpler, and the rest can be easily moved to your repository layer, use cases or just plain
 top-level functions. This is where this library is opinionated, and where one of its main advantages - simplicity, comes
-from. Everything you want to achieve by composing stores can also be achieved using plugins.
+from. Everything you want to achieve by composing store element can also be achieved using plugins or child/parent
+stores. 
 
 ### How to avoid class explosion?
 
 1. Modularize your app. The library allows you to do that easily.
 2. Use nested classes. For example, you can define an `object ScreenContract` and nest your state, intents, and actions
    inside to make autocompletion easier.
-3. Use `LambdaIntent`s. They don't require subclassing MVIIntent.
+3. Use `LambdaIntent`s. They don't require subclassing `MVIIntent`.
 4. Disallow Actions for your store. Side effects are sometimes considered an anti-pattern, and you may want to disable
    them if you care about the architecture this much.
 
