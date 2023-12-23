@@ -13,9 +13,12 @@
           href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
     <style>
      :root {
+       --heading-font-family: 'Comfortaa', sans-serif;
        --content-max-width: 70em;
        --code-inline-color: var(--theme-color);
        --theme-color: #00d46a;
+       --selection-color: rgba(0, 212, 106, 0.3);
+       --code-font-family: "Monaspace", "Inconsolata", monospace;
      }
      /* custom theme overrides for versioned plugin*/
     .app-name {
@@ -29,11 +32,9 @@
         justify-content: center;
         margin: 15px auto 10px;
   }
-  /* Version selector label */
   .version-selector-label {
     margin-right: 10px;
   }
-  /* Version selector dropdown */
   .version-selector select {
     font-size: 14px;
     padding: 4px 8px;
@@ -109,7 +110,5 @@ if (typeof navigator.serviceWorker !== 'undefined') {
 <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-kotlin.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
-<!--https://github.com/UliGall/docsify-versioned-plugin/issues/2-->
-<!--<script src="https://cdn.jsdelivr.net/npm/docsify-versioned-plugin@0.0.1/index.js"></script>-->
 </body>
 </html>
