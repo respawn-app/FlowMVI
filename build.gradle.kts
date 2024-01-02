@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
+    alias(libs.plugins.serialization) apply false
     alias(libs.plugins.jetbrainsCompose) apply false
     // plugins already on a classpath (conventions)
     // alias(libs.plugins.androidApplication) apply false
