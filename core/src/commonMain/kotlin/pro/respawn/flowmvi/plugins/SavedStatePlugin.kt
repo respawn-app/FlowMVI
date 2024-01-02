@@ -23,11 +23,12 @@ public const val DefaultSavedStatePluginName: String = "SavedState"
  * There are platform overloads for this function.
  */
 @FlowMVIDSL
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
     name: String = DefaultSavedStatePluginName,
     context: CoroutineContext = EmptyCoroutineContext,
-    @BuilderInference crossinline get: S.() -> S?,
-    @BuilderInference crossinline set: (S) -> Unit,
+    @BuilderInference crossinline get: suspend S.() -> S?,
+    @BuilderInference crossinline set: suspend (S) -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onState { _, new ->
@@ -47,9 +48,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
  * Creates and installs a new [savedStatePlugin].
  */
 @FlowMVIDSL
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     name: String = DefaultSavedStatePluginName,
     context: CoroutineContext = EmptyCoroutineContext,
-    @BuilderInference crossinline get: S.() -> S?,
-    @BuilderInference crossinline set: S.() -> Unit,
+    @BuilderInference crossinline get: suspend S.() -> S?,
+    @BuilderInference crossinline set: suspend S.() -> Unit,
 ): Unit = install(savedStatePlugin(name, context, get, set))
