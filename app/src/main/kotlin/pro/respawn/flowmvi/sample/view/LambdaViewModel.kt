@@ -38,7 +38,6 @@ class LambdaViewModel(
         name = "Counter"
         debuggable = BuildConfig.DEBUG
         install(platformLoggingPlugin())
-        parcelizeState(savedStateHandle)
         whileSubscribed {
             repo.getTimer()
                 .onEach { produceState(it) } // set mapped states

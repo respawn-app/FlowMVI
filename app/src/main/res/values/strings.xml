@@ -11,4 +11,6 @@
     <string name="to_compose_button_label">To compose screen</string>
     <string name="counter_undo_label">Undo</string>
     <string name="counter_back_label">Back</string>
+    <string name="counter_input_label">Enter value</string>
+    <string name="counter_input_hint">The value of this field is persisted across app restarts. Try it!</string>
 </resources>
