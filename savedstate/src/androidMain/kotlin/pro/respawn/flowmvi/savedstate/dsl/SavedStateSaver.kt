@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 
-private fun <T> SavedStateSaver(
+public fun <T> SavedStateSaver(
     handle: SavedStateHandle,
     key: String,
     recover: suspend (e: Exception) -> T? = ThrowRecover,
@@ -17,13 +17,7 @@ private fun <T> SavedStateSaver(
     }
 }
 
-private fun <T : Parcelable> ParcelableSaver(
-    handle: SavedStateHandle,
-    key: String,
-    recover: suspend (e: Exception) -> T? = ThrowRecover,
-): Saver<T> = SavedStateSaver(handle, key, recover)
-
-private fun <T : java.io.Serializable> SerializableSaver(
+public fun <T : Parcelable> ParcelableSaver(
     handle: SavedStateHandle,
     key: String,
     recover: suspend (e: Exception) -> T? = ThrowRecover,
