@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.sample
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -13,11 +15,12 @@ sealed interface CounterState : MVIState {
     data class Error(val e: Exception) : CounterState
 
     @Serializable
+    @Parcelize
     data class DisplayingCounter(
         val timer: Int,
         val counter: Int = 0,
         val input: String,
-    ) : CounterState
+    ) : CounterState, Parcelable
 }
 
 typealias CounterLambdaIntent = LambdaIntent<CounterState, CounterAction>

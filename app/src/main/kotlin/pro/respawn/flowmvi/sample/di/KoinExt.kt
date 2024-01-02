@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import org.koin.androidx.compose.defaultExtras
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.compose.currentKoinScope

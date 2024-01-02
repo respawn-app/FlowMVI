@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
-import pro.respawn.flowmvi.android.plugins.parcelizeState
 import pro.respawn.flowmvi.api.ImmutableContainer
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.intent
@@ -21,6 +20,7 @@ import pro.respawn.flowmvi.sample.CounterLambdaIntent
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.repository.CounterRepository
+import pro.respawn.flowmvi.savedstate.plugins.parcelizeState
 import pro.respawn.flowmvi.util.typed
 
 private typealias Ctx = PipelineContext<CounterState, CounterLambdaIntent, CounterAction>
@@ -36,6 +36,7 @@ class LambdaViewModel(
         scope = viewModelScope,
     ) {
         name = "Counter"
+        parcelizeState(savedStateHandle)
         debuggable = BuildConfig.DEBUG
         install(platformLoggingPlugin())
         whileSubscribed {
