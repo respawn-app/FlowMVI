@@ -45,11 +45,11 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
 @Suppress("Indentation") // detekt <> IDE conflict
 @FlowMVIDSL
 public inline fun <
-        reified T : S,
-        reified S : MVIState,
-        I : MVIIntent,
-        A : MVIAction
-        > StoreBuilder<S, I, A>.serializeState(
+    reified T : S,
+    reified S : MVIState,
+    I : MVIIntent,
+    A : MVIAction
+    > StoreBuilder<S, I, A>.serializeState(
     dir: String,
     json: Json,
     serializer: KSerializer<T>,

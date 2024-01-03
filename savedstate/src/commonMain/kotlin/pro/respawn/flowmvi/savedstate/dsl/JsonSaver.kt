@@ -4,11 +4,11 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.savedstate.api.Saver
 
-public inline fun <T> JsonSaver(
+public fun <T> JsonSaver(
     json: Json,
     delegate: Saver<String>,
     serializer: KSerializer<T>,
-    @BuilderInference noinline recover: suspend (Exception) -> T? = { e ->
+    @BuilderInference recover: suspend (Exception) -> T? = { e -> // TODO: Compiler bug does not permit inlining this
         delegate.recover(e)?.let { json.decodeFromString(serializer, it) }
     },
 ): Saver<T> = object : Saver<T> {
