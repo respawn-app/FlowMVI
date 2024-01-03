@@ -8,7 +8,7 @@ public inline fun <T> JsonSaver(
     json: Json,
     delegate: Saver<String>,
     serializer: KSerializer<T>,
-    noinline recover: suspend (Exception) -> T? = { e ->
+    @BuilderInference noinline recover: suspend (Exception) -> T? = { e ->
         delegate.recover(e)?.let { json.decodeFromString(serializer, it) }
     },
 ): Saver<T> = object : Saver<T> {

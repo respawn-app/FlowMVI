@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
@@ -20,9 +21,10 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     dir: String,
     json: Json,
     serializer: KSerializer<T>,
+    behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     filename: String = DefaultName<T>(),
+    fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
-    saveOnChange: Boolean = false,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> = saveStatePlugin(
@@ -30,13 +32,13 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
         JsonSaver(
             json = json,
             serializer = serializer,
-            delegate = CompressedFileSaver(dir, "$filename.json", ThrowRecover),
+            delegate = CompressedFileSaver(dir, "$filename$fileExtension", ThrowRecover),
             recover = recover
         )
     ),
+    behaviors = behaviors,
     context = context,
     name = "$filename$PluginNameSuffix",
-    saveOnChange = saveOnChange,
     resetOnException = resetOnException
 )
 
@@ -51,8 +53,9 @@ public inline fun <
     dir: String,
     json: Json,
     serializer: KSerializer<T>,
+    behaviors: Set<SaveBehavior> = SaveBehavior.Default,
+    fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
-    saveOnChange: Boolean = false,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): Unit = install(
@@ -61,9 +64,10 @@ public inline fun <
         json = json,
         filename = name ?: DefaultName<T>(),
         context = context,
-        saveOnChange = saveOnChange,
+        behaviors = behaviors,
         resetOnException = resetOnException,
         recover = recover,
         serializer = serializer,
+        fileExtension = fileExtension,
     )
 )
