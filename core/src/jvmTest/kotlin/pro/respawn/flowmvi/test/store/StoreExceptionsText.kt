@@ -11,7 +11,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
@@ -54,7 +53,7 @@ class StoreExceptionsText : FreeSpec({
 
             "then exceptions in processing scope do not cancel the pipeline" {
                 store.test { job ->
-                    send { }
+                    intent { }
                     idle()
                     job.isActive shouldBe true
                     plugin.intents.shouldBeSingleton()
@@ -86,7 +85,7 @@ class StoreExceptionsText : FreeSpec({
                 recover { null }
             }
             store.test { job ->
-                send {
+                intent {
                     launch a@{
                         println("job 1 started")
                         this@a.launch b@{

@@ -108,7 +108,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
     @PublishedApi
     internal val state: MutableState<S> = mutableStateOf(store.state)
 
-    override fun intent(intent: I) = store.send(intent)
+    override fun intent(intent: I) = store.intent(intent)
     override suspend fun emit(intent: I) = store.emit(intent)
 
     @Composable

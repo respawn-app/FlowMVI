@@ -12,6 +12,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeout
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
@@ -62,7 +63,7 @@ class StoreLaunchTest : FreeSpec({
         "then if launched can process intents" {
             coroutineScope {
                 store.subscribeAndTest {
-                    send { }
+                    intent { }
                     idle()
                     plugin.intents.shouldBeSingleton()
                 }
@@ -87,7 +88,7 @@ class StoreLaunchTest : FreeSpec({
             val intent = TestIntent { throw IllegalArgumentException("intent was handled") }
             "and if store is launched and closed" - {
                 store.test {
-                    send { println("intent") }
+                    intent { println("intent") }
                     idle()
                 }
                 idle()

@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
@@ -31,7 +30,7 @@ class StoreEventsTest : FreeSpec({
             val store = testStore(plugin)
             "then intents result in actions" {
                 store.subscribeAndTest {
-                    send { send(TestAction.Some) }
+                    intent { action(TestAction.Some) }
                     actions.test {
                         awaitItem() shouldBe TestAction.Some
                     }
@@ -71,7 +70,7 @@ class StoreEventsTest : FreeSpec({
                 store.subscribeAndTest {
                     states.test {
                         awaitItem() shouldBe TestState.Some
-                        send { }
+                        intent { }
                         awaitItem() shouldBe newState
                     }
                 }
