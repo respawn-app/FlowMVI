@@ -12,11 +12,11 @@ public inline fun <reified T, R> MapSaver(
     delegate: Saver<R>,
     @BuilderInference crossinline from: suspend (R) -> T?,
     @BuilderInference crossinline to: suspend (T?) -> R?,
-): Saver<T> = object : Saver<T> {
-    override suspend fun save(state: T?) = delegate.save(to(state))
-    override suspend fun restore(): T? = delegate.restore()?.let { from(it) }
-    override suspend fun recover(e: Exception): T? = delegate.recover(e)?.let { from(it) }
-}
+): Saver<T> = Saver(
+    save = { delegate.save(to(it)) },
+    restore = { delegate.restore()?.let { from(it) } },
+    recover = { e -> delegate.recover(e)?.let { from(it) } },
+)
 
 /**
  * A [MapSaver] that will only persist values of type [T].

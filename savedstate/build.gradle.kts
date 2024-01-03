@@ -9,8 +9,9 @@ android {
 
 dependencies {
     commonMainApi(projects.core)
+    commonMainApi(libs.kotlin.serialization.json)
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.kotlin.io)
-    commonMainImplementation(libs.kotlin.serialization.json)
-    androidMainImplementation(libs.lifecycle.savedstate)
+
+    androidMainApi(libs.lifecycle.savedstate)
 }

@@ -41,7 +41,7 @@ public sealed interface SaveBehavior {
 
         /**
          * A default [SaveBehavior] that saves the state both on each change with a delay,
-         * and on when all subscribers leave.
+         * and when all subscribers leave.
          * @see [saveStatePlugin]
          */
         public val Default: Set<SaveBehavior> = setOf(OnChange(), OnUnsubscribe())
