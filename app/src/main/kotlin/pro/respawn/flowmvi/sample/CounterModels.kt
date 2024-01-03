@@ -18,7 +18,7 @@ sealed interface CounterState : MVIState {
     @Parcelize
     data class DisplayingCounter(
         val timer: Int,
-        val counter: Int = 0,
+        val counter: Int,
         val input: String,
     ) : CounterState, Parcelable
 }

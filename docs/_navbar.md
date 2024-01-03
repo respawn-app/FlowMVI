@@ -2,6 +2,7 @@
 * [Quickstart](quickstart.md)
 * [Plugins](plugins.md)
 * [Android](android.md)
+* [Saving State](savedstate.md)
 * [FAQ](faq.md)
 * [Roadmap](roadmap.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
