@@ -15,4 +15,8 @@ internal fun write(data: String, to: Path) {
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-internal fun read(from: Path): String = SystemFileSystem.source(from).buffered().use { it.readString() }
+internal fun read(from: Path): String? = SystemFileSystem
+    .source(from)
+    .buffered()
+    .use { it.readString() }
+    .takeIf { it.isNotBlank() }

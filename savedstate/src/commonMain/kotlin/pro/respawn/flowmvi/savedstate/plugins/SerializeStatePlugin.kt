@@ -16,17 +16,29 @@ import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * An overload of [saveStatePlugin] that is configured with some default values for convenience.
+ *
+ * This overload will save a GZip-compressed JSON of the state value of type [T] to a file
+ * in the [dir] directory and named [filename] with a specified [fileExtension].
+ *
+ * * This will save the state according to the [behaviors] specified in [SaveBehavior.Default].
+ * * By default, this will use [Dispatchers.Default] to save the state ([context]).
+ * * This will only compress the JSON if the platform permits it (Android, JVM). ([CompressedFileSaver]).
+ * * This will reset the state on exceptions in the store ([resetOnException]).
+ * * This will invoke [recover] if an exception is encountered when saving or restoring the state.
+ */
 @FlowMVIDSL
 public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAction> serializeStatePlugin(
     dir: String,
     json: Json,
     serializer: KSerializer<T>,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    filename: String = DefaultName<T>(),
+    filename: String = nameByType<T>() ?: "State",
     fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
-    noinline recover: suspend (Exception) -> T? = ThrowRecover,
+    noinline recover: suspend (Exception) -> T?,
 ): StorePlugin<S, I, A> = saveStatePlugin(
     saver = TypedSaver<T, _>(
         JsonSaver(
@@ -42,6 +54,13 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     resetOnException = resetOnException
 )
 
+/**
+ * Install a [serializeStatePlugin].
+ *
+ * Please see the parent overload for more info.
+ *
+ * @see serializeStatePlugin
+ */
 @Suppress("Indentation") // detekt <> IDE conflict
 @FlowMVIDSL
 public inline fun <
@@ -62,7 +81,7 @@ public inline fun <
     serializeStatePlugin<T, S, I, A>(
         dir = dir,
         json = json,
-        filename = name ?: DefaultName<T>(),
+        filename = name ?: nameByType<T>() ?: "State",
         context = context,
         behaviors = behaviors,
         resetOnException = resetOnException,

@@ -9,5 +9,10 @@ private object NoOpSaver : Saver<Nothing> {
     override suspend fun recover(e: Exception): Nothing? = null
 }
 
-@Suppress("UNCHECKED_CAST")
+/**
+ * A [Saver] that will do nothing to save the state and will not [Saver.restore] to any state.
+ *
+ * Useful for testing.
+ */
+@Suppress("UNCHECKED_CAST", "FunctionName")
 public fun <S> NoOpSaver(): Saver<S> = NoOpSaver as Saver<S>
