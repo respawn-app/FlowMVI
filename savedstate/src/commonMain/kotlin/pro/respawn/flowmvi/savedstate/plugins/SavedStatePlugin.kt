@@ -26,8 +26,10 @@ import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import kotlin.coroutines.CoroutineContext
 
-@PublishedApi
-internal inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
+/**
+ * Get the name of the class, removing the "State" suffix, if present
+ */
+public inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
 
 @PublishedApi
 internal val PluginNameSuffix: String = "SaveStatePlugin"

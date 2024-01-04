@@ -11,8 +11,8 @@ import pro.respawn.flowmvi.savedstate.api.Saver
  */
 public fun <T> JsonSaver(
     json: Json,
-    delegate: Saver<String>,
     serializer: KSerializer<T>,
+    delegate: Saver<String>,
     @BuilderInference recover: suspend (Exception) -> T? = { e -> // TODO: Compiler bug does not permit inlining this
         delegate.recover(e)?.let { json.decodeFromString(serializer, it) }
     },
