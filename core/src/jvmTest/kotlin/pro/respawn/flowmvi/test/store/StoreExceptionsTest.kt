@@ -21,7 +21,7 @@ import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravelPlugin
 
-class StoreExceptionsText : FreeSpec({
+class StoreExceptionsTest : FreeSpec({
     asUnconfined()
 
     val plugin = testTimeTravelPlugin()
