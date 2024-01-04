@@ -28,9 +28,8 @@ public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @Publish
 
     @OptIn(DelicateStoreApi::class)
     override val state: S by store::state
-    override fun send(intent: I): Unit = store.send(intent)
-    override suspend fun emit(intent: I): Unit = store.send(intent)
-    override fun intent(intent: I): Unit = store.send(intent)
+    override suspend fun emit(intent: I): Unit = store.emit(intent)
+    override fun intent(intent: I): Unit = store.intent(intent)
 
     /**
      * Assert that [Provider.state] is equal to [state]

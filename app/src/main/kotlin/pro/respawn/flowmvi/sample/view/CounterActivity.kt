@@ -68,7 +68,7 @@ class CounterActivity :
                 }
                 with(tvParam) {
                     isVisible = true
-                    text = state.param
+                    text = state.input
                 }
                 with(tvTimer) {
                     isVisible = true

@@ -17,6 +17,7 @@ import java.io.Serializable
  * Your state must be [Parcelable] to use this.
  * @see savedStatePlugin
  */
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 @FlowMVIDSL
 public fun <S, I : MVIIntent, A : MVIAction> parcelizeStatePlugin(
     key: String,
@@ -34,6 +35,7 @@ public fun <S, I : MVIIntent, A : MVIAction> parcelizeStatePlugin(
  * Your state must be [Serializable] to use this
  * @see savedStatePlugin
  */
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 @FlowMVIDSL
 public fun <S, I : MVIIntent, A : MVIAction> serializeStatePlugin(
     key: String,
@@ -50,6 +52,7 @@ public fun <S, I : MVIIntent, A : MVIAction> serializeStatePlugin(
  * Your state must be [Parcelable] to use this.
  * @see savedStatePlugin
  */
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 @FlowMVIDSL
 public fun <S, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.parcelizeState(
     handle: SavedStateHandle,

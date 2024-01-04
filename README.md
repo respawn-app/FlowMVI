@@ -32,12 +32,13 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
+flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # core KMP code
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
 
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }  # compose multiplatform
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
+flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" } # KMP state preservation
 ```
 ### Kotlin DSL
 ```kotlin
@@ -45,6 +46,7 @@ dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
@@ -54,12 +56,14 @@ dependencies {
 
 ## Features:
 
-Rich, plugin-based store DSL:
+Rich store DSL with dozens of useful pre-made plugins:
 
 ```kotlin
 sealed interface CounterState : MVIState {
     data object Loading : CounterState
     data class Error(val e: Exception) : CounterState
+
+    @Serializable
     data class DisplayingCounter(
         val timer: Int,
         val counter: Int,
@@ -90,10 +94,14 @@ class CounterContainer(
             timeTravelPlugin(), // unit test stores and track changes
         )
 
-        saveState {  // persist and restore state
-            get = { repo.restoreStateFromFile() }
-            set = { repo.saveStateToFile(this) }
-        }
+        // one-liner for persisting and restoring compressed state to/from files,
+        // bundles, or anywhere 
+        serializeState(
+            dir = repo.cacheDir,
+            json = Json,
+            serializer = DisplayingCounter.serializer(),
+            recover = ThrowRecover
+        )
 
         val undoRedoPlugin = undoRedo(maxQueueSize = 10) // undo and redo any changes
 

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("kotlin-parcelize")
+    alias(libs.plugins.serialization)
 }
 
 private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
@@ -41,9 +42,11 @@ dependencies {
     implementation(projects.android)
     implementation(projects.compose)
     implementation(projects.androidView)
+    implementation(projects.savedstate)
 
     implementation(libs.bundles.koin)
     implementation(libs.koin.android.compose)
+    implementation(libs.kotlin.serialization.json)
 
     implementation(libs.androidx.core)
 

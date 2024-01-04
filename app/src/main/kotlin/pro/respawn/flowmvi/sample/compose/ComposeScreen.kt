@@ -3,10 +3,16 @@ package pro.respawn.flowmvi.sample.compose
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize.Max
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
@@ -33,6 +39,7 @@ import pro.respawn.flowmvi.sample.CounterAction.ShowLambdaMessage
 import pro.respawn.flowmvi.sample.CounterIntent
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedBack
 import pro.respawn.flowmvi.sample.CounterIntent.ClickedCounter
+import pro.respawn.flowmvi.sample.CounterIntent.InputChanged
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.CounterState.Error
@@ -84,6 +91,21 @@ private fun IntentReceiver<CounterIntent>.ComposeScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    OutlinedTextField(
+                        value = state.input,
+                        onValueChange = { intent(InputChanged(it)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .widthIn(max = 600.dp),
+                        label = { Text(stringResource(R.string.counter_input_label)) }
+                    )
+                    Text(
+                        stringResource(R.string.counter_input_hint),
+                        style = MaterialTheme.typography.caption,
+                        modifier = Modifier.width(Max),
+                    )
+                }
                 Text(
                     text = stringResource(id = R.string.timer_template, state.timer),
                 )

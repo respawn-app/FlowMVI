@@ -11,6 +11,6 @@ public interface Consumer<S : MVIState, I : MVIIntent, A : MVIAction> : IntentRe
      * Container, an object that wraps a Store.
      */
     public val container: Container<S, I, A>
-    override fun intent(intent: I): Unit = container.store.send(intent)
+    override fun intent(intent: I): Unit = container.store.intent(intent)
     override suspend fun emit(intent: I): Unit = container.store.emit(intent)
 }

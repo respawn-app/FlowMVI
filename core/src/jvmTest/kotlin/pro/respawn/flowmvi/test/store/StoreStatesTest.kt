@@ -7,6 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.LambdaIntent
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.test.subscribeAndTest
@@ -37,7 +38,7 @@ class StoreStatesTest : FreeSpec({
             "then state is never updated by another intent" {
                 store.subscribeAndTest {
                     send(blockingIntent)
-                    send {
+                    intent {
                         updateState {
                             TestState.SomeData(1)
                         }
@@ -52,7 +53,7 @@ class StoreStatesTest : FreeSpec({
             "then withState is never executed" {
                 store.subscribeAndTest {
                     send(blockingIntent)
-                    send {
+                    intent {
                         withState {
                             throw AssertionError("WithState was executed")
                         }
@@ -69,8 +70,8 @@ class StoreStatesTest : FreeSpec({
                 store.subscribeAndTest {
                     states.test {
                         awaitItem() shouldBe TestState.Some
-                        send(blockingIntent)
-                        send { useState { newState } }
+                        intent(blockingIntent)
+                        intent { useState { newState } }
                         awaitItem() shouldBe newState
                         state shouldBe newState
                     }

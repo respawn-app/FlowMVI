@@ -73,7 +73,7 @@ class ActionShareBehaviorTest : FreeSpec({
                     }
                     idle()
                     val intent = TestIntent { action(TestAction.Some) }
-                    send(intent)
+                    intent(intent)
                     joinAll(job1, job2)
                     plugin.intents shouldContain intent
                     plugin.actions shouldContain TestAction.Some

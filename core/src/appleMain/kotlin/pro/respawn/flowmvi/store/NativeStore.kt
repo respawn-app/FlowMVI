@@ -47,7 +47,7 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * See [pro.respawn.flowmvi.api.IntentReceiver.send]
      */
-    public fun send(intent: I): Unit = store.send(intent)
+    public fun send(intent: I): Unit = store.intent(intent)
 
     /**
      * See [pro.respawn.flowmvi.api.IntentReceiver.send]

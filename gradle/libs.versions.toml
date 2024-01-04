@@ -1,8 +1,8 @@
 [versions]
-activity = "1.8.1"
+activity = "1.8.2"
 compose = "1.5.4"
 compose-plugin = "1.5.11"
-compose-compiler = "1.5.6"
+compose-compiler = "1.5.7"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.7.3"
@@ -11,21 +11,23 @@ detekt = "1.23.4"
 detektFormattingPlugin = "1.23.4"
 dokka = "1.9.10"
 fragment = "1.6.2"
-gradleAndroid = "8.3.0-alpha18"
+gradleAndroid = "8.3.0-beta01"
 gradleDoctorPlugin = "0.9.1"
 junit = "4.13.2"
-koin = "3.5.0"
-koin-compose = "1.1.1-RC1"
+koin = "3.5.3"
+koin-compose = "1.1.2"
 kotest = "5.8.0"
 kotest-plugin = "5.8.0"
 # @pin
 kotlin = "1.9.21"
 kotlinx-atomicfu = "0.23.1"
 lifecycle = "2.6.2"
-material = "1.10.0"
+material = "1.11.0"
 turbine = "1.0.0"
-versionCatalogUpdatePlugin = "0.8.1"
+versionCatalogUpdatePlugin = "0.8.3"
 versionsPlugin = "0.50.0"
+kotlin-io = "0.3.0"
+serialization = "1.6.2"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -62,8 +64,10 @@ kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-co
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
+kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlin-io" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
@@ -100,3 +104,4 @@ kotest = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
 versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
