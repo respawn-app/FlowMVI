@@ -9,11 +9,9 @@ import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import kotlin.coroutines.CoroutineContext
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
-    public val ctx: TestPipelineContext<S, I, A>,
+    private val ctx: TestPipelineContext<S, I, A>,
     public val timeTravel: TimeTravel<S, I, A>,
 ) : PipelineContext<S, I, A> by ctx, StorePlugin<S, I, A> by ctx.plugin {
 
@@ -31,7 +29,8 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
         ),
     )
 
-    public fun shouldBeActive(): Unit = assertFalse { ctx.closed }
-    public fun shouldBeClosed(): Unit = assertTrue { ctx.closed }
+    // compiler bug which crashes compilation because both context and plugin declare equals
+    override fun equals(other: Any?): Boolean = ctx.plugin == other
+    override fun hashCode(): Int = ctx.plugin.hashCode()
     public val state: S by ctx::state
 }

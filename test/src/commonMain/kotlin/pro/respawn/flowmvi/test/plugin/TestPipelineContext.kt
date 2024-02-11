@@ -10,16 +10,13 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import kotlin.coroutines.CoroutineContext
 
-public class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
+internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     initial: S,
     override val coroutineContext: CoroutineContext,
-    public val plugin: StorePlugin<S, I, A>,
+    val plugin: StorePlugin<S, I, A>,
 ) : PipelineContext<S, I, A> {
 
-    public var state: S by atomic(initial)
-        private set
-
-    public var closed: Boolean by atomic(false)
+    var state: S by atomic(initial)
         private set
 
     @DelicateStoreApi
@@ -40,10 +37,6 @@ public class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @Pu
         with(plugin) {
             onState(state, state.transform())?.also { state = it }
         }
-    }
-
-    override fun close() {
-        closed = true
     }
 
     override suspend fun withState(block: suspend S.() -> Unit): Unit = block(state)

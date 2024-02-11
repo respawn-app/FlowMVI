@@ -25,7 +25,6 @@ class StorePluginTest : FreeSpec({
     //   all store plugin events are invoked
     //   subscriber count is correct
     //   subscriber count decrements correctly
-    //   saved state plugin
     //   disallow restart plugin
     //   parent store plugin
     //   cache plugin
