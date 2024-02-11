@@ -1,9 +1,4 @@
-@file:Suppress(
-    "MemberVisibilityCanBePrivate",
-    "MissingPackageDeclaration",
-    "UndocumentedPublicProperty",
-    "UndocumentedPublicFunction"
-)
+@file:Suppress("MissingPackageDeclaration")
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog
@@ -56,7 +51,13 @@ fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
 
 val Project.localProperties
     get() = lazy {
-        Properties().apply {
-            load(FileInputStream(File(rootProject.rootDir, "local.properties")))
-        }
+        Properties().apply { load(FileInputStream(File(rootProject.rootDir, "local.properties"))) }
     }
+
+fun stabilityLevel(version: String): Int {
+    Config.stabilityLevels.forEachIndexed { index, postfix ->
+        val regex = """.*[.\-]$postfix[.\-\d]*""".toRegex(RegexOption.IGNORE_CASE)
+        if (version.matches(regex)) return index
+    }
+    return Config.stabilityLevels.size
+}

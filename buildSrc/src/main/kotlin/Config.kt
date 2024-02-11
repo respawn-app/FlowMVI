@@ -67,7 +67,10 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & f
     const val proguardFile = "proguard-rules.pro"
     const val consumerProguardFile = "consumer-rules.pro"
 
-    val stabilityLevels = listOf("preview", "eap", "alpha", "beta", "m", "cr", "rc")
+    // position reflects the level of stability, order is important
+    val stabilityLevels = listOf("snapshot", "eap", "preview", "alpha", "beta", "m", "cr", "rc")
+    val minStabilityLevel = stabilityLevels.indexOf("beta")
+
     object Detekt {
 
         const val configFile = "detekt.yml"

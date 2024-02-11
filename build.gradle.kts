@@ -1,5 +1,5 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
+import nl.littlerobots.vcu.plugin.versionSelector
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
@@ -10,7 +10,6 @@ private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:repo
 plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gradleDoctor)
-    alias(libs.plugins.versions)
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
@@ -90,12 +89,14 @@ dependencies {
 }
 
 versionCatalogUpdate {
-    sortByKey.set(true)
+    sortByKey = true
+
+    versionSelector { stabilityLevel(it.candidate.version) >= Config.minStabilityLevel }
 
     keep {
-        keepUnusedVersions.set(true)
-        keepUnusedLibraries.set(true)
-        keepUnusedPlugins.set(true)
+        keepUnusedVersions = true
+        keepUnusedLibraries = true
+        keepUnusedPlugins = true
     }
 }
 
@@ -133,22 +134,6 @@ tasks {
     register<io.gitlab.arturbosch.detekt.Detekt>("detektAll") {
         description = "Run detekt on whole project"
         autoCorrect = false
-    }
-
-    withType<DependencyUpdatesTask>().configureEach {
-        outputFormatter = "json"
-
-        fun stabilityLevel(version: String): Int {
-            Config.stabilityLevels.forEachIndexed { index, postfix ->
-                val regex = """.*[.\-]$postfix[.\-\d]*""".toRegex(RegexOption.IGNORE_CASE)
-                if (version.matches(regex)) return index
-            }
-            return Config.stabilityLevels.size
-        }
-
-        rejectVersionIf {
-            stabilityLevel(currentVersion) > stabilityLevel(candidate.version)
-        }
     }
 }
 
