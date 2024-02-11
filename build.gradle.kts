@@ -27,8 +27,8 @@ allprojects {
     version = Config.versionName
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            jvmTarget.set(Config.jvmTarget)
-            languageVersion.set(Config.kotlinVersion)
+            jvmTarget = Config.jvmTarget
+            languageVersion = Config.kotlinVersion
             freeCompilerArgs.apply {
                 addAll(Config.jvmCompilerArgs)
                 if (project.findProperty("enableComposeCompilerReports") == "true") {

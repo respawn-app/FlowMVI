@@ -35,6 +35,37 @@ dependencies {
 }
 ```
 
+The library's minimum JVM target is set to 11 (sadly still not the default).
+If you encounter an error:
+
+```
+Cannot inline bytecode built with JVM target 11 into bytecode that
+is being built with JVM target 1.8. Please specify proper '-jvm-target' option
+```
+
+Then configure your kotlin compilation to target JVM 11 in your root `build.gradle.kts`:
+
+```kotlin
+allprojects.tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
+}
+```
+
+And in your module-level gradle files, set:
+```kotlin
+android {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+```
+
+If you support Android API <26, you will also need to
+enable [desugaring](https://developer.android.com/studio/write/java8-support).
+
 ## Step 2: Choose your style
 
 FlowMVI supports both MVI (strict model-driven logic) and the MVVM+ (functional, lambda-driven logic) styles.
@@ -121,14 +152,13 @@ sealed interface CounterIntent : MVIIntent {
 // MVVM+ Style Intents
 typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
 
-// Optional - can be disabled by using Nothing as a type
 sealed interface CounterAction : MVIAction {
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
 
 * If your store does not have a `State`, you can use an `EmptyState` object.
-*
+* If your store does not have side-effects, use `Nothing` in place of the side-effect type.
 
 ## Step 4: Define your store
 
