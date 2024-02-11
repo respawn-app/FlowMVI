@@ -28,7 +28,7 @@ import pro.respawn.flowmvi.sample.CounterIntent.InputChanged
 import pro.respawn.flowmvi.sample.CounterState
 import pro.respawn.flowmvi.sample.CounterState.DisplayingCounter
 import pro.respawn.flowmvi.sample.repository.CounterRepository
-import pro.respawn.flowmvi.savedstate.api.ThrowRecover
+import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.plugins.serializeState
 import pro.respawn.flowmvi.util.typed
 import kotlin.random.Random
@@ -54,7 +54,7 @@ class CounterContainer(
             dir = cacheDir,
             json = json,
             serializer = DisplayingCounter.serializer(),
-            recover = ThrowRecover
+            recover = NullRecover,
         )
         val undoRedo = undoRedo(10)
         val jobManager = manageJobs()
@@ -104,7 +104,7 @@ class CounterContainer(
     }
 
     private suspend fun Ctx.produceState(timer: Int) = updateState {
-        // remember that you have to merge states when you are running produceState
+        //  merge states
         val current = typed<DisplayingCounter>()
         DisplayingCounter(
             timer = timer,
