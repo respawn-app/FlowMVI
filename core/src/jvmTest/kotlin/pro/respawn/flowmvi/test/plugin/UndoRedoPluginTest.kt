@@ -16,6 +16,8 @@ import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravel
 
+// this can be converted into a direct plugin test now, but I don't want to. The more real the scenario is, the better
+
 class UndoRedoPluginTest : FreeSpec({
     asUnconfined()
     val timeTravel = testTimeTravel()
@@ -78,21 +80,24 @@ class UndoRedoPluginTest : FreeSpec({
                         intent(intent)
                     }
                     idle()
-                    // "then queue size matches intent count"
-                    plugin.index.value shouldBe reps - 1
-                    state shouldBe SomeData(5)
-                    // "then multiple actions can be undone"
-                    plugin.undo(true)
-                    plugin.undo(true)
-                    idle()
-                    plugin.index.value shouldBe reps - 1 - 2 // 2
-                    plugin.queueSize shouldBe 5
-                    // "then making another action replaces the redo queue"
-                    intent(intent)
-                    idle()
-                    assertSoftly {
-                        plugin.queueSize shouldBe 4
-                        plugin.index.value shouldBe 3
+                    "then queue size matches intent count" {
+                        plugin.index.value shouldBe reps - 1
+                        state shouldBe SomeData(5)
+                    }
+                    "then multiple actions can be undone" {
+                        plugin.undo(true)
+                        plugin.undo(true)
+                        idle()
+                        plugin.index.value shouldBe reps - 1 - 2 // 2
+                        plugin.queueSize shouldBe 5
+                    }
+                    "then making another action replaces the redo queue" {
+                        intent(intent)
+                        idle()
+                        assertSoftly {
+                            plugin.queueSize shouldBe 4
+                            plugin.index.value shouldBe 3
+                        }
                     }
                 }
             }
