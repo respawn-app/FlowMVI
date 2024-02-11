@@ -61,7 +61,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
             onStop(it)
         }
-    ) pipeline@{
+    ) {
         check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
         launch intents@{
             coroutineScope {

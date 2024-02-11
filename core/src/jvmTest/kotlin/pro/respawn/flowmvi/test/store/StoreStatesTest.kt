@@ -33,7 +33,7 @@ class StoreStatesTest : FreeSpec({
             }
             "then state is never updated by another intent" {
                 store.subscribeAndTest {
-                    send(blockingIntent)
+                    emit(blockingIntent)
                     intent {
                         updateState {
                             TestState.SomeData(1)
