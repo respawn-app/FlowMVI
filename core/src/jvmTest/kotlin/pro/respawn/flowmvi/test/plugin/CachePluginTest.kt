@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.plugins.cachePlugin
+import pro.respawn.flowmvi.plugins.cached
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
@@ -11,9 +12,9 @@ import pro.respawn.flowmvi.util.TestState
 class CachePluginTest : FreeSpec({
     "Given cache plugin" - {
         var inits = 0
-        val plugin = cachePlugin<_, TestState, TestIntent, TestAction> { inits++ }
+        val value = cached<_, TestState, TestIntent, TestAction> { inits++ }
+        val plugin = cachePlugin(value)
         plugin.test(TestState.Some) {
-            val value by plugin
             "and onStart invoked" - {
                 onStart()
                 "then should be inited" {
@@ -27,7 +28,7 @@ class CachePluginTest : FreeSpec({
                 }
                 "and should throw on access" {
                     shouldThrow<IllegalArgumentException> {
-                        println(value)
+                        println(value.value)
                     }
                 }
             }
