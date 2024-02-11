@@ -18,6 +18,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     name: String? = null,
 ): StorePlugin<S, I, A> = CompositePlugin(plugins, name)
 
+@Suppress("DEPRECATION")
 private class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val plugins: Set<StorePlugin<S, I, A>>,
     name: String? = null,

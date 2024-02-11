@@ -99,6 +99,7 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
 
     @FlowMVIDSL
     @PublishedApi
+    @Suppress("DEPRECATION")
     internal fun build(): StorePlugin<S, I, A> = object : AbstractStorePlugin<S, I, A>(name) {
         override suspend fun PipelineContext<S, I, A>.onStart() = start()
         override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = state(old, new)
