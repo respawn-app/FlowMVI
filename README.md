@@ -67,9 +67,9 @@ dependencies {
 
 * Fully async and parallel business logic - with no manual thread synchronization required!
 * Automatically recover from any errors and avoid runtime crashes with one line of code
-* Build fully-multiplatform business logic with pluggable UI
 * Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
-* Automatic platform-independent system lifecycle handling with hooks on subscription
+* Automatic platform-independent system lifecycle handling
+* Build fully-multiplatform business logic with pluggable UI
 * Restartable, reusable stores with no external dependencies or dedicated lifecycles.
 * Compress, persist, and restore state automatically with a single line of code - on any platform
 * Out of the box debugging, logging, testing and long-running task management support
@@ -79,6 +79,7 @@ dependencies {
 * Share, distribute, or disable side-effects based on your team's needs
 * Create parent-child relationships between stores and delegate responsibilities
 * 70+% unit test coverage of core library code
+* The core library depends on kotlin coroutines. That's it. Nothing else.
 
 ## How does it look?
 
@@ -119,34 +120,26 @@ class CounterContainer(
         intentCapacity = 64
 
         install(
-            // log all store activity to console, logcat or NSLog
             platformLoggingPlugin(),
-            // unit test stores and track changes
             timeTravelPlugin(),
-            // undo and redo any actions
             undoRedoPlugin(),
         )
 
-        // manage named job
         val jobManager = manageJobs()
 
-        // persist and restore state 
         serializeState(
             dir = repo.cacheDir,
             json = Json,
             serializer = DisplayingCounter.serializer(),
         )
 
-        // run actions when store is launched
         init { repo.startTimer() }
 
-        // recover from errors both in jobs and plugins
         recover { e: Exception ->
             action(ShowMessage(e.message))
             null
         }
 
-        // run jobs while subscribers are present
         whileSubscribed {
             repo.timer.collect {
                 updateState<DisplayingCounter, _> {
@@ -155,7 +148,6 @@ class CounterContainer(
             }
         }
 
-        // install, split, and decompose reducers
         reduce { intent: CounterIntent ->
             when (intent) {
                 is ClickedCounter -> updateState<DisplayingCounter, _> {
@@ -164,7 +156,6 @@ class CounterContainer(
             }
         }
 
-        // one-liner to attach to any other store.
         parentStore(repo.store) { state ->
             updateState {
                 copy(timer = state.timer)
@@ -176,8 +167,8 @@ class CounterContainer(
             repo.getPagedDataSuspending()
         }
 
-        install { // build and install custom plugins on the fly
-            onStop { // hook into various store events
+        install { // build custom plugins on the fly
+            onStop {
                 repo.stopTimer()
             }
         }
@@ -197,7 +188,7 @@ store.subscribe(
 
 ### Custom plugins:
 
-Create plugins with a single line of code for any store or a specific one and hook into all store events:
+Create plugins with a single line of code for any store or a specific one, then hook into any store events:
 
 ```kotlin
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
@@ -219,7 +210,7 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 fun CounterScreen() {
     val store = inject<CounterContainer>()
 
-    // collect the state and handle events efficiently based on system lifecycle - on any platform
+    // subscribe to store based on system lifecycle - on any platform
     val state by store.subscribe { action ->
         when (action) {
             is ShowMessage -> {
@@ -240,9 +231,10 @@ fun CounterScreen() {
 
 ### Android support:
 
+No more subclassing `ViewModel`. Use `StoreViewModel` instead and inject stores directly.
+
 ```kotlin
 val module = module {
-    // No more subclassing. Use StoreViewModel for everything and inject containers or stores directly.
     factoryOf(::CounterContainer)
     viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
 }
@@ -273,6 +265,8 @@ class ScreenFragment : Fragment() {
 ```kotlin
 counterStore().subscribeAndTest {
 
+    // turbine + kotest example
+
     ClickedCounter resultsIn {
         states.test {
             awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
@@ -289,11 +283,15 @@ counterStore().subscribeAndTest {
 ```kotlin
 val timer = Timer()
 timerPlugin(timer).test(Loading) {
+
     onStart()
+
     assert(timeTravel.starts == 1) // keeps track of all plugin operations
     assert(state is DisplayingCounter)
     assert(timer.isStarted)
+
     onStop(null)
+
     assert(!timer.isStarted)
 }
 ```
@@ -303,7 +301,7 @@ Ready to try? Start with reading the [Quickstart Guide](https://opensource.respa
 ## License
 
 ```
-   Copyright 2022-2023 Respawn Team and contributors
+   Copyright 2022-2024 Respawn Team and contributors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

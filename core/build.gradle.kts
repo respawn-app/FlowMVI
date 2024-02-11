@@ -12,6 +12,7 @@ dependencies {
     commonMainCompileOnly(projects.annotations)
     compileOnly(projects.annotations)
     commonMainApi(libs.kotlin.coroutines.core)
+
     commonMainImplementation(libs.kotlin.atomicfu)
     // unfortunately kotest doesn't support all the targets that we support
     jvmTestImplementation(libs.bundles.unittest)
