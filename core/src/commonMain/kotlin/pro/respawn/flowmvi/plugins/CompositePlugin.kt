@@ -3,8 +3,8 @@ package pro.respawn.flowmvi.plugins
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.dsl.plugin
 
 /**
  * A plugin that delegates to [plugins] in the iteration order.
@@ -16,30 +16,23 @@ import pro.respawn.flowmvi.api.StorePlugin
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     plugins: Set<StorePlugin<S, I, A>>,
     name: String? = null,
-): StorePlugin<S, I, A> = CompositePlugin(plugins, name)
-
-@Suppress("DEPRECATION")
-private class CompositePlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
-    private val plugins: Set<StorePlugin<S, I, A>>,
-    name: String? = null,
-) : AbstractStorePlugin<S, I, A>(name) {
-
-    override suspend fun PipelineContext<S, I, A>.onStart(): Unit = plugins { onStart() }
-    override fun onStop(e: Exception?): Unit = plugins { onStop(e) }
-    override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = plugins(new) { onState(old, it) }
-    override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = plugins(intent) { onIntent(it) }
-    override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = plugins(action) { onAction(it) }
-    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = plugins(e) { onException(it) }
-    override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit =
-        plugins { onUnsubscribe(subscriberCount) }
-
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(
-        subscriberCount: Int
-    ): Unit = plugins { onSubscribe(subscriberCount) }
-
-    private inline fun plugins(block: StorePlugin<S, I, A>.() -> Unit) = plugins.forEach(block)
-    private inline fun <R> plugins(
-        initial: R,
-        block: StorePlugin<S, I, A>.(R) -> R?
-    ) = plugins.fold<_, R?>(initial) { acc, it -> it.block(acc ?: return@plugins acc) }
+): StorePlugin<S, I, A> = plugin {
+    this.name = name
+    onState { old: S, new: S -> plugins.fold(new) { onState(old, it) } }
+    onIntent { intent: I -> plugins.fold(intent) { onIntent(it) } }
+    onAction { action: A -> plugins.fold(action) { onAction(it) } }
+    onException { e: Exception -> plugins.fold(e) { onException(it) } }
+    onUnsubscribe { subs: Int -> plugins.fold { onUnsubscribe(subs) } }
+    onSubscribe { subs: Int -> plugins.fold { onSubscribe(subs) } }
+    onStart { plugins.fold { onStart() } }
+    onStop { plugins.fold { onStop(it) } }
 }
+
+private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Iterable<StorePlugin<S, I, A>>.fold(
+    block: StorePlugin<S, I, A>.() -> Unit,
+) = forEach(block)
+
+private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> Iterable<StorePlugin<S, I, A>>.fold(
+    initial: R,
+    block: StorePlugin<S, I, A>.(R) -> R?
+) = fold<_, R?>(initial) inner@{ acc, it -> it.block(acc ?: return@fold acc) }
