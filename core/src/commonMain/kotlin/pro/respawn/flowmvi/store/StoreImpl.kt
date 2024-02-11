@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
 import pro.respawn.flowmvi.exceptions.UnhandledStoreException
@@ -83,6 +84,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
         withContext(this@StoreImpl) {
+            if (e is UnrecoverableException) throw e
             onException(e)?.let { throw UnhandledStoreException(it) }
         }
     }
