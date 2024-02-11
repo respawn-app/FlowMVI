@@ -1,6 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
+import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -151,8 +152,10 @@ tasks {
     }
 }
 
-extensions.findByType<YarnRootExtension>()?.run {
-    yarnLockMismatchReport = YarnLockMismatchReport.WARNING
-    reportNewYarnLock = true
-    yarnLockAutoReplace = false
+rootProject.plugins.withType<YarnPlugin>().configureEach {
+    rootProject.the<YarnRootExtension>().apply {
+        yarnLockMismatchReport = YarnLockMismatchReport.WARNING // NONE | FAIL | FAIL_AFTER_BUILD
+        reportNewYarnLock = false // true
+        yarnLockAutoReplace = false // true
+    }
 }
