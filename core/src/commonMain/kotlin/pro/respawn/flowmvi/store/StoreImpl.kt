@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
 import pro.respawn.flowmvi.exceptions.UnhandledStoreException
@@ -27,16 +28,16 @@ import pro.respawn.flowmvi.modules.actionModule
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
-import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscribersModule
+import pro.respawn.flowmvi.plugins.compositePlugin
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
     Provider<S, I, A>,
     RecoverModule<S, I, A>,
-    StorePlugin<S, I, A> by pluginModule(config.plugins),
+    StorePlugin<S, I, A> by compositePlugin(config.plugins),
     SubscribersModule by subscribersModule(),
     StateModule<S> by stateModule(config.initial),
     IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
@@ -60,7 +61,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
             onStop(it)
         }
-    ) pipeline@{
+    ) {
         check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
         launch intents@{
             coroutineScope {
@@ -83,6 +84,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
         withContext(this@StoreImpl) {
+            if (e is UnrecoverableException) throw e
             onException(e)?.let { throw UnhandledStoreException(it) }
         }
     }

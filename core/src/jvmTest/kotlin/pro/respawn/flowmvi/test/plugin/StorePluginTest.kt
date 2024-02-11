@@ -17,19 +17,16 @@ import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
+// TODO:
+//   parent store plugin
+//   while subscribed plugin: job cancelled, multiple subs, single sub
+//   subscriber manager
+//   subscriber count is correct
+//   subscriber count decrements correctly
+//   await subscribers
+//   job manager
 class StorePluginTest : FreeSpec({
     asUnconfined()
-    // TODO:
-    //   action: emit, action()
-    //   intent: emit, action()
-    //   all store plugin events are invoked
-    //   subscriber count is correct
-    //   subscriber count decrements correctly
-    //   saved state plugin
-    //   disallow restart plugin
-    //   parent store plugin
-    //   cache plugin
-    //   while subscribed plugin: job cancelled, multiple subs, single sub
     "given test store" - {
         "and recover plugin that throws".config(
 

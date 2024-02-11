@@ -21,12 +21,7 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
     autoStart: Boolean = false,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
-) : AutoCloseable {
-
-    /**
-     * Get the name of the store. Changed using [pro.respawn.flowmvi.dsl.StoreBuilder]
-     */
-    public val name: String? = store.name
+) : Store<S, I, A> by store, CoroutineScope by scope {
 
     init {
         if (autoStart) store.start(scope)
@@ -44,24 +39,5 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
         override fun close() = job.cancel()
     }
 
-    /**
-     * See [pro.respawn.flowmvi.api.IntentReceiver.send]
-     */
-    public fun send(intent: I): Unit = store.intent(intent)
-
-    /**
-     * See [pro.respawn.flowmvi.api.IntentReceiver.send]
-     */
-    public fun intent(intent: I): Unit = store.intent(intent)
-
-    /**
-     * Stop the store, but do not cancel the scope
-     */
-    override fun close(): Unit = store.close()
-
-    /**
-     * Close the store, all subscribers, and the parent scope. NativeStore object **cannot** be used after this!
-     * @see close
-     */
-    public fun cancel(): Unit = scope.cancel()
+    override fun close(): Unit = cancel()
 }

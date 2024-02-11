@@ -6,7 +6,6 @@ All stores are mostly based on plugins, and their behavior is entirely determine
 Plugins can influence subscription, stopping, and all other forms of store behavior.
 Access the store's context and other functions through the `PipelineContext` receiver.
 It is not recommended to implement the `StorePlugin` interface,
-if you really need to subclass something, extend `AbstractStorePlugin` instead.
 If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
 described below.
 
@@ -20,9 +19,7 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
 
 ```
 
----
-
-Here are all the dsl functions of a plugin:
+## Plugin DSL
 
 ### Name
 

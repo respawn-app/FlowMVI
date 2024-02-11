@@ -14,12 +14,12 @@ import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.testStore
-import pro.respawn.flowmvi.util.testTimeTravelPlugin
+import pro.respawn.flowmvi.util.testTimeTravel
 
 @OptIn(DelicateStoreApi::class)
 class StoreContextTest : FreeSpec({
     asUnconfined()
-    val plugin = testTimeTravelPlugin()
+    val plugin = testTimeTravel()
 
     beforeEach {
         plugin.reset()

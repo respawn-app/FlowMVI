@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.test.store
 
-import app.cash.turbine.test
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
@@ -20,16 +19,14 @@ import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
-import pro.respawn.flowmvi.util.testTimeTravelPlugin
+import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreLaunchTest : FreeSpec({
     asUnconfined()
-    val plugin = testTimeTravelPlugin()
-    afterEach {
-        plugin.reset()
-    }
+    val timeTravel = testTimeTravel()
+    afterEach { timeTravel.reset() }
     "Given store" - {
-        val store = testStore(plugin)
+        val store = testStore(timeTravel)
         "then can be launched and stopped" {
             coroutineScope {
                 val job = shouldNotThrowAny {
@@ -65,7 +62,7 @@ class StoreLaunchTest : FreeSpec({
                 store.subscribeAndTest {
                     intent { }
                     idle()
-                    plugin.intents.shouldBeSingleton()
+                    timeTravel.intents.shouldBeSingleton()
                 }
             }
         }

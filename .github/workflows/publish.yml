@@ -43,4 +43,5 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
-        run: ./gradlew publishAllPublicationsToSonatypeRepository --stacktrace
+          # It's important to not upload in parallel or duplicate repos will be created
+        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace

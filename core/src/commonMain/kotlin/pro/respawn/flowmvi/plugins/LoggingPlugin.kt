@@ -47,6 +47,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     crossinline log: (level: StoreLogLevel, tag: String, msg: String) -> Unit,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
+    log(Info, tag ?: name, "Initialized logging")
     onState { old, new ->
         log(Trace, tag ?: name, "\nState:\n--->\n$old\n<---\n$new")
         new
@@ -60,7 +61,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
         it
     }
     onException {
-        log(Error, tag ?: name, "Exception:\n $it")
+        log(Error, tag ?: name, "Exception:\n ${it.stackTraceToString()}")
         it
     }
     onStart {

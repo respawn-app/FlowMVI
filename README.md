@@ -1,4 +1,4 @@
-# FlowMVI 2.0
+# FlowMVI
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
@@ -26,7 +26,9 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 
-### Version Catalogs
+<details>
+<summary>Version catalogs</summary>
+
 ```toml
 [versions]
 flowmvi = "< Badge above 👆🏻 >"
@@ -40,7 +42,12 @@ flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowm
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" } # KMP state preservation
 ```
-### Kotlin DSL
+
+</details>
+
+<details>
+<summary>Gradle DSL</summary>
+
 ```kotlin
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
@@ -54,9 +61,29 @@ dependencies {
 }
 ```
 
-## Features:
+</details>
 
-Rich store DSL with dozens of useful pre-made plugins:
+## Why FlowMVI?
+
+* Fully async and parallel business logic - with no manual thread synchronization required!
+* Automatically recover from any errors and avoid runtime crashes with one line of code
+* Build fully-multiplatform business logic with pluggable UI
+* Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
+* Automatic platform-independent system lifecycle handling with hooks on subscription
+* Restartable, reusable stores with no external dependencies or dedicated lifecycles.
+* Compress, persist, and restore state automatically with a single line of code - on any platform
+* Out of the box debugging, logging, testing and long-running task management support
+* Decompose stores into plugins, split responsibilities, and modularize the project easily
+* No base classes or complicated interfaces - store is built using a simple DSL
+* Use both MVVM+ (functional) or MVI (model-driven) style of programming
+* Share, distribute, or disable side-effects based on your team's needs
+* Create parent-child relationships between stores and delegate responsibilities
+* 70+% unit test coverage of core library code
+
+## How does it look?
+
+<details>
+<summary>Define a contract</summary>
 
 ```kotlin
 sealed interface CounterState : MVIState {
@@ -77,54 +104,59 @@ sealed interface CounterIntent : MVIIntent {
 sealed interface CounterAction : MVIAction {
     data class ShowMessage(val message: String) : CounterAction
 }
+```
 
+</details>
+
+```kotlin
 class CounterContainer(
     private val repo: CounterRepository,
 ) {
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
-        name = "CounterStore"
         parallelIntents = true
-        coroutineContext = Dispatchers.Default // run all operations on background threads if needed
-        actionShareBehavior = ActionShareBehavior.Distribute() // disable, share, distribute or consume side effects
+        coroutineContext = Dispatchers.Default
+        actionShareBehavior = ActionShareBehavior.Distribute()
         intentCapacity = 64
 
         install(
-            platformLoggingPlugin(), // log to console, logcat or NSLog
-            analyticsPlugin(name), // create custom plugins
-            timeTravelPlugin(), // unit test stores and track changes
+            // log all store activity to console, logcat or NSLog
+            platformLoggingPlugin(),
+            // unit test stores and track changes
+            timeTravelPlugin(),
+            // undo and redo any actions
+            undoRedoPlugin(),
         )
 
-        // one-liner for persisting and restoring compressed state to/from files,
-        // bundles, or anywhere 
+        // manage named job
+        val jobManager = manageJobs()
+
+        // persist and restore state 
         serializeState(
             dir = repo.cacheDir,
             json = Json,
             serializer = DisplayingCounter.serializer(),
-            recover = ThrowRecover
         )
 
-        val undoRedoPlugin = undoRedo(maxQueueSize = 10) // undo and redo any changes
+        // run actions when store is launched
+        init { repo.startTimer() }
 
-        val jobManager = manageJobs() // manage named jobs
-
-        init { // run actions when store is launched
-            repo.startTimer()
-        }
-
-        whileSubscribed { // run a job while any subscribers are present
-            repo.timer.onEach { timer: Int ->
-                updateState<DisplayingCounter, _> { // update state safely between threads and filter by type
-                    copy(timer = timer)
-                }
-            }.consume()
-        }
-
-        recover { e: Exception -> // recover from errors both in jobs and plugins
-            action(ShowMessage(e.message)) // send side-effects
+        // recover from errors both in jobs and plugins
+        recover { e: Exception ->
+            action(ShowMessage(e.message))
             null
         }
 
-        reduce { intent: CounterIntent -> // reduce intents
+        // run jobs while subscribers are present
+        whileSubscribed {
+            repo.timer.collect {
+                updateState<DisplayingCounter, _> {
+                    copy(timer = timer)
+                }
+            }
+        }
+
+        // install, split, and decompose reducers
+        reduce { intent: CounterIntent ->
             when (intent) {
                 is ClickedCounter -> updateState<DisplayingCounter, _> {
                     copy(counter = counter + 1)
@@ -132,25 +164,21 @@ class CounterContainer(
             }
         }
 
-        parentStore(repo.store) { state -> // one-liner to attach to any other store.
+        // one-liner to attach to any other store.
+        parentStore(repo.store) { state ->
             updateState {
                 copy(timer = state.timer)
             }
         }
 
-        install { // build and install custom plugins on the fly
+        // lazily evaluate and cache values, even when the method is suspending.
+        val pagingData by cache {
+            repo.getPagedDataSuspending()
+        }
 
+        install { // build and install custom plugins on the fly
             onStop { // hook into various store events
                 repo.stopTimer()
-            }
-
-            onState { old, new -> // veto changes, modify states, launch jobs, do literally anything
-                new.withType<DisplayingCounter, _> {
-                    if (counter >= 100) {
-                        launch { repo.resetTimer() }
-                        copy(counter = 0, timer = 0)
-                    } else new
-                }
             }
         }
     }
@@ -161,7 +189,7 @@ class CounterContainer(
 
 ```kotlin
 store.subscribe(
-    scope = consumerCoroutineScope,
+    scope = coroutineScope,
     consume = { action -> /* process side effects */ },
     render = { state -> /* render states */ },
 )
@@ -169,8 +197,9 @@ store.subscribe(
 
 ### Custom plugins:
 
+Create plugins with a single line of code for any store or a specific one and hook into all store events:
+
 ```kotlin
-// Create plugins with a single line of code for any store or a specific one
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
     onStart {
         /*...*/
@@ -188,9 +217,9 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 ```kotlin
 @Composable
 fun CounterScreen() {
-    val store = remember { CounterContainer() } // or use a DI framework
+    val store = inject<CounterContainer>()
 
-    // collect the state and handle events efficiently based on system lifecycle, whether it's iOS or Desktop
+    // collect the state and handle events efficiently based on system lifecycle - on any platform
     val state by store.subscribe { action ->
         when (action) {
             is ShowMessage -> {
@@ -224,7 +253,6 @@ class ScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // One-liner for store subscription. Lifecycle-aware and efficient.
         subscribe(vm, ::consume, ::render)
     }
 
@@ -238,11 +266,12 @@ class ScreenFragment : Fragment() {
 }
 ```
 
-### Testing DSL
+## Testing DSL
+
+### Test Stores
 
 ```kotlin
-// using Turbine + Kotest
-testStore().subscribeAndTest {
+counterStore().subscribeAndTest {
 
     ClickedCounter resultsIn {
         states.test {
@@ -252,6 +281,20 @@ testStore().subscribeAndTest {
             awaitItem().shouldBeTypeOf<ShowMessage>()
         }
     }
+}
+```
+
+### Test plugins
+
+```kotlin
+val timer = Timer()
+timerPlugin(timer).test(Loading) {
+    onStart()
+    assert(timeTravel.starts == 1) // keeps track of all plugin operations
+    assert(state is DisplayingCounter)
+    assert(timer.isStarted)
+    onStop(null)
+    assert(!timer.isStarted)
 }
 ```
 

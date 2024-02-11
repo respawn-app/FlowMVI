@@ -35,6 +35,37 @@ dependencies {
 }
 ```
 
+The library's minimum JVM target is set to 11 (sadly still not the default).
+If you encounter an error:
+
+```
+Cannot inline bytecode built with JVM target 11 into bytecode that
+is being built with JVM target 1.8. Please specify proper '-jvm-target' option
+```
+
+Then configure your kotlin compilation to target JVM 11 in your root `build.gradle.kts`:
+
+```kotlin
+allprojects.tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
+}
+```
+
+And in your module-level gradle files, set:
+```kotlin
+android {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+```
+
+If you support Android API <26, you will also need to
+enable [desugaring](https://developer.android.com/studio/write/java8-support).
+
 ## Step 2: Choose your style
 
 FlowMVI supports both MVI (strict model-driven logic) and the MVVM+ (functional, lambda-driven logic) styles.
@@ -66,7 +97,7 @@ intents. This will prevent leaking the context of the store to subscribers.
 ## Step 3: Describe your Contract
 
 <details>
-<summary>Click for general advice on how to define a contract if you're a newbie</summary>
+<summary>Click for general advice on how to define a contract</summary>
 
 Describing the contract first makes building the logic easier because you have everything you need at the
 start. To define your contract, ask yourself the following:
@@ -121,14 +152,13 @@ sealed interface CounterIntent : MVIIntent {
 // MVVM+ Style Intents
 typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
 
-// Optional - can be disabled by using Nothing as a type
 sealed interface CounterAction : MVIAction {
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
 
 * If your store does not have a `State`, you can use an `EmptyState` object.
-*
+* If your store does not have side-effects, use `Nothing` in place of the side-effect type.
 
 ## Step 4: Define your store
 
@@ -198,7 +228,7 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
   with `whileSubscribed { }`.
 * **Logging Plugin** - log events to a log stream of the target platform. Install with `platformLoggingPlugin()`
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
-  `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
+  `parcelizeState` and `serializeState` plugins based on this one. See [saved state](./savedstate.md) for details.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
   work. Install with `awaitSubscribers()`.
@@ -274,11 +304,6 @@ So make sure to consider how your plugins affect the store's logic when using an
 
 The discussion above warrants another note.
 
-!> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
-you handle intents, but it's possible to create a store like this:
-`val store = store(Loading) { }`.
-This is a store that does **literally nothing**. If you forget to install a plugin, it will never be run.
-
 ### Step 6: Create, inject and provide dependencies
 
 You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
@@ -311,6 +336,8 @@ Next steps:
 
 * Learn how to create custom [plugins](plugins.md)
 * Learn how to use DI and [Android-specific features](android.md)
+* Learn how to [persist and restore state](savedstate.md)
+* Get answers to common [questions](faq.md)
 * [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
   about how our team has used the library to improve performance and stability of our app, with practical examples.
 * Explore

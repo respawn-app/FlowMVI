@@ -48,6 +48,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> savedStatePlugin(
  * Creates and installs a new [savedStatePlugin].
  */
 @FlowMVIDSL
+@Suppress("DEPRECATION")
 @Deprecated("If you want to save state, use the new `savedstate` module dependency")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     name: String = DefaultSavedStatePluginName,

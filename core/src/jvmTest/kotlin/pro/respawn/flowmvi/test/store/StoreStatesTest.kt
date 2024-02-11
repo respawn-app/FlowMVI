@@ -5,28 +5,24 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
-import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
+import pro.respawn.flowmvi.util.testTimeTravel
 
-@OptIn(DelicateStoreApi::class)
 class StoreStatesTest : FreeSpec({
     asUnconfined()
-    val plugin = timeTravelPlugin<TestState, LambdaIntent<TestState, TestAction>, TestAction>()
-    beforeEach {
-        plugin.reset()
-    }
+    val timeTravel = testTimeTravel()
+    beforeEach { timeTravel.reset() }
 
     "given lambdaIntent store" - {
-        val store = testStore(plugin)
+        val store = testStore(timeTravel)
         "and intent that blocks state" - {
             val blockingIntent = LambdaIntent<TestState, TestAction> {
                 launch {
@@ -37,7 +33,7 @@ class StoreStatesTest : FreeSpec({
             }
             "then state is never updated by another intent" {
                 store.subscribeAndTest {
-                    send(blockingIntent)
+                    emit(blockingIntent)
                     intent {
                         updateState {
                             TestState.SomeData(1)

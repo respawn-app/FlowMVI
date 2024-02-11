@@ -12,6 +12,8 @@ import pro.respawn.flowmvi.plugins.AbstractStorePlugin
  * A class that builds a new [StorePlugin]
  * For more documentation, see [StorePlugin]
  */
+
+@Suppress("DEPRECATION")
 public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }

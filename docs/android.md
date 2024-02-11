@@ -17,7 +17,7 @@ This example is also fully implemented in the sample app.
 class CounterViewModel(
     repo: CounterRepository,
     handle: SavedStateHandle,
-) : ViewModel(), ImmutableContainer<CounterState, LambdaIntent<CounterState, CounterAction>, CounterAction> {
+) : ViewModel(), ImmutableContainer<CounterState, CounterIntent, CounterAction> {
 
     // the store is lazy here, which is good for performance if you use other properties of the VM.
     // if you don't want a lazy store, use the regular store() function here
@@ -25,7 +25,6 @@ class CounterViewModel(
         initial = Loading,
         scope = viewModelScope,
     ) {
-        // perks of direct approach
         debuggable = BuildConfig.DEBUG
         install(androidLoggingPlugin())
         parcelizeState(handle)
@@ -73,21 +72,18 @@ From here, the only things left are to inject your `Container` into an instance 
 specify your qualifiers. The most basic setup for Koin will look like this:
 
 ```kotlin
+// declare
 inline fun <reified T : Container<*, *, *>> Module.storeViewModel() {
     viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }) }
 }
 
+// inject
 @Composable
 inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> storeViewModel(
-    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-    },
-    key: String? = null,
-    extras: CreationExtras = defaultExtras(viewModelStoreOwner),
-    scope: Scope = getKoinScope(),
     noinline parameters: ParametersDefinition? = null,
-): StoreViewModel<S, I, A> = getViewModel(qualifier<T>(), viewModelStoreOwner, key, extras, scope, parameters)
+): StoreViewModel<S, I, A> = getViewModel(qualifier = qualifier<T>(), parameters = parameters)
 
+// use
 val appModule = module {
     singleOf(::CounterRepository)
     factoryOf(::CounterContainer)
@@ -101,13 +97,11 @@ e.g. `StoreViewModel<CounterState, CounterIntent, CounterAction>`, or it will be
 DI framework will fail, likely in runtime.
 
 This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
-to subclass ViewModels.
-The biggest downside of this approach is that you'll have to use qualifiers with your DI framework to distinguish
-between different ViewModels. This example is also demonstrated in the sample app.
+to subclass ViewModels. This example is also demonstrated in the sample app.
 
 ## UI Layer
 
-It doesn't matter which UI framework you use. Neither your Contract or your Container/ViewModel will change in any way.
+It doesn't matter which UI framework you use. Neither your Contract nor your `Container` will change in any way.
 
 ### Compose
 
@@ -115,7 +109,7 @@ It doesn't matter which UI framework you use. Neither your Contract or your Cont
 It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
 also degrade performance.
 
-You don't have to annotate your state with `@Immutable` as `MVIState` is already marked immutable.
+?> You don't have to annotate your state with `@Immutable` as `MVIState` is already marked immutable.
 
 ```kotlin
 @Composable

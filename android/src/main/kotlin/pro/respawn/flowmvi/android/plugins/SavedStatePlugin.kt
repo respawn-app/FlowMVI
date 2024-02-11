@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package pro.respawn.flowmvi.android.plugins
 
 import android.os.Parcelable

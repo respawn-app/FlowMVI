@@ -5,8 +5,9 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.util.CappedMutableList
 
 /**
@@ -15,13 +16,12 @@ import pro.respawn.flowmvi.util.CappedMutableList
  * Keep a reference to this plugin and use it to enable custom time travel support or validate the store's behavior
  * in tests.
  */
-public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    name: String,
-    maxStates: Int,
-    maxIntents: Int,
-    maxActions: Int,
-    maxExceptions: Int,
-) : AbstractStorePlugin<S, I, A>(name) {
+public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
+    maxStates: Int = DefaultHistorySize,
+    maxIntents: Int = DefaultHistorySize,
+    maxActions: Int = DefaultHistorySize,
+    maxExceptions: Int = DefaultHistorySize,
+) {
 
     private val _states by atomic(CappedMutableList<S>(maxStates))
 
@@ -57,19 +57,19 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
      * The last value is the most recent.
      */
     public var subscriptions: Int by atomic(0)
-        internal set
+        private set
 
     /**
      * Number of times the store was launched. Never decreases.
      */
     public var starts: Int by atomic(0)
-        internal set
+        private set
 
     /**
      * Number of the times the store was stopped. Never decreases.
      */
     public var stops: Int by atomic(0)
-        internal set
+        private set
 
     /**
      * Number of times the store has been unsubscribed from. Never decreases.
@@ -91,28 +91,16 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
         stops = 0
     }
 
-    override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S = new.also { _states.add(it) }
-
-    override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I = intent.also { _intents.add(it) }
-
-    override suspend fun PipelineContext<S, I, A>.onAction(action: A): A = action.also { _actions.add(it) }
-
-    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception = e.also { _exceptions.add(it) }
-
-    override suspend fun PipelineContext<S, I, A>.onStart() {
-        starts += 1
-    }
-
-    override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
-        subscriptions += 1
-    }
-
-    override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
-        unsubscriptions += 1
-    }
-
-    override fun onStop(e: Exception?) {
-        stops += 1
+    internal fun asPlugin(name: String) = plugin {
+        this.name = name
+        onState { _: S, new: S -> new.also { _states.add(new) } }
+        onIntent { intent: I -> intent.also { _intents.add(it) } }
+        onAction { action: A -> action.also { _actions.add(it) } }
+        onException { e: Exception -> e.also { _exceptions.add(it) } }
+        onStart { starts += 1 }
+        onSubscribe { subscriptions += 1 }
+        onUnsubscribe { unsubscriptions += 1 }
+        onStop { stops += 1 }
     }
 
     public companion object {
@@ -130,33 +118,21 @@ public class TimeTravelPlugin<S : MVIState, I : MVIIntent, A : MVIAction> intern
 }
 
 /**
- * Create a new [TimeTravelPlugin]. Keep a reference to the plugin to use its properties.
+ * Create a new [TimeTravel]. Keep a reference to the plugin to use its properties.
  * @return the plugin.
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
-    name: String = TimeTravelPlugin.Name,
-    maxStates: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxIntents: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxActions: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxExceptions: Int = TimeTravelPlugin.DefaultHistorySize,
-): TimeTravelPlugin<S, I, A> = TimeTravelPlugin(name, maxStates, maxIntents, maxActions, maxExceptions)
+    timeTravel: TimeTravel<S, I, A>,
+    name: String = TimeTravel.Name,
+): StorePlugin<S, I, A> = timeTravel.asPlugin(name)
 
 /**
- * Create a new [TimeTravelPlugin] and installs it. Keep a reference to the plugin to use its properties.
+ * Create a new [TimeTravel] and installs it. Keep a reference to the plugin to use its properties.
  * @return the plugin.
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
-    name: String = TimeTravelPlugin.Name,
-    maxStates: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxIntents: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxActions: Int = TimeTravelPlugin.DefaultHistorySize,
-    maxExceptions: Int = TimeTravelPlugin.DefaultHistorySize,
-): TimeTravelPlugin<S, I, A> = timeTravelPlugin<S, I, A>(
-    name = name,
-    maxStates = maxStates,
-    maxIntents = maxIntents,
-    maxActions = maxActions,
-    maxExceptions = maxExceptions,
-).also { install(it) }
+    timeTravel: TimeTravel<S, I, A>,
+    name: String = TimeTravel.Name,
+): Unit = install(timeTravelPlugin(timeTravel, name = name))

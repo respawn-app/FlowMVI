@@ -16,17 +16,15 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 2
-    const val minorRelease = 3
+    const val minorRelease = 4
     const val patch = 0
-    const val postfix = "rc"
-    const val versionName = "$majorRelease.$minorRelease.$patch-$postfix"
+    const val postfix = "" // include dash (-)
+    const val versionName = "$majorRelease.$minorRelease.$patch$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
-    const val description = """
-A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & flexible
-"""
+    const val description = """A Kotlin Multiplatform MVI library based on plugins with a powerful plugin system"""
     // kotlin
 
     val optIns = listOf(
@@ -45,7 +43,7 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & f
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
         add("-P")
-        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=false")
+        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true")
         addAll(optIns.map { "-opt-in=$it" })
     }
 
@@ -67,7 +65,10 @@ A Kotlin Multiplatform MVI library based on plugins that is simple, powerful & f
     const val proguardFile = "proguard-rules.pro"
     const val consumerProguardFile = "consumer-rules.pro"
 
-    val stabilityLevels = listOf("preview", "eap", "alpha", "beta", "m", "cr", "rc")
+    // position reflects the level of stability, order is important
+    val stabilityLevels = listOf("snapshot", "eap", "preview", "alpha", "beta", "m", "cr", "rc")
+    val minStabilityLevel = stabilityLevels.indexOf("beta")
+
     object Detekt {
 
         const val configFile = "detekt.yml"
