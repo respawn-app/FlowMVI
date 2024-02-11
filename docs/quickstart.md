@@ -198,7 +198,7 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
   with `whileSubscribed { }`.
 * **Logging Plugin** - log events to a log stream of the target platform. Install with `platformLoggingPlugin()`
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
-  `parcelizeState` and `serializeState` plugins based on this one. Install with `saveState(get = {}, set = {})`.
+  `parcelizeState` and `serializeState` plugins based on this one. See [saved state](./savedstate.md) for details.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
   work. Install with `awaitSubscribers()`.
