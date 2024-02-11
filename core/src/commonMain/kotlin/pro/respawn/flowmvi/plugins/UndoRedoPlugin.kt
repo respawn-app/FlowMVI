@@ -8,25 +8,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.util.CappedMutableList
 
 /**
  * A plugin that allows to undo and redo any actions happening in the [pro.respawn.flowmvi.api.Store].
  * Keep a reference to the plugin instance to call [undo], [redo], and [invoke].
  */
-public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
+public class UndoRedo(
     private val maxQueueSize: Int,
-    name: String? = null,
-    private val resetOnException: Boolean,
-) : AbstractStorePlugin<S, I, A>(name) {
+) {
 
     init {
-        require(maxQueueSize > 0) { "Queue size less than 1 is not possible, you provided: $maxQueueSize" }
+        require(maxQueueSize > 0) { "Queue size less than 1 is not allowed, you provided: $maxQueueSize" }
     }
 
     private val queue by atomic<CappedMutableList<Event>>(CappedMutableList(maxQueueSize))
@@ -86,7 +86,7 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
      * Add the [intent] to the queue with specified [undo] and **immediately** execute the [intent].
      * **You cannot call [UndoRedoPlugin.undo] or [UndoRedoPlugin.redo] in [intent] or [undo]!**
      */
-    public suspend operator fun PipelineContext<S, I, A>.invoke(
+    public suspend operator fun <I : MVIIntent> IntentReceiver<I>.invoke(
         intent: I,
         undo: suspend () -> Unit,
     ): Int = invoke(redo = { intent(intent) }, undo = undo, doImmediately = true)
@@ -129,11 +129,15 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
         -1
     }
 
-    // reset because pipeline context captured in Events is no longer running
-    override suspend fun PipelineContext<S, I, A>.onStart(): Unit = reset()
-    override fun onStop(e: Exception?): Unit = reset()
-    override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception =
-        e.also { if (resetOnException) reset() }
+    public fun <S : MVIState, I : MVIIntent, A : MVIAction> asPlugin(
+        name: String?,
+        resetOnException: Boolean,
+    ): StorePlugin<S, I, A> = plugin {
+        this.name = name
+        // reset because pipeline context captured in Events is no longer running
+        onStop { reset() }
+        if (resetOnException) onException { it.also { reset() } }
+    }
 
     /**
      * An event happened in the [UndoRedoPlugin].
@@ -152,18 +156,20 @@ public class UndoRedoPlugin<S : MVIState, I : MVIIntent, A : MVIAction>(
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
-    maxQueueSize: Int,
+    undoRedo: UndoRedo,
     name: String? = null,
     resetOnException: Boolean = true,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin(maxQueueSize, name, resetOnException)
+): StorePlugin<S, I, A> = undoRedo.asPlugin(name, resetOnException)
 
 /**
- * Creates and installs a new [UndoRedoPlugin]
- * @return an instance that was created. Make sure to keep it to use the plugin's api.
+ * Creates, installs and returns a new [UndoRedo] instance
+ * @return an instance that was created. Use the returned instance to execute undo and redo operations.
+ * @see UndoRedo
+ * @see undoRedoPlugin
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.undoRedo(
     maxQueueSize: Int,
     name: String? = null,
     resetOnException: Boolean = true,
-): UndoRedoPlugin<S, I, A> = UndoRedoPlugin<S, I, A>(maxQueueSize, name, resetOnException).also { install(it) }
+): UndoRedo = UndoRedo(maxQueueSize).also { install(it.asPlugin(name, resetOnException)) }
