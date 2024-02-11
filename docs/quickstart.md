@@ -66,7 +66,7 @@ intents. This will prevent leaking the context of the store to subscribers.
 ## Step 3: Describe your Contract
 
 <details>
-<summary>Click for general advice on how to define a contract if you're a newbie</summary>
+<summary>Click for general advice on how to define a contract</summary>
 
 Describing the contract first makes building the logic easier because you have everything you need at the
 start. To define your contract, ask yourself the following:
@@ -274,11 +274,6 @@ So make sure to consider how your plugins affect the store's logic when using an
 
 The discussion above warrants another note.
 
-!> Because plugins are optional, you can do weird things with them. The library has validations in place to make sure
-you handle intents, but it's possible to create a store like this:
-`val store = store(Loading) { }`.
-This is a store that does **literally nothing**. If you forget to install a plugin, it will never be run.
-
 ### Step 6: Create, inject and provide dependencies
 
 You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
@@ -311,6 +306,8 @@ Next steps:
 
 * Learn how to create custom [plugins](plugins.md)
 * Learn how to use DI and [Android-specific features](android.md)
+* Learn how to [persist and restore state](savedstate.md)
+* Get answers to common [questions](faq.md)
 * [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
   about how our team has used the library to improve performance and stability of our app, with practical examples.
 * Explore
