@@ -7,7 +7,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.plugin
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -52,14 +54,13 @@ and the plugin that caches the value was installed before first access.
  * @see cache
  * @see cachePlugin
  */
-public class CachePlugin<out T, S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    name: String? = null,
+public class CachedValue<out T, S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     private val init: suspend PipelineContext<S, I, A>.() -> T,
-) : AbstractStorePlugin<S, I, A>(name), ReadOnlyProperty<Any?, T> {
+) : ReadOnlyProperty<Any?, T> {
 
     private data object UNINITIALIZED {
 
-        override fun toString() = "Uncached value"
+        override fun toString() = "Uninitialized cache value"
     }
 
     private var _value = atomic<Any?>(UNINITIALIZED)
@@ -69,36 +70,52 @@ public class CachePlugin<out T, S : MVIState, I : MVIIntent, A : MVIAction> inte
      */
     public val isCached: Boolean get() = _value.value !== UNINITIALIZED
 
-    override suspend fun PipelineContext<S, I, A>.onStart(): Unit = _value.update { init() }
+    /**
+     * Obtain the value.
+     * **The value can only be accessed before [StorePlugin.onStart] and [StorePlugin.onStop], otherwise this function
+     * will throw!**
+     */
+    public val value: T
+        @Suppress("UNCHECKED_CAST") get() {
+            require(isCached) { AccessBeforeCachingMessage }
+            return _value.value as T
+        }
 
-    override fun onStop(e: Exception?): Unit = _value.update { UNINITIALIZED }
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 
-    @Suppress("UNCHECKED_CAST")
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        require(isCached) { AccessBeforeCachingMessage }
-        return _value.value as T
+    internal fun asPlugin(name: String?) = plugin {
+        this.name = name
+
+        onStart { _value.update { init() } }
+
+        onStop { _value.update { UNINITIALIZED } }
     }
 }
 
 /**
- * Creates and returns a new [CachePlugin] without installing it.
- * @see CachePlugin
+ * Creates and returns a new [CachedValue].
+ * @see cachePlugin
  */
+public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cached(
+    @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
+): CachedValue<T, S, I, A> = CachedValue(init)
+
 @FlowMVIDSL
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
+    value: CachedValue<T, S, I, A>,
     name: String? = null,
-    @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
-): CachePlugin<T, S, I, A> = CachePlugin(name, init)
+): StorePlugin<S, I, A> = value.asPlugin(name)
 
 /**
- * Creates and installs a new [CachePlugin], returning a delegate that can be used to get access to the property that
+ * Creates and installs a new [CachedValue], returning a delegate that can be used to get access to the property that
  * was cached. Please consult the documentation of the parent class to understand how to use this plugin.
  *
- * @return A [ReadOnlyProperty] granting access to the value returned from [init]
+ * @return A [CachedValue] granting access to the value returned from [init]
  * @see cachePlugin
+ * @see cached
  */
 @FlowMVIDSL
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.cache(
     name: String? = null,
     @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
-): ReadOnlyProperty<Any?, T> = cachePlugin(name, init).also { install(it) }
+): CachedValue<T, S, I, A> = CachedValue(init).also { install(it.asPlugin(name)) }
