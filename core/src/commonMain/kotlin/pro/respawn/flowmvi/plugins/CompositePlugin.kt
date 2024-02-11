@@ -1,12 +1,18 @@
-package pro.respawn.flowmvi.modules
+package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.plugins.AbstractStorePlugin
 
+/**
+ * A plugin that delegates to [plugins] in the iteration order.
+ * This is an implementation of the "Composite" pattern and the "Chain or Responsibility" pattern.
+ *
+ * This plugin is mostly not intended for usage in general code as there are no real use cases for it so far.
+ * It can be useful in testing and custom store implementations.
+ */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     plugins: Set<StorePlugin<S, I, A>>,
     name: String? = null,

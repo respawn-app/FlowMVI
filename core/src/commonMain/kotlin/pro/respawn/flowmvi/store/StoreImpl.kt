@@ -24,7 +24,7 @@ import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
-import pro.respawn.flowmvi.modules.compositePlugin
+import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
