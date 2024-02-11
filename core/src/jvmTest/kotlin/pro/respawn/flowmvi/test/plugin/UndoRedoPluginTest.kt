@@ -14,14 +14,12 @@ import pro.respawn.flowmvi.util.TestState.SomeData
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
-import pro.respawn.flowmvi.util.testTimeTravelPlugin
+import pro.respawn.flowmvi.util.testTimeTravel
 
 class UndoRedoPluginTest : FreeSpec({
     asUnconfined()
-    val timeTravel = testTimeTravelPlugin()
-    beforeEach {
-        timeTravel.reset()
-    }
+    val timeTravel = testTimeTravel()
+    beforeEach { timeTravel.reset() }
     "Given undo/redo plugin" - {
         val plugin = undoRedoPlugin<TestState, TestIntent, TestAction>(10)
         "and an intent that changes state" - {

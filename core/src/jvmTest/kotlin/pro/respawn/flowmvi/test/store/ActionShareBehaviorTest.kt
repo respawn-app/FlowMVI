@@ -12,25 +12,23 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
-import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
+import pro.respawn.flowmvi.util.testTimeTravel
 
 class ActionShareBehaviorTest : FreeSpec({
     asUnconfined()
-    val plugin = timeTravelPlugin<TestState, TestIntent, TestAction>()
-    beforeEach {
-        plugin.reset()
-    }
+    val timeTravel = testTimeTravel()
+    beforeEach { timeTravel.reset() }
+
     "Given store" - {
         "and actions disabled" - {
-            val store = testStore(plugin) {
+            val store = testStore(timeTravel) {
                 actionShareBehavior = ActionShareBehavior.Disabled
             }
             "then trying to collect actions throws" {
@@ -55,7 +53,7 @@ class ActionShareBehaviorTest : FreeSpec({
             }
         }
         "and actions are shared" - {
-            val store = testStore(plugin) {
+            val store = testStore(timeTravel) {
                 actionShareBehavior = ActionShareBehavior.Share()
             }
 
@@ -75,13 +73,13 @@ class ActionShareBehaviorTest : FreeSpec({
                     val intent = TestIntent { action(TestAction.Some) }
                     intent(intent)
                     joinAll(job1, job2)
-                    plugin.intents shouldContain intent
-                    plugin.actions shouldContain TestAction.Some
+                    timeTravel.intents shouldContain intent
+                    timeTravel.actions shouldContain TestAction.Some
                 }
             }
         }
         "and actions are distributed" - {
-            val store = testStore(plugin) {
+            val store = testStore(timeTravel) {
                 actionShareBehavior = ActionShareBehavior.Distribute()
             }
             "then one subscriber gets the action only" {
@@ -103,7 +101,7 @@ class ActionShareBehaviorTest : FreeSpec({
             }
         }
         "and actions are consumed" - {
-            val store = testStore(plugin) {
+            val store = testStore(timeTravel) {
                 actionShareBehavior = ActionShareBehavior.Restrict()
             }
             "then one subscriber gets the action only" {

@@ -19,15 +19,13 @@ import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
-import pro.respawn.flowmvi.util.testTimeTravelPlugin
+import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreExceptionsTest : FreeSpec({
     asUnconfined()
 
-    val plugin = testTimeTravelPlugin()
-    afterEach {
-        plugin.reset()
-    }
+    val plugin = testTimeTravel()
+    afterEach { plugin.reset() }
 
     "Given an exception" - {
         val e = IllegalArgumentException("Test")
