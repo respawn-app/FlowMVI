@@ -10,8 +10,23 @@ import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.api.Store
+
+/**
+ * Subscribe to [this] store and suspend until [consume] finishes (which should never return).
+ * This means the function will suspend forever.
+ * @see subscribe for non-suspending variant
+ */
+@FlowMVIDSL
+public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.collect(
+    @BuilderInference crossinline consume: suspend Provider<S, I, A>.() -> Unit,
+): Unit = coroutineScope {
+    subscribe {
+        consume()
+    }.join()
+}
 
 /**
  * Subscribe to the [store] and invoke [consume] and [render] in parallel in the provided scope.
