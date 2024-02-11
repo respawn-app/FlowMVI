@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnChange
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnUnsubscribe
 import pro.respawn.flowmvi.savedstate.api.Saver
+import pro.respawn.flowmvi.savedstate.dsl.CallbackSaver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.DefaultFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.FileSaver
@@ -24,7 +25,6 @@ import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.dsl.MapSaver
 import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
-import pro.respawn.flowmvi.savedstate.dsl.CallbackSaver
 import pro.respawn.flowmvi.savedstate.util.EmptyBehaviorsMessage
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
 import pro.respawn.flowmvi.savedstate.util.nameByType

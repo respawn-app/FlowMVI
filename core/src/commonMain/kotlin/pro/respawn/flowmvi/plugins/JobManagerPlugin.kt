@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancelAndJoin
@@ -133,6 +134,11 @@ public class JobManager<K : Any> {
      * @return the completed job or null if not found
      */
     public suspend fun join(key: K): Job? = jobs[key]?.apply { join() }
+
+    /**
+     * Joins all jobs specified in [keys] in the declaration order
+     */
+    public suspend fun joinAll(vararg keys: K): Unit = keys.forEach { join(it) }
 
     /**
      * Start the job with [key] if it is present.

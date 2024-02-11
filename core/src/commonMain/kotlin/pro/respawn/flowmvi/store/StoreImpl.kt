@@ -25,12 +25,12 @@ import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
-import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscribersModule
+import pro.respawn.flowmvi.plugins.compositePlugin
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
