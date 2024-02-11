@@ -63,21 +63,24 @@ dependencies {
 
 </details>
 
-## Features:
+## Why FlowMVI?
 
-* No base classes or complicated interfaces - store is composed using a simple DSL
 * Fully async and parallel business logic - with no manual thread synchronization required!
-* Automatically recover from all errors and avoid runtime crashes with no extra code required
+* Automatically recover from any errors and avoid runtime crashes with one line of code
 * Build fully-multiplatform business logic with pluggable UI
-* Create compile-time safe state machines with a dedicated DSL. Forget about `state as? ...` casts
-* Automatic lifecycle handling with hooks on subscription and restartable, reusable stores
+* Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
+* Automatic platform-independent system lifecycle handling with hooks on subscription
+* Restartable, reusable stores with no external dependencies or dedicated lifecycles.
 * Compress, persist, and restore state automatically with a single line of code - on any platform
-* Out of the box debugging, logging, testing and job management support
+* Out of the box debugging, logging, testing and long-running task management support
 * Decompose stores into plugins, split responsibilities, and modularize the project easily
+* No base classes or complicated interfaces - store is built using a simple DSL
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
 * Create parent-child relationships between stores and delegate responsibilities
-* 70+% unit test coverage of library code
+* 70+% unit test coverage of core library code
+
+## How does it look?
 
 <details>
 <summary>Define a contract</summary>

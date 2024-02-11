@@ -12,6 +12,8 @@ import pro.respawn.flowmvi.plugins.AbstractStorePlugin
  * A class that builds a new [StorePlugin]
  * For more documentation, see [StorePlugin]
  */
+
+@Suppress("DEPRECATION")
 public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
@@ -99,7 +101,6 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
 
     @FlowMVIDSL
     @PublishedApi
-    @Suppress("DEPRECATION")
     internal fun build(): StorePlugin<S, I, A> = object : AbstractStorePlugin<S, I, A>(name) {
         override suspend fun PipelineContext<S, I, A>.onStart() = start()
         override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = state(old, new)
