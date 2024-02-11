@@ -129,7 +129,7 @@ public class UndoRedo(
         -1
     }
 
-    public fun <S : MVIState, I : MVIIntent, A : MVIAction> asPlugin(
+    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> asPlugin(
         name: String?,
         resetOnException: Boolean,
     ): StorePlugin<S, I, A> = plugin {
@@ -152,7 +152,7 @@ public class UndoRedo(
 }
 
 /**
- * Creates a new [UndoRedoPlugin]
+ * Returns a plugin that manages the [undoRedo] provided
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(

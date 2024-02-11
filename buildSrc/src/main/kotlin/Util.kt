@@ -1,4 +1,4 @@
-@file:Suppress("MissingPackageDeclaration")
+@file:Suppress("MissingPackageDeclaration", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalog

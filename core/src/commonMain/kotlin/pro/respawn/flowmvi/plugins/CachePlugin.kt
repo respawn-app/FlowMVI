@@ -100,6 +100,14 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cached(
     @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
 ): CachedValue<T, S, I, A> = CachedValue(init)
 
+/**
+ * Converts [value] to a [StorePlugin].
+ * Mostly needed when storing a direct reference to the [CachedValue] out of the store's scope (which is less safe).
+ * For all other cases, use [cache].
+ *
+ * @see cache
+ * @see cached
+ */
 @FlowMVIDSL
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
     value: CachedValue<T, S, I, A>,

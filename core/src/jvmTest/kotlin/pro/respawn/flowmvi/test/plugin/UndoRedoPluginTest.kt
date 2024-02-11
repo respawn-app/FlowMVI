@@ -4,7 +4,6 @@ import io.kotest.assertions.assertSoftly
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.plugins.UndoRedo
-import pro.respawn.flowmvi.util.TestState.SomeData
 import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 
