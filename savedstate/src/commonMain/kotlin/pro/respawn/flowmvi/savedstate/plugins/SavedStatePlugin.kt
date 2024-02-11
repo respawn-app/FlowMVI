@@ -24,36 +24,13 @@ import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.dsl.MapSaver
 import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
+import pro.respawn.flowmvi.savedstate.dsl.CallbackSaver
+import pro.respawn.flowmvi.savedstate.util.EmptyBehaviorsMessage
+import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
+import pro.respawn.flowmvi.savedstate.util.nameByType
+import pro.respawn.flowmvi.savedstate.util.restoreCatching
+import pro.respawn.flowmvi.savedstate.util.saveCatching
 import kotlin.coroutines.CoroutineContext
-
-/**
- * Get the name of the class, removing the "State" suffix, if present
- */
-public inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
-
-@PublishedApi
-internal val PluginNameSuffix: String = "SaveStatePlugin"
-
-@PublishedApi
-internal const val EmptyBehaviorsMessage: String = """
-You wanted to save the state but have not provided any behaviors.
-Please supply at least one behavior or remove the plugin as it would do nothing otherwise.
-"""
-
-@PublishedApi
-internal suspend fun <S> Saver<S>.saveCatching(state: S?): Unit = try {
-    save(state)
-} catch (expected: Exception) {
-    recover(expected)
-    Unit
-}
-
-@PublishedApi
-internal suspend fun <S> Saver<S>.restoreCatching(): S? = try {
-    restore()
-} catch (expected: Exception) {
-    recover(expected)
-}
 
 /**
  * Creates a plugin for persisting and restoring [MVIState] of the current store.
@@ -65,13 +42,13 @@ internal suspend fun <S> Saver<S>.restoreCatching(): S? = try {
  *  * [JsonSaver] for saving the state as a JSON.
  *  * [FileSaver] for saving the state to a file. See [DefaultFileSaver] for custom file writing logic.
  *  * [CompressedFileSaver] for saving the state to a file and compressing it.
+ *  * [CallbackSaver] for logging.
  *  * [NoOpSaver] for testing.
  *
  *  The plugin will determine **when** to save the state based on [behaviors].
  *  Please see [SaveBehavior] documentation for more details.
  *  this function will throw if the [behaviors] are empty.
  * ----
- *  * By default, the plugin will  use the name derived from the store's name, or the state [S] class name.
  *  * If [resetOnException] is `true`, the plugin will attempt to clear the state if an exception is thrown.
  *  * All state saving is done in a background coroutine.
  *  * The state **restoration**, however, is done **before** the store starts.
@@ -82,11 +59,11 @@ internal suspend fun <S> Saver<S>.restoreCatching(): S? = try {
  *  @see [Saver]
  */
 @FlowMVIDSL
-public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     saver: Saver<S>,
     context: CoroutineContext,
+    name: String? = null,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    name: String? = "${nameByType<S>().orEmpty()}$PluginNameSuffix",
     resetOnException: Boolean = true,
 ): StorePlugin<S, I, A> = plugin {
     require(behaviors.isNotEmpty()) { EmptyBehaviorsMessage }
@@ -133,6 +110,8 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> saveState
 /**
  * Creates and installs a new [saveStatePlugin]. Please see the parent overload for more info.
  *
+ * * By default, the plugin will  use the name derived from the store's name, or the state [S] class name.
+ *
  * @see saveStatePlugin
  */
 @FlowMVIDSL
@@ -142,4 +121,4 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuil
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     name: String? = "${this.name ?: nameByType<S>().orEmpty()}$PluginNameSuffix",
     resetOnException: Boolean = true,
-): Unit = install(saveStatePlugin(saver, context, behaviors, name, resetOnException))
+): Unit = install(saveStatePlugin(saver, context, name, behaviors, resetOnException))
