@@ -24,10 +24,10 @@ import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscribersModule
 import pro.respawn.flowmvi.modules.actionModule
+import pro.respawn.flowmvi.modules.compositePlugin
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
-import pro.respawn.flowmvi.modules.pluginModule
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscribersModule
 
@@ -36,7 +36,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 ) : Store<S, I, A>,
     Provider<S, I, A>,
     RecoverModule<S, I, A>,
-    StorePlugin<S, I, A> by pluginModule(config.plugins),
+    StorePlugin<S, I, A> by compositePlugin(config.plugins),
     SubscribersModule by subscribersModule(),
     StateModule<S> by stateModule(config.initial),
     IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
