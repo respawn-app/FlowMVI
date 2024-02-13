@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.api
 
-import androidx.compose.runtime.Stable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
  * A [Store] that does not allow sending intents.
  * @see Store
  */
-@Stable
 public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
 
     /**

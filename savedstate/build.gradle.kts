@@ -12,7 +12,6 @@ dependencies {
     commonMainApi(libs.kotlin.serialization.json)
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.kotlin.io)
-    commonMainCompileOnly(projects.annotations)
 
     androidMainApi(libs.lifecycle.savedstate)
 }

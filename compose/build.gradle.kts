@@ -50,7 +50,6 @@ android {
 }
 
 dependencies {
-    commonMainCompileOnly(projects.annotations)
     debugImplementation(libs.compose.tooling)
 }
 

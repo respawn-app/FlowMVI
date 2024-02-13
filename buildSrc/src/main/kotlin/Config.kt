@@ -17,7 +17,7 @@ object Config {
 
     const val majorRelease = 2
     const val minorRelease = 4
-    const val patch = 0
+    const val patch = 1
     const val postfix = "" // include dash (-)
     const val versionName = "$majorRelease.$minorRelease.$patch$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
@@ -36,14 +36,14 @@ object Config {
     )
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
+        "-P",
+        "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
-        add("-P")
-        add("plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true")
         addAll(optIns.map { "-opt-in=$it" })
     }
 

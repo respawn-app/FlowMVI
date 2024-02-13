@@ -4,36 +4,53 @@ Here's how the library works at a glance:
 
 ![](images/FlowMVI.png)
 
-## Step 1: Add Dependencies
+## Step 1: Configure the library
+
+### 1.1: Add dependencies
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
-### Version catalogs
+<details>
+<summary>Version catalogs</summary>
 
 ```toml
 [versions]
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # multiplatform
+flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # core KMP code
+flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
+
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }  # compose multiplatform
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
+flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" } # KMP state preservation
 ```
 
-### Kotlin DSL
+</details>
+
+<details>
+<summary>Gradle DSL</summary>
 
 ```kotlin
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
 }
 ```
+
+</details>
+
+### 1.2 Configure JDK
+
+<details>
+<summary>Configure JDK</summary>
 
 The library's minimum JVM target is set to 11 (sadly still not the default).
 If you encounter an error:
@@ -46,9 +63,11 @@ is being built with JVM target 1.8. Please specify proper '-jvm-target' option
 Then configure your kotlin compilation to target JVM 11 in your root `build.gradle.kts`:
 
 ```kotlin
-allprojects.tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
+allprojects {
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
 }
 ```
@@ -65,6 +84,51 @@ android {
 
 If you support Android API <26, you will also need to
 enable [desugaring](https://developer.android.com/studio/write/java8-support).
+
+</details>
+
+### 1.3 Configure Compose
+
+If you are using compose, set up stability definitions for your project.
+
+<details>
+<summary>stability_definitions.txt</summary>
+
+```text
+pro.respawn.flowmvi.api.MVIIntent
+pro.respawn.flowmvi.api.MVIState
+pro.respawn.flowmvi.api.MVIAction
+pro.respawn.flowmvi.api.Store
+pro.respawn.flowmvi.api.Container
+pro.respawn.flowmvi.api.ImmutableStore
+pro.respawn.flowmvi.dsl.LambdaIntent
+```
+
+</details>
+
+Then configure compose compiler to account for the definitions in your root `build.gradle.kts`:
+
+<details>
+<summary>/build.gradle.kts</summary>
+
+```kotlin
+allprojects {
+    tasks.withType<KotlinCompile>().configureEach {
+        compilerOptions {
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                        "${rootProject.rootDir.absolutePath}/stability_definitions.txt"
+            )
+        }
+    }
+}
+```
+
+</details>
+
+Now the states/intents you create will be stable in compose. Immutability of these classes is already required by the
+library, so this will ensure you get the best performance.
 
 ## Step 2: Choose your style
 
