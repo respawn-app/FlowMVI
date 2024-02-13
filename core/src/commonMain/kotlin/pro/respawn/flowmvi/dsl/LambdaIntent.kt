@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.dsl
 
-import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
@@ -22,7 +21,6 @@ import kotlin.jvm.JvmInline
  * e.g. logging of lambda intents**
  */
 @JvmInline
-@Immutable
 public value class LambdaIntent<S : MVIState, A : MVIAction>(
     private val block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ) : MVIIntent {

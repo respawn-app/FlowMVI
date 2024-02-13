@@ -1,16 +1,18 @@
 package pro.respawn.flowmvi.api
 
+import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.StorePluginBuilder
+import pro.respawn.flowmvi.dsl.plugin
+
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
  *
  * Plugins can influence subscription, stopping, and all other forms of store behavior.
  * Access the store's context and other functions through the [PipelineContext] receiver.
- * Plugins are typically made using [pro.respawn.flowmvi.dsl.StorePluginBuilder].
+ * Plugins are typically made using [StorePluginBuilder].
  *
- * It is not recommended to implement this interface,
- * if you really need to, subclass [pro.respawn.flowmvi.plugins.AbstractStorePlugin] instead.
- * If you do override this interface, you **must** comply with the contract defined above.
+ * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
 @Suppress("ComplexInterface")
 public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
@@ -19,7 +21,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
      * The name of this plugin. The name can be used for logging purposes, but most importantly, to
      * distinguish between different plugins.
      * Name is optional, in which case the plugins will be compared **by reference**.
-     * If you attempt to [pro.respawn.flowmvi.dsl.StoreBuilder.install] the same plugin, or different plugins
+     * If you attempt to [StoreBuilder.install] the same plugin, or different plugins
      * with the same name, multiple times, **an exception will be thrown**.
      * If you need to have the same plugin installed multiple times, consider giving plugins different names.
      * Plugins that have no name can be installed multiple times, assuming they are different instances of a plugin.

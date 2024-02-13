@@ -6,14 +6,12 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.plugins.AbstractStorePlugin
 
 /**
  * A class that builds a new [StorePlugin]
  * For more documentation, see [StorePlugin]
  */
 
-@Suppress("DEPRECATION")
 public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
@@ -101,7 +99,8 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
 
     @FlowMVIDSL
     @PublishedApi
-    internal fun build(): StorePlugin<S, I, A> = object : AbstractStorePlugin<S, I, A>(name) {
+    internal fun build(): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
+        override val name = this@StorePluginBuilder.name
         override suspend fun PipelineContext<S, I, A>.onStart() = start()
         override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = state(old, new)
         override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(this, intent)
@@ -110,6 +109,13 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
         override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) = subscribe(subscriberCount)
         override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) = unsubscribe(subscriberCount)
         override fun onStop(e: Exception?): Unit = stop(e)
+        override fun toString(): String = "StorePlugin \"${name ?: super.toString()}\""
+        override fun hashCode(): Int = name?.hashCode() ?: super.hashCode()
+        override fun equals(other: Any?): Boolean = when {
+            other !is StorePlugin<*, *, *> -> false
+            other.name == null && name == null -> this === other
+            else -> name == other.name
+        }
     }
 }
 

@@ -109,7 +109,10 @@ It doesn't matter which UI framework you use. Neither your Contract nor your `Co
 It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
 also degrade performance.
 
-?> You don't have to annotate your state with `@Immutable` as `MVIState` is already marked immutable.
+?> Compose stability configuration has been added in 1.6.0, and the library specifies stability rules with itself.
+`MVIState`, `MVIIntent`, `MVIAction`, `LambdaIntent` and `Store` are marked as `@Stable`. It's still best to
+annotate your contract with `@Immutable` explicitly however to ensure that the compiler pics up the mapping.
+See `stability_definitions.txt` to learn how to configure stability yourself.
 
 ```kotlin
 @Composable
@@ -146,8 +149,7 @@ In `onResume()`, the composable will resubscribe. Your composable will recompose
 resubscribe to events. The lifecycle state is customizable.
 
 ?> Compose plays well with MVI style because state changes will trigger recompositions. Just mutate your state,
-and the UI will update to reflect changes. Also, the `IntentReceiver` is `@Stable`, so you can safely send intents from
-anywhere without awkward method references and unstable lambdas.
+and the UI will update to reflect changes.
 
 * Use the lambda parameter of `subscribe` to subscribe to `MVIActions`.
   Those will be processed as they arrive and the `consume` lambda
