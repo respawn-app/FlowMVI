@@ -27,10 +27,16 @@ allprojects {
     version = Config.versionName
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
+            optIn.addAll(Config.optIns)
             jvmTarget = Config.jvmTarget
             languageVersion = Config.kotlinVersion
             freeCompilerArgs.apply {
                 addAll(Config.jvmCompilerArgs)
+                addAll(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
+                            "${rootProject.rootDir.absolutePath}/stability_definitions.txt",
+                )
                 if (project.findProperty("enableComposeCompilerReports") == "true") {
                     addAll(
                         "-P",
@@ -40,7 +46,6 @@ allprojects {
                     )
                 }
             }
-            optIn.addAll(Config.optIns.map { "-opt-in=$it" })
         }
     }
 }
