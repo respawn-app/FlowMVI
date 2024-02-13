@@ -67,19 +67,20 @@ dependencies {
 
 * Fully async and parallel business logic - with no manual thread synchronization required!
 * Automatically recover from any errors and avoid runtime crashes with one line of code
-* Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
 * Automatic platform-independent system lifecycle handling
 * Build fully-multiplatform business logic with pluggable UI
+* Out of the box debugging, logging, testing and long-running task management support
 * Restartable, reusable stores with no external dependencies or dedicated lifecycles.
 * Compress, persist, and restore state automatically with a single line of code - on any platform
-* Out of the box debugging, logging, testing and long-running task management support
+* Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
 * Decompose stores into plugins, split responsibilities, and modularize the project easily
 * No base classes or complicated interfaces - store is built using a simple DSL
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
 * Create parent-child relationships between stores and delegate responsibilities
-* 70+% unit test coverage of core library code
+* Built for Compose: The library lets you achieve the best performance with Compose out of the box.
 * The core library depends on kotlin coroutines. That's it. Nothing else.
+* 70+% unit test coverage of core library code
 
 ## How does it look?
 
