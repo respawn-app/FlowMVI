@@ -1,0 +1,3 @@
+<idea-plugin>
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>
