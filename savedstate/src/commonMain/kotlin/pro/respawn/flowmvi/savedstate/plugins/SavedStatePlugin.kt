@@ -30,6 +30,7 @@ import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
 import pro.respawn.flowmvi.savedstate.util.nameByType
 import pro.respawn.flowmvi.savedstate.util.restoreCatching
 import pro.respawn.flowmvi.savedstate.util.saveCatching
+import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**

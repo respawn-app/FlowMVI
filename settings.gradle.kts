@@ -46,8 +46,10 @@ include(":android-compose")
 include(":android-view")
 include(":compose")
 include(":savedstate")
-include(":debugger:ideplugin")
-
+include(":debugger:client")
+include(":debugger:app")
+include(":debugger:plugin")
+// include(":debugger:ideplugin")
 
 fun RepositoryHandler.node() {
     exclusiveContent {

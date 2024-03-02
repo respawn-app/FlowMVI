@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     alias(libs.plugins.intellij.ide)
     kotlin("jvm")
+    alias(libs.plugins.jetbrainsCompose)
 }
 val props by localProperties
 
@@ -18,7 +19,7 @@ configurations.all {
 }
 
 intellijPlatform {
-    projectName = rootProject.name
+    projectName = Config.debuggerPluginName
     verifyPlugin {
         ides {
             recommended()
@@ -44,8 +45,8 @@ intellijPlatform {
         }
         changeNotes
         id = "${Config.artifactId}.ideplugin"
-        description = Config.idePluginDescription
-        name = rootProject.name
+        description = Config.debuggerPluginDescription
+        name = Config.debuggerPluginName
         version = Config.versionName
     }
 }
@@ -61,8 +62,10 @@ tasks {
 }
 
 dependencies {
+    compileOnly(compose.desktop.currentOs)
     implementation(projects.core)
     intellijPlatform {
+        plugin("org.jetbrains.compose.intellij.platform")
         // bundledPlugin("org.jetbrains.kotlin")
         // props["plugin.local.ide.path"]?.toString()?.let(::local)
         intellijIdeaCommunity("2023.3.3")

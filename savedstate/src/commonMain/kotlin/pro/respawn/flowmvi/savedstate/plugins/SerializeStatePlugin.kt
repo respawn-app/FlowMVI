@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
-import pro.respawn.flowmvi.savedstate.util.nameByType
+import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**

@@ -1,11 +1,13 @@
 [versions]
 activity = "1.8.2"
+apiresult = "1.0.3"
 compose = "1.6.2"
 compose-compiler = "1.5.10"
 compose-plugin = "1.5.12"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.8.0"
+datetime = "0.6.0-RC.2"
 dependencyAnalysisPlugin = "1.29.0"
 detekt = "1.23.5"
 detektFormattingPlugin = "1.23.5"
@@ -13,7 +15,9 @@ dokka = "1.9.10"
 fragment = "1.6.2"
 gradleAndroid = "8.3.0"
 gradleDoctorPlugin = "0.9.1"
+intellij-ide-plugin = "2.0.0-SNAPSHOT"
 junit = "4.13.2"
+kmputils = "1.3.1"
 koin = "3.5.3"
 koin-compose = "1.1.2"
 kotest = "5.8.0"
@@ -22,18 +26,20 @@ kotest-plugin = "5.8.0"
 kotlin = "1.9.22"
 kotlin-io = "0.3.1"
 kotlinx-atomicfu = "0.23.2"
+ktor = "3.0.0-beta-1"
 lifecycle = "2.7.0"
 material = "1.11.0"
 serialization = "1.6.3"
 turbine = "1.0.0"
+uuid = "0.8.2"
 versionCatalogUpdatePlugin = "0.8.4"
-intellij-ide-plugin = "2.0.0-SNAPSHOT"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
@@ -48,6 +54,10 @@ detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", v
 detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
 dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
 junit = { module = "junit:junit", version.ref = "junit" }
+kmputils-common = { module = "pro.respawn.kmmutils:common", version.ref = "kmputils" }
+kmputils-coroutines = { module = "pro.respawn.kmmutils:coroutines", version.ref = "kmputils" }
+kmputils-datetime = { module = "pro.respawn.kmmutils:datetime", version.ref = "kmputils" }
+kmputils-inputforms = { module = "pro.respawn.kmmutils:inputforms", version.ref = "kmputils" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
@@ -61,22 +71,54 @@ kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "ko
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlin-io" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+ktor-engine = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 [bundles]
+kmputils = [
+    "kmputils-common",
+    "kmputils-coroutines",
+    "kmputils-datetime",
+    "kmputils-inputforms",
+]
 koin = [
     "koin-android",
+    "koin-compose",
     "koin-core",
+]
+ktor = [
+    "ktor-auth",
+    "ktor-contentNegotiation",
+    "ktor-core",
+    "ktor-encoding",
+    "ktor-logging",
+    "ktor-serialization",
+]
+serialization = [
+    "kotlin-reflect",
+    "kotlin-serialization",
+    "kotlin-serialization-json",
 ]
 unittest = [
     "koin-test",
@@ -97,9 +139,9 @@ dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.re
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
+intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
-intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }

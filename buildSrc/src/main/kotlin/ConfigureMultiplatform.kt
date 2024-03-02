@@ -14,7 +14,7 @@ fun Project.configureMultiplatform(
     js: Boolean = true,
     tvOs: Boolean = true,
     macOs: Boolean = true,
-    watchOs: Boolean = true
+    watchOs: Boolean = true,
 ) = ext.apply {
     val libs by versionCatalog
     explicitApi()

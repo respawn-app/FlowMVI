@@ -2,11 +2,6 @@ package pro.respawn.flowmvi.savedstate.util
 
 import pro.respawn.flowmvi.savedstate.api.Saver
 
-/**
- * Get the name of the class, removing the "State" suffix, if present
- */
-public inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
-
 @PublishedApi
 internal val PluginNameSuffix: String = "SaveStatePlugin"
 

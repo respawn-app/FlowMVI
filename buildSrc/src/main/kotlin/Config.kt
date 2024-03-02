@@ -27,7 +27,8 @@ object Config {
     const val description = """A Kotlin Multiplatform MVI library based on coroutines with a powerful plugin system"""
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
-    const val idePluginDescription = "An Intellij IDEA plugin for FlowMVI - $description"
+    const val debuggerPluginDescription = "An Intellij IDEA plugin for FlowMVI - $description"
+    const val debuggerPluginName = "FlowMVI Debugger"
     // kotlin
 
     val optIns = listOf(

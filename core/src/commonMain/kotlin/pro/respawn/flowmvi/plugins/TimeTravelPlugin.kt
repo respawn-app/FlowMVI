@@ -23,6 +23,10 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
     maxExceptions: Int = DefaultHistorySize,
 ) {
 
+    public constructor(maxHistorySize: Int = DefaultHistorySize) : this(
+        maxHistorySize, maxHistorySize, maxHistorySize, maxHistorySize
+    )
+
     private val _states by atomic(CappedMutableList<S>(maxStates))
 
     /**
