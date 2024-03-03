@@ -28,8 +28,9 @@ android {
 
 dependencies {
     commonMainApi(projects.debugger.client)
-    commonMainImplementation(libs.bundles.ktor)
-    commonMainImplementation(libs.ktor.engine)
+    commonMainApi(projects.debugger.common)
+    commonMainImplementation(libs.bundles.ktor.client)
+    commonMainImplementation(libs.ktor.client.engine)
     commonMainImplementation(libs.bundles.serialization)
     commonMainImplementation(libs.uuid)
 }

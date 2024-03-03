@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.core.serializers
+package pro.respawn.flowmvi.debugger.serializers
 
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuidFrom
@@ -8,7 +8,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-internal object UUIDSerializer : KSerializer<Uuid> {
+object UUIDSerializer : KSerializer<Uuid> {
 
     override val descriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
     override fun deserialize(decoder: Decoder) = uuidFrom(decoder.decodeString())

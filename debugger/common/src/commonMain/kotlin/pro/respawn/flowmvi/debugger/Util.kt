@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.core
+package pro.respawn.flowmvi.debugger
 
 import pro.respawn.flowmvi.api.EmptyState
 import pro.respawn.flowmvi.api.MVIAction

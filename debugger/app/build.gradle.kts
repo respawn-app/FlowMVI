@@ -27,7 +27,6 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(libs.bundles.serialization)
-            implementation(libs.bundles.ktor)
             implementation(libs.bundles.kmputils)
             implementation(libs.kotlin.datetime)
             implementation(libs.apiresult)
@@ -35,7 +34,9 @@ kotlin {
             implementation(libs.bundles.koin)
             implementation(libs.kotlin.io)
             implementation(projects.core)
-            implementation(projects.savedstate)
+
+            implementation(projects.debugger.server)
+            implementation(projects.debugger.common)
             implementation(projects.compose)
         }
         desktopMain.apply {

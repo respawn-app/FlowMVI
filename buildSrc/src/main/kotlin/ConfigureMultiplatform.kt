@@ -15,9 +15,10 @@ fun Project.configureMultiplatform(
     tvOs: Boolean = true,
     macOs: Boolean = true,
     watchOs: Boolean = true,
+    explicitApi: Boolean = true,
 ) = ext.apply {
     val libs by versionCatalog
-    explicitApi()
+    if (explicitApi) explicitApi()
     applyDefaultHierarchyTemplate()
     withSourcesJar(true)
 

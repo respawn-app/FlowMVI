@@ -1,11 +1,11 @@
-package pro.respawn.flowmvi.debugger.core.models
+package pro.respawn.flowmvi.debugger.model
 
 import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.debugger.core.name
+import pro.respawn.flowmvi.debugger.name
 
 @Serializable
-internal data class StoreState(
+data class StoreState(
     val name: String,
     val body: String,
 ) {

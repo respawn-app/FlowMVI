@@ -1,33 +1,33 @@
 @file:UseSerializers(UUIDSerializer::class)
 
-package pro.respawn.flowmvi.debugger.core.models
+package pro.respawn.flowmvi.debugger.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.debugger.core.name
-import pro.respawn.flowmvi.debugger.core.serializers.UUIDSerializer
+import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
+import pro.respawn.flowmvi.debugger.name
 
 @Serializable
-internal sealed interface OutgoingEvent {
+sealed interface ClientEvent {
 
     @Serializable
     data class StoreStarted(
         val name: String,
-    ) : OutgoingEvent
+    ) : ClientEvent
 
     @Serializable
     data class StoreStopped(
         val name: String,
-    ) : OutgoingEvent
+    ) : ClientEvent
 
     @Serializable
     data class StoreIntent(
         val name: String,
         val data: String,
-    ) : OutgoingEvent {
+    ) : ClientEvent {
 
         constructor(intent: MVIIntent) : this(name = intent.name, intent.toString())
     }
@@ -36,7 +36,7 @@ internal sealed interface OutgoingEvent {
     data class StoreAction(
         val name: String,
         val data: String,
-    ) : OutgoingEvent {
+    ) : ClientEvent {
 
         constructor(action: MVIAction) : this(name = action.name, action.toString())
     }
@@ -45,7 +45,7 @@ internal sealed interface OutgoingEvent {
     data class StoreStateChanged(
         val from: StoreState,
         val to: StoreState,
-    ) : OutgoingEvent {
+    ) : ClientEvent {
 
         constructor(from: MVIState, to: MVIState) : this(from = StoreState(from), to = StoreState(to))
     }
@@ -53,19 +53,19 @@ internal sealed interface OutgoingEvent {
     @Serializable
     data class StoreUnsubscribed(
         val newSubscriptionCount: Int,
-    ) : OutgoingEvent
+    ) : ClientEvent
 
     @Serializable
     data class StoreSubscribed(
         val newSubscriptionCount: Int,
-    ) : OutgoingEvent
+    ) : ClientEvent
 
     @Serializable
     data class StoreException(
         val name: String,
         val message: String?,
-        val stackTrace: String?,
-    ) : OutgoingEvent {
+        val stackTrace: String,
+    ) : ClientEvent {
         constructor(e: Exception): this(e.name, e.message, e.stackTraceToString())
     }
 }

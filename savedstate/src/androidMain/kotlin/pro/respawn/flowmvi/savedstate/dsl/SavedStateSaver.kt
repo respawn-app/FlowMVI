@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
-import pro.respawn.flowmvi.savedstate.util.nameByType
+import pro.respawn.flowmvi.util.nameByType
 
 /**
  * A [Saver] implementation that saves the specified value of [T] to a [handle].

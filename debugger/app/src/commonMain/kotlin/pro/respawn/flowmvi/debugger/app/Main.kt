@@ -10,6 +10,7 @@ import org.koin.compose.KoinContext
 import org.koin.core.context.KoinContext
 import pro.respawn.flowmvi.debugger.app.di.koin
 import pro.respawn.flowmvi.debugger.app.ui.theme.RespawnTheme
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineScreen
 
 fun main() = application {
     val state = rememberWindowState(
@@ -23,9 +24,7 @@ fun main() = application {
         state = state
     ) {
         KoinContext(koin) {
-            RespawnTheme {
-
-            }
+            RespawnTheme { TimelineScreen() }
         }
     }
 }
