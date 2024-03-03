@@ -8,13 +8,15 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
 
 internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     initial: S,
     override val coroutineContext: CoroutineContext,
     val plugin: StorePlugin<S, I, A>,
-) : PipelineContext<S, I, A> {
+) : PipelineContext<S, I, A>, StoreLogger by PlatformStoreLogger {
 
     var state: S by atomic(initial)
         private set

@@ -27,7 +27,6 @@ import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.StoreConnectionDescriptor
 import pro.respawn.flowmvi.debugger.model.StoreEvent
-import pro.respawn.flowmvi.debugger.model.StoreState
 import pro.respawn.flowmvi.plugins.TimeTravel
 import kotlin.time.Duration
 
@@ -35,7 +34,7 @@ internal class DebugClient<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val name: String,
     private val client: HttpClient,
     private val timeTravel: TimeTravel<S, I, A>,
-    private val host: String = DebuggerDefaults.Host,
+    private val host: String = DebuggerDefaults.LocalHost,
     private val port: Int = DebuggerDefaults.Port,
     private val reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ) {

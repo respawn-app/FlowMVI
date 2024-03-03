@@ -28,6 +28,7 @@ internal const val NonDebuggableStoreMessage: String = """
 Store must be debuggable in order to use the debugger.
 Please set `debuggable = true` before installing the plugin.
 Don't include debug code in production builds.
+Suppress this error by using install(debuggerPlugin) directly.
 """
 
 @FlowMVIDSL
@@ -35,7 +36,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     client: HttpClient,
     timeTravel: TimeTravel<S, I, A>,
-    host: String = DebuggerDefaults.Host,
+    host: String = DebuggerDefaults.LocalHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): StorePlugin<S, I, A> = plugin {
@@ -77,7 +78,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.Host,
+    host: String = DebuggerDefaults.LocalHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): StorePlugin<S, I, A> {
@@ -101,7 +102,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger(
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.Host,
+    host: String = DebuggerDefaults.LocalHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ) {

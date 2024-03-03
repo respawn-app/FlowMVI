@@ -27,7 +27,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
 
     override val store by debugServerStore()
 
-    private val server = embeddedServer(Netty, port = DebuggerDefaults.Port, host = DebuggerDefaults.Host) {
+    private val server = embeddedServer(Netty, port = DebuggerDefaults.Port, host = DebuggerDefaults.LocalHost) {
         configureDebugServer()
         // store will be started / closed along with the server
         store.start(this)

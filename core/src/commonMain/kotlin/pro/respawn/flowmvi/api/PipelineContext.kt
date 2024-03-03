@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.job
+import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -17,6 +18,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * * [StateReceiver]
  * * [ActionReceiver]
  * * [CoroutineScope]
+ * * [StoreLogger]
  *
  * Pipeline context is built based on the parent [CoroutineScope] and depends on it.
  * Pipeline context is a child of the [CoroutineContext] of the store (scope).
@@ -40,6 +42,7 @@ public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
+    StoreLogger,
     CoroutineScope,
     CoroutineContext.Element {
 
