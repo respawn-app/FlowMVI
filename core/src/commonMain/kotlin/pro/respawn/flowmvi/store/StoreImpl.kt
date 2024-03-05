@@ -19,7 +19,6 @@ import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
 import pro.respawn.flowmvi.exceptions.UnhandledStoreException
-import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.RecoverModule
@@ -36,7 +35,6 @@ import pro.respawn.flowmvi.plugins.compositePlugin
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S, I, A>,
 ) : Store<S, I, A>,
-    StoreLogger by config.logger,
     Provider<S, I, A>,
     RecoverModule<S, I, A>,
     StorePlugin<S, I, A> by compositePlugin(config.plugins),

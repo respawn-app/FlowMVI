@@ -42,7 +42,6 @@ public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,
     ActionReceiver<A>,
-    StoreLogger,
     CoroutineScope,
     CoroutineContext.Element {
 

@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 import pro.respawn.flowmvi.debugger.name
 
 @Serializable
-sealed interface ClientEvent {
+sealed interface ClientEvent : MVIIntent {
 
     @Serializable
     data class StoreStarted(

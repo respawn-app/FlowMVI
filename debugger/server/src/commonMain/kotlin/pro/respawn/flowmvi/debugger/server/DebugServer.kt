@@ -16,12 +16,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.supervisorScope
 import pro.respawn.flowmvi.api.Container
-import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.StoreConnectionDescriptor
 import pro.respawn.flowmvi.debugger.model.StoreEvent
 import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
+import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StoreConnected
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StoreDisconnected
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
@@ -71,7 +71,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
         .start()
 
     fun stop() {
-        store.intent(ServerIntent.StopRequested)
+        store.intent(StopRequested)
         server?.stop()
         server = null
     }

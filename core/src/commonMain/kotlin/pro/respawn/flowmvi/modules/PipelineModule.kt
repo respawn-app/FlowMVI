@@ -39,10 +39,9 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
     onStart: PipelineContext<S, I, A>.() -> Unit,
-): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : RecoverModule<S, I, A>, T : StoreLogger = object :
+): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : RecoverModule<S, I, A> = object :
     IntentReceiver<I> by this,
     StateReceiver<S> by this,
-    StoreLogger by this,
     PipelineContext<S, I, A>,
     ActionReceiver<A> {
 

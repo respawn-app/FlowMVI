@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.logging.defaultLogger
 import pro.respawn.flowmvi.store.StoreConfiguration
 import pro.respawn.flowmvi.store.StoreImpl
 import kotlin.coroutines.CoroutineContext
@@ -33,7 +34,20 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public val initial: S,
 ) {
 
+    private var _logger: StoreLogger? = null
     private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
+
+    /**
+     * [StoreLogger] used for this store.
+     * If [debuggable] is `true` and logger has not been set,
+     * then [PlatformStoreLogger] will be used, else [NoOpStoreLogger] will be used.
+     * If the logger was set explicitly, then it will be used regardless of the [debuggable] flag.
+     */
+    public var logger: StoreLogger
+        get() = _logger ?: defaultLogger(debuggable)
+        set(value) {
+            _logger = value
+        }
 
     /**
      *  A coroutine context overrides for the store.
@@ -103,12 +117,6 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public var intentCapacity: Int = Channel.UNLIMITED
 
     /**
-     * [StoreLogger] used for this store. If [debuggable] is true, then [PlatformStoreLogger] will be used
-     */
-    @FlowMVIDSL
-    public var logger: StoreLogger = PlatformStoreLogger
-
-    /**
      * Install an existing [StorePlugin]. See the other overload to build the plugin on the fly.
      * This installs a prebuilt plugin.
      * Plugins will **preserve** the order of installation and will proceed according to this order.
@@ -159,7 +167,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         debuggable = debuggable,
         plugins = plugins,
         coroutineContext = coroutineContext,
-        logger = if (debuggable) logger else NoOpStoreLogger
+        logger = logger,
     ).let(::StoreImpl)
 }
 

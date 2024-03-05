@@ -45,7 +45,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.en
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     logger: StoreLogger = PlatformStoreLogger,
     tag: String? = null,
-    name: String = "${tag}Logging",
+    name: String = "${tag.orEmpty()}Logging",
     level: StoreLogLevel? = null,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
@@ -65,7 +65,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
         logger(level ?: Error, tag, it)
         it
     }
-    onStart { logger(level ?: Info, tag) { "Started $tag" } }
+    onStart { logger(level ?: Info, tag) { "Started ${tag ?: "Store"}" } }
     onSubscribe { subs -> logger(level ?: Info, tag) { "New subscriber #$subs" } }
     onUnsubscribe { logger(level ?: Info, tag) { "Subscriber #${it + 1} removed" } }
     onStop {

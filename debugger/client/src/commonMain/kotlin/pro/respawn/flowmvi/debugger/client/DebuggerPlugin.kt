@@ -31,6 +31,36 @@ Don't include debug code in production builds.
 Suppress this error by using install(debuggerPlugin) directly.
 """
 
+private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlugin(
+    storeName: String,
+    timeTravel: TimeTravel<S, I, A>,
+) = plugin<S, I, A> {
+    this.name = "${storeName}DebuggerPlugin"
+    onStart {
+        start(this)
+        emit(StoreStarted(storeName))
+    }
+    onIntent {
+        emit(StoreIntent(it))
+        it
+    }
+    onAction {
+        emit(StoreAction(it))
+        it
+    }
+    onState { old, new ->
+        emit(StoreStateChanged(old, new))
+        new
+    }
+    onException {
+        emit(StoreException(it))
+        it
+    }
+    onSubscribe { emit(StoreSubscribed(it)) }
+    onUnsubscribe { emit(StoreUnsubscribed(it)) }
+    onStop { close() }
+}
+
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
@@ -39,40 +69,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
-): StorePlugin<S, I, A> = plugin {
-    this.name = "${storeName}DebuggerPlugin"
-    with(DebugClient(storeName, client, timeTravel, host, port, reconnectionDelay)) {
-        onStart {
-            launch(this)
-            send(StoreStarted(storeName))
-        }
-        onIntent {
-            send(StoreIntent(it))
-            it
-        }
-        onAction {
-            send(StoreAction(it))
-            it
-        }
-        onState { old, new ->
-            send(StoreStateChanged(old, new))
-            new
-        }
-        onException {
-            send(StoreException(it))
-            it
-        }
-        onSubscribe {
-            send(StoreSubscribed(it))
-        }
-        onUnsubscribe {
-            send(StoreUnsubscribed(it))
-        }
-        onStop {
-            // nothing to do at this point - the debugger will know that store has disconnected
-        }
-    }
-}
+): StorePlugin<S, I, A> = debugClientStore(
+    clientName = storeName,
+    client = client,
+    host = host,
+    port = port,
+    reconnectionDelay = reconnectionDelay
+).asPlugin(storeName, timeTravel)
 
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,

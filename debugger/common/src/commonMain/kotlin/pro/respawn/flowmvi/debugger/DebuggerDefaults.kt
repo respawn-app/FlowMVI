@@ -9,8 +9,8 @@ internal expect val DefaultHost: String
 object DebuggerDefaults {
 
     const val Port = 9684
-    const val LocalHost = "localhost"
-    val ReconnectionDelay = 20.seconds
+    const val LocalHost = "127.0.0.1"
+    val ReconnectionDelay = 10.seconds
     val ClientHost get() = DefaultHost
     const val DefaultHistorySize: Int = 100
 
