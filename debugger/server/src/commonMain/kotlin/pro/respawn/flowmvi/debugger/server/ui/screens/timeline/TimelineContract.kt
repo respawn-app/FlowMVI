@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.datetime.LocalDateTime
+import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -44,6 +45,7 @@ internal data class FocusedEvent(
 internal sealed interface TimelineState : MVIState {
 
     data class Error(val e: Exception) : TimelineState
+
     data class ConfiguringServer(
         val host: Input = input(DebuggerDefaults.LocalHost),
         val port: Input = input(DebuggerDefaults.Port.toString()),

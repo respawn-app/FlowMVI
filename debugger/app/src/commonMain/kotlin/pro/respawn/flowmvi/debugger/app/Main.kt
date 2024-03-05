@@ -14,9 +14,9 @@ import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 
 fun main() = application {
     val state = rememberWindowState(
-        width = 1800.dp,
-        height = 1200.dp,
-        position = WindowPosition.Aligned(Alignment.Center)
+        width = 1200.dp,
+        height = 800.dp,
+        position = WindowPosition.Aligned(Alignment.Center),
     )
     Window(
         onCloseRequest = ::exitApplication,

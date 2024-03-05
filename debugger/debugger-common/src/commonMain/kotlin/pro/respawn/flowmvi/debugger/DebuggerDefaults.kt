@@ -39,6 +39,11 @@ public object DebuggerDefaults {
     public const val DefaultHistorySize: Int = 100
 
     /**
+     * History size for the server event log
+     */
+    public const val ServerHistorySize: Int = 300
+
+    /**
      * The default Json instance used for serializing debugger responses and requests.
      * Can be overridden if you provide a custom HttpClient
      */

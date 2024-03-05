@@ -2,7 +2,12 @@ package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -37,9 +42,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -51,6 +58,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -82,6 +91,7 @@ import pro.respawn.flowmvi.debugger.server.ui.widgets.DropDownActions
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RDropDownMenu
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
 import pro.respawn.flowmvi.debugger.server.ui.widgets.rememberDropDownActions
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 /**
@@ -106,7 +116,7 @@ fun TimelineScreen() {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
     state: TimelineState,
@@ -163,46 +173,67 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
                     )
                 }
             }
-            Row(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.weight(1f)) {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
-                        items(state.currentEvents) {
-                            StoreEventItem(
-                                event = it,
-                                onClick = { intent(EntryClicked(it)) },
-                                format = timestampFormatter::format
-                            )
-                        }
-                        if (state.currentEvents.isEmpty()) item {
-                            Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Waiting for events", modifier = Modifier.padding(top = 12.dp))
-                                    CircularProgressIndicator(modifier = Modifier.padding(12.dp))
+            Row(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.weight(1f).fillMaxHeight().animateContentSize()
+                ) {
+                    Column(Modifier.fillMaxSize()) {
+                        LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
+                            items(state.currentEvents) {
+                                StoreEventItem(
+                                    event = it,
+                                    onClick = { intent(EntryClicked(it)) },
+                                    format = timestampFormatter::format,
+                                    modifier = Modifier.animateItemPlacement(),
+                                    selected = it.event == state.focusedEvent?.event,
+                                )
+                            }
+                            if (state.currentEvents.isEmpty()) item {
+                                Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text("Waiting for events", modifier = Modifier.padding(top = 12.dp))
+                                        CircularProgressIndicator(modifier = Modifier.padding(12.dp))
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                AnimatedVisibility(state.focusedEvent != null) {
+                    VerticalDivider(Modifier.padding(horizontal = 12.dp))
+                }
                 AnimatedVisibility(
                     visible = state.focusedEvent != null,
-                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    modifier = Modifier.weight(1f, false).fillMaxHeight().animateContentSize(),
+                    enter = slideInHorizontally { it },
+                    exit = slideOutHorizontally { it }
                 ) {
-                    Row {
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp)
-                                .width(3.dp)
-                                .background(MaterialTheme.colorScheme.surface.copy(Opacity.disabled))
-                                .fillMaxHeight()
-                        )
-                        Column(modifier = Modifier.fillMaxWidth()) inner@{
-                            FocusedEventLayout(state.focusedEvent ?: return@inner, timestampFormatter::format)
+                    Surface(
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        Row(Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.fillMaxWidth()) inner@{
+                                if (state.focusedEvent == null) return@inner
+                                FocusedEventLayout(state.focusedEvent, timestampFormatter::format)
+                            }
                         }
                     }
                 }
             } // row
         } // column
     } // when
+}
+
+@Composable
+fun VerticalDivider(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .width(3.dp)
+            .background(MaterialTheme.colorScheme.surface.copy(Opacity.disabled))
+            .fillMaxHeight()
+    )
 }
 
 @Composable
@@ -244,15 +275,20 @@ private fun IntentReceiver<TimelineIntent>.StoreSelectorDropDown(
 @Composable
 private fun StoreEventItem(
     event: ServerEventEntry,
+    selected: Boolean,
     onClick: () -> Unit,
-    format: java.time.LocalDateTime.() -> String,
+    format: LocalDateTime.() -> String,
     modifier: Modifier = Modifier,
 ) {
     val timestamp = remember(event.timestamp) {
         format(event.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime())
     }
+    val color by animateColorAsState(
+        if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = Opacity.tint) else Color.Transparent
+    )
     ListItem(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(onClick = onClick).clip(MaterialTheme.shapes.extraSmall),
+        colors = ListItemDefaults.colors(containerColor = color),
         supportingContent = {
             Text(
                 timestamp,

@@ -72,6 +72,6 @@ private suspend inline fun Ctx.state(
 ) = updateState<Running, _>(update)
 
 private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = this
-    .takeLast(DebuggerDefaults.DefaultHistorySize)
+    .takeLast(DebuggerDefaults.ServerHistorySize)
     .plus(event)
     .toPersistentList()

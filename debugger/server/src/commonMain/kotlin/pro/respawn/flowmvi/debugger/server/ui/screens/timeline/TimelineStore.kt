@@ -79,7 +79,10 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
                                 .map { StoreItem(it.key, it.value.name) }
                                 .toPersistentList(),
                         ).also {
+                            val hasFocusedItem = it.focusedEvent != null
+                            val hasEvents = it.currentEvents.isNotEmpty()
                             if (current == null || !it.autoScroll) return@also
+                            if (hasFocusedItem || !hasEvents) return@also
                             action(ScrollToItem(it.currentEvents.lastIndex))
                         }
                     }
@@ -113,6 +116,7 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
             }
             is CloseFocusedEntryClicked -> updateState<DisplayingTimeline, _> { copy(focusedEvent = null) }
             is EntryClicked -> updateState<DisplayingTimeline, _> {
+                if (intent.entry.event == focusedEvent?.event) return@updateState copy(focusedEvent = null)
                 copy(
                     focusedEvent = FocusedEvent(
                         timestamp = intent.entry.timestamp.toLocalDateTime(timezone),
