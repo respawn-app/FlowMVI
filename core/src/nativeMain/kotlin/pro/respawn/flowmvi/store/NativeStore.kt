@@ -40,4 +40,6 @@ public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     override fun close(): Unit = cancel()
+    override fun equals(other: Any?): Boolean = store == other
+    override fun hashCode(): Int = store.hashCode()
 }
