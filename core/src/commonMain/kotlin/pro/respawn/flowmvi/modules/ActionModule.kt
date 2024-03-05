@@ -11,6 +11,8 @@ import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.UnrecoverableException
+import pro.respawn.flowmvi.exceptions.ActionsDisabledException
 
 internal fun <A : MVIAction> actionModule(
     behavior: ActionShareBehavior,
@@ -78,14 +80,9 @@ internal class SharedModule<A : MVIAction>(
 
 internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
 
-    override val actions get() = error(ActionsDisabledMessage)
+    override val actions get() = throw ActionsDisabledException()
 
     @DelicateStoreApi
-    override fun send(action: A) = error(ActionsDisabledMessage)
-    override suspend fun action(action: A) = error(ActionsDisabledMessage)
-
-    private companion object {
-
-        private const val ActionsDisabledMessage = "Actions are disabled for this store"
-    }
+    override fun send(action: A) = actions
+    override suspend fun action(action: A) = actions
 }
