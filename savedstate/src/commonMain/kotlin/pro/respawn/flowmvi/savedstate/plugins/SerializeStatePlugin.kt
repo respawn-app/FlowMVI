@@ -83,7 +83,7 @@ public inline fun <
     serializeStatePlugin<T, S, I, A>(
         dir = dir,
         json = json,
-        filename = name ?: nameByType<T>() ?: "State",
+        filename = nameByType<T>() ?: "State",
         context = context,
         behaviors = behaviors,
         resetOnException = resetOnException,
