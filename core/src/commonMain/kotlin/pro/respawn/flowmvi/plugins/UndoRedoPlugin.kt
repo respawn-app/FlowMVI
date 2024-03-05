@@ -18,8 +18,9 @@ import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.util.CappedMutableList
 
 /**
- * A plugin that allows to undo and redo any actions happening in the [pro.respawn.flowmvi.api.Store].
- * Keep a reference to the plugin instance to call [undo], [redo], and [invoke].
+ * An object that allows to undo and redo any actions happening in the [pro.respawn.flowmvi.api.Store].
+ * Keep a reference to the object instance to call [undo], [redo], and [invoke].
+ * Don't forget to install the corresponding plugin with [undoRedoPlugin].
  */
 public class UndoRedo(
     private val maxQueueSize: Int,
@@ -66,7 +67,7 @@ public class UndoRedo(
     /**
      * Add a given [undo] and [redo] to the queue.
      * If [doImmediately] is true, then [redo] will be executed **before** the queue is modified!
-     * **You cannot call [UndoRedoPlugin.undo] or [UndoRedoPlugin.redo] in [redo] or [undo]!**
+     * **You cannot call [UndoRedo.undo] or [UndoRedo.redo] in [redo] or [undo]!**
      */
     public suspend operator fun invoke(
         doImmediately: Boolean = true,
@@ -84,7 +85,7 @@ public class UndoRedo(
 
     /**
      * Add the [intent] to the queue with specified [undo] and **immediately** execute the [intent].
-     * **You cannot call [UndoRedoPlugin.undo] or [UndoRedoPlugin.redo] in [intent] or [undo]!**
+     * **You cannot call [UndoRedo.undo] or [UndoRedo.redo] in [intent] or [undo]!**
      */
     public suspend operator fun <I : MVIIntent> IntentReceiver<I>.invoke(
         intent: I,
@@ -122,7 +123,7 @@ public class UndoRedo(
     }
 
     /**
-     * Clear the queue of events and reset [index] to 0
+     * Clear the queue of events and reset [index] to -1
      */
     public fun reset(): Unit = _index.update {
         queue.clear()
@@ -140,9 +141,9 @@ public class UndoRedo(
     }
 
     /**
-     * An event happened in the [UndoRedoPlugin].
+     * An event happened in the [UndoRedo].
      */
-    public data class Event internal constructor(
+    internal data class Event internal constructor(
         internal val redo: suspend () -> Unit,
         internal val undo: suspend () -> Unit,
     ) {
@@ -152,7 +153,7 @@ public class UndoRedo(
 }
 
 /**
- * Returns a plugin that manages the [undoRedo] provided
+ * Returns a plugin that manages the [undoRedo] provided.
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> undoRedoPlugin(
