@@ -22,19 +22,6 @@ import kotlin.coroutines.EmptyCoroutineContext
  *
  * Pipeline context is built based on the parent [CoroutineScope] and depends on it.
  * Pipeline context is a child of the [CoroutineContext] of the store (scope).
- *
- * To be used, this context **must not be overridden** by the store's logic.
- * Writing the following:
- * ```kotlin
- * withContext(Dispatchers.IO) { intent(Intent) }
- * ```
- * **will result in an exception**
- *
- * Instead, if you want to send intents using the context, use it as follows:
- * ```kotlin
- * // this -> PipelineContext<S, I, A>
- * withContext(this + Dispatchers.IO) { }
- * ```
  * The pipeline's context is always the context the store was started with.
  */
 @FlowMVIDSL
