@@ -1,16 +1,10 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,9 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -49,7 +41,6 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets.StoreEven
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets.TimelineMenuBar
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
-import pro.respawn.flowmvi.debugger.server.ui.widgets.VerticalDivider
 import java.time.format.DateTimeFormatter
 
 /**

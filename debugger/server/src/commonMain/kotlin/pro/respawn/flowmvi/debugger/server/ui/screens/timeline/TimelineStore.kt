@@ -42,7 +42,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction as
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent as Intent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState as State
 
-@Suppress("UnnecessaryParentheses")
+@Suppress("UnnecessaryParentheses", "CyclomaticComplexMethod") // will fix later
 internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>(ConfiguringServer(), scope) {
     val timezone = TimeZone.currentSystemDefault()
     val filters = MutableStateFlow(TimelineFilters())

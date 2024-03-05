@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,13 +64,17 @@ internal fun IntentReceiver<TimelineIntent>.FocusedEventLayout(
                                 }
                             },
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(end = 8.dp)
+                            modifier = Modifier.padding(end = 8.dp),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
                             text = timestamp,
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(end = 8.dp).alpha(Opacity.secondary)
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .alpha(Opacity.secondary)
                         )
                     }
                     Row {
@@ -87,8 +92,7 @@ internal fun IntentReceiver<TimelineIntent>.FocusedEventLayout(
                     }
                 }
                 Divider()
-                Column(modifier = Modifier.horizontalScroll(rememberScrollState()).fillMaxWidth()) {
-                    Divider()
+                Column(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                     Text(value.event.representation, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
                 }
             }
