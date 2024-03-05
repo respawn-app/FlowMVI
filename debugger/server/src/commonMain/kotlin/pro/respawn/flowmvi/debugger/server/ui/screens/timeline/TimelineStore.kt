@@ -80,7 +80,6 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
                                 .toPersistentList(),
                         ).also {
                             if (current == null || !it.autoScroll) return@also
-                            if (current.currentEvents.size >= it.currentEvents.size) return@also
                             action(ScrollToItem(it.currentEvents.lastIndex))
                         }
                     }
