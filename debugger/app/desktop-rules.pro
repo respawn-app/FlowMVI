@@ -1,0 +1,7 @@
+-dontwarn kotlinx.datetime.**
+-dontwarn org.slf4j.**
+-keep class com.sun.jna.*
+-keep class * implements com.sun.jna.* { *; }
+-dontwarn io.netty.handler.**
+-dontwarn io.netty.util.**
+-dontwarn kotlinx.coroutines.android.**

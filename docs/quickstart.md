@@ -2,7 +2,7 @@
 
 Here's how the library works at a glance:
 
-![](images/FlowMVI.png)
+![](images/chart.png)
 
 ## Step 1: Configure the library
 

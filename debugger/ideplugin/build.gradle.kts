@@ -19,7 +19,7 @@ configurations.all {
 }
 
 intellijPlatform {
-    projectName = Config.debuggerPluginName
+    projectName = Config.debuggerName
     verifyPlugin {
         ides {
             recommended()
@@ -46,7 +46,7 @@ intellijPlatform {
         changeNotes
         id = "${Config.artifactId}.ideplugin"
         description = Config.debuggerPluginDescription
-        name = Config.debuggerPluginName
+        name = Config.debuggerName
         version = Config.versionName
     }
 }

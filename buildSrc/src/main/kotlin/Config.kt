@@ -18,17 +18,20 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 5
     const val patch = 0
-    const val postfix = "" // include dash (-)
-    const val versionName = "$majorRelease.$minorRelease.$patch$postfix"
+    const val postfix = "-alpha01" // include dash (-)
+    const val majorVersionName = "$majorRelease.$minorRelease.$patch"
+    const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
+    const val licenseFile = "LICENSE.txt"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
     const val description = """A Kotlin Multiplatform MVI library based on coroutines with a powerful plugin system"""
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
-    const val debuggerPluginDescription = "An Intellij IDEA plugin for FlowMVI - $description"
-    const val debuggerPluginName = "FlowMVI Debugger"
+    const val debuggerPluginDescription = "A debugger tool for FlowMVI - $description"
+    const val debuggerName = "FlowMVI Debugger"
+    const val debuggerAppId = "fd36c0cc-ae50-4aad-8579-f37e1e8af99c"
     // kotlin
 
     val optIns = listOf(

@@ -1,4 +1,4 @@
-# FlowMVI
+![](docs/images/banner.png)
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
@@ -301,7 +301,13 @@ Ready to try? Start with reading the [Quickstart Guide](https://opensource.respa
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date)](https://star-history.com/#respawn-app/flowmvi&Date)
+<a href="https://star-history.com/#respawn-app/flowmvi&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date" />
+  </picture>
+</a>
 
 ## License
 
