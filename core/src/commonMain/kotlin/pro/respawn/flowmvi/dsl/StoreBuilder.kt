@@ -106,7 +106,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      * [StoreLogger] used for this store. If [debuggable] is true, then [PlatformStoreLogger] will be used
      */
     @FlowMVIDSL
-    public var logger: StoreLogger? = null
+    public var logger: StoreLogger = PlatformStoreLogger
 
     /**
      * Install an existing [StorePlugin]. See the other overload to build the plugin on the fly.
@@ -159,7 +159,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         debuggable = debuggable,
         plugins = plugins,
         coroutineContext = coroutineContext,
-        logger = logger ?: if (debuggable) PlatformStoreLogger else NoOpStoreLogger
+        logger = if (debuggable) logger else NoOpStoreLogger
     ).let(::StoreImpl)
 }
 

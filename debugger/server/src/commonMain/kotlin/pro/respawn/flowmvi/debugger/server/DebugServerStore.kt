@@ -7,13 +7,17 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.server.ServerIntent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
+import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
+import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StoreConnected
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.server.ServerState
+import pro.respawn.flowmvi.debugger.server.ServerState.Idle
 import pro.respawn.flowmvi.debugger.server.ServerState.Running
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.debugger.server.ServerAction as Action
@@ -22,14 +26,14 @@ import pro.respawn.flowmvi.debugger.server.ServerState as State
 
 private typealias Ctx = PipelineContext<State, Intent, Action>
 
-internal fun debugServerStore() = lazyStore<State, Intent, Action>(Running()) {
+internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
     name = "DebugServer"
     parallelIntents = true
     coroutineContext = Dispatchers.Default
     actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
     debuggable = true
     onOverflow = BufferOverflow.DROP_OLDEST
-    install(platformLoggingPlugin())
+    enableLogging()
     recover { e ->
         updateState { State.Error(e, this) }
         null
@@ -37,6 +41,8 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Running()) {
     reduce { intent ->
         when (intent) {
             is RestoreRequested -> updateState<ServerState.Error, _> { previous }
+            is StopRequested -> useState { Idle } // needs to be fast
+            is ServerStarted -> useState { Running() }
             is EventReceived -> state {
                 copy(
                     eventLog = eventLog.add(

@@ -37,6 +37,7 @@ internal data class ServerEventEntry(
 
 internal sealed interface ServerState : MVIState {
     data class Error(val e: Exception, val previous: ServerState) : ServerState
+    data object Idle : ServerState
     data class Running(
         val clients: PersistentMap<Uuid, ServerClientState> = persistentMapOf(),
         val eventLog: PersistentList<ServerEventEntry> = persistentListOf(),
@@ -45,6 +46,8 @@ internal sealed interface ServerState : MVIState {
 
 internal sealed interface ServerIntent : MVIIntent {
     data object RestoreRequested : ServerIntent
+    data object StopRequested : ServerIntent
+    data object ServerStarted : ServerIntent
     data class StoreConnected(val descriptor: StoreConnectionDescriptor) : ServerIntent
     data class EventReceived(val event: ClientEvent, val from: Uuid) : ServerIntent
     data class StoreDisconnected(val id: Uuid) : ServerIntent

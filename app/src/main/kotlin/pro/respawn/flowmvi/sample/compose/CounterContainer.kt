@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.compose
 
 import android.content.Context
-import androidx.compose.runtime.produceState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -12,10 +11,8 @@ import pro.respawn.flowmvi.debugger.plugin.remoteDebugger
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.disallowRestartPlugin
-import pro.respawn.flowmvi.plugins.logging
 import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.manageJobs
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.registerOrReplace
@@ -52,7 +49,7 @@ class CounterContainer(
     override val store = store(CounterState.Loading) {
         name = "CounterContainer"
         debuggable = BuildConfig.DEBUG
-        if (debuggable) remoteDebugger()
+        if (debuggable) remoteDebugger(host = "10.0.2.2")
         install(
             loggingPlugin(),
             disallowRestartPlugin() // store does not restart when it is in a viewmodel

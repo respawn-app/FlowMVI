@@ -28,23 +28,17 @@ fun Project.configureMultiplatform(
         mingwX64()
     }
 
-    if (js) {
-        js(IR) {
-            browser()
-            nodejs()
-            binaries.library()
-        }
+    if (js) js(IR) {
+        browser()
+        nodejs()
+        binaries.library()
     }
 
-    if (android) {
-        androidTarget {
-            publishLibraryVariants("release")
-        }
+    if (android) androidTarget {
+        publishLibraryVariants("release")
     }
 
-    if (jvm) {
-        jvm()
-    }
+    if (jvm) jvm()
 
     sequence {
         if (iOs) {

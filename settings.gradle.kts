@@ -20,9 +20,6 @@ pluginManagement {
         }
     }
 }
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
-}
 dependencyResolutionManagement {
     // REQUIRED for IDE module configuration to resolve IDE platform
     repositoriesMode = RepositoriesMode.PREFER_PROJECT

@@ -25,13 +25,13 @@ import kotlin.math.log
  * [pro.respawn.flowmvi.api.Store.name] is used as a tag by default.
  */
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.logging(
-    logger: StoreLogger? = this.logger,
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableLogging(
+    logger: StoreLogger = this.logger,
     tag: String? = this.name,
     name: String = "${tag}Logging",
     level: StoreLogLevel? = null,
 ) {
-    install(loggingPlugin(logger ?: return, tag, name, level))
+    install(loggingPlugin(logger, tag, name, level))
 }
 
 /**
@@ -43,14 +43,14 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.lo
 @Suppress("CyclomaticComplexMethod") // false-positive based on ternary ops
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
-    logger: StoreLogger? = PlatformStoreLogger,
+    logger: StoreLogger = PlatformStoreLogger,
     tag: String? = null,
     name: String = "${tag}Logging",
     level: StoreLogLevel? = null,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onState { old, new ->
-        logger(level ?: Trace, tag) { "\nState:\n--->\n$old\n<---\n$new" }
+        logger(level ?: Trace, tag) { "State:\n--->\n$old\n<---\n$new" }
         new
     }
     onIntent {

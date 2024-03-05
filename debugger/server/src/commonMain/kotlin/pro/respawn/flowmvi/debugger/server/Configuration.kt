@@ -21,7 +21,7 @@ import org.slf4j.event.Level
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 
 internal fun Application.configureDebugServer() {
-    install(CORS)
+    install(CORS) { anyHost() }
     install(ContentNegotiation) {
         json(DebuggerDefaults.DefaultJson)
         checkAcceptHeaderCompliance = false

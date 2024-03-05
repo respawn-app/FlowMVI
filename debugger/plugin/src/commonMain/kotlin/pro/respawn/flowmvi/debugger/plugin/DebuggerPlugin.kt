@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.DebuggerDefaults.DefaultHistorySize
+import pro.respawn.flowmvi.debugger.client.debuggerPlugin
 import pro.respawn.flowmvi.debugger.client.remoteDebugger
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import kotlin.time.Duration
@@ -15,10 +16,10 @@ import kotlin.time.Duration
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.LocalHost,
+    host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
-): StorePlugin<S, I, A> = pro.respawn.flowmvi.debugger.client.debuggerPlugin(
+): StorePlugin<S, I, A> = debuggerPlugin(
     storeName = storeName,
     client = DebugHttpClient,
     historySize = historySize,
@@ -30,7 +31,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger(
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.LocalHost,
+    host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): Unit = remoteDebugger(

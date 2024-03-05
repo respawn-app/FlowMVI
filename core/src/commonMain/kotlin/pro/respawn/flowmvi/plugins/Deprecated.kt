@@ -35,7 +35,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> consoleLoggingPlugin(
  */
 @Deprecated(
     "Just use logging plugin and a platform store logger from now on",
-    ReplaceWith("loggingPlugin(PlatformStoreLogger, tag, name, level)")
+    ReplaceWith("loggingPlugin()")
 )
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPlugin(

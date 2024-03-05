@@ -34,7 +34,9 @@ kotlin {
             implementation(libs.uuid)
             implementation(libs.bundles.koin)
             implementation(libs.kotlin.io)
+            implementation(libs.kotlin.atomicfu)
 
+            implementation(projects.savedstate)
             implementation(projects.core)
             implementation(projects.compose)
             implementation(projects.debugger.common)

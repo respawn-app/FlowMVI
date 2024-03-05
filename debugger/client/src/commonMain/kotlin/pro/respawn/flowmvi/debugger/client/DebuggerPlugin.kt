@@ -36,7 +36,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     client: HttpClient,
     timeTravel: TimeTravel<S, I, A>,
-    host: String = DebuggerDefaults.LocalHost,
+    host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): StorePlugin<S, I, A> = plugin {
@@ -78,7 +78,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.LocalHost,
+    host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): StorePlugin<S, I, A> {
@@ -102,7 +102,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger(
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
-    host: String = DebuggerDefaults.LocalHost,
+    host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ) {

@@ -4,12 +4,14 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 
+internal expect val DefaultHost: String
+
 object DebuggerDefaults {
 
-    const val Port = 6789
-    const val LocalHost = "127.0.0.1"
-    const val EmulatorHost = "127.0.0.2"
+    const val Port = 9684
+    const val LocalHost = "localhost"
     val ReconnectionDelay = 20.seconds
+    val ClientHost get() = DefaultHost
     const val DefaultHistorySize: Int = 100
 
     @OptIn(ExperimentalSerializationApi::class)

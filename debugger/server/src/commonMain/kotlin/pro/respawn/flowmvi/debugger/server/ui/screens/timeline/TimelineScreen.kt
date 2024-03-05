@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
@@ -28,6 +29,7 @@ import androidx.compose.material.ListItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,9 +51,13 @@ import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.ui.representation
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventFilterSelected
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.HostChanged
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.PortChanged
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StartServerClicked
 import pro.respawn.flowmvi.debugger.server.ui.type
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DropDownActions
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RDropDownMenu
+import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
 import pro.respawn.flowmvi.debugger.server.ui.widgets.rememberDropDownActions
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -75,7 +81,17 @@ fun TimelineScreen() {
 private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(state: TimelineState) {
     val timestampFormatter = remember { DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG) }
     when (state) {
-        is TimelineState.Loading -> CircularProgressIndicator()
+        is TimelineState.ConfiguringServer -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                RTextInput(state.host, onTextChange = { intent(HostChanged(it)) }, label = "ClientHost")
+                RTextInput(state.port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
+                TextButton(onClick = { intent(StartServerClicked) }, enabled = state.canStart) { Text("Connect") }
+            }
+        }
         is TimelineState.Error -> Column {
             Text("An error has occurred", fontSize = 32.sp)
             SelectionContainer {
