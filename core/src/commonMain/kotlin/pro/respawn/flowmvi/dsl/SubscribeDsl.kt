@@ -29,6 +29,17 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Immutable
 }
 
 /**
+ * Subscribe to the store. An overload of [Store.subscribe] that is applied on [CoroutineScope].
+ */
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
+    store: ImmutableStore<S, I, A>,
+    @BuilderInference crossinline consume: suspend Provider<S, I, A>.() -> Unit,
+): Job = with(store) {
+    subscribe { consume() }
+}
+
+/**
  * Subscribe to the [store] and invoke [consume] and [render] in parallel in the provided scope.
  *
  * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
