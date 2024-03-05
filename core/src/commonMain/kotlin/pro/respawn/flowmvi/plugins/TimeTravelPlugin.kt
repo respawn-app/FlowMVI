@@ -122,8 +122,8 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
 }
 
 /**
- * Create a new [TimeTravel]. Keep a reference to the plugin to use its properties.
- * @return the plugin.
+ * Install the specified [timeTravel] as a plugin.
+ * @return the plugin
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
@@ -132,11 +132,19 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
 ): StorePlugin<S, I, A> = timeTravel.asPlugin(name)
 
 /**
- * Create a new [TimeTravel] and installs it. Keep a reference to the plugin to use its properties.
- * @return the plugin.
+ * Create a new [TimeTravel] and installs it. Keep a reference to the object to use its properties.
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
     timeTravel: TimeTravel<S, I, A>,
     name: String = TimeTravel.Name,
 ): Unit = install(timeTravelPlugin(timeTravel, name = name))
+
+/**
+ * Create a new [TimeTravel] and installs it. Keep a reference to the returning value to use its properties.
+ * @return the [TimeTravel] instance.
+ */
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
+    name: String = TimeTravel.Name,
+): TimeTravel<S, I, A> = TimeTravel<S, I, A>().also { install(timeTravelPlugin(it, name = name)) }
