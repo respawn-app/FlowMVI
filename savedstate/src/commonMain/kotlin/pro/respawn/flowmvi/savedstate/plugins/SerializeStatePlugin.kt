@@ -40,7 +40,7 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
-    noinline recover: suspend (Exception) -> T?,
+    noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> = saveStatePlugin(
     saver = TypedSaver<T, _>(
         JsonSaver(
