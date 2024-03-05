@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.savedstate.util
 
+import kotlinx.coroutines.CancellationException
 import pro.respawn.flowmvi.savedstate.api.Saver
 
 @PublishedApi
@@ -14,6 +15,8 @@ Please supply at least one behavior or remove the plugin as it would do nothing 
 @PublishedApi
 internal suspend fun <S> Saver<S>.saveCatching(state: S?): Unit = try {
     save(state)
+} catch (e: CancellationException) {
+    throw e
 } catch (expected: Exception) {
     recover(expected)
     Unit
@@ -22,6 +25,8 @@ internal suspend fun <S> Saver<S>.saveCatching(state: S?): Unit = try {
 @PublishedApi
 internal suspend fun <S> Saver<S>.restoreCatching(): S? = try {
     restore()
+} catch (e: CancellationException) {
+    throw e
 } catch (expected: Exception) {
     recover(expected)
 }
