@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.coroutineScope
@@ -89,13 +91,13 @@ public abstract class AbstractStorePlugin<S : MVIState, I : MVIIntent, A : MVIAc
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        A2 : MVIAction
-        > parentStorePlugin(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    A2 : MVIAction
+    > parentStorePlugin(
     parent: Store<S2, I2, A2>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,
@@ -147,7 +149,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction, S2 : MVIState, I2
     @BuilderInference crossinline render: suspend PipelineContext<S, I, A>.(state: S2) -> Unit,
 ): StorePlugin<S, I, A> = whileSubscribedPlugin(name = name, minSubscriptions = minExternalSubscriptions) {
     coroutineScope {
-        subscribe(parent) { render(it) }.join()
+        subscribe(parent, render = { render(it) }).join()
     }
 }
 
@@ -169,12 +171,12 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction, S2 : MVIState, I2
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        > StoreBuilder<S, I, A>.parentStore(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    > StoreBuilder<S, I, A>.parentStore(
     parent: Store<S2, I2, *>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,
@@ -199,13 +201,13 @@ public inline fun <
 @Suppress("Indentation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        S2 : MVIState,
-        I2 : MVIIntent,
-        A2 : MVIAction,
-        > StoreBuilder<S, I, A>.parentStore(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    S2 : MVIState,
+    I2 : MVIIntent,
+    A2 : MVIAction,
+    > StoreBuilder<S, I, A>.parentStore(
     parent: Store<S2, I2, A2>,
     name: String? = parent.name?.let { "ParentStorePlugin\$$it" },
     minExternalSubscriptions: Int = 1,

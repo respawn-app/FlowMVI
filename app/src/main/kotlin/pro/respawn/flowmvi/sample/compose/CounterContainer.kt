@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.debugger.plugin.remoteDebugger
+import pro.respawn.flowmvi.debugger.plugin.enableRemoteDebugging
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.disallowRestartPlugin
@@ -49,7 +49,7 @@ class CounterContainer(
     override val store = store(CounterState.Loading) {
         name = "CounterContainer"
         debuggable = BuildConfig.DEBUG
-        if (debuggable) remoteDebugger(host = "10.0.2.2")
+        if (debuggable) enableRemoteDebugging(host = "10.0.2.2")
         install(
             loggingPlugin(),
             disallowRestartPlugin() // store does not restart when it is in a viewmodel

@@ -1,4 +1,5 @@
 @file:UseSerializers(UUIDSerializer::class)
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty") // response models for internal usage
 
 package pro.respawn.flowmvi.debugger.model
 
@@ -9,13 +10,10 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
-sealed interface ServerEvent : MVIIntent {
+public sealed interface ServerEvent : MVIIntent {
 
-    val storeId: Uuid
-
-    @Serializable
-    data class Stop(val index: Int, override val storeId: Uuid) : ServerEvent
+    public val storeId: Uuid
 
     @Serializable
-    data class RestoreState(val index: Int, override val storeId: Uuid) : ServerEvent
+    public data class Stop(val index: Int, override val storeId: Uuid) : ServerEvent
 }

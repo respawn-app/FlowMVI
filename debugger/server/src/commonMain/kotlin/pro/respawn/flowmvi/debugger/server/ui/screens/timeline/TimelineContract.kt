@@ -16,24 +16,24 @@ import pro.respawn.kmmutils.inputforms.Input
 import pro.respawn.kmmutils.inputforms.dsl.input
 import pro.respawn.kmmutils.inputforms.dsl.isValid
 
-enum class EventType {
+internal enum class EventType {
     Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
 }
 
 @Immutable
-data class TimelineFilters(
+internal data class TimelineFilters(
     val store: StoreItem? = null,
     val events: ImmutableSet<EventType> = EventType.entries.toImmutableSet(),
 )
 
 @Immutable
-data class StoreItem(
+internal data class StoreItem(
     val id: Uuid,
     val name: String,
 )
 
 @Immutable
-data class FocusedEvent(
+internal data class FocusedEvent(
     val timestamp: LocalDateTime,
     val storeName: String,
     val type: EventType,

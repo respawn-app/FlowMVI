@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.desktop.ui.tooling.preview.Preview
@@ -27,7 +26,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material.icons.rounded.ExitToApp
@@ -41,7 +39,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -79,6 +76,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.Po
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StartServerClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StopServerClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
+import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
 import pro.respawn.flowmvi.debugger.server.ui.type
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DropDownActions
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RDropDownMenu
@@ -86,6 +84,9 @@ import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
 import pro.respawn.flowmvi.debugger.server.ui.widgets.rememberDropDownActions
 import java.time.format.DateTimeFormatter
 
+/**
+ * The Timeline (Main) screen of the debugger.
+ */
 @Composable
 fun TimelineScreen() {
     val scope = rememberCoroutineScope()
@@ -191,7 +192,7 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
                             modifier = Modifier
                                 .padding(horizontal = 12.dp)
                                 .width(3.dp)
-                                .background(MaterialTheme.colorScheme.surface.copy(0.38f))
+                                .background(MaterialTheme.colorScheme.surface.copy(Opacity.disabled))
                                 .fillMaxHeight()
                         )
                         Column(modifier = Modifier.fillMaxWidth()) inner@{
@@ -296,7 +297,7 @@ private fun IntentReceiver<TimelineIntent>.FocusedEventLayout(
                         Text(
                             text = timestamp,
                             style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(end = 8.dp).alpha(0.8f)
+                            modifier = Modifier.padding(end = 8.dp).alpha(Opacity.secondary)
                         )
                     }
                     Spacer(Modifier.weight(1f))

@@ -1,6 +1,6 @@
 @file:Suppress("DuplicatedCode")
 
-package pro.respawn.flowmvi.debugger.app.ui.theme
+package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -100,6 +100,9 @@ private val DarkColors = darkColorScheme(
 @Composable
 internal fun rememberColorScheme(dark: Boolean) = remember(dark) { if (dark) DarkColors else LightColors }
 
+/**
+ * Respawn branded theme
+ */
 @Composable
 fun RespawnTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),

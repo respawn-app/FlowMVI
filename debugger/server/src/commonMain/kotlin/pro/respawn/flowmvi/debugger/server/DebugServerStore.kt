@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.debugger.model.ClientEvent
+import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
@@ -25,8 +25,6 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent as Intent
 import pro.respawn.flowmvi.debugger.server.ServerState as State
 
 private typealias Ctx = PipelineContext<State, Intent, Action>
-
-private const val MaxHistorySize = 1000
 
 internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
     name = "DebugServer"
@@ -74,7 +72,6 @@ private suspend inline fun Ctx.state(
 ) = updateState<Running, _>(update)
 
 private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = this
-    .asSequence()
+    .takeLast(DebuggerDefaults.DefaultHistorySize)
     .plus(event)
-    .take(MaxHistorySize)
     .toPersistentList()

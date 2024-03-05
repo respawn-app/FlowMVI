@@ -11,14 +11,14 @@ import pro.respawn.kmmutils.inputforms.dsl.checks
 
 private val PortRange = 0..10000
 
-val PortForm = Form(
+internal val PortForm = Form(
     FailFast,
     NonEmpty,
     Rules.DigitsOnly,
     Rule { { it.toIntOrNull() in PortRange } checks { ValidationError.NotInRange(it, PortRange) } }
 )
 
-val HostForm = Form(
+internal val HostForm = Form(
     FailFast,
     NonEmpty,
     AsciiOnly,

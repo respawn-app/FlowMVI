@@ -33,7 +33,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
     private var server: EmbeddedServer<*, *>? by atomic(null)
     private val logger = PlatformStoreLogger
 
-    fun start(port: Int) = embeddedServer(Netty, port = port, host = "127.0.0.1") {
+    fun start(host: String, port: Int) = embeddedServer(Netty, port = port, host = host) {
         configureDebugServer()
         // store will be started / closed along with the server
         store.start(this)

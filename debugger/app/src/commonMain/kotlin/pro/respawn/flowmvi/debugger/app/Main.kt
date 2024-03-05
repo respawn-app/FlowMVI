@@ -9,8 +9,8 @@ import androidx.compose.ui.window.rememberWindowState
 import org.koin.compose.KoinContext
 import org.koin.core.context.KoinContext
 import pro.respawn.flowmvi.debugger.app.di.koin
-import pro.respawn.flowmvi.debugger.app.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineScreen
+import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 
 fun main() = application {
     val state = rememberWindowState(

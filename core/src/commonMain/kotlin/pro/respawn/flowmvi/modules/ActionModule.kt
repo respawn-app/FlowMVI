@@ -11,7 +11,6 @@ import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
-import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.ActionsDisabledException
 
 internal fun <A : MVIAction> actionModule(

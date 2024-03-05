@@ -38,14 +38,15 @@ import pro.respawn.kmmutils.inputforms.Input
 import pro.respawn.kmmutils.inputforms.ValidationError
 import pro.respawn.kmmutils.inputforms.dsl.isEmptyValue
 
+// TODO: Implement normal error messages
 @Composable
-fun List<ValidationError>.toMessages() = map { it::class.simpleName }
+internal fun List<ValidationError>.toMessages() = map { it::class.simpleName }
 
 @Composable
-fun List<ValidationError>.toReadableString() = toMessages().joinToString("\n")
+internal fun List<ValidationError>.toReadableString() = toMessages().joinToString("\n")
 
 @Composable
-fun KeyboardActions.Companion.default(
+internal fun KeyboardActions.Companion.default(
     onOther: (KeyboardActionScope.() -> Unit)? = null,
 ) = LocalFocusManager.current.run {
     remember {
@@ -61,7 +62,7 @@ fun KeyboardActions.Companion.default(
 }
 
 @Composable
-fun RTextInput(
+internal fun RTextInput(
     input: Input,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -175,7 +176,7 @@ fun RTextInput(
 }
 
 @Composable
-fun ClearFieldIcon(
+internal fun ClearFieldIcon(
     input: Input,
     onClear: () -> Unit,
     enabled: Boolean = true,

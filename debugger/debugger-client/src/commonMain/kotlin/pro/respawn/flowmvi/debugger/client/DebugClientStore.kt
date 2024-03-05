@@ -7,6 +7,7 @@ import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.close
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +78,9 @@ internal fun debugClientStore(
                 session.value = this
                 log(StoreLogLevel.Debug, this@store.name) { "Established connection to ${call.request.url}" }
                 awaitEvents {
-                    // STOPSHIP: Add code to support events we want to work with
+                    when (it) {
+                        is ServerEvent.Stop -> close()
+                    }
                     log(StoreLogLevel.Debug, this@store.name) { "Received event: $it" }
                 }
             }

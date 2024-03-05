@@ -1,3 +1,5 @@
 package pro.respawn.flowmvi.debugger
 
-internal actual val DefaultHost = "127.0.0.1"
+import pro.respawn.flowmvi.debugger.DebuggerDefaults.LocalHost
+
+internal actual val DefaultHost = LocalHost

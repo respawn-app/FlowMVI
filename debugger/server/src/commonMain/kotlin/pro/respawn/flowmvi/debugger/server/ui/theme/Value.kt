@@ -1,4 +1,5 @@
-package pro.respawn.flowmvi.debugger.app.ui.theme
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
+package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.dp

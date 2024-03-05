@@ -1,4 +1,6 @@
-package pro.respawn.flowmvi.debugger.app.ui.theme
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
+
+package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
@@ -18,8 +20,8 @@ import androidx.compose.ui.unit.sp
 val Comfortaa = Font("font/comfortaa.ttf").toFontFamily()
 val Montserrat = Font("font/montserrat.ttf").toFontFamily()
 
-inline val FontFamily.Companion.Montserrat get() = pro.respawn.flowmvi.debugger.app.ui.theme.Montserrat
-inline val FontFamily.Companion.Comfortaa get() = pro.respawn.flowmvi.debugger.app.ui.theme.Comfortaa
+inline val FontFamily.Companion.Montserrat get() = pro.respawn.flowmvi.debugger.server.ui.theme.Montserrat
+inline val FontFamily.Companion.Comfortaa get() = pro.respawn.flowmvi.debugger.server.ui.theme.Comfortaa
 
 private const val FontFeatures = "dlig, liga, kern, zero, locl, size"
 

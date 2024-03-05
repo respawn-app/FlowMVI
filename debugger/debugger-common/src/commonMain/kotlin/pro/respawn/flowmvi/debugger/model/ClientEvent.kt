@@ -1,4 +1,5 @@
 @file:UseSerializers(UUIDSerializer::class)
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty") // response models for internal usage
 
 package pro.respawn.flowmvi.debugger.model
 
@@ -12,72 +13,73 @@ import pro.respawn.flowmvi.debugger.name
 import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
-sealed interface ClientEvent : MVIIntent {
+public sealed interface ClientEvent : MVIIntent {
 
     @Serializable
-    data class StoreConnected(
+    public data class StoreConnected(
         val name: String,
         val id: Uuid,
     ) : ClientEvent
 
     @Serializable
-    data class StoreDisconnected(
+    public data class StoreDisconnected(
         val id: Uuid,
     ) : ClientEvent
 
     @Serializable
-    data class StoreStarted(
+    public data class StoreStarted(
         val name: String,
     ) : ClientEvent
 
     @Serializable
-    data class StoreStopped(
+    public data class StoreStopped(
         val name: String,
     ) : ClientEvent
 
     @Serializable
-    data class StoreIntent(
+    public data class StoreIntent(
         val name: String,
         val data: String,
     ) : ClientEvent {
 
-        constructor(intent: MVIIntent) : this(name = intent.name, intent.toString())
+        public constructor(intent: MVIIntent) : this(name = intent.name, intent.toString())
     }
 
     @Serializable
-    data class StoreAction(
+    public data class StoreAction(
         val name: String,
         val data: String,
     ) : ClientEvent {
 
-        constructor(action: MVIAction) : this(name = action.name, action.toString())
+        public constructor(action: MVIAction) : this(name = action.name, action.toString())
     }
 
     @Serializable
-    data class StoreStateChanged(
+    public data class StoreStateChanged(
         val from: StoreState,
         val to: StoreState,
     ) : ClientEvent {
 
-        constructor(from: MVIState, to: MVIState) : this(from = StoreState(from), to = StoreState(to))
+        public constructor(from: MVIState, to: MVIState) : this(from = StoreState(from), to = StoreState(to))
     }
 
     @Serializable
-    data class StoreUnsubscribed(
+    public data class StoreUnsubscribed(
         val newSubscriptionCount: Int,
     ) : ClientEvent
 
     @Serializable
-    data class StoreSubscribed(
+    public data class StoreSubscribed(
         val newSubscriptionCount: Int,
     ) : ClientEvent
 
     @Serializable
-    data class StoreException(
+    public data class StoreException(
         val name: String,
         val message: String?,
         val stackTrace: String,
     ) : ClientEvent {
-        constructor(e: Exception) : this(e.name, e.message, e.stackTraceToString())
+
+        public constructor(e: Exception) : this(e.name, e.message, e.stackTraceToString())
     }
 }

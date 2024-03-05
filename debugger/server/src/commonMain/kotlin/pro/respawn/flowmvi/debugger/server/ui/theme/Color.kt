@@ -1,4 +1,6 @@
-package pro.respawn.flowmvi.debugger.app.ui.theme
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty", "UndocumentedPublicFunction")
+
+package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,7 +25,6 @@ val pink = Color(0xffff4081) // -49023
 val gray = Color(0xff607d8b) // -10453621
 val brown = Color(0xff8d6e63) // -7508381
 
-// Respawn's color palette, in order of prominence
 val mint = Color(0xff00d46a)
 val skyblue = Color(0xff0288d1)
 val bright_red = Color(0xFFFF5555)

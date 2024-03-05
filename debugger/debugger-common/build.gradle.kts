@@ -7,7 +7,7 @@ plugins {
 }
 
 kotlin {
-    configureMultiplatform(this, explicitApi = false)
+    configureMultiplatform(this)
 }
 
 android {

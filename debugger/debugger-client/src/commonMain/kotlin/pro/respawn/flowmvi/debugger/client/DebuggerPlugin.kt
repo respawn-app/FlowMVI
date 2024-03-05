@@ -31,9 +31,10 @@ Don't include debug code in production builds.
 Suppress this error by using install(debuggerPlugin) directly.
 """
 
+@Suppress("UNUSED_PARAMETER")
 private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlugin(
     storeName: String,
-    timeTravel: TimeTravel<S, I, A>,
+    timeTravel: TimeTravel<S, I, A>, // will be used later
 ) = plugin<S, I, A> {
     this.name = "${storeName}DebuggerPlugin"
     onStart {
@@ -61,6 +62,19 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
     onStop { close() }
 }
 
+/**
+ * Creates a new remote debugging plugin.
+ * * You must also provide a [TimeTravel] for the plugin to use where it will track events.
+ * * This overload uses a custom [client] for networking. This client **must** be configured
+ *   to correctly serialize and use websockets for connection.
+ *   See the documentation to learn how to set up the client.
+ *   If you want to use the default client, depend on debugger-plugin
+ *   module instead.
+ *
+ * This plugin **must not be used** in production code.
+ * Better yet, do not include the debugger-client dependency at all in production builds,
+ * because the plugin depends on a lot of things you may not need for your application.
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
@@ -77,6 +91,19 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     reconnectionDelay = reconnectionDelay
 ).asPlugin(storeName, timeTravel)
 
+/**
+ * Creates a new remote debugging plugin.
+ * * This overload will create and install a [TimeTravel] plugin for you.
+ * * This overload uses a custom [client] for networking. This client **must** be configured
+ *   to correctly serialize and use websockets for connection.
+ *   See the documentation to learn how to set up the client.
+ *   If you want to use the default client, depend on debugger-plugin
+ *   module instead.
+ *
+ * This plugin **must not be used** in production code.
+ * Better yet, do not include the debugger-client dependency at all in production builds,
+ * because the plugin depends on a lot of things you may not need for your application.
+ */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
@@ -88,7 +115,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
 ): StorePlugin<S, I, A> {
     val tt = TimeTravel<S, I, A>(maxHistorySize = historySize)
     return compositePlugin(
-        setOf(
+        name = "${storeName}DebuggerPlugin",
+        plugins = setOf(
             timeTravelPlugin(timeTravel = tt, name = "${storeName}DebuggerTimeTravel"),
             debuggerPlugin(
                 storeName = storeName,
@@ -102,8 +130,23 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     )
 }
 
+/**
+ * Create and install a new remote debugging plugin.
+ * * This overload will create and install a [TimeTravel] plugin for you.
+ * * This overload uses a custom [client] for networking. This client **must** be configured
+ *   to correctly serialize and use websockets for connection.
+ *   See the documentation to learn how to set up the client.
+ *   If you want to use the default client, depend on debugger-plugin
+ *   module instead.
+ * * This overload will throw if the store is **not** debuggable for safety reasons. If you still want to override
+ *   this behavior (although strictly not recommended), please use another overload like [debuggerPlugin].
+ *
+ * This plugin **must not be used** in production code.
+ * Better yet, do not include the debugger-client dependency at all in production builds,
+ * because the plugin depends on a lot of things you may not need for your application.
+ */
 @FlowMVIDSL
-public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger(
+public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableRemoteDebugging(
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
     host: String = DebuggerDefaults.ClientHost,

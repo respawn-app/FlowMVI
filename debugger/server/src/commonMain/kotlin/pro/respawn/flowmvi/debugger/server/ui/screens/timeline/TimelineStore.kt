@@ -16,7 +16,6 @@ import pro.respawn.flowmvi.debugger.server.ServerState
 import pro.respawn.flowmvi.debugger.server.ui.HostForm
 import pro.respawn.flowmvi.debugger.server.ui.PortForm
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.AutoScrollToggled
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEntryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EntryClicked
@@ -96,7 +95,7 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
             is AutoScrollToggled -> updateState<DisplayingTimeline, _> { copy(autoScroll = !autoScroll) }
             is Intent.StartServerClicked -> updateState<ConfiguringServer, _> {
                 if (canStart) {
-                    DebugServer.start(port = port.value.toInt())
+                    DebugServer.start(host = host.value, port = port.value.toInt())
                     DisplayingTimeline(persistentListOf(), persistentListOf())
                 } else this
             }

@@ -19,19 +19,20 @@ import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.websocket.WebSockets
 import org.slf4j.event.Level
-import pro.respawn.flowmvi.debugger.DebuggerDefaults
+import pro.respawn.flowmvi.debugger.DebuggerDefaults.DefaultJson
 
+@Suppress("MagicNumber")
 internal fun Application.configureDebugServer() {
     install(CORS) { anyHost() }
     install(ContentNegotiation) {
-        json(DebuggerDefaults.DefaultJson)
+        json(DefaultJson)
         checkAcceptHeaderCompliance = false
     }
     install(DefaultHeaders)
     install(DataConversion)
     install(PartialContent)
     install(WebSockets) {
-        contentConverter = KotlinxWebsocketSerializationConverter(DebuggerDefaults.DefaultJson)
+        contentConverter = KotlinxWebsocketSerializationConverter(DefaultJson)
     }
     install(CallLogging) {
         level = if (this@configureDebugServer.developmentMode) Level.DEBUG else Level.INFO
