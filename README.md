@@ -34,13 +34,20 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" } # core KMP code
-flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }  # test DSL
-
-flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }  # compose multiplatform
-flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" } # common android
-flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" } # view-based android
-flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" } # KMP state preservation
+# core KMP module
+flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" }
+# test DSL
+flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }
+# compose multiplatform
+flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }
+# common android
+flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
+# view-based android
+flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" }
+# Multiplatform state preservation
+flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
+# Remote debugging client
+flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" } 
 ```
 
 </details>
@@ -56,6 +63,7 @@ dependencies {
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
+    androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
 }
