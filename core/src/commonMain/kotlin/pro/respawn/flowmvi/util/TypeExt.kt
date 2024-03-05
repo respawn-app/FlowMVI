@@ -22,3 +22,8 @@ public inline fun <reified T : R, R> R.withType(@BuilderInference block: T.() ->
  */
 @FlowMVIDSL
 public inline fun <reified T> Any?.typed(): T? = this as? T
+
+/**
+ * Get the name of the class, removing the "State" suffix, if present.
+ */
+public inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")

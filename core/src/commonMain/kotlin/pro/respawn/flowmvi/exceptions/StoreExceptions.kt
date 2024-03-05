@@ -39,3 +39,10 @@ internal fun UnhandledStoreException(cause: Exception) = UnrecoverableException(
     """.trimIndent(),
     cause = cause,
 )
+
+internal fun ActionsDisabledException() = UnrecoverableException(
+    message = """
+        Actions are disabled for this store, but you tried to consume or send one.
+        This is most likely a developer error. Either enable actions or do not attempt to send them.
+    """.trimIndent()
+)

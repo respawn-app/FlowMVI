@@ -43,6 +43,7 @@ dependencies {
     implementation(projects.compose)
     implementation(projects.androidView)
     implementation(projects.savedstate)
+    implementation(projects.debugger.debuggerPlugin)
 
     implementation(libs.bundles.koin)
     implementation(libs.koin.android.compose)

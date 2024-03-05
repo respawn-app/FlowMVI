@@ -1,0 +1,5 @@
+<idea-plugin>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.compose.intellij.platform</depends>
+    <depends>com.intellij.modules.platform</depends>
+</idea-plugin>

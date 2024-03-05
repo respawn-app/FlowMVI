@@ -12,6 +12,8 @@ import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
+private val Project.subProjectName get() = name.removePrefix(":").replace("[/:]".toRegex(), "-")
+
 /**
  * Configures Maven publishing to sonatype for this project
  */
@@ -24,8 +26,8 @@ fun Project.publishMultiplatform() {
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
             sonatypeRepository(isReleaseBuild, properties)
-
             publications.withType<MavenPublication>().configureEach {
+                groupId = rootProject.group.toString()
                 artifact(javadocTask)
                 configurePom()
                 configureVersion(isReleaseBuild)
@@ -61,8 +63,6 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
                 maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
                     from(components[Config.publishingVariant])
                     groupId = rootProject.group.toString()
-                    artifactId = project.name
-
                     configurePom()
                     configureVersion(isReleaseBuild)
                 }

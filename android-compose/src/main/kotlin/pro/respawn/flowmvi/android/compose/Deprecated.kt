@@ -120,7 +120,7 @@ internal data class ConsumerScopeImpl<S : MVIState, in I : MVIIntent, out A : MV
                 owner.repeatOnLifecycle(lifecycleState) {
                     block?.let { block ->
                         subscribe(store, { block(it) }) { state.value = it }
-                    } ?: subscribe(store) { state.value = it }
+                    } ?: subscribe(store, render = { state.value = it })
                 }
             }
         }

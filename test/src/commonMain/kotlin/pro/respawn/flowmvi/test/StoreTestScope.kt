@@ -22,6 +22,8 @@ public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @Publish
 
     @OptIn(DelicateStoreApi::class)
     override val state: S by store::state
+    override fun hashCode(): Int = store.hashCode()
+    override fun equals(other: Any?): Boolean = store == other
     override suspend fun emit(intent: I): Unit = store.emit(intent)
     override fun intent(intent: I): Unit = store.intent(intent)
 

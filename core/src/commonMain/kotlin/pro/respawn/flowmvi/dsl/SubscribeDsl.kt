@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.api.Store
+import kotlin.jvm.JvmName
 
 /**
  * Subscribe to [this] store and suspend until [consume] finishes (which should never return).
@@ -29,6 +30,18 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Immutable
 }
 
 /**
+ * Subscribe to the store. An overload of [Store.subscribe] that is applied on [CoroutineScope].
+ */
+@JvmName("subscribeConsume")
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
+    store: ImmutableStore<S, I, A>,
+    @BuilderInference crossinline consume: suspend Provider<S, I, A>.() -> Unit,
+): Job = with(store) {
+    subscribe { consume() }
+}
+
+/**
  * Subscribe to the [store] and invoke [consume] and [render] in parallel in the provided scope.
  *
  * * This function does **not** handle the lifecycle of the UI layer. For that, see platform implementations.
@@ -36,6 +49,7 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Immutable
  *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
+@JvmName("subscribeAndRender")
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
     store: ImmutableStore<S, I, A>,
@@ -62,6 +76,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
  *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
  * @see [Store.subscribe]
  */
+@JvmName("subscribeAndRender")
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.subscribe(
     store: ImmutableStore<S, I, A>,

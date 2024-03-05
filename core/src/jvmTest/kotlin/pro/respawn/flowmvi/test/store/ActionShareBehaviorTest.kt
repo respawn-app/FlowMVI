@@ -11,6 +11,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
@@ -32,14 +33,14 @@ class ActionShareBehaviorTest : FreeSpec({
                 actionShareBehavior = ActionShareBehavior.Disabled
             }
             "then trying to collect actions throws" {
-                shouldThrowExactly<IllegalStateException> {
+                shouldThrowExactly<UnrecoverableException> {
                     store.subscribeAndTest {
                         actions.first()
                     }
                 }
             }
             "then trying to send actions throws".config(enabled = false) {
-                shouldThrowExactly<IllegalStateException> {
+                shouldThrowExactly<UnrecoverableException> {
                     coroutineScope {
                         val job = store.start(this)
                         with(store) {

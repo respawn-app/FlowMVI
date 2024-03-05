@@ -16,15 +16,19 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 2
-    const val minorRelease = 4
-    const val patch = 1
+    const val minorRelease = 5
+    const val patch = 0
     const val postfix = "" // include dash (-)
     const val versionName = "$majorRelease.$minorRelease.$patch$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
     const val licenseName = "The Apache Software License, Version 2.0"
-    const val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
-    const val description = """A Kotlin Multiplatform MVI library based on plugins with a powerful plugin system"""
+    const val description = """A Kotlin Multiplatform MVI library based on coroutines with a powerful plugin system"""
+    const val supportEmail = "hello@respawn.pro"
+    const val vendorName = "Respawn Open Source Team"
+    const val debuggerPluginDescription = "An Intellij IDEA plugin for FlowMVI - $description"
+    const val debuggerPluginName = "FlowMVI Debugger"
     // kotlin
 
     val optIns = listOf(
@@ -48,6 +52,7 @@ object Config {
     }
 
     val jvmTarget = JvmTarget.JVM_11
+    val idePluginJvmTarget = JvmTarget.JVM_17
     val javaVersion = JavaVersion.VERSION_11
     val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
     const val compileSdk = 34

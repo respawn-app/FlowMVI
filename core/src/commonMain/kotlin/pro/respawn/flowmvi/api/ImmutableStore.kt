@@ -46,4 +46,7 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      */
     @DelicateStoreApi
     public val state: S
+
+    override fun hashCode(): Int
+    override fun equals(other: Any?): Boolean
 }

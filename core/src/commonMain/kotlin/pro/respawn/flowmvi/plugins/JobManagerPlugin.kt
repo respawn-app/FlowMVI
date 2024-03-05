@@ -142,7 +142,7 @@ public class JobManager<K : Any> {
 
     /**
      * Start the job with [key] if it is present.
-     * @return the job tha was started or null if not found.
+     * @return the job that was started or null if not found.
      */
     public fun start(key: K): Job? = jobs[key]?.apply { start() }
 }
@@ -151,9 +151,7 @@ public class JobManager<K : Any> {
  * Same as [JobManager.put].
  */
 @FlowMVIDSL
-public fun <K : Any> Job.register(manager: JobManager<K>, key: K) {
-    manager[key] = this
-}
+public fun <K : Any> Job.register(manager: JobManager<K>, key: K): Job = apply { manager[key] = this }
 
 /**
  * Same as [JobManager.putOrReplace].

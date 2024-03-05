@@ -8,11 +8,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
 import pro.respawn.flowmvi.api.ImmutableContainer
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.debugger.plugin.enableRemoteDebugging
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.reduceLambdas
 import pro.respawn.flowmvi.dsl.updateState
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
+import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.sample.BuildConfig
 import pro.respawn.flowmvi.sample.CounterAction
@@ -41,7 +42,9 @@ class LambdaViewModel(
     ) {
         name = "Counter"
         debuggable = BuildConfig.DEBUG
-        install(platformLoggingPlugin())
+        if (debuggable) enableRemoteDebugging(host = "10.0.2.2")
+        parallelIntents = true
+        enableLogging()
         saveState(
             saver = CallbackSaver(
                 delegate = TypedSaver<DisplayingCounter, _>(ParcelableSaver(savedStateHandle)),

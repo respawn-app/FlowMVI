@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
-import pro.respawn.flowmvi.savedstate.util.nameByType
+import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -40,7 +40,7 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
-    noinline recover: suspend (Exception) -> T?,
+    noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> = saveStatePlugin(
     saver = TypedSaver<T, _>(
         JsonSaver(
@@ -83,7 +83,7 @@ public inline fun <
     serializeStatePlugin<T, S, I, A>(
         dir = dir,
         json = json,
-        filename = name ?: nameByType<T>() ?: "State",
+        filename = nameByType<T>() ?: "State",
         context = context,
         behaviors = behaviors,
         resetOnException = resetOnException,

@@ -14,10 +14,11 @@ fun Project.configureMultiplatform(
     js: Boolean = true,
     tvOs: Boolean = true,
     macOs: Boolean = true,
-    watchOs: Boolean = true
+    watchOs: Boolean = true,
+    explicitApi: Boolean = true,
 ) = ext.apply {
     val libs by versionCatalog
-    explicitApi()
+    if (explicitApi) explicitApi()
     applyDefaultHierarchyTemplate()
     withSourcesJar(true)
 
@@ -27,23 +28,17 @@ fun Project.configureMultiplatform(
         mingwX64()
     }
 
-    if (js) {
-        js(IR) {
-            browser()
-            nodejs()
-            binaries.library()
-        }
+    if (js) js(IR) {
+        browser()
+        nodejs()
+        binaries.library()
     }
 
-    if (android) {
-        androidTarget {
-            publishLibraryVariants("release")
-        }
+    if (android) androidTarget {
+        publishLibraryVariants("release")
     }
 
-    if (jvm) {
-        jvm()
-    }
+    if (jvm) jvm()
 
     sequence {
         if (iOs) {

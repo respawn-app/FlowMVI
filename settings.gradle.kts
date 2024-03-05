@@ -1,13 +1,12 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
 pluginManagement {
     repositories {
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
         google()
         gradlePluginPortal()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
-
     // TODO: https://github.com/Kotlin/kotlinx-atomicfu/issues/56
     resolutionStrategy {
         eachPlugin {
@@ -21,19 +20,35 @@ pluginManagement {
         }
     }
 }
-
 dependencyResolutionManagement {
-    // kmm plugin adds "ivy" repo as part of the apply block
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-
+    // REQUIRED for IDE module configuration to resolve IDE platform
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
         google()
+        // kmm plugin adds "ivy" repo as part of the apply block
         ivyNative()
         node()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
+
+rootProject.name = "FlowMVI"
+
+include(":app")
+include(":test")
+include(":core")
+include(":android")
+include(":android-compose")
+include(":android-view")
+include(":compose")
+include(":savedstate")
+include(":debugger:app")
+include(":debugger:debugger-client")
+include(":debugger:debugger-plugin")
+include(":debugger:server")
+include(":debugger:debugger-common")
+// include(":debugger:ideplugin")
 
 fun RepositoryHandler.node() {
     exclusiveContent {
@@ -89,14 +104,3 @@ fun RepositoryHandler.ivyNative() {
         filter { includeModuleByRegex(".*", ".*kotlin-native-prebuilt.*") }
     }
 }
-
-rootProject.name = "FlowMVI"
-
-include(":app")
-include(":test")
-include(":core")
-include(":android")
-include(":android-compose")
-include(":android-view")
-include(":compose")
-include(":savedstate")

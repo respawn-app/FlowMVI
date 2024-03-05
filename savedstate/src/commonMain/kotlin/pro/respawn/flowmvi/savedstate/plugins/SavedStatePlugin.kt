@@ -27,9 +27,9 @@ import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.EmptyBehaviorsMessage
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
-import pro.respawn.flowmvi.savedstate.util.nameByType
 import pro.respawn.flowmvi.savedstate.util.restoreCatching
 import pro.respawn.flowmvi.savedstate.util.saveCatching
+import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**

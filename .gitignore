@@ -171,3 +171,5 @@ hs_err_pid*
 /kotlin-js-store/**
 /.idea/appInsightsSettings.xml
 /.idea/deploymentTargetSelector.xml
+**/plugin_encrypted_key.pem
+**/plugin_rsa_private_key.pem

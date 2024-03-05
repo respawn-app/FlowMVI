@@ -7,16 +7,18 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.debugger.plugin.enableRemoteDebugging
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.disallowRestartPlugin
+import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.manageJobs
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.registerOrReplace
 import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
+import pro.respawn.flowmvi.sample.BuildConfig
 import pro.respawn.flowmvi.sample.CounterAction
 import pro.respawn.flowmvi.sample.CounterAction.GoBack
 import pro.respawn.flowmvi.sample.CounterAction.ShowErrorMessage
@@ -46,8 +48,10 @@ class CounterContainer(
 
     override val store = store(CounterState.Loading) {
         name = "CounterContainer"
+        debuggable = BuildConfig.DEBUG
+        if (debuggable) enableRemoteDebugging(host = "10.0.2.2")
         install(
-            platformLoggingPlugin(),
+            loggingPlugin(),
             disallowRestartPlugin() // store does not restart when it is in a viewmodel
         )
         serializeState(
