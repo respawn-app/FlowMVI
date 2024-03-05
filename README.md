@@ -299,6 +299,10 @@ timerPlugin(timer).test(Loading) {
 
 Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date)](https://star-history.com/#respawn-app/flowmvi&Date)
+
 ## License
 
 ```
