@@ -24,6 +24,7 @@ kotlin {
             implementation(compose.animation)
             implementation(compose.animationGraphics)
             implementation(compose.ui)
+            implementation(compose.materialIconsExtended)
             implementation(libs.bundles.serialization)
             implementation(libs.bundles.ktor.server)
             implementation(libs.bundles.kmputils)

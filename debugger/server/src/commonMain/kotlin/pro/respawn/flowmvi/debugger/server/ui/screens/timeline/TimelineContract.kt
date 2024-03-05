@@ -68,6 +68,7 @@ internal sealed interface TimelineIntent : MVIIntent {
     data class PortChanged(val port: String) : TimelineIntent
     data class HostChanged(val host: String) : TimelineIntent
     data object StartServerClicked : TimelineIntent
+    data object CopyEventClicked : TimelineIntent
     data object StopServerClicked : TimelineIntent
     data class StoreFilterSelected(val store: StoreItem?) : TimelineIntent
     data object RetryClicked : TimelineIntent
@@ -79,5 +80,6 @@ internal sealed interface TimelineIntent : MVIIntent {
 @Immutable
 internal sealed interface TimelineAction : MVIAction {
 
+    data class CopyToClipboard(val text: String) : TimelineAction
     data class ScrollToItem(val index: Int) : TimelineAction
 }

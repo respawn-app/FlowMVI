@@ -15,9 +15,12 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
 import pro.respawn.flowmvi.debugger.server.ServerState
 import pro.respawn.flowmvi.debugger.server.ui.HostForm
 import pro.respawn.flowmvi.debugger.server.ui.PortForm
+import pro.respawn.flowmvi.debugger.server.ui.representation
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.CopyToClipboard
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.AutoScrollToggled
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEntryClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EntryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventFilterSelected
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.HostChanged
@@ -30,7 +33,7 @@ import pro.respawn.flowmvi.debugger.server.ui.type
 import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
-import pro.respawn.flowmvi.plugins.enableLogging
+import pro.respawn.flowmvi.dsl.withState
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
@@ -46,7 +49,6 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
     name = "TimelineStore"
     parallelIntents = true
     debuggable = true
-    enableLogging()
     recover {
         updateState { State.Error(it) }
         null
@@ -92,6 +94,10 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
     }
     reduce { intent ->
         when (intent) {
+            is CopyEventClicked -> withState<DisplayingTimeline, _> {
+                val event = focusedEvent?.event?.representation ?: return@withState
+                action(CopyToClipboard(event))
+            }
             is HostChanged -> updateState<ConfiguringServer, _> { copy(host = HostForm(intent.host)) }
             is PortChanged -> updateState<ConfiguringServer, _> { copy(port = PortForm(intent.port)) }
             is AutoScrollToggled -> updateState<DisplayingTimeline, _> { copy(autoScroll = !autoScroll) }
