@@ -81,6 +81,7 @@ dependencies {
 * Built for Compose: The library lets you achieve the best performance with Compose out of the box.
 * The core library depends on kotlin coroutines. That's it. Nothing else.
 * 70+% unit test coverage of core library code
+* Dedicated remote debugger app for Windows, Linux, MacOS (in alpha)
 
 ## How does it look?
 

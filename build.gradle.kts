@@ -51,7 +51,7 @@ allprojects {
 }
 
 subprojects {
-    if (name == "app") return@subprojects
+    if (name in setOf("app", "debugger")) return@subprojects
     apply(plugin = rootProject.libs.plugins.dokka.id)
 
     dependencies {

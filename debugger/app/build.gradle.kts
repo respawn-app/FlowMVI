@@ -50,13 +50,12 @@ kotlin {
 
 compose.desktop {
     application {
+        mainClass = "${Config.namespace}.debugger.app.MainKt"
         buildTypes.release.proguard {
             obfuscate = false
             optimize = false // TODO: Solve the issues with ktor and compose-desktop...
             configurationFiles.from(projectDir.resolve("desktop-rules.pro"))
         }
-        mainClass = "${Config.namespace}.debugger.app.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
             packageName = Config.namespace

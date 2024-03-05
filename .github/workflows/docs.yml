@@ -29,7 +29,7 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 19
+          java-version: 21
           cache: 'gradle'
 
       - name: Validate gradle wrapper
@@ -44,7 +44,7 @@ jobs:
         run: cp ./README.md ./docs/README.md
 
       - name: Generate docs
-        run: ./gradlew dokkaHtmlMultiModule --no-configuration-cache -Pkotlin.mpp.enableCInteropCommonization=false
+        run: ./gradlew :dokkaHtmlMultiModule --no-configuration-cache
 
       - name: Move docs to the parent docs dir
         run: cp -r ./build/dokka/htmlMultiModule/ ./docs/javadocs/

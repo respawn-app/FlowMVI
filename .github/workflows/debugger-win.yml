@@ -6,12 +6,12 @@ on:
       - '2.*'
 
 concurrency:
-  group: "publish"
+  group: "publish-win"
   cancel-in-progress: true
 
 jobs:
   publish:
-    runs-on: macos-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -24,15 +24,11 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 19
+          java-version: 21
           cache: 'gradle'
 
       - name: Validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
-
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
 
       - name: Create local properties
         env:
@@ -45,14 +41,7 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: Debugger-MacOS
-          path: ./build/compose/binaries/main/dmg/*
+          name: Debugger-Win
+          path: ./build/compose/binaries/main/exe/*
           if-no-files-found: error
           overwrite: true
-
-      - name: Publish to sonatype
-        env:
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
-          # It's important to not upload in parallel or duplicate repos will be created
-        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace
