@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.debugger.server
 
 import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -29,7 +30,9 @@ internal fun Application.configureDebugServer() {
     install(DefaultHeaders)
     install(DataConversion)
     install(PartialContent)
-    install(WebSockets)
+    install(WebSockets) {
+        contentConverter = KotlinxWebsocketSerializationConverter(DebuggerDefaults.DefaultJson)
+    }
     install(CallLogging) {
         level = if (this@configureDebugServer.developmentMode) Level.DEBUG else Level.INFO
     }

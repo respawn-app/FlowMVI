@@ -26,6 +26,7 @@ kotlin {
             implementation(compose.ui)
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
+
             implementation(libs.bundles.serialization)
             implementation(libs.bundles.kmputils)
             implementation(libs.kotlin.datetime)
@@ -36,7 +37,7 @@ kotlin {
             implementation(projects.core)
 
             implementation(projects.debugger.server)
-            implementation(projects.debugger.common)
+            implementation(projects.debugger.debuggerCommon)
             implementation(projects.compose)
         }
         desktopMain.apply {
@@ -63,7 +64,6 @@ compose.desktop {
         }
     }
 }
-
 
 dependencies {
     // debugImplementation(libs.compose.tooling)

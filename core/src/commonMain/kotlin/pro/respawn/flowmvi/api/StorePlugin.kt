@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.api
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.StorePluginBuilder
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.logging.StoreLogger
 
 /**
  * A unit that can extend the business logic of the [Store].

@@ -44,10 +44,10 @@ include(":android-view")
 include(":compose")
 include(":savedstate")
 include(":debugger:app")
-include(":debugger:client")
-include(":debugger:plugin")
+include(":debugger:debugger-client")
+include(":debugger:debugger-plugin")
 include(":debugger:server")
-include(":debugger:common")
+include(":debugger:debugger-common")
 // include(":debugger:ideplugin")
 
 fun RepositoryHandler.node() {

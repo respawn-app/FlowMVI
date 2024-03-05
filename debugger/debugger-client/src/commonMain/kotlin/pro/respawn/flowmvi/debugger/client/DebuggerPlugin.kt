@@ -77,6 +77,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     reconnectionDelay = reconnectionDelay
 ).asPlugin(storeName, timeTravel)
 
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     storeName: String,
     client: HttpClient,
@@ -108,11 +109,12 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuil
     host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
+    name: String = this.name ?: nameByType<S>() ?: "Store",
 ) {
     require(debuggable) { NonDebuggableStoreMessage }
     install(
         debuggerPlugin(
-            storeName = name ?: nameByType<S>() ?: "Store",
+            storeName = name,
             client = client,
             historySize = historySize,
             host = host,

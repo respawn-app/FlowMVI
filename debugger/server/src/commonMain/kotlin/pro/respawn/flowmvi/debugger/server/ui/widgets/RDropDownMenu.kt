@@ -42,35 +42,31 @@ data class DropDownActions(
  */
 @Composable
 fun RDropDownMenu(
+    expanded: Boolean,
+    onExpand: () -> Unit,
     button: @Composable () -> Unit,
     actions: DropDownActions,
     modifier: Modifier = Modifier,
 ) {
-    var expanded by remember { mutableStateOf(false) }
     // box needed for popup anchoring
     Box(modifier = modifier) {
         AnimatedVisibility(
             visible = actions.actions.isNotEmpty(),
-            modifier = Modifier
-                .clickable(
-                    role = Role.DropdownList,
-                    onClick = { expanded = !expanded },
-                )
-                .minimumInteractiveComponentSize(),
+            modifier = Modifier.minimumInteractiveComponentSize(),
             content = { button() },
         )
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onDismissRequest = onExpand,
             properties = remember { PopupProperties() },
         ) {
             actions.actions.forEach { action ->
                 DropdownMenuItem(
                     text = { Text(text = action.text) },
                     onClick = {
-                        expanded = false
                         action.onClick()
+                        onExpand()
                     },
                 )
             }

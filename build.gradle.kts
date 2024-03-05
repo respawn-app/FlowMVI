@@ -35,7 +35,7 @@ allprojects {
                 addAll(
                     "-P",
                     "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                            "${rootProject.rootDir.absolutePath}/stability_definitions.txt",
+                        "${rootProject.rootDir.absolutePath}/stability_definitions.txt",
                 )
                 if (project.findProperty("enableComposeCompilerReports") == "true") {
                     addAll(

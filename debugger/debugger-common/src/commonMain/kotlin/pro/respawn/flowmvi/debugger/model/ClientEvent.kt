@@ -2,16 +2,28 @@
 
 package pro.respawn.flowmvi.debugger.model
 
+import com.benasher44.uuid.Uuid
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 import pro.respawn.flowmvi.debugger.name
+import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
 sealed interface ClientEvent : MVIIntent {
+
+    @Serializable
+    data class StoreConnected(
+        val name: String,
+        val id: Uuid,
+    ) : ClientEvent
+
+    @Serializable
+    data class StoreDisconnected(
+        val id: Uuid,
+    ) : ClientEvent
 
     @Serializable
     data class StoreStarted(
@@ -66,6 +78,6 @@ sealed interface ClientEvent : MVIIntent {
         val message: String?,
         val stackTrace: String,
     ) : ClientEvent {
-        constructor(e: Exception): this(e.name, e.message, e.stackTraceToString())
+        constructor(e: Exception) : this(e.name, e.message, e.stackTraceToString())
     }
 }

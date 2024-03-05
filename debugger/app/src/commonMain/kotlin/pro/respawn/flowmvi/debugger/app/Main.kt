@@ -21,7 +21,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "FlowMVI Debugger",
-        state = state
+        state = state,
     ) {
         KoinContext(koin) {
             RespawnTheme { TimelineScreen() }

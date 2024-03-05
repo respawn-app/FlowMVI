@@ -15,7 +15,9 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
 import pro.respawn.flowmvi.debugger.server.ServerState
 import pro.respawn.flowmvi.debugger.server.ui.HostForm
 import pro.respawn.flowmvi.debugger.server.ui.PortForm
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.AutoScrollToggled
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEntryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EntryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventFilterSelected
@@ -23,9 +25,8 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.Ho
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.PortChanged
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.RetryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StoreFilterSelected
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.ConfiguringServer
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
 import pro.respawn.flowmvi.debugger.server.ui.type
 import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.store
@@ -39,6 +40,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction as
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent as Intent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState as State
 
+@Suppress("UnnecessaryParentheses")
 internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>(ConfiguringServer(), scope) {
     val timezone = TimeZone.currentSystemDefault()
     val filters = MutableStateFlow(TimelineFilters())
@@ -47,7 +49,7 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
     debuggable = true
     enableLogging()
     recover {
-        updateState { TimelineState.Error(it) }
+        updateState { State.Error(it) }
         null
     }
     whileSubscribed {
@@ -57,17 +59,31 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
                 filters
             ) { state, currentFilters ->
                 updateState {
+                    val current = typed<DisplayingTimeline>()
                     when (state) {
                         is ServerState.Idle -> typed<ConfiguringServer>() ?: ConfiguringServer()
-                        is ServerState.Error -> TimelineState.Error(state.e)
+                        is ServerState.Error -> State.Error(state.e)
                         is ServerState.Running -> DisplayingTimeline(
-                            focusedEvent = typed<DisplayingTimeline>()?.focusedEvent,
+                            autoScroll = current?.autoScroll ?: true,
+                            focusedEvent = current?.focusedEvent,
                             filters = currentFilters,
-                            currentEvents = state.eventLog,
-                            stores = state.clients
-                                .map { StoreItem(it.key, it.value.client.name) }
+                            currentEvents = state.eventLog
+                                .asSequence()
+                                .run {
+                                    if (current == null) return@run this
+                                    val id = current.filters.store?.id
+                                    filter { it.event.type in current.filters.events && (id == null || id == it.id) }
+                                }
                                 .toPersistentList(),
-                        )
+                            stores = state.clients
+                                .asSequence()
+                                .map { StoreItem(it.key, it.value.name) }
+                                .toPersistentList(),
+                        ).also {
+                            if (current == null || !it.autoScroll) return@also
+                            if (current.currentEvents.size >= it.currentEvents.size) return@also
+                            action(ScrollToItem(it.currentEvents.lastIndex))
+                        }
                     }
                 }
             }.consume(Dispatchers.Default)
@@ -77,13 +93,17 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
         when (intent) {
             is HostChanged -> updateState<ConfiguringServer, _> { copy(host = HostForm(intent.host)) }
             is PortChanged -> updateState<ConfiguringServer, _> { copy(port = PortForm(intent.port)) }
-            is TimelineIntent.StartServerClicked -> updateState<ConfiguringServer, _> {
+            is AutoScrollToggled -> updateState<DisplayingTimeline, _> { copy(autoScroll = !autoScroll) }
+            is Intent.StartServerClicked -> updateState<ConfiguringServer, _> {
                 if (canStart) {
                     DebugServer.start(port = port.value.toInt())
                     DisplayingTimeline(persistentListOf(), persistentListOf())
                 } else this
             }
-            is TimelineIntent.StopServerClicked -> DebugServer.stop()
+            is Intent.StopServerClicked -> updateState<DisplayingTimeline, _> {
+                DebugServer.stop()
+                ConfiguringServer()
+            }
             is RetryClicked -> DebugServer.store.intent(RestoreRequested)
             is StoreFilterSelected -> filters.update { it.copy(store = intent.store) }
             is EventFilterSelected -> filters.update {
@@ -98,7 +118,7 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
                 copy(
                     focusedEvent = FocusedEvent(
                         timestamp = intent.entry.timestamp.toLocalDateTime(timezone),
-                        storeName = intent.entry.client.name,
+                        storeName = intent.entry.name,
                         type = intent.entry.event.type,
                         event = intent.entry.event,
                     )

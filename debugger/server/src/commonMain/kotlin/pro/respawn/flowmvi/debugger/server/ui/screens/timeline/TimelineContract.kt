@@ -17,7 +17,7 @@ import pro.respawn.kmmutils.inputforms.dsl.input
 import pro.respawn.kmmutils.inputforms.dsl.isValid
 
 enum class EventType {
-    Intent, Action, StateChange, Subscription, Connection, Exception;
+    Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
 }
 
 @Immutable
@@ -30,10 +30,7 @@ data class TimelineFilters(
 data class StoreItem(
     val id: Uuid,
     val name: String,
-) {
-
-    val representation = "$name ($id)"
-}
+)
 
 @Immutable
 data class FocusedEvent(
@@ -58,6 +55,7 @@ internal sealed interface TimelineState : MVIState {
         val currentEvents: ImmutableList<ServerEventEntry>,
         val focusedEvent: FocusedEvent? = null,
         val filters: TimelineFilters = TimelineFilters(),
+        val autoScroll: Boolean = true,
     ) : TimelineState
 }
 
@@ -69,13 +67,15 @@ internal sealed interface TimelineIntent : MVIIntent {
     data class HostChanged(val host: String) : TimelineIntent
     data object StartServerClicked : TimelineIntent
     data object StopServerClicked : TimelineIntent
-    data class StoreFilterSelected(val store: StoreItem) : TimelineIntent
+    data class StoreFilterSelected(val store: StoreItem?) : TimelineIntent
     data object RetryClicked : TimelineIntent
     data class EntryClicked(val entry: ServerEventEntry) : TimelineIntent
     data object CloseFocusedEntryClicked : TimelineIntent
+    data object AutoScrollToggled : TimelineIntent
 }
 
 @Immutable
 internal sealed interface TimelineAction : MVIAction {
 
+    data class ScrollToItem(val index: Int) : TimelineAction
 }

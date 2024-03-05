@@ -13,25 +13,20 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ServerEvent
-import pro.respawn.flowmvi.debugger.model.StoreConnectionDescriptor
-
-@Immutable
-internal data class ServerClient(
-    val name: String,
-    val id: Uuid,
-)
 
 @Immutable
 internal data class ServerClientState(
-    val client: ServerClient,
+    val id: Uuid,
+    val name: String,
     val isConnected: Boolean,
     val lastConnected: Instant = Clock.System.now(),
 )
 
 @Immutable
 internal data class ServerEventEntry(
+    val id: Uuid,
+    val name: String,
     val event: ClientEvent,
-    val client: ServerClient,
     val timestamp: Instant = Clock.System.now(),
 )
 
@@ -48,9 +43,7 @@ internal sealed interface ServerIntent : MVIIntent {
     data object RestoreRequested : ServerIntent
     data object StopRequested : ServerIntent
     data object ServerStarted : ServerIntent
-    data class StoreConnected(val descriptor: StoreConnectionDescriptor) : ServerIntent
     data class EventReceived(val event: ClientEvent, val from: Uuid) : ServerIntent
-    data class StoreDisconnected(val id: Uuid) : ServerIntent
 }
 
 internal sealed interface ServerAction : MVIAction {

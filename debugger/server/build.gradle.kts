@@ -4,7 +4,6 @@ plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
-
 }
 val props by localProperties
 
@@ -36,10 +35,9 @@ kotlin {
             implementation(libs.kotlin.io)
             implementation(libs.kotlin.atomicfu)
 
-            implementation(projects.savedstate)
             implementation(projects.core)
             implementation(projects.compose)
-            implementation(projects.debugger.common)
+            implementation(projects.debugger.debuggerCommon)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)

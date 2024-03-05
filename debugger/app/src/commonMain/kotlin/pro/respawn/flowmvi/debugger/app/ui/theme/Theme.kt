@@ -98,9 +98,7 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-internal fun rememberColorScheme(dark: Boolean) = remember(dark) {
-    if (dark) DarkColors else LightColors
-}
+internal fun rememberColorScheme(dark: Boolean) = remember(dark) { if (dark) DarkColors else LightColors }
 
 @Composable
 fun RespawnTheme(

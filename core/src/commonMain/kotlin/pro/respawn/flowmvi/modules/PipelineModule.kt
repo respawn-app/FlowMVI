@@ -17,7 +17,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
-import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
 
 /**

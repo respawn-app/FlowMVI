@@ -6,12 +6,11 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocketSession
-import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
-import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,13 +18,13 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withTimeoutOrNull
 import pro.respawn.flowmvi.api.ActionShareBehavior.Disabled
 import pro.respawn.flowmvi.api.EmptyState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.debugger.model.ClientEvent
+import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
-import pro.respawn.flowmvi.debugger.model.StoreConnectionDescriptor
-import pro.respawn.flowmvi.debugger.model.StoreEvent
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.invoke
@@ -67,16 +66,16 @@ internal fun debugClientStore(
                 log(StoreLogLevel.Error, this@store.name, it)
             },
         ) {
-            log(StoreLogLevel.Debug) { "Starting connection" }
+            log(StoreLogLevel.Debug) { "Starting connection at $host:$port/$id" }
             client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
                 port = port,
                 path = "/$id",
-            ) {
-                setBody(StoreConnectionDescriptor(id, clientName))
-            }.apply {
+            ).apply {
+                sendSerialized<ClientEvent>(StoreConnected(clientName, id))
                 session.value = this
+                log(StoreLogLevel.Debug, this@store.name) { "Established connection to ${call.request.url}" }
                 awaitEvents {
                     // STOPSHIP: Add code to support events we want to work with
                     log(StoreLogLevel.Debug, this@store.name) { "Received event: $it" }
@@ -86,9 +85,11 @@ internal fun debugClientStore(
     }
 
     reduce { intent ->
-        session.filterNotNull().first().apply {
-            sendSerialized(StoreEvent(intent, id))
-            log(StoreLogLevel.Debug, this@store.name) { "Sent event $intent to ${call.request.url}" }
+        withTimeoutOrNull(reconnectionDelay) {
+            session.filterNotNull().first().apply {
+                sendSerialized<ClientEvent>(intent)
+                log(StoreLogLevel.Debug, this@store.name) { "Sent event $intent to ${call.request.url}" }
+            }
         }
     }
 }
@@ -100,7 +101,10 @@ private inline fun CoroutineScope.launchConnectionLoop(
 ) = launch {
     while (true) {
         try {
-            supervisorScope { connect() }
+            supervisorScope {
+                connect()
+                awaitCancellation()
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (expected: Exception) {
