@@ -34,15 +34,15 @@ FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-# core KMP module
+# Core KMP module
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" }
-# test DSL
+# Test DSL
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }
-# compose multiplatform
+# Compose multiplatform
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }
-# common android
+# Common android
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
-# view-based android
+# View-based android
 flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
@@ -63,9 +63,9 @@ dependencies {
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
 
-    androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
+    androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
 }
 ```
 
@@ -82,14 +82,13 @@ dependencies {
 * Compress, persist, and restore state automatically with a single line of code - on any platform
 * Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
 * Decompose stores into plugins, split responsibilities, and modularize the project easily
-* No base classes or complicated interfaces - store is built using a simple DSL
+* No base classes, complicated interfaces or factories of factories - store is built using a simple DSL
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
-* Create parent-child relationships between stores and delegate responsibilities
-* Built for Compose: The library lets you achieve the best performance with Compose out of the box.
-* The core library depends on kotlin coroutines. That's it. Nothing else.
-* 70+% unit test coverage of core library code
 * Dedicated remote debugger app for Windows, Linux, MacOS (in alpha)
+* Built for Compose: The library lets you achieve the best performance with Compose out of the box.
+* The core library depends on kotlin coroutines. Nothing else.
+* 70+% unit test coverage of core library code
 
 ## How does it look?
 
@@ -124,19 +123,24 @@ class CounterContainer(
     private val repo: CounterRepository,
 ) {
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
+
+        // makes the store fully async and parallel
         parallelIntents = true
         coroutineContext = Dispatchers.Default
         actionShareBehavior = ActionShareBehavior.Distribute()
-        intentCapacity = 64
 
-        install(
-            platformLoggingPlugin(),
-            timeTravelPlugin(),
-            undoRedoPlugin(),
-        )
+        // enables debugging features such as logging and remote connection
+        debuggable = true
+        enableLogging()
+        enableRemoteDebugger()
 
+        // allows to undo any operation
+        val undoRedo = undoRedo()
+
+        // manages long-running jobs
         val jobManager = manageJobs()
 
+        // saves and restores the state automatically
         serializeState(
             dir = repo.cacheDir,
             json = Json,
@@ -145,17 +149,24 @@ class CounterContainer(
 
         init { repo.startTimer() }
 
+        // handles any errors
         recover { e: Exception ->
             action(ShowMessage(e.message))
             null
         }
 
+        // hooks into subscriber lifecycle
         whileSubscribed {
             repo.timer.collect {
                 updateState<DisplayingCounter, _> {
                     copy(timer = timer)
                 }
             }
+        }
+
+        // lazily evaluates and cache values, even when the method is suspending.
+        val pagingData by cache {
+            repo.getPagedDataSuspending()
         }
 
         reduce { intent: CounterIntent ->
@@ -166,21 +177,9 @@ class CounterContainer(
             }
         }
 
-        parentStore(repo.store) { state ->
-            updateState {
-                copy(timer = state.timer)
-            }
-        }
-
-        // lazily evaluate and cache values, even when the method is suspending.
-        val pagingData by cache {
-            repo.getPagedDataSuspending()
-        }
-
-        install { // build custom plugins on the fly
-            onStop {
-                repo.stopTimer()
-            }
+        // builds custom plugins on the fly
+        install {
+            onStop { repo.stopTimer() }
         }
     }
 }
@@ -196,18 +195,27 @@ store.subscribe(
 )
 ```
 
-### Custom plugins:
+### Plugins:
 
-Create plugins with a single line of code for any store or a specific one, then hook into any store events:
+Powerful DSL allows to hook into store events and amend any store's logic with reusable plugins.
 
 ```kotlin
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
-    onStart {
-        /*...*/
-    }
-    onIntent { intent ->
-        /*...*/
-    }
+    onStart { }
+    
+    onStop { }
+    
+    onIntent { intent -> }
+    
+    onState { old, new -> }
+    
+    onAction { action -> }
+    
+    onSubscribe { subs -> }
+    
+    onUnsubscribe { subs -> }
+    
+    onException { e -> }
 }
 ```
 
@@ -218,7 +226,7 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 ```kotlin
 @Composable
 fun CounterScreen() {
-    val store = inject<CounterContainer>()
+    val store = inject<CounterContainer>().store
 
     // subscribe to store based on system lifecycle - on any platform
     val state by store.subscribe { action ->
@@ -241,7 +249,7 @@ fun CounterScreen() {
 
 ### Android support:
 
-No more subclassing `ViewModel`. Use `StoreViewModel` instead and inject stores directly.
+No more subclassing `ViewModel`. Use `StoreViewModel` instead and make your business logic multiplatform.
 
 ```kotlin
 val module = module {
@@ -276,7 +284,6 @@ class ScreenFragment : Fragment() {
 counterStore().subscribeAndTest {
 
     // turbine + kotest example
-
     ClickedCounter resultsIn {
         states.test {
             awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
@@ -296,7 +303,8 @@ timerPlugin(timer).test(Loading) {
 
     onStart()
 
-    assert(timeTravel.starts == 1) // keeps track of all plugin operations
+    // time travel keeps track of all plugin operations for you
+    assert(timeTravel.starts == 1) 
     assert(state is DisplayingCounter)
     assert(timer.isStarted)
 
