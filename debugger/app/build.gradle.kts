@@ -75,6 +75,7 @@ compose.desktop {
             windows {
                 dirChooser = true
                 menu = false
+                shortcut = true
                 perUserInstall = true
                 upgradeUuid = Config.debuggerAppId
                 iconFile = iconDir.resolve("favicon.ico")

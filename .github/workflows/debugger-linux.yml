@@ -1,17 +1,18 @@
-name: publish
+name: debugger-linux
 
 on:
   push:
-    tags:
-      - '2.*'
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 concurrency:
-  group: "publish"
+  group: "publish-linux"
   cancel-in-progress: true
 
 jobs:
-  publish:
-    runs-on: macos-latest
+  publish-windows:
+    runs-on: linux-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -30,15 +31,18 @@ jobs:
       - name: Validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
 
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
       - name: Create local properties
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: echo "$LOCAL_PROPERTIES" > local.properties
 
-      - name: Publish to sonatype
-        # It's important to not upload in parallel or duplicate repos will be created
-        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace
+      - name: Create platform debugger distributable
+        run: ./gradlew debugger:app:packageDistributionForCurrentOS
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: Debugger_Linux
+          path: ./debugger/app/build/compose/binaries/main/deb/*
+          if-no-files-found: error
+          overwrite: false

@@ -1,9 +1,10 @@
-name: publish
+name: debugger-windows
 
 on:
   push:
-    tags:
-      - '2.*'
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 concurrency:
   group: "publish-win"
