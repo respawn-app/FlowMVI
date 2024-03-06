@@ -12,26 +12,24 @@ import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
-private val Project.subProjectName get() = name.removePrefix(":").replace("[/:]".toRegex(), "-")
-
 /**
  * Configures Maven publishing to sonatype for this project
  */
 fun Project.publishMultiplatform() {
-    val properties by localProperties
-    val isReleaseBuild = properties["release"]?.toString().toBoolean()
+    val properties by rootProject.localProperties
+    val isReleaseBuild = requireNotNull(properties["release"]).toString().toBooleanStrict()
 
     val javadocTask = tasks.named("emptyJavadocJar") // TODO: dokka does not support kmp javadocs yet
 
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-            sonatypeRepository(isReleaseBuild, properties)
             publications.withType<MavenPublication>().configureEach {
                 groupId = rootProject.group.toString()
                 artifact(javadocTask)
                 configurePom()
                 configureVersion(isReleaseBuild)
             }
+            sonatypeRepository(isReleaseBuild, properties)
         }
         signPublications(isReleaseBuild, properties)
     }
@@ -45,20 +43,16 @@ fun Project.publishMultiplatform() {
  * Publish the android artifact
  */
 fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
+    val properties by rootProject.localProperties
     publishing {
         singleVariant(Config.publishingVariant) {
             withSourcesJar()
             withJavadocJar()
         }
     }
-
     afterEvaluate {
-        val properties by localProperties
         val isReleaseBuild = properties["release"]?.toString().toBoolean()
-
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-            sonatypeRepository(isReleaseBuild, properties)
-
             publications {
                 maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
                     from(components[Config.publishingVariant])
@@ -67,6 +61,7 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
                     configureVersion(isReleaseBuild)
                 }
             }
+            sonatypeRepository(isReleaseBuild, properties)
         }
         signPublications(isReleaseBuild, properties)
     }

@@ -32,11 +32,11 @@ internal fun MavenPublication.configurePom() = pom {
     }
     developers {
         developer {
-            id.set("respawn-app")
-            name.set("Respawn")
-            email.set("hello@respawn.pro")
-            url.set("https://respawn.pro")
-            organization.set("Respawn")
+            id.set(Config.vendorId)
+            name.set(Config.vendorName)
+            email.set(Config.supportEmail)
+            url.set("https://opensource.respawn.pro")
+            organization.set(Config.vendorName)
             organizationUrl.set(url)
         }
     }
