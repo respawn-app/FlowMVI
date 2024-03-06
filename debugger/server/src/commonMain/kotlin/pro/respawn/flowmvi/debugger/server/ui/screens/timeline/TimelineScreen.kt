@@ -112,12 +112,7 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
                             )
                         }
                         if (state.currentEvents.isEmpty()) item {
-                            Box(Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Waiting for events", modifier = Modifier.padding(top = 12.dp))
-                                    CircularProgressIndicator(modifier = Modifier.padding(12.dp))
-                                }
-                            }
+                            WaitingForEventsLayout(Modifier.fillParentMaxSize())
                         }
                     }
                 },
@@ -132,4 +127,14 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
             )
         } // column
     } // when
+}
+
+@Composable
+private fun WaitingForEventsLayout(modifier: Modifier = Modifier) {
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Waiting for events", modifier = Modifier.padding(top = 12.dp))
+            CircularProgressIndicator(modifier = Modifier.padding(12.dp))
+        }
+    }
 }

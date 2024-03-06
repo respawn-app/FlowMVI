@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
@@ -92,7 +93,11 @@ internal fun IntentReceiver<TimelineIntent>.FocusedEventLayout(
                     }
                 }
                 Divider()
-                Column(modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .verticalScroll(rememberScrollState())
+                ) {
                     Text(value.event.representation, fontFamily = FontFamily.Monospace, fontSize = 14.sp)
                 }
             }
