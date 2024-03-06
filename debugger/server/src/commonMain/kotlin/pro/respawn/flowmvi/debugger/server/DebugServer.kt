@@ -18,6 +18,7 @@ import kotlinx.coroutines.supervisorScope
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
+import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
@@ -49,7 +50,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
                                 actions
                                     .filterIsInstance<SendClientEvent>()
                                     .filter { it.client == storeId }
-                                    .collect { sendSerialized(it.event) }
+                                    .collect { sendSerialized<ServerEvent>(it.event) }
                             }
                             launch {
                                 while (true) {

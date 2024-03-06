@@ -4,6 +4,7 @@
 package pro.respawn.flowmvi.debugger.model
 
 import com.benasher44.uuid.Uuid
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.api.MVIAction
@@ -13,30 +14,36 @@ import pro.respawn.flowmvi.debugger.name
 import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
+@SerialName("client")
 public sealed interface ClientEvent : MVIIntent {
 
     @Serializable
+    @SerialName("connected")
     public data class StoreConnected(
         val name: String,
         val id: Uuid,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("disconnected")
     public data class StoreDisconnected(
         val id: Uuid,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("started")
     public data class StoreStarted(
         val name: String,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("stopped")
     public data class StoreStopped(
         val name: String,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("intent")
     public data class StoreIntent(
         val name: String,
         val data: String,
@@ -46,6 +53,7 @@ public sealed interface ClientEvent : MVIIntent {
     }
 
     @Serializable
+    @SerialName("action")
     public data class StoreAction(
         val name: String,
         val data: String,
@@ -55,6 +63,7 @@ public sealed interface ClientEvent : MVIIntent {
     }
 
     @Serializable
+    @SerialName("state_change")
     public data class StoreStateChanged(
         val from: StoreState,
         val to: StoreState,
@@ -64,16 +73,19 @@ public sealed interface ClientEvent : MVIIntent {
     }
 
     @Serializable
+    @SerialName("unsubscribed")
     public data class StoreUnsubscribed(
         val newSubscriptionCount: Int,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("subscribed")
     public data class StoreSubscribed(
         val newSubscriptionCount: Int,
     ) : ClientEvent
 
     @Serializable
+    @SerialName("exception")
     public data class StoreException(
         val name: String,
         val message: String?,
