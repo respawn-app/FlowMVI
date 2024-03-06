@@ -112,7 +112,7 @@ also degrade performance.
 ?> Compose stability configuration has been added in 1.6.0, and the library specifies stability rules with itself.
 `MVIState`, `MVIIntent`, `MVIAction`, `LambdaIntent` and `Store` are marked as `@Stable`. It's still best to
 annotate your contract with `@Immutable` explicitly however to ensure that the compiler pics up the mapping.
-See `stability_definitions.txt` to learn how to configure stability yourself.
+See [quickstart](quickstart.md) to learn how to configure stability yourself.
 
 ```kotlin
 @Composable

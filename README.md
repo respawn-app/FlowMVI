@@ -132,7 +132,7 @@ class CounterContainer(
         // enables debugging features such as logging and remote connection
         debuggable = true
         enableLogging()
-        enableRemoteDebugger()
+        enableRemoteDebugging()
 
         // allows to undo any operation
         val undoRedo = undoRedo()

@@ -171,14 +171,16 @@ intents. This will prevent leaking the context of the store to subscribers.
 <details>
 <summary>Click for general advice on how to define a contract</summary>
 
-Describing the contract first makes building the logic easier because you have everything you need at the
-start. To define your contract, ask yourself the following:
+Describing the contract first makes building the logic easier because this helps make your business logic declarative.
+To define your contract, ask yourself the following:
 
 1. What can be shown at what times? Can the page be empty? Can it be loading? Can errors happen? -
    this will define your state family.
 2. What elements can be shown on this screen, for each state? - this will be your state properties.
 3. What can the user do on this screen? What can happen in the system? - these will be your Intents.
-4. In response to given intents, what one-time events may happen? - these are Actions.
+4. In response to given intents, what one-time events may happen? - these are Actions. Keep in mind that side-effects
+   are not the best way to manage your business logic. Try to make your UI/platform logic stateful first, and resort
+   to side-effects only if a third-party API you're working with is imperative (such as Android SDK or View system).
 
 * The `MVIState` is what should be displayed or used by the UI layer. Whenever the state changes,
   update **all** of your UI with the current properties of the state.
@@ -188,7 +190,7 @@ start. To define your contract, ask yourself the following:
       Use `copy()` of the data classes to mutate your state instead. Even if you use `List`s as the value type,
       for example, make sure those are **new** lists and not just `MutableList`s that were upcasted.
     * It's okay to copy the state often, modern devices can handle a few garbage collections.
-* The `MVIIntent` is an action that the user or the subscriber takes, for example, clicks, system broadcasts and dialog
+* The `MVIIntent` is an action that the user or the subscriber takes, for example: clicks, system broadcasts and dialog
   button presses.
 * The `MVIAction` is a one-off event that should happen in the UI or that the subscriber should handle.
     * Examples include snackbars, popup messages, sounds and so on.
@@ -206,13 +208,12 @@ start. To define your contract, ask yourself the following:
 sealed interface CounterState : MVIState {
     data object Loading : CounterState
     data class Error(val e: Exception) : CounterState
-    data class DisplayingCounter(
-        val counter: Int,
-    ) : CounterState
+    data class DisplayingCounter(val counter: Int) : CounterState
 }
 
 // MVI Style Intents
 sealed interface CounterIntent : MVIIntent {
+
     data object ClickedNext : CounterIntent
 
     @JvmInline
@@ -225,6 +226,7 @@ sealed interface CounterIntent : MVIIntent {
 typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
 
 sealed interface CounterAction : MVIAction {
+
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
@@ -298,9 +300,9 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
 * **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
 * **While Subscribed Plugin** - run jobs when the Nth subscriber of a store appears. Install
   with `whileSubscribed { }`.
-* **Logging Plugin** - log events to a log stream of the target platform. Install with `platformLoggingPlugin()`
-* **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts. Android has
-  `parcelizeState` and `serializeState` plugins based on this one. See [saved state](./savedstate.md) for details.
+* **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
+* **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
+  See [saved state](./savedstate.md) for details.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
   work. Install with `awaitSubscribers()`.
@@ -309,9 +311,9 @@ Prebuilt plugins come with a nice dsl when building a store. Here's the list of 
   Install with `disallowRestart`.
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { }`
-* **Parent Store Plugin** - attach to another store and follow the subscription lifecycle. Install
-  with `parentStore(otherStore) { state ->  }`
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
+* **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for  
+  testing, debugging and when building other plugins.
 
 Consult the javadocs of the plugins to learn how to use them.
 
@@ -404,16 +406,60 @@ class CounterContainer(
 }
 ```
 
-Next steps:
+### Step 7: Start and subscribe to your store
+
+!> Don't forget to start your store! Store will do nothing unless it is started using the `start(scope: CoroutineScope)`
+function. Provide a coroutine scope with a lifecycle that matches the duration your store should be accepting intents
+and running background jobs. For  [android](android.md) this will be `viewModelScope` for example.
+On desktop, you can use `rememberCoroutineScope()`. On iOS, provide an application lifecycle scope.
+
+#### Automatically:
+
+```kotlin
+fun counterStore(scope: CoroutineScope) = store(initial = Loading, scope = scope) { /* ... */ }
+```
+
+#### Separately:
+
+```kotlin
+fun counterStore() = store(initial = Loading) { /* ... */ }
+
+// somewhere else
+val store = counterStore()
+store.start(lifecycleScope)
+```
+
+#### Manually
+
+```kotlin
+val scope = CoroutineScope()
+val store = counterStore()
+
+// start
+store.start(scope)
+
+// stop
+scope.cancel()
+// or to keep the scope alive
+store.stop()
+```
+
+To subscribe to the store, regardless of your platform see [this guide](android.md)
+
+### Next steps:
 
 * Learn how to create custom [plugins](plugins.md)
 * Learn how to use DI and [Android-specific features](android.md)
 * Learn how to [persist and restore state](savedstate.md)
 * Get answers to common [questions](faq.md)
+* Set up [remote debugging](debugging.md)
 * [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
   about how our team has used the library to improve performance and stability of our app, with practical examples.
 * Explore
   the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/app/src/main/kotlin/pro/respawn/flowmvi/sample)
+    * Want more samples? Explore how we created
+      a [multiplatform debugger app](https://github.com/respawn-app/FlowMVI/tree/34236773e21e7138a330d7d0fb6c5d0eba21b61e/debugger/server/src/commonMain/kotlin/pro/respawn/flowmvi/debugger/server)
+      for FlowMVI using... FlowMVI itself.
 
 --- 
 

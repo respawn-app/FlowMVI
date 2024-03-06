@@ -42,7 +42,7 @@ class LambdaViewModel(
     ) {
         name = "Counter"
         debuggable = BuildConfig.DEBUG
-        if (debuggable) enableRemoteDebugging(host = "10.0.2.2")
+        if (debuggable) enableRemoteDebugging()
         parallelIntents = true
         enableLogging()
         saveState(
