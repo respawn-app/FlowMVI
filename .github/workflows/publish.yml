@@ -24,7 +24,7 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 19
+          java-version: 21
           cache: 'gradle'
 
       - name: Validate gradle wrapper
@@ -45,8 +45,8 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: Debugger-MacOS
-          path: ./build/compose/binaries/main/dmg/*
+          name: Debugger_MacOS
+          path: ./debugger/app/build/compose/binaries/main/dmg/*
           if-no-files-found: error
           overwrite: true
 

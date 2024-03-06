@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  publish:
+  publish-windows:
     runs-on: windows-latest
 
     steps:
@@ -41,7 +41,7 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: Debugger-Win
-          path: ./build/compose/binaries/main/exe/*
+          name: Debugger_Windows
+          path: ./debugger/app/build/compose/binaries/main/exe/*
           if-no-files-found: error
-          overwrite: true
+          overwrite: false
