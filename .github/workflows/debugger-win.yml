@@ -36,7 +36,7 @@ jobs:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: echo "$LOCAL_PROPERTIES" > local.properties
 
-      - name: Create macOS debugger distributable
+      - name: Create platform debugger distributable
         run: ./gradlew debugger:app:packageDistributionForCurrentOS
 
       - name: Upload a Build Artifact

@@ -49,14 +49,11 @@ fun List<String>.toJavaArrayString() = buildString {
 
 fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
 
-val Project.localProperties
-    get() = lazy {
-        Properties().apply {
-            val file = File(rootProject.rootDir.absolutePath, "local.properties")
-            require(file.exists()) { "Please create root local.properties file" }
-            load(FileInputStream(file))
-        }
-    }
+fun Project.localProperties() = Properties().apply {
+    val file = File(rootProject.rootDir.absolutePath, "local.properties")
+    require(file.exists()) { "Please create root local.properties file" }
+    load(FileInputStream(file))
+}
 
 fun stabilityLevel(version: String): Int {
     Config.stabilityLevels.forEachIndexed { index, postfix ->

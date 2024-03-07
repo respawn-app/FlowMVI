@@ -5,8 +5,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
 }
-val props by localProperties
-
 kotlin {
     jvm {
         compilations.all {

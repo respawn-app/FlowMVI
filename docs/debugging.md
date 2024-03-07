@@ -70,14 +70,15 @@ be picked up by the compiler. We'll have to resort to "notepad-style coding" for
 
 ### 1.3 Set up store configuration injection
 
-Set up config injection using a factory pattern using your DI framework. Example below is for Koin:
+?> If you're building a small pet project, you may omit this complicated setup and just use conditional
+installation if you know the risks you are taking.
+
+Set up config injection using a factory pattern using your DI framework:
 
 ```kotlin
 interface StoreConfiguration {
 
     operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(name: String)
-
-    fun <S : MVIState> saver(serializer: KSerializer<S>, fileName: String): Saver<S>
 }
 
 inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.configure(
@@ -134,18 +135,15 @@ internal class CounterContainer(
 }
 ```
 
-?> If you're building a small pet project, you may omit this complicated setup and just use conditional
-installation if you know the risks you are taking.
-
 ## Step 2: Connect the client on Android
 
 ?> You can skip this step if you don't target Android
 
-On all platforms except the android, we can just use the default host and port for debugging (localhost). But if you
+On all platforms except Android, we can just use the default host and port for debugging (localhost). But if you
 use an external device or an emulator on Android, you need to configure the host yourself.
 
-For emulators, the plugin will use the emulator host by default `10.0.2.2`. We will need to allow cleartext traffic on
-that hosts and our local network hosts
+For emulators, the plugin will use the emulator host by default (`10.0.2.2`). We will need to allow cleartext traffic on
+that host and our local network hosts
 
 In your `common-arch` module we created earlier, or in the `app` module, create a network security configuration
 **for debug builds only**.

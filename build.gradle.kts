@@ -51,7 +51,8 @@ allprojects {
 }
 
 subprojects {
-    if (name in setOf("app", "debugger")) return@subprojects
+    // TODO: Migrate to applying dokka plugin per-project in conventions
+    if (name in setOf("app", "debugger", "server")) return@subprojects
     apply(plugin = rootProject.libs.plugins.dokka.id)
 
     dependencies {
