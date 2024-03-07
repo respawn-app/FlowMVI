@@ -11,25 +11,40 @@ import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.util.withReentrantLock
 
-internal fun <S : MVIState> stateModule(initial: S): StateModule<S> = StateModuleImpl(initial)
+internal fun <S : MVIState> stateModule(
+    initial: S,
+    atomic: Boolean,
+): StateModule<S> = if (atomic) AtomicStateModule(initial) else DefaultStateModule(initial)
 
 internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
 
-private class StateModuleImpl<S : MVIState>(initial: S) : StateModule<S> {
+private abstract class AbstractStateModule<S : MVIState>(initial: S) : StateModule<S> {
 
-    private val _states = MutableStateFlow(initial)
-    private val stateMutex = Mutex()
+    @Suppress("PropertyName")
+    protected val _states = MutableStateFlow(initial)
+    final override val states: StateFlow<S> = _states.asStateFlow()
 
     @DelicateStoreApi
-    override val state by _states::value
+    final override val state by _states::value
 
-    override fun useState(block: S.() -> S) = _states.update(block)
+    final override fun useState(block: S.() -> S) = _states.update(block)
+}
 
-    override val states: StateFlow<S> = _states.asStateFlow()
+private class AtomicStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
 
-    override suspend fun withState(block: suspend S.() -> Unit) =
-        stateMutex.withReentrantLock { block(states.value) }
+    private val stateMutex = Mutex()
 
-    override suspend fun updateState(transform: suspend S.() -> S) =
-        stateMutex.withReentrantLock { _states.update { transform(it) } }
+    override suspend fun withState(
+        block: suspend S.() -> Unit
+    ) = stateMutex.withReentrantLock { block(states.value) }
+
+    override suspend fun updateState(
+        transform: suspend S.() -> S
+    ) = stateMutex.withReentrantLock { _states.update { transform(it) } }
+}
+
+private class DefaultStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
+
+    override suspend fun updateState(transform: suspend S.() -> S) = _states.update { transform(it) }
+    override suspend fun withState(block: suspend S.() -> Unit) = _states.value.block()
 }
