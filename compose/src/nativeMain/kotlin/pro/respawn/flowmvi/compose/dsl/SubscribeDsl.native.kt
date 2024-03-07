@@ -28,23 +28,11 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @return the [State] that contains the [ImmutableStore.state].
  * @see ImmutableStore.subscribe
  */
-@OptIn(DelicateStoreApi::class)
 @FlowMVIDSL
 @Composable
 public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     noinline consume: suspend CoroutineScope.(action: A) -> Unit
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe) {
-        subscribe(
-            store = this@subscribe,
-            render = { state.value = it },
-            consume = { block(it) }
-        ).join()
-    }
-    return state
-}
+): State<S> = subscribeDirect(consume)
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -57,16 +45,7 @@ public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableS
  * @return the [State] that contains the [ImmutableStore.state].
  * @see ImmutableStore.subscribe
  */
-@OptIn(DelicateStoreApi::class)
 @FlowMVIDSL
 @Composable
-public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe) {
-        subscribe(
-            store = this@subscribe,
-            render = { state.value = it }
-        ).join()
-    }
-    return state
-}
+public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(): State<S> =
+    subscribeDirect()

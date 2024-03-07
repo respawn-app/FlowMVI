@@ -13,6 +13,7 @@ kotlin {
         tvOs = false,
         linux = false,
         js = false,
+        wasmJs = false
     )
 }
 

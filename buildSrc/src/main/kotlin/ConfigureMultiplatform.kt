@@ -4,7 +4,9 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
+@OptIn(ExperimentalWasmDsl::class)
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
     jvm: Boolean = true,
@@ -16,6 +18,8 @@ fun Project.configureMultiplatform(
     macOs: Boolean = true,
     watchOs: Boolean = true,
     explicitApi: Boolean = true,
+    wasmJs: Boolean = true,
+    wasmWasi: Boolean = false, // TODO: Coroutines do not support wasmWasi yet
 ) = ext.apply {
     val libs by versionCatalog
     if (explicitApi) explicitApi()
@@ -34,6 +38,14 @@ fun Project.configureMultiplatform(
         binaries.library()
     }
 
+    if (wasmJs) wasmJs {
+        moduleName = this@configureMultiplatform.name
+        nodejs()
+        browser()
+        binaries.library()
+    }
+
+    if (wasmWasi) wasmWasi()
     if (android) androidTarget {
         publishLibraryVariants("release")
     }
