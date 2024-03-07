@@ -207,7 +207,6 @@ The setup is a little bit more complicated, but in short, it involves:
 ## Next Steps
 
 Right now the debugging setup includes only the essentials.
-Check out the [roadmap](roadmap.md) to learn what we will be cooking up next in the future releases.
 
 Feel free to create an issue for a feature you want to be added.
 
