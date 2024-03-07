@@ -1,5 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     alias(libs.plugins.jetbrainsCompose)
@@ -14,7 +12,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(compose.runtime)
             implementation(compose.foundation)

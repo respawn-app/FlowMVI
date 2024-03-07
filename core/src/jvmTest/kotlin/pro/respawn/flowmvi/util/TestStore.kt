@@ -9,7 +9,6 @@ import pro.respawn.flowmvi.dsl.reduceLambdas
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.loggingPlugin
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravel
 
 internal typealias TestTimeTravel = TimeTravel<TestState, LambdaIntent<TestState, TestAction>, TestAction>

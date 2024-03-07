@@ -6,12 +6,15 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinContext
-import org.koin.core.context.KoinContext
 import pro.respawn.flowmvi.debugger.app.di.koin
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineScreen
+import pro.respawn.flowmvi.debugger.server.ui.theme.Resources
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 
+@OptIn(ExperimentalResourceApi::class)
 fun main() = application {
     val state = rememberWindowState(
         width = 1200.dp,
@@ -20,6 +23,7 @@ fun main() = application {
     )
     Window(
         onCloseRequest = ::exitApplication,
+        icon = painterResource(Resources.projectIcon),
         title = "FlowMVI Debugger",
         state = state,
     ) {

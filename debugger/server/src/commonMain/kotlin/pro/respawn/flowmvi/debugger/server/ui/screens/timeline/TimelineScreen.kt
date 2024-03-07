@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -27,6 +29,8 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.CopyToClipboard
@@ -41,6 +45,8 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets.StoreEven
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets.TimelineMenuBar
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
+import pro.respawn.flowmvi.server.generated.resources.Res
+import pro.respawn.flowmvi.server.generated.resources.icon_192
 import java.time.format.DateTimeFormatter
 
 /**
@@ -67,7 +73,7 @@ fun TimelineScreen() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
 private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
     state: TimelineState,
@@ -75,16 +81,19 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
 ) {
     val timestampFormatter = remember { DateTimeFormatter.ISO_DATE_TIME }
     when (state) {
-        is TimelineState.ConfiguringServer -> {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                RTextInput(state.host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
-                RTextInput(state.port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
-                TextButton(onClick = { intent(StartServerClicked) }, enabled = state.canStart) { Text("Connect") }
-            }
+        is TimelineState.ConfiguringServer -> Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.icon_192),
+                modifier = Modifier.padding(64.dp).size(120.dp),
+                contentDescription = null,
+            )
+            RTextInput(state.host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
+            RTextInput(state.port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
+            TextButton(onClick = { intent(StartServerClicked) }, enabled = state.canStart) { Text("Connect") }
         }
         is TimelineState.Error -> Column {
             Text("An error has occurred", fontSize = 32.sp)
