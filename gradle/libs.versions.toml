@@ -1,9 +1,9 @@
 [versions]
 activity = "1.8.2"
 apiresult = "1.0.3"
-compose = "1.6.2"
+compose = "1.6.3"
 compose-compiler = "1.5.10"
-compose-plugin = "1.5.12"
+compose-plugin = "1.6.0"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.12.0"
 coroutines = "1.8.0"
@@ -11,7 +11,7 @@ datetime = "0.6.0-RC.2"
 dependencyAnalysisPlugin = "1.29.0"
 detekt = "1.23.5"
 detektFormattingPlugin = "1.23.5"
-dokka = "1.9.10"
+dokka = "1.9.20"
 fragment = "1.6.2"
 gradleAndroid = "8.3.0"
 gradleDoctorPlugin = "0.9.1"
@@ -24,16 +24,16 @@ kotest = "5.8.0"
 kotest-plugin = "5.8.0"
 # @pin
 kotlin = "1.9.22"
+kotlin-collections = "0.3.7"
 kotlin-io = "0.3.1"
 kotlinx-atomicfu = "0.23.2"
 ktor = "3.0.0-beta-1"
 lifecycle = "2.7.0"
 material = "1.11.0"
 serialization = "1.6.3"
-turbine = "1.0.0"
+turbine = "1.1.0"
 uuid = "0.8.2"
 versionCatalogUpdatePlugin = "0.8.4"
-kotlin-collections = "0.3.7"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -76,6 +76,7 @@ kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotes
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 # kotlin
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
+kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
@@ -85,7 +86,6 @@ kotlin-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "k
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization" }
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 # ktor client
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
