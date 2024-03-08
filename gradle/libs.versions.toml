@@ -34,6 +34,8 @@ serialization = "1.6.3"
 turbine = "1.1.0"
 uuid = "0.8.2"
 versionCatalogUpdatePlugin = "0.8.4"
+decompose = "3.0.0-alpha08"
+essenty = "2.0.0-alpha07"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -50,6 +52,13 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+
+# decompose
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
+essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
+
 # detekt
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }

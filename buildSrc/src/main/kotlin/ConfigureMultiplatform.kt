@@ -17,20 +17,21 @@ fun Project.configureMultiplatform(
     tvOs: Boolean = true,
     macOs: Boolean = true,
     watchOs: Boolean = true,
-    explicitApi: Boolean = true,
+    windows: Boolean = true,
     wasmJs: Boolean = true,
     wasmWasi: Boolean = false, // TODO: Coroutines do not support wasmWasi yet
 ) = ext.apply {
     val libs by versionCatalog
-    if (explicitApi) explicitApi()
+    explicitApi()
     applyDefaultHierarchyTemplate()
     withSourcesJar(true)
 
     if (linux) {
         linuxX64()
         linuxArm64()
-        mingwX64()
     }
+
+    if (windows) mingwX64()
 
     if (js) js(IR) {
         browser()

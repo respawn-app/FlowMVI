@@ -21,7 +21,8 @@ kotlin {
         tvOs = false,
         linux = false,
         js = true,
-        wasmJs = true
+        wasmJs = true,
+        windows = false,
     )
     sourceSets {
         androidMain.dependencies {
