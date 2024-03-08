@@ -16,7 +16,7 @@ import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.compose.api.SubscriberLifecycleOwner
+import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.util.immediateOrDefault
@@ -27,14 +27,14 @@ import pro.respawn.flowmvi.util.immediateOrDefault
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     mode: SubscriptionMode = SubscriptionMode.Started,
-    owner: SubscriberLifecycleOwner = CurrentLifecycle,
+    lifecycle: SubscriberLifecycle = CurrentLifecycle,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, mode, owner) {
+    LaunchedEffect(this@subscribe, mode, lifecycle) {
         withContext(Dispatchers.Main.immediateOrDefault) {
-            owner.repeatOnLifecycle(mode) {
+            lifecycle.repeatOnLifecycle(mode) {
                 subscribe(
                     store = this@subscribe,
                     consume = { block(it) },
@@ -51,13 +51,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    mode: SubscriptionMode = SubscriptionMode.Visible,
-    owner: SubscriberLifecycleOwner = CurrentLifecycle,
+    mode: SubscriptionMode = SubscriptionMode.Started,
+    lifecycle: SubscriberLifecycle = CurrentLifecycle,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, mode, owner) {
+    LaunchedEffect(this@subscribe, mode, lifecycle) {
         withContext(Dispatchers.Main.immediateOrDefault) {
-            owner.repeatOnLifecycle(mode) {
+            lifecycle.repeatOnLifecycle(mode) {
                 subscribe(
                     store = this@subscribe,
                     render = { state.value = it }

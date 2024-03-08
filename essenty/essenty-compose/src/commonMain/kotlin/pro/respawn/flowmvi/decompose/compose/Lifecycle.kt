@@ -1,27 +1,25 @@
-package pro.respawn.flowmvi.compose.android
+package pro.respawn.flowmvi.decompose.compose
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
+import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.LifecycleOwner
+import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriptionMode
 
-public fun LifecycleOwner.asSubscriberOwner(): SubscriberLifecycle = SubscriberLifecycle { mode, block ->
-    repeatOnLifecycle(mode.asLifecycleState, block)
-}
+public val LifecycleOwner.asSubscriberLifecycle: SubscriberLifecycle
+    get() = SubscriberLifecycle { mode, block -> repeatOnLifecycle(mode.asEssentyLifecycle, block = block) }
 
-public val SubscriptionMode.asLifecycleState: Lifecycle.State
+public val SubscriptionMode.asEssentyLifecycle: Lifecycle.State
     get() = when (this) {
         SubscriptionMode.Immediate -> Lifecycle.State.CREATED
         SubscriptionMode.Started -> Lifecycle.State.STARTED
         SubscriptionMode.Visible -> Lifecycle.State.RESUMED
     }
-
 public val Lifecycle.State.asSubscriptionMode: SubscriptionMode
     get() = when (this) {
         Lifecycle.State.CREATED -> SubscriptionMode.Immediate
         Lifecycle.State.STARTED -> SubscriptionMode.Started
         Lifecycle.State.RESUMED -> SubscriptionMode.Visible
         Lifecycle.State.DESTROYED,
-        Lifecycle.State.INITIALIZED -> error("Android lifecycle does not support $this as subscription mode")
+        Lifecycle.State.INITIALIZED -> error("Essenty does not provide support for using $name as subscriber lifecycle")
     }

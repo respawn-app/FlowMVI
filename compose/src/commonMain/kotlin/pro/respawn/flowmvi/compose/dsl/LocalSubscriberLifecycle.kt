@@ -3,15 +3,15 @@ package pro.respawn.flowmvi.compose.dsl
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
-import pro.respawn.flowmvi.compose.api.SubscriberLifecycleOwner
+import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 
-public val LocalSubscriberLifecycle: ProvidableCompositionLocal<SubscriberLifecycleOwner?> = staticCompositionLocalOf {
+public val LocalSubscriberLifecycle: ProvidableCompositionLocal<SubscriberLifecycle?> = staticCompositionLocalOf {
     null
 }
 
-@PublishedApi
-internal val CurrentLifecycle: SubscriberLifecycleOwner
-    @Composable get() = LocalSubscriberLifecycle.current ?: PlatformLifecycle ?: ImmediateLifecycleOwner
-
 @get:Composable
-internal expect val PlatformLifecycle: SubscriberLifecycleOwner?
+internal expect val PlatformLifecycle: SubscriberLifecycle?
+
+@PublishedApi
+internal val CurrentLifecycle: SubscriberLifecycle
+    @Composable get() = LocalSubscriberLifecycle.current ?: PlatformLifecycle ?: ImmediateLifecycle

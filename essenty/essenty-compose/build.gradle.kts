@@ -8,7 +8,7 @@ plugins {
 
 android {
     configureAndroidLibrary(this)
-    namespace = "${Config.namespace}.compose"
+    namespace = "${Config.namespace}.decompose.compose"
 
     buildFeatures {
         compose = true
@@ -18,15 +18,9 @@ android {
 kotlin {
     configureMultiplatform(
         ext = this,
-        jvm = true,
-        android = true,
-        iOs = true,
-        macOs = true,
-        watchOs = false,
         tvOs = false,
+        watchOs = false,
         linux = false,
-        js = true,
-        wasmJs = true,
         windows = false,
     )
     sourceSets {
@@ -40,6 +34,11 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             api(projects.core)
+            api(projects.compose)
+
+            api(libs.essenty.lifecycle)
+            api(libs.essenty.lifecycle.coroutines)
+            api(libs.essenty.instancekeeper)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
@@ -48,8 +47,8 @@ kotlin {
     }
 }
 
-dependencies {
-    debugImplementation(libs.compose.tooling)
-}
-
 publishMultiplatform()
+
+dependencies {
+
+}
