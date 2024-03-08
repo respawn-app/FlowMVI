@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.MVIState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -26,4 +27,4 @@ public inline fun <reified T> Any?.typed(): T? = this as? T
 /**
  * Get the name of the class, removing the "State" suffix, if present.
  */
-public inline fun <reified T> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
+public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")

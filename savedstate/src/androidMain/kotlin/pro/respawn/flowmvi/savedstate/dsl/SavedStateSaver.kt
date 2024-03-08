@@ -4,6 +4,7 @@ package pro.respawn.flowmvi.savedstate.dsl
 
 import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.util.nameByType
@@ -30,8 +31,8 @@ public fun <T> SavedStateHandleSaver(
  *
  * The [key] parameter is derived from the simple class name of the state by default.
  */
-public inline fun <reified T : Parcelable> ParcelableSaver(
+public inline fun <reified T> ParcelableSaver(
     handle: SavedStateHandle,
     key: String = nameByType<T>() ?: "State",
     noinline recover: suspend (e: Exception) -> T? = ThrowRecover,
-): Saver<T> = SavedStateHandleSaver(handle, key, recover)
+): Saver<T> where T : Parcelable, T : MVIState = SavedStateHandleSaver(handle, key, recover)
