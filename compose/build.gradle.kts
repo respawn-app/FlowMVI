@@ -28,7 +28,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.foundation)
             implementation(libs.compose.preview)
-            implementation(libs.compose.lifecycle.viewmodel)
             implementation(libs.compose.lifecycle.runtime)
             api(projects.android)
         }
@@ -39,6 +38,7 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
+            implementation(libs.compose.lifecycle.runtime)
         }
     }
 }
