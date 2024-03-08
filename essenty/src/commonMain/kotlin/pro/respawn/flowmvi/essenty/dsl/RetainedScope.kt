@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.decompose.dsl
+package pro.respawn.flowmvi.essenty.dsl
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import pro.respawn.flowmvi.decompose.api.RetainedScope
+import pro.respawn.flowmvi.essenty.internal.RetainedScope
 import pro.respawn.flowmvi.util.immediateOrDefault
 import kotlin.coroutines.CoroutineContext
 

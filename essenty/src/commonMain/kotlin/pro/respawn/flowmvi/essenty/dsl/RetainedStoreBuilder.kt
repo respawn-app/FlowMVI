@@ -1,19 +1,22 @@
-package pro.respawn.flowmvi.decompose.dsl
+package pro.respawn.flowmvi.essenty.dsl
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
+import pro.respawn.flowmvi.essenty.internal.retain
 import pro.respawn.flowmvi.util.nameByType
 
 // keeper
 
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
     name: String,
@@ -26,6 +29,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.re
     }.retain(scope)
 }
 
+@FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),
@@ -35,6 +39,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 
 // owner
 
+@FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
     name: String,
@@ -42,6 +47,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
     @BuilderInference builder: BuildStore<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(initial, name, scope, builder)
 
+@FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),

@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.decompose.api
+package pro.respawn.flowmvi.essenty.internal
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.CoroutineScope
