@@ -37,6 +37,7 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
  */
 @Composable
 @FlowMVIDSL
+@Suppress("ComposableParametersOrdering")
 public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
