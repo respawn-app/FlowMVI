@@ -19,15 +19,15 @@ configuration changes is as simple as:
 ```kotlin
 class CounterComponent(
     componentContext: ComponentContext,
-) : ComponentContext by componentContext, Container<S, I, A> {
+) : ComponentContext by componentContext, Container<State, Intent, Action> {
 
-    val store = retainedStore(Loading) {
+    val store = retainedStore(initial = Loading) {
         // build your store as usual
     }
 }
 ```
 
-The store that has been created will will be started in a retained
+The store that has been created will be started in a retained
 coroutine scope upon creation. The `Container` interface serves as a marker and is optional.
 You can override the scope by passing your own scope to the function:
 
@@ -46,7 +46,7 @@ Pass `null` to the scope to not start the store upon creation. In this case, you
 !> Caveat: If you build a store that is retained, it will capture everything you pass into the `builder` closure. This
 means that any parameters or outside properties you use in the builder will be captured **and retained** as well.
 This is the same caveat that you have to be aware of when
-using [Retained Components](https://arkivanov.github.io/Decompose/component/instance-retaining/#retained-components-since-v210-alpha-03)
+using [Retained Components](https://arkivanov.github.io/Decompose/component/instance-retaining/#retained-components-since-v210-alpha-03).
 If you don't want to retain your stores to prevent this from happening, just build the store
 normally using a `store` builder. However, the store will be recreated and relaunched on configuration changes.
 
@@ -54,7 +54,8 @@ normally using a `store` builder. However, the store will be recreated and relau
 
 By default, a store is launched using a `retainedScope`. As the name says, it's retained across configuration changes
 and will be stopped when the `InstanceKeeper`'s storage is cleared. If you want to relaunch the store on lifecycle
-events instead, pass a regular `coroutineScope` from essenty coroutine extensions.
+events instead, pass a regular `coroutineScope` from essenty coroutine extensions. All stores will share the same scope
+by default.
 
 ```kotlin
 class CounterComponent(
@@ -70,7 +71,7 @@ class CounterComponent(
 ## Compose Lifecycle
 
 The base `compose` artifact already provides you with everything that is necessary to implement lifecycle support.
-The `essenty-compose` artifact simplifies the provision of lifecycle to UI that subscribes to the stores.
+The `essenty-compose` artifact simplifies the provision of lifecycle to the UI that subscribes to the stores.
 When you create a component, it is assigned a new `Lifecycle` instance by Decompose.
 This lifecycle will be used on the UI to correctly subscribe to the store.
 
