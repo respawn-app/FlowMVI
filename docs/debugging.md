@@ -190,7 +190,7 @@ you can just use the defaults. Your devices must be on the same network to conne
 
 Run the server and the app. After a few seconds, your devices should connect and you can start debugging.
 
-![result.png](images/debugger_setup_2.png)
+![debugger](images/debugger.gif)
 
 ## Step 3.2 External device configuration
 

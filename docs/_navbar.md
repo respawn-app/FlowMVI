@@ -4,6 +4,7 @@
 * [Android](android.md)
 * [Saving State](savedstate.md)
 * [Remote Debugging](debugging.md)
+* [Essenty integration](essenty.md)
 * [FAQ](faq.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * [Contributing](CONTRIBUTING.md)

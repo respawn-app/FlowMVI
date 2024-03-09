@@ -9,7 +9,7 @@
 [![AndroidWeekly #556](https://androidweekly.net/issues/issue-556/badge)](https://androidweekly.net/issues/issue-556/)
 [![Slack channel](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 
-![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos]
+![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos] ![badge][badge-wasm]
 
 FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
 
@@ -47,7 +47,10 @@ flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flo
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
 # Remote debugging client
-flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" } 
+flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
+# Essenty (Decompose) integration
+flowmvi-essenty = { module = "pro.respawn.flowmvi:essenty", version.ref = "flowmvi" }
+flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" } 
 ```
 
 </details>
@@ -58,13 +61,21 @@ flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", vers
 ```kotlin
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
+    // Core KMP module
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
+    // compose multiplatform
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    // saving and restoring state
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
+    // essenty integration
+    commonMainImplementation("pro.respawn.flowmvi:essenty:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:essenty-compose:$flowmvi")
+    // testing DSL
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
-
+    // android integration
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
     androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
+    // remote debugging client
     androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
 }
 ```
@@ -85,9 +96,10 @@ dependencies {
 * No base classes, complicated interfaces or factories of factories - store is built using a simple DSL
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
-* Dedicated remote debugger app for Windows, Linux, MacOS (in alpha)
+* Dedicated remote debugger app for Windows, Linux, MacOS.
 * Built for Compose: The library lets you achieve the best performance with Compose out of the box.
 * The core library depends on kotlin coroutines. Nothing else.
+* Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
 * 70+% unit test coverage of core library code
 
 ## How does it look?
@@ -224,7 +236,7 @@ val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
 
 ### Compose Multiplatform:
 
-![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm]  
+![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm] ![badge][badge-wasm] ![badge][badge-js]
 
 ```kotlin
 @Composable
@@ -316,6 +328,11 @@ timerPlugin(timer).test(Loading) {
     assert(!timer.isStarted)
 }
 ```
+
+### Debugger App
+
+![debugger.gif](docs/images/debugger.gif)
+
 
 Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
