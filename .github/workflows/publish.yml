@@ -38,7 +38,7 @@ jobs:
       - name: Create local properties
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "$LOCAL_PROPERTIES" > local.properties
+        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Publish to sonatype
         # It's important to not upload in parallel or duplicate repos will be created

@@ -32,7 +32,7 @@ jobs:
       - name: Create local properties
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "$LOCAL_PROPERTIES" > local.properties
+        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Create platform debugger distributable
         run: ./gradlew debugger:app:packageDistributionForCurrentOS
