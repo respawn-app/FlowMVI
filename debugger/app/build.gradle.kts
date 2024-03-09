@@ -1,3 +1,4 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -15,12 +16,17 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        configurations.all {
+            exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
+        }
 
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.animation)
+            @OptIn(ExperimentalComposeLibrary::class)
+            implementation(compose.desktop.components.splitPane)
             implementation(compose.animationGraphics)
             implementation(compose.ui)
             implementation(compose.components.resources)
@@ -32,14 +38,16 @@ kotlin {
             implementation(libs.uuid)
             implementation(libs.bundles.koin)
             implementation(libs.kotlin.io)
-            implementation(projects.core)
 
+            implementation(projects.core)
+            implementation(projects.essenty.essentyCompose)
             implementation(projects.debugger.server)
             implementation(projects.debugger.debuggerCommon)
             implementation(projects.compose)
         }
         desktopMain.apply {
             dependencies {
+                implementation(libs.kotlin.coroutines.swing)
                 implementation(compose.desktop.currentOs)
             }
         }

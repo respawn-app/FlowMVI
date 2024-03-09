@@ -41,7 +41,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> = subscribe(
-    lifecycle = lifecycleOwner.asSubscriberOwner(),
+    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
     mode = lifecycleState.asSubscriptionMode,
     consume = consume
 )
@@ -65,4 +65,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-): State<S> = subscribe(lifecycle = lifecycleOwner.asSubscriberOwner(), mode = lifecycleState.asSubscriptionMode)
+): State<S> = subscribe(
+    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
+    mode = lifecycleState.asSubscriptionMode
+)

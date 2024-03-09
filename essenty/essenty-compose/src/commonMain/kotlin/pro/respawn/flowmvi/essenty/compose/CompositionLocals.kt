@@ -15,6 +15,6 @@ public fun ProvideSubscriberLifecycle(
     owner: LifecycleOwner,
     content: @Composable () -> Unit
 ): Unit = CompositionLocalProvider(
-    LocalSubscriberLifecycle provides owner.asSubscriberLifecycle,
+    LocalSubscriberLifecycle provides owner.lifecycle.asSubscriberLifecycle,
     content = content,
 )

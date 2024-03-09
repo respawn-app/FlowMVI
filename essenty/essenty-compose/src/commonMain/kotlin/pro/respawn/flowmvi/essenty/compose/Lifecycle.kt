@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.compose.api.SubscriptionMode
  * Convert this [LifecycleOwner] to a [SubscriberLifecycle].
  */
 @Stable
-public val LifecycleOwner.asSubscriberLifecycle: SubscriberLifecycle
+public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
     get() = SubscriberLifecycle { mode, block -> repeatOnLifecycle(mode.asEssentyLifecycle, block = block) }
 
 /**

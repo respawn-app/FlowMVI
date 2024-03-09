@@ -17,7 +17,7 @@ kotlin {
 
 android {
     configureAndroidLibrary(this)
-    namespace = "${Config.namespace}.decompose"
+    namespace = "${Config.namespace}.essenty"
 }
 
 dependencies {

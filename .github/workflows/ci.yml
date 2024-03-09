@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew detektAll
 
       - name: Build
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assemble --stacktrace
 
       - name: Unit tests
         run: ./gradlew allTests --stacktrace

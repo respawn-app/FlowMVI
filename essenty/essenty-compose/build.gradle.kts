@@ -8,7 +8,7 @@ plugins {
 
 android {
     configureAndroidLibrary(this)
-    namespace = "${Config.namespace}.decompose.compose"
+    namespace = "${Config.namespace}.essenty.compose"
 
     buildFeatures {
         compose = true

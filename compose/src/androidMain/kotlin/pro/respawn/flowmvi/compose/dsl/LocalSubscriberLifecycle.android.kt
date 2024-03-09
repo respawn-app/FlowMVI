@@ -7,4 +7,4 @@ import pro.respawn.flowmvi.compose.android.asSubscriberOwner
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 
 internal actual val PlatformLifecycle: SubscriberLifecycle?
-    @Composable @ReadOnlyComposable get() = LocalLifecycleOwner.current.asSubscriberOwner()
+    @Composable @ReadOnlyComposable get() = LocalLifecycleOwner.current.lifecycle.asSubscriberOwner()

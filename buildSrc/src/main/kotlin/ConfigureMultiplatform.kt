@@ -47,6 +47,7 @@ fun Project.configureMultiplatform(
     }
 
     if (wasmWasi) wasmWasi()
+
     if (android) androidTarget {
         publishLibraryVariants("release")
     }

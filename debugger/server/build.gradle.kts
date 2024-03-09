@@ -36,6 +36,7 @@ kotlin {
             implementation(projects.debugger.debuggerCommon)
         }
         jvmMain.dependencies {
+            implementation(libs.kotlin.coroutines.swing)
             implementation(compose.desktop.common)
         }
     }

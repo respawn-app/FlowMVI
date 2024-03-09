@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.compose.api.SubscriptionMode
  * Converts this Android [LifecycleOwner] to a [SubscriberLifecycle].
  */
 @Stable
-public fun LifecycleOwner.asSubscriberOwner(): SubscriberLifecycle = SubscriberLifecycle { mode, block ->
+public fun Lifecycle.asSubscriberOwner(): SubscriberLifecycle = SubscriberLifecycle { mode, block ->
     repeatOnLifecycle(mode.asLifecycleState, block)
 }
 
