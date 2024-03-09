@@ -75,13 +75,7 @@ fun Project.configureMultiplatform(
             yield(watchosDeviceArm64())
             yield(watchosSimulatorArm64())
         }
-    }.forEach {
-        it.binaries.framework {
-            binaryOption("bundleId", Config.artifactId)
-            binaryOption("bundleVersion", Config.versionName)
-            baseName = Config.artifactId
-        }
-    }
+    }.toList() // for now, do nothing, but iterate the lazy sequence
 
     sourceSets.apply {
         if (jvm) {
