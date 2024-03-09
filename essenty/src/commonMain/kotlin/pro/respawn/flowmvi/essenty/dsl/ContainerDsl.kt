@@ -9,6 +9,8 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.dsl.BuildStore
+import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.util.nameByType
 
 /**
@@ -39,4 +41,43 @@ public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.reta
     @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
     key, scope, factory
+)
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    initial: S,
+    name: String,
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
+    initial, name, scope, builder
+)
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
+ *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    initial: S,
+    scope: CoroutineScope? = retainedScope(),
+    name: String = "${requireNotNull(nameByType<S>())}Store",
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
+    initial, name, scope, builder
 )

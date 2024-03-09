@@ -54,6 +54,8 @@ compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "co
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 
 # decompose
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
 essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
