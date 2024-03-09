@@ -1,3 +1,5 @@
+@file:Suppress("UndocumentedPublicProperty", "UndocumentedPublicClass")
+
 package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import org.jetbrains.compose.resources.ExperimentalResourceApi

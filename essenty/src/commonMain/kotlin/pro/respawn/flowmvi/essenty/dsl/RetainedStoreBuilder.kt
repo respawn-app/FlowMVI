@@ -16,6 +16,15 @@ import pro.respawn.flowmvi.util.nameByType
 
 // keeper
 
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
@@ -29,6 +38,16 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.re
     }.retain(scope)
 }
 
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
+ *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
@@ -39,6 +58,15 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 
 // owner
 
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
@@ -47,6 +75,16 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
     @BuilderInference builder: BuildStore<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(initial, name, scope, builder)
 
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
+ *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,

@@ -1,12 +1,15 @@
 package pro.respawn.flowmvi.util
 
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
-import kotlin.concurrent.Volatile
 
-@Volatile
-private var isImmediateSupported: Boolean = true
+private var isImmediateSupported: Boolean by atomic(true)
 
+/**
+ * Obtain a [MainCoroutineDispatcher.immediate], and if not supported by the current platform, fall back to a
+ * default [MainCoroutineDispatcher].
+ */
 @Suppress("UnusedReceiverParameter")
 public val MainCoroutineDispatcher.immediateOrDefault: MainCoroutineDispatcher
     get() {

@@ -1,3 +1,5 @@
+@file:OptIn(DelicateStoreApi::class)
+
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
@@ -21,7 +23,28 @@ import pro.respawn.flowmvi.compose.api.SubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.util.immediateOrDefault
 
-@OptIn(DelicateStoreApi::class)
+/**
+ * A function to subscribe to the store that follows the system lifecycle.
+ *
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Provided [consume] parameter will be used to consume actions that come from the store.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
+ *
+ *  [lifecycle] is an instance of the lifecycle wrapper used to execute the subscription event.
+ *  * The provided implementation must follow the contract outlined in [SubscriberLifecycle]. This instance can be
+ *  provided automatically on Android, but must be implemented manually on other platforms for now.
+ *  * If you have provided a lifecycle via [LocalSubscriberLifecycle], use [requireLifecycle].
+ *  * If you don't want to provide a lifecycle, use [DefaultLifecycle] to fall back to a no-op implementation if needed
+ *
+ *
+ * @param mode the subscription mode that should be reached in order to subscribe to the store. At specified moments
+ * in the UI lifecycle (Activity, Composable, Window etc), the store will subscribe and unsubscribe from the store.
+ * @param consume a lambda to consume actions with.
+ * @return the [State] that contains the current state.
+ * @see ImmutableStore.subscribe
+ * @see subscribe
+ */
 @Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
@@ -46,8 +69,26 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
     return state
 }
 
-
-@OptIn(DelicateStoreApi::class)
+/**
+ * A function to subscribe to the store that follows the system lifecycle.
+ *
+ * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
+ * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+ *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
+ *
+ *  [lifecycle] is an instance of the lifecycle wrapper used to execute the subscription event.
+ *  * The provided implementation must follow the contract outlined in [SubscriberLifecycle]. This instance can be
+ *  provided automatically on Android, but must be implemented manually on other platforms for now.
+ *  * If you have provided a lifecycle via [LocalSubscriberLifecycle], use [requireLifecycle].
+ *  * If you don't want to provide a lifecycle, use [DefaultLifecycle] to fall back to a no-op implementation if needed
+ *
+ *
+ * @param mode the subscription mode that should be reached in order to subscribe to the store. At specified moments
+ * in the UI lifecycle (Activity, Composable, Window etc), the store will subscribe and unsubscribe from the store.
+ * @return the [State] that contains the current state.
+ * @see ImmutableStore.subscribe
+ * @see subscribe
+ */
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(

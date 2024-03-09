@@ -15,6 +15,13 @@ import pro.respawn.flowmvi.util.nameByType
 
 // keeper
 
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * Uses the State class name as a key for the instance keeper by default.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     scope: CoroutineScope? = retainedScope(),
@@ -22,6 +29,12 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
     @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = getOrCreate(key) { retained(factory(), scope) }
 
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     key: Any,
@@ -31,6 +44,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.re
 
 // keeper owner
 
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * Uses the State class name as a key for the instance keeper by default.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     key: Any,
@@ -38,6 +58,12 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
     factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(key, scope, factory)
 
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     scope: CoroutineScope? = retainedScope(),

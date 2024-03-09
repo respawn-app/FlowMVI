@@ -20,7 +20,7 @@ internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S
 
 private abstract class AbstractStateModule<S : MVIState>(initial: S) : StateModule<S> {
 
-    @Suppress("PropertyName")
+    @Suppress("PropertyName", "VariableNaming")
     protected val _states = MutableStateFlow(initial)
     final override val states: StateFlow<S> = _states.asStateFlow()
 

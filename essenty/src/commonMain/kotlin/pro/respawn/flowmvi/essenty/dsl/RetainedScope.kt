@@ -17,11 +17,23 @@ internal fun createRetainedScope(
     context: CoroutineContext = Dispatchers.Main.immediateOrDefault
 ): RetainedScope = object : RetainedScope, CoroutineScope by CoroutineScope(context + SupervisorJob(context[Job])) {}
 
+/**
+ * Creates OR obtains a [CoroutineScope]
+ * instance that is retained across configuration changes using this [InstanceKeeper].
+ *
+ * Uses an [immediateOrDefault] dispatcher as the coroutine context by default.
+ */
 public fun InstanceKeeper.retainedScope(
     context: CoroutineContext = Dispatchers.Main.immediateOrDefault,
     key: String = DefaultScopeKey,
 ): CoroutineScope = getOrCreate(key) { createRetainedScope(context) }
 
+/**
+ * Creates OR obtains a [CoroutineScope]
+ * instance that is retained across configuration changes using this [InstanceKeeper].
+ *
+ * Uses an [immediateOrDefault] dispatcher as the coroutine context by default.
+ */
 public fun InstanceKeeperOwner.retainedScope(
     context: CoroutineContext = Dispatchers.Main.immediateOrDefault,
     key: String = DefaultScopeKey,

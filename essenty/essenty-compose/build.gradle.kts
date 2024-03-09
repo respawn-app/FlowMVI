@@ -50,5 +50,4 @@ kotlin {
 publishMultiplatform()
 
 dependencies {
-
 }

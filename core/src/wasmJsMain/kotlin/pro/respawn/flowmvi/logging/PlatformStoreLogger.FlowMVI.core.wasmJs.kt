@@ -1,28 +1,13 @@
+@file:Suppress("TrimMultilineRawString", "UnusedParameter")
 package pro.respawn.flowmvi.logging
 
-private fun log(message: String): Unit = js(
-    """{
-        console.log(message);
-    }"""
-)
+private fun log(message: String): Unit = js("""{ console.log(message); }""")
 
-private fun info(message: String): Unit = js(
-    """{
-        console.info(message);
-    }"""
-)
+private fun info(message: String): Unit = js("""{ console.info(message); }""")
 
-private fun warn(message: String): Unit = js(
-    """{
-        console.warn(message);
-    }"""
-)
+private fun warn(message: String): Unit = js("""{ console.warn(message); }""")
 
-private fun error(message: String): Unit = js(
-    """{
-        console.error(message);
-    }"""
-)
+private fun error(message: String): Unit = js("""{ console.error(message); }""")
 
 /**
  * A [StoreLogger] instance for each supported platform
