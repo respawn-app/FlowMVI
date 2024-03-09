@@ -58,10 +58,10 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     private val handler = PipelineExceptionHandler()
     private val pipelineName = CoroutineName(toString())
     override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + job + handler + this
-    override suspend fun updateState(transform: suspend S.() -> S) = onTransformState(transform)
-    override suspend fun action(action: A) = onAction(action)
+    override suspend fun updateState(transform: suspend S.() -> S) = catch { onTransformState(transform) }
+    override suspend fun action(action: A) = catch { onAction(action) }
     override fun send(action: A) {
-        launch { onAction(action) }
+        launch { action(action) }
     }
 }.run {
     onStart()

@@ -8,6 +8,11 @@ plugins {
 
 android {
     configureAndroidLibrary(this)
+    namespace = "${Config.namespace}.compose"
+
+    buildFeatures {
+        compose = true
+    }
 }
 
 kotlin {
@@ -20,13 +25,14 @@ kotlin {
         watchOs = false,
         tvOs = false,
         linux = false,
-        js = false,
+        js = true,
+        wasmJs = true,
+        windows = false,
     )
     sourceSets {
         androidMain.dependencies {
             implementation(libs.compose.foundation)
             implementation(libs.compose.preview)
-            implementation(libs.compose.lifecycle.viewmodel)
             implementation(libs.compose.lifecycle.runtime)
             api(projects.android)
         }
@@ -37,15 +43,8 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
+            implementation(libs.compose.lifecycle.runtime)
         }
-    }
-}
-
-android {
-    namespace = "${Config.namespace}.compose"
-
-    buildFeatures {
-        compose = true
     }
 }
 

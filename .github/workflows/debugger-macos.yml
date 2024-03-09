@@ -3,8 +3,6 @@ name: debugger-macos
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 concurrency:
   group: "publish-macos"
@@ -13,7 +11,7 @@ concurrency:
 jobs:
   publish-windows:
     runs-on: macos-latest
-
+    environment: publishing
     steps:
       - uses: actions/checkout@v3
 

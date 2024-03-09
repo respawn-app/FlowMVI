@@ -11,10 +11,10 @@ import io.ktor.server.websocket.receiveDeserialized
 import io.ktor.server.websocket.sendSerialized
 import io.ktor.server.websocket.webSocket
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
@@ -45,22 +45,18 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
                 val storeId = call.parameters.getOrFail("id").asUUID
                 with(store) {
                     try {
-                        supervisorScope {
-                            subscribe {
-                                actions
-                                    .filterIsInstance<SendClientEvent>()
-                                    .filter { it.client == storeId }
-                                    .collect { sendSerialized<ServerEvent>(it.event) }
-                            }
-                            launch {
-                                while (true) {
-                                    val event = receiveDeserialized<ClientEvent>()
-                                    logger.invoke(StoreLogLevel.Debug) { "received event $event" }
-                                    intent(EventReceived(event, storeId))
-                                }
-                            }
+                        subscribe {
+                            actions
+                                .filterIsInstance<SendClientEvent>()
+                                .filter { it.client == storeId }
+                                .collect { sendSerialized<ServerEvent>(it.event) }
+                        }
+                        while (true) {
+                            val event = receiveDeserialized<ClientEvent>()
+                            intent(EventReceived(event, storeId))
                         }
                     } finally {
+                        logger(StoreLogLevel.Debug) { "Store $storeId disconnected" }
                         intent(EventReceived(StoreDisconnected(storeId), storeId))
                     }
                 }
@@ -70,7 +66,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
         .also { server = it }
         .start()
 
-    fun stop() {
+    suspend fun stop() = withContext(Dispatchers.IO) {
         store.intent(StopRequested)
         server?.stop()
         server = null

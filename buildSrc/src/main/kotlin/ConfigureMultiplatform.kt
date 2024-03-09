@@ -4,7 +4,9 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
+@OptIn(ExperimentalWasmDsl::class)
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
     jvm: Boolean = true,
@@ -15,24 +17,36 @@ fun Project.configureMultiplatform(
     tvOs: Boolean = true,
     macOs: Boolean = true,
     watchOs: Boolean = true,
-    explicitApi: Boolean = true,
+    windows: Boolean = true,
+    wasmJs: Boolean = true,
+    wasmWasi: Boolean = false, // TODO: Coroutines do not support wasmWasi yet
 ) = ext.apply {
     val libs by versionCatalog
-    if (explicitApi) explicitApi()
+    explicitApi()
     applyDefaultHierarchyTemplate()
     withSourcesJar(true)
 
     if (linux) {
         linuxX64()
         linuxArm64()
-        mingwX64()
     }
+
+    if (windows) mingwX64()
 
     if (js) js(IR) {
         browser()
         nodejs()
         binaries.library()
     }
+
+    if (wasmJs) wasmJs {
+        moduleName = this@configureMultiplatform.name
+        nodejs()
+        browser()
+        binaries.library()
+    }
+
+    if (wasmWasi) wasmWasi()
 
     if (android) androidTarget {
         publishLibraryVariants("release")
@@ -61,13 +75,7 @@ fun Project.configureMultiplatform(
             yield(watchosDeviceArm64())
             yield(watchosSimulatorArm64())
         }
-    }.forEach {
-        it.binaries.framework {
-            binaryOption("bundleId", Config.artifactId)
-            binaryOption("bundleVersion", Config.versionName)
-            baseName = Config.artifactId
-        }
-    }
+    }.toList() // for now, do nothing, but iterate the lazy sequence
 
     sourceSets.apply {
         if (jvm) {

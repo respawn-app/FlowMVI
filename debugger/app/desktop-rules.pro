@@ -5,3 +5,5 @@
 -dontwarn io.netty.handler.**
 -dontwarn io.netty.util.**
 -dontwarn kotlinx.coroutines.android.**
+-keep class kotlinx.coroutines.internal.MainDispatcherFactory { *; }
+-keep class kotlinx.coroutines.swing.SwingDispatcherFactory { *; }

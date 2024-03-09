@@ -1,12 +1,8 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
 }
-val props by localProperties
-
 kotlin {
     jvm {
         compilations.all {
@@ -16,7 +12,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -41,6 +36,7 @@ kotlin {
             implementation(projects.debugger.debuggerCommon)
         }
         jvmMain.dependencies {
+            implementation(libs.kotlin.coroutines.swing)
             implementation(compose.desktop.common)
         }
     }

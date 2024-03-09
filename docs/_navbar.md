@@ -5,7 +5,6 @@
 * [Saving State](savedstate.md)
 * [Remote Debugging](debugging.md)
 * [FAQ](faq.md)
-* [Roadmap](roadmap.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * [Contributing](CONTRIBUTING.md)
 * [Migrating from v1](migration.md)

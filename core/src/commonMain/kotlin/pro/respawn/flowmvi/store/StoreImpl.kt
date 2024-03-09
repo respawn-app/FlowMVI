@@ -39,7 +39,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     RecoverModule<S, I, A>,
     StorePlugin<S, I, A> by compositePlugin(config.plugins),
     SubscribersModule by subscribersModule(),
-    StateModule<S> by stateModule(config.initial),
+    StateModule<S> by stateModule(config.initial, config.atomicStateUpdates),
     IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
     ActionModule<A> by actionModule(config.actionShareBehavior) {
 
@@ -49,38 +49,35 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun start(scope: CoroutineScope): Job = launchPipeline(
         name = name,
         parent = scope + config.coroutineContext,
-        onAction = { catch { onAction(it)?.let { this@StoreImpl.action(it) } } },
+        onAction = { action -> onAction(action)?.let { this@StoreImpl.action(it) } },
         onTransformState = { transform ->
-            catch {
-                this@StoreImpl.updateState {
-                    onState(this, transform()) ?: this
-                }
-            }
+            this@StoreImpl.updateState { onState(this, transform()) ?: this }
         },
         onStop = {
             checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
             onStop(it)
-        }
-    ) {
-        check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
-        launch intents@{
-            coroutineScope {
-                // run onStart plugins first to not let subscribers appear before the store is started fully
-                catch { onStart() }
-                launch {
-                    observeSubscribers(
-                        onSubscribe = { catch { onSubscribe(it) } },
-                        onUnsubscribe = { catch { onUnsubscribe(it) } }
-                    )
-                }
-                launch {
-                    awaitIntents {
-                        catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
+        },
+        onStart = {
+            check(launchJob.getAndSet(coroutineContext.job) == null) { "Store is already started" }
+            launch intents@{
+                coroutineScope {
+                    // run onStart plugins first to not let subscribers appear before the store is started fully
+                    catch { onStart() }
+                    launch {
+                        observeSubscribers(
+                            onSubscribe = { catch { onSubscribe(it) } },
+                            onUnsubscribe = { catch { onUnsubscribe(it) } }
+                        )
+                    }
+                    launch {
+                        awaitIntents {
+                            catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
+                        }
                     }
                 }
             }
         }
-    }
+    )
 
     override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
         withContext(this@StoreImpl) {

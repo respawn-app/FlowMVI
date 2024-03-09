@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.reduceLambdas
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.TimeTravel
-import pro.respawn.flowmvi.plugins.platformLoggingPlugin
+import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravel
 
 internal typealias TestTimeTravel = TimeTravel<TestState, LambdaIntent<TestState, TestAction>, TestAction>
@@ -24,8 +24,9 @@ internal fun testStore(
     debuggable = false
     name = "TestStore"
     actionShareBehavior = behavior
+    atomicStateUpdates = false
     timeTravel(timeTravel)
-    install(platformLoggingPlugin(name))
+    install(loggingPlugin())
     configure()
     reduceLambdas()
 }

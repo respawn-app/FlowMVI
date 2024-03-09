@@ -30,6 +30,7 @@ internal data class TimelineFilters(
 internal data class StoreItem(
     val id: Uuid,
     val name: String,
+    val isConnected: Boolean,
 )
 
 @Immutable

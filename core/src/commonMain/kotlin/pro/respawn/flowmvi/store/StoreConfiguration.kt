@@ -22,4 +22,5 @@ internal data class StoreConfiguration<S : MVIState, I : MVIIntent, A : MVIActio
     val debuggable: Boolean,
     val coroutineContext: CoroutineContext,
     val logger: StoreLogger,
+    val atomicStateUpdates: Boolean,
 )

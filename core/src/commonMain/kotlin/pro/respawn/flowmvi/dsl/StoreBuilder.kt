@@ -117,6 +117,21 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public var intentCapacity: Int = Channel.UNLIMITED
 
     /**
+     * Enables transaction serialization for state updates, making state updates atomic and suspendable.
+     *
+     * * Serializes both state reads and writes using a mutex.
+     * * Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
+     *   All other clients attempt to get the state will wait on a FIFO queue and suspend the parent coroutine.
+     * * This property disables state transactions for the whole store.
+     *   For one-time usage of non-atomic updates, see [useState].
+     * * Has a small performance impact because of coroutine context switching and mutex usage.
+     *
+     * `true` by default
+     */
+    @FlowMVIDSL
+    public var atomicStateUpdates: Boolean = true
+
+    /**
      * Install an existing [StorePlugin]. See the other overload to build the plugin on the fly.
      * This installs a prebuilt plugin.
      * Plugins will **preserve** the order of installation and will proceed according to this order.
@@ -168,6 +183,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         plugins = plugins,
         coroutineContext = coroutineContext,
         logger = logger,
+        atomicStateUpdates = atomicStateUpdates,
     ).let(::StoreImpl)
 }
 

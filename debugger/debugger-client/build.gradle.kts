@@ -8,7 +8,9 @@ plugins {
 kotlin {
     configureMultiplatform(
         this,
-        watchOs = false, // not supported by all needed ktor artifacts?
+        // not supported by all needed ktor artifacts?
+        watchOs = false,
+        wasmJs = false,
     )
 }
 android {

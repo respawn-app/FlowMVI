@@ -269,6 +269,13 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
     // UNLIMITED, CONFLATED, RENDEZVOUS, BUFFERED
     var intentCapacity = Channel.UNLIMITED
 
+    // Enables transaction serialization for state updates, making state updates atomic and suspendable.
+    // Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
+    // All other clients attempt to get the state will wait on a FIFO queue and suspend the parent coroutine.
+    // For one-time usage of non-atomic updates, see [useState].
+    // Has a small performance impact because of coroutine context switching and mutex usage when enabled.
+    var atomicStateUpdates = true
+
     // Install a prebuilt plugin. The order of plugins matters!
     // Plugins will preserve the order of installation and will proceed according to this order.
     // Installation of the same plugin multiple times is not allowed.

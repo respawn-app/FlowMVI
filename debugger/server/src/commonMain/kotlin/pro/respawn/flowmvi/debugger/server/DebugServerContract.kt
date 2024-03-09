@@ -36,7 +36,11 @@ internal sealed interface ServerState : MVIState {
     data class Running(
         val clients: PersistentMap<Uuid, ServerClientState> = persistentMapOf(),
         val eventLog: PersistentList<ServerEventEntry> = persistentListOf(),
-    ) : ServerState
+    ) : ServerState {
+
+        override fun toString() =
+            "Running(clients=${clients.count { it.value.isConnected }}, logSize = ${eventLog.size})"
+    }
 }
 
 internal sealed interface ServerIntent : MVIIntent {

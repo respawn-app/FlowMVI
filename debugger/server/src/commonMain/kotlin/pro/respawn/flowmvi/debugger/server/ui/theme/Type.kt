@@ -1,4 +1,5 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
+@file:OptIn(ExperimentalResourceApi::class)
 
 package pro.respawn.flowmvi.debugger.server.ui.theme
 
@@ -8,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -16,165 +18,178 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.Font
+import pro.respawn.flowmvi.server.generated.resources.Res
+import pro.respawn.flowmvi.server.generated.resources.comfortaa
+import pro.respawn.flowmvi.server.generated.resources.montserrat
 
-val Comfortaa = Font("font/comfortaa.ttf").toFontFamily()
-val Montserrat = Font("font/montserrat.ttf").toFontFamily()
+val Comfortaa @Composable get() = Font(Res.font.comfortaa).toFontFamily()
+val Montserrat @Composable get() = Font(Res.font.montserrat).toFontFamily()
 
-inline val FontFamily.Companion.Montserrat get() = pro.respawn.flowmvi.debugger.server.ui.theme.Montserrat
-inline val FontFamily.Companion.Comfortaa get() = pro.respawn.flowmvi.debugger.server.ui.theme.Comfortaa
+inline val FontFamily.Companion.Montserrat @Composable get() = pro.respawn.flowmvi.debugger.server.ui.theme.Montserrat
+inline val FontFamily.Companion.Comfortaa @Composable get() = pro.respawn.flowmvi.debugger.server.ui.theme.Comfortaa
 
 private const val FontFeatures = "dlig, liga, kern, zero, locl, size"
 
 // region Typography
-internal val AppTypography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.W700,
-        fontSize = 48.sp,
-        lineHeight = 58.sp,
-        letterSpacing = 5.sp,
-        lineBreak = LineBreak.Heading,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    displayMedium = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.W600,
-        fontSize = 40.sp,
-        lineHeight = 54.sp,
-        letterSpacing = 4.sp,
-        lineBreak = LineBreak.Heading,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    displaySmall = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.W600,
-        fontSize = 32.sp,
-        lineHeight = 42.sp,
-        letterSpacing = 3.sp,
-        lineBreak = LineBreak.Heading,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = Montserrat,
-        fontWeight = FontWeight.W500,
-        fontSize = 30.sp,
-        lineHeight = 38.sp,
-        letterSpacing = 2.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W500,
-        fontSize = 26.sp,
-        lineHeight = 34.sp,
-        letterSpacing = 1.5.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W500,
-        fontSize = 23.sp,
-        lineHeight = 32.sp,
-        letterSpacing = 1.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    titleLarge = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W500,
-        fontSize = 22.sp,
-        lineHeight = 30.sp,
-        letterSpacing = 0.9.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    titleMedium = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W500,
-        fontSize = 19.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.8.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    titleSmall = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W500,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.7.sp,
-        lineBreak = LineBreak.Simple,
-        hyphens = Hyphens.None,
-        fontFeatureSettings = FontFeatures,
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W400,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.7.sp,
-        lineBreak = LineBreak.Paragraph,
-        hyphens = Hyphens.Auto,
-        fontFeatureSettings = FontFeatures,
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W400,
-        fontSize = 14.sp,
-        lineHeight = 21.sp,
-        letterSpacing = 0.6.sp,
-        lineBreak = LineBreak.Paragraph,
-        hyphens = Hyphens.Auto,
-        fontFeatureSettings = FontFeatures,
-    ),
-    bodySmall = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W400,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
-        letterSpacing = 0.5.sp,
-        lineBreak = LineBreak.Paragraph,
-        hyphens = Hyphens.Auto,
-        fontFeatureSettings = FontFeatures,
-    ),
-    labelLarge = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W300,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.5.sp,
-        lineBreak = LineBreak.Simple,
-        fontFeatureSettings = FontFeatures,
-    ),
-    labelMedium = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W300,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
-        letterSpacing = 0.4.sp,
-        lineBreak = LineBreak.Simple,
-        fontFeatureSettings = FontFeatures,
-    ),
-    labelSmall = TextStyle(
-        fontFamily = Comfortaa,
-        fontWeight = FontWeight.W300,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.4.sp,
-        lineBreak = LineBreak.Simple,
-        fontFeatureSettings = FontFeatures,
-    ),
-)
+internal val AppTypography
+    @Composable
+    get() = run {
+        val comfortaa = Comfortaa
+        val montserrat = Montserrat
+        remember {
+            Typography(
+                displayLarge = TextStyle(
+                    fontFamily = montserrat,
+                    fontWeight = FontWeight.W700,
+                    fontSize = 48.sp,
+                    lineHeight = 58.sp,
+                    letterSpacing = 5.sp,
+                    lineBreak = LineBreak.Heading,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                displayMedium = TextStyle(
+                    fontFamily = montserrat,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 40.sp,
+                    lineHeight = 54.sp,
+                    letterSpacing = 4.sp,
+                    lineBreak = LineBreak.Heading,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                displaySmall = TextStyle(
+                    fontFamily = montserrat,
+                    fontWeight = FontWeight.W600,
+                    fontSize = 32.sp,
+                    lineHeight = 42.sp,
+                    letterSpacing = 3.sp,
+                    lineBreak = LineBreak.Heading,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                headlineLarge = TextStyle(
+                    fontFamily = montserrat,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 30.sp,
+                    lineHeight = 38.sp,
+                    letterSpacing = 2.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                headlineMedium = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 26.sp,
+                    lineHeight = 34.sp,
+                    letterSpacing = 1.5.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                headlineSmall = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 23.sp,
+                    lineHeight = 32.sp,
+                    letterSpacing = 1.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                titleLarge = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 22.sp,
+                    lineHeight = 30.sp,
+                    letterSpacing = 0.9.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                titleMedium = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 19.sp,
+                    lineHeight = 28.sp,
+                    letterSpacing = 0.8.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                titleSmall = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W500,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    letterSpacing = 0.7.sp,
+                    lineBreak = LineBreak.Simple,
+                    hyphens = Hyphens.None,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                bodyLarge = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    letterSpacing = 0.7.sp,
+                    lineBreak = LineBreak.Paragraph,
+                    hyphens = Hyphens.Auto,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                bodyMedium = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 14.sp,
+                    lineHeight = 21.sp,
+                    letterSpacing = 0.6.sp,
+                    lineBreak = LineBreak.Paragraph,
+                    hyphens = Hyphens.Auto,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                bodySmall = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W400,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp,
+                    letterSpacing = 0.5.sp,
+                    lineBreak = LineBreak.Paragraph,
+                    hyphens = Hyphens.Auto,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                labelLarge = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W300,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    letterSpacing = 0.5.sp,
+                    lineBreak = LineBreak.Simple,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                labelMedium = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W300,
+                    fontSize = 12.sp,
+                    lineHeight = 18.sp,
+                    letterSpacing = 0.4.sp,
+                    lineBreak = LineBreak.Simple,
+                    fontFeatureSettings = FontFeatures,
+                ),
+                labelSmall = TextStyle(
+                    fontFamily = comfortaa,
+                    fontWeight = FontWeight.W300,
+                    fontSize = 11.sp,
+                    lineHeight = 16.sp,
+                    letterSpacing = 0.4.sp,
+                    lineBreak = LineBreak.Simple,
+                    fontFeatureSettings = FontFeatures,
+                ),
+            )
+        }
+    }
 // endregion
 
 @Preview

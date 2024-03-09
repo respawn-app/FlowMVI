@@ -124,10 +124,12 @@ class CounterContainer(
 ) {
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
 
-        // makes the store fully async and parallel
+        actionShareBehavior = ActionShareBehavior.Distribute()
+
+        // makes the store fully async, parallel and thread-safe
         parallelIntents = true
         coroutineContext = Dispatchers.Default
-        actionShareBehavior = ActionShareBehavior.Distribute()
+        atomicStateUpdates = true
 
         // enables debugging features such as logging and remote connection
         debuggable = true
@@ -201,6 +203,7 @@ Powerful DSL allows to hook into store events and amend any store's logic with r
 
 ```kotlin
 val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
+    
     onStart { }
     
     onStop { }

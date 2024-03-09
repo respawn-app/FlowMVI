@@ -3,25 +3,19 @@
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.android.subscribe
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.compose.android.asSubscriberOwner
+import pro.respawn.flowmvi.compose.android.asSubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
 
 /**
@@ -39,30 +33,18 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
-@OptIn(DelicateStoreApi::class)
 @Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
-): State<S> {
-    val owner = LocalLifecycleOwner.current
-    val state = remember(this) { mutableStateOf(state) }
-    val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, lifecycleState, owner) {
-        withContext(Dispatchers.Main.immediate) {
-            owner.repeatOnLifecycle(lifecycleState) {
-                subscribe(
-                    store = this@subscribe,
-                    consume = { block(it) },
-                    render = { state.value = it }
-                ).join()
-            }
-        }
-    }
-    return state
-}
+): State<S> = subscribe(
+    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
+    mode = lifecycleState.asSubscriptionMode,
+    consume = consume
+)
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -77,42 +59,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
-@OptIn(DelicateStoreApi::class)
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-): State<S> {
-    val owner = LocalLifecycleOwner.current
-    val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, lifecycleState, owner) {
-        withContext(Dispatchers.Main.immediate) {
-            owner.repeatOnLifecycle(lifecycleState) {
-                subscribe(
-                    store = this@subscribe,
-                    render = { state.value = it }
-                ).join()
-            }
-        }
-    }
-    return state
-}
-
-/**
- * Alias for [pro.respawn.flowmvi.compose.dsl.subscribe] with [Lifecycle.State.STARTED].
- **/
-@FlowMVIDSL
-@Composable
-public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(): State<S> =
-    subscribe(Lifecycle.State.STARTED)
-
-/**
- * Alias for [pro.respawn.flowmvi.compose.dsl.subscribe] with [Lifecycle.State.STARTED].
- **/
-@FlowMVIDSL
-@Composable
-@Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
-public actual inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    noinline consume: suspend CoroutineScope.(action: A) -> Unit
-): State<S> = subscribe(Lifecycle.State.STARTED, consume)
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+): State<S> = subscribe(
+    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
+    mode = lifecycleState.asSubscriptionMode
+)

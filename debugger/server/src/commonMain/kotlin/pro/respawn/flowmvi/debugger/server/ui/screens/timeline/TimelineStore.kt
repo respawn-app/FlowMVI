@@ -78,7 +78,7 @@ internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>
                                 .toPersistentList(),
                             stores = state.clients
                                 .asSequence()
-                                .map { StoreItem(it.key, it.value.name) }
+                                .map { StoreItem(it.key, it.value.name, it.value.isConnected) }
                                 .toPersistentList(),
                         ).also {
                             val hasFocusedItem = it.focusedEvent != null
