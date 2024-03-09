@@ -26,8 +26,8 @@ import pro.respawn.flowmvi.util.immediateOrDefault
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+    lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
-    lifecycle: SubscriberLifecycle = CurrentLifecycle,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }
@@ -51,8 +51,8 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+    lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
-    lifecycle: SubscriberLifecycle = CurrentLifecycle,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }
     LaunchedEffect(this@subscribe, mode, lifecycle) {

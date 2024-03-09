@@ -37,10 +37,14 @@ import pro.respawn.flowmvi.dsl.subscribe
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycleState: Lifecycle.State,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     noinline consume: suspend CoroutineScope.(action: A) -> Unit,
-): State<S> = subscribe(lifecycleState.asSubscriptionMode, lifecycleOwner.asSubscriberOwner(), consume)
+): State<S> = subscribe(
+    lifecycle = lifecycleOwner.asSubscriberOwner(),
+    mode = lifecycleState.asSubscriptionMode,
+    consume = consume
+)
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -59,6 +63,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
 @Composable
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycleState: Lifecycle.State,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-): State<S> = subscribe(lifecycleState.asSubscriptionMode, lifecycleOwner.asSubscriberOwner())
+): State<S> = subscribe(lifecycle = lifecycleOwner.asSubscriberOwner(), mode = lifecycleState.asSubscriptionMode)
