@@ -36,6 +36,8 @@ jobs:
         uses: gradle/wrapper-validation-action@v1
 
       - name: Create local properties
+        with:
+          properties: ${{ secrets.LOCAL_PROPERTIES }}
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: echo "$LOCAL_PROPERTIES" > local.properties

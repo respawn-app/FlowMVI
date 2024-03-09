@@ -11,7 +11,7 @@ concurrency:
 jobs:
   publish-windows:
     runs-on: macos-latest
-
+    environment: publishing
     steps:
       - uses: actions/checkout@v3
 
