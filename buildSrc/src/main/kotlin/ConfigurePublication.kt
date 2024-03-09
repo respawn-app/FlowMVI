@@ -7,8 +7,6 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
@@ -18,7 +16,6 @@ import org.gradle.plugins.signing.Sign
 fun Project.publishMultiplatform() {
     val properties = localProperties()
     val isReleaseBuild = requireNotNull(properties["release"]).toString().toBooleanStrict()
-
     val javadocTask = tasks.named("emptyJavadocJar") // TODO: dokka does not support kmp javadocs yet
 
     afterEvaluate {
@@ -44,6 +41,7 @@ fun Project.publishMultiplatform() {
  */
 fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
     val properties = localProperties()
+    val isReleaseBuild = requireNotNull(properties["release"]).toString().toBooleanStrict()
     publishing {
         singleVariant(Config.publishingVariant) {
             withSourcesJar()
@@ -51,15 +49,11 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
         }
     }
     afterEvaluate {
-        val isReleaseBuild = properties["release"]?.toString().toBoolean()
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-            publications {
-                maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
-                    from(components[Config.publishingVariant])
-                    groupId = rootProject.group.toString()
-                    configurePom()
-                    configureVersion(isReleaseBuild)
-                }
+            publications.withType<MavenPublication>().configureEach {
+                groupId = rootProject.group.toString()
+                configurePom()
+                configureVersion(isReleaseBuild)
             }
             sonatypeRepository(isReleaseBuild, properties)
         }

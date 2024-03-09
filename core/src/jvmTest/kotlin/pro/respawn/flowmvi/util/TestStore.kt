@@ -24,7 +24,7 @@ internal fun testStore(
     debuggable = false
     name = "TestStore"
     actionShareBehavior = behavior
-    atomicStateUpdates = false
+    atomicStateUpdates = true
     timeTravel(timeTravel)
     install(loggingPlugin())
     configure()
