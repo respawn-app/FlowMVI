@@ -1,6 +1,10 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.SignalWifi4Bar
+import androidx.compose.material.icons.rounded.SignalWifiOff
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +30,9 @@ internal fun IntentReceiver<TimelineIntent>.StoreSelectorDropDown(
 ) {
     AnimatedVisibility(visible = stores.isNotEmpty(), modifier = modifier) {
         var expanded by remember { mutableStateOf(false) }
+        val connectedColor = MaterialTheme.colorScheme.primary
+        val errorColor = MaterialTheme.colorScheme.error
+
         RDropDownMenu(
             expanded = expanded,
             onExpand = { expanded = !expanded },
@@ -36,17 +43,16 @@ internal fun IntentReceiver<TimelineIntent>.StoreSelectorDropDown(
             },
             actions = rememberDropDownActions(stores) {
                 buildList {
-                    add(
-                        DropDownActions.Action("All stores") {
-                            intent(TimelineIntent.StoreFilterSelected(null))
-                        }
-                    )
+                    DropDownActions.Action("All stores") {
+                        intent(TimelineIntent.StoreFilterSelected(null))
+                    }.let(::add)
                     stores.forEach {
-                        add(
-                            DropDownActions.Action(text = it.name) {
-                                intent(TimelineIntent.StoreFilterSelected(it))
-                            }
-                        )
+                        DropDownActions.Action(
+                            text = it.name,
+                            icon = if (it.isConnected) Icons.Rounded.SignalWifi4Bar else Icons.Rounded.SignalWifiOff,
+                            iconTint = if (it.isConnected) connectedColor else errorColor,
+                            onClick = { intent(TimelineIntent.StoreFilterSelected(it)) },
+                        ).let(::add)
                     }
                 }
             },

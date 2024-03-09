@@ -17,6 +17,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
@@ -43,6 +45,7 @@ internal fun debugClientStore(
     host: String,
     port: Int,
     reconnectionDelay: Duration,
+    logEvents: Boolean = false,
 ) = store<EmptyState, ClientEvent, Nothing>(EmptyState) {
     val id = uuid4()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -52,7 +55,7 @@ internal fun debugClientStore(
     parallelIntents = false // ensure the order of events matches server's expectations
     actionShareBehavior = Disabled
     onOverflow = BufferOverflow.DROP_OLDEST // drop old events in the queue
-    enableLogging()
+    if (logEvents) enableLogging()
     val log = this@store.logger
     recover {
         log(StoreLogLevel.Error, this@store.name, it)
@@ -62,9 +65,11 @@ internal fun debugClientStore(
     init {
         launchConnectionLoop(
             reconnectionDelay,
-            onError = {
-                session.value = null
-                log(StoreLogLevel.Error, this@store.name, it)
+            onError = { e ->
+                session.update {
+                    it?.close()
+                    null
+                }
             },
         ) {
             log(StoreLogLevel.Debug) { "Starting connection at $host:$port/$id" }
@@ -74,14 +79,17 @@ internal fun debugClientStore(
                 port = port,
                 path = "/$id",
             ).apply {
+                session.update {
+                    it?.close()
+                    this
+                }
                 sendSerialized<ClientEvent>(StoreConnected(clientName, id))
-                session.value = this
                 log(StoreLogLevel.Debug, this@store.name) { "Established connection to ${call.request.url}" }
                 awaitEvents {
+                    log(StoreLogLevel.Debug, this@store.name) { "Received event: $it" }
                     when (it) {
                         is ServerEvent.Stop -> close()
                     }
-                    log(StoreLogLevel.Debug, this@store.name) { "Received event: $it" }
                 }
             }
         }
@@ -91,7 +99,6 @@ internal fun debugClientStore(
         withTimeoutOrNull(reconnectionDelay) {
             session.filterNotNull().first().apply {
                 sendSerialized<ClientEvent>(intent)
-                log(StoreLogLevel.Debug, this@store.name) { "Sent event $intent to ${call.request.url}" }
             }
         }
     }
@@ -102,13 +109,14 @@ private inline fun CoroutineScope.launchConnectionLoop(
     crossinline onError: suspend (Exception) -> Unit,
     crossinline connect: suspend () -> Unit,
 ) = launch {
-    while (true) {
+    while (isActive) {
         try {
             supervisorScope {
                 connect()
                 awaitCancellation()
             }
         } catch (e: CancellationException) {
+            onError(e)
             throw e
         } catch (expected: Exception) {
             onError(expected)
@@ -118,5 +126,5 @@ private inline fun CoroutineScope.launchConnectionLoop(
 }
 
 private suspend inline fun DefaultClientWebSocketSession.awaitEvents(onEvent: (ServerEvent) -> Unit) {
-    while (true) onEvent(receiveDeserialized<ServerEvent>())
+    while (isActive) onEvent(receiveDeserialized<ServerEvent>())
 }

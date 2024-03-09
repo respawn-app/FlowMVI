@@ -47,7 +47,7 @@ class CounterContainer(
     private val cacheDir = context.cacheDir.resolve("state").path
 
     override val store = store(CounterState.Loading) {
-        name = "CounterContainer"
+        name = "ComposeCounter"
         debuggable = BuildConfig.DEBUG
         if (debuggable) {
             enableRemoteDebugging()

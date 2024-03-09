@@ -61,7 +61,7 @@ fun TimelineScreen() {
     val listState = rememberLazyListState()
     val clipboard = LocalClipboardManager.current
     with(store) {
-        val state by subscribe(DefaultLifecycle, SubscriptionMode.Visible) {
+        val state by subscribe(DefaultLifecycle, SubscriptionMode.Started) {
             when (it) {
                 is ScrollToItem -> listState.animateScrollToItem(it.index)
                 is CopyToClipboard -> clipboard.setText(AnnotatedString(it.text))

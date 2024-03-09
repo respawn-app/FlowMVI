@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ExitToApp
 import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,7 +23,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventType
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun IntentReceiver<TimelineIntent>.TimelineMenuBar(
     state: TimelineState.DisplayingTimeline,
@@ -38,7 +37,7 @@ internal fun IntentReceiver<TimelineIntent>.TimelineMenuBar(
             ),
             modifier = Modifier.padding(8.dp)
         ) {
-            Icon(Icons.Rounded.ExitToApp, contentDescription = null)
+            Icon(Icons.AutoMirrored.Rounded.ExitToApp, contentDescription = null)
         }
         OutlinedButton(
             onClick = { intent(TimelineIntent.AutoScrollToggled) },
