@@ -328,8 +328,7 @@ timerPlugin(timer).test(Loading) {
 
 ## Debugger App
 
-![debugger.gif](docs/images/debugger.gif | width=1280)
-
+<img src="docs/images/debugger.gif" width="1200" alt="">
 
 Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
