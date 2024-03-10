@@ -68,6 +68,7 @@ public fun <S, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.parcelizeStat
  * @see savedStatePlugin
  */
 @FlowMVIDSL
+@Deprecated("If you want to save state, use the new `savedstate` module dependency")
 public fun <S, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.serializeState(
     handle: SavedStateHandle,
     key: String = "${name.orEmpty()}State",
