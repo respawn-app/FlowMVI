@@ -33,8 +33,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.foundation)
             implementation(libs.compose.preview)
-            implementation(libs.compose.lifecycle.runtime)
-            api(projects.android)
+            implementation(projects.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -43,7 +42,6 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
-            implementation(libs.compose.lifecycle.runtime)
         }
     }
 }
