@@ -7,6 +7,8 @@ import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.AbstractPublishToMaven
 import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.maybeCreate
 import org.gradle.kotlin.dsl.withType
 import org.gradle.plugins.signing.Sign
 
@@ -50,7 +52,8 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
     }
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
-            publications.withType<MavenPublication>().configureEach {
+            publications.maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
+                from(components[Config.publishingVariant])
                 groupId = rootProject.group.toString()
                 configurePom()
                 configureVersion(isReleaseBuild)
