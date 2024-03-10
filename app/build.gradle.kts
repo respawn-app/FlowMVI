@@ -41,7 +41,6 @@ android {
 dependencies {
     implementation(projects.android)
     implementation(projects.compose)
-    implementation(projects.androidView)
     implementation(projects.savedstate)
     implementation(projects.debugger.debuggerPlugin)
 
