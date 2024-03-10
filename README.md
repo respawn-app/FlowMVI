@@ -11,11 +11,8 @@
 
 ![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos] ![badge][badge-wasm]
 
-FlowMVI is a Kotlin Multiplatform MVI library based on coroutines that has a few main goals:
-
-1. Being simple to understand and use while staying powerful and flexible.
-2. Featuring a clean and rich DSL.
-3. Being thread-safe but asynchronous by design.
+FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines with an extensive feature set, powerful
+plugin system and a rich DSL.
 
 ## Quickstart:
 
@@ -40,10 +37,8 @@ flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" }
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }
 # Compose multiplatform
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }
-# Common android
+# Android (common + view-based)
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
-# View-based android
-flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
 # Remote debugging client
@@ -74,7 +69,6 @@ dependencies {
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
     // android integration
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
     // remote debugging client
     androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
 }
@@ -100,7 +94,7 @@ dependencies {
 * Built for Compose: The library lets you achieve the best performance with Compose out of the box.
 * The core library depends on kotlin coroutines. Nothing else.
 * Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
-* 70+% unit test coverage of core library code
+* 60+% unit test coverage of core library code
 
 ## How does it look?
 
@@ -161,7 +155,10 @@ class CounterContainer(
             serializer = DisplayingCounter.serializer(),
         )
 
-        init { repo.startTimer() }
+        // performs long-running tasks on startup
+        init {
+            repo.startTimer()
+        }
 
         // handles any errors
         recover { e: Exception ->
@@ -178,7 +175,7 @@ class CounterContainer(
             }
         }
 
-        // lazily evaluates and cache values, even when the method is suspending.
+        // lazily evaluates and caches values, even when the method is suspending.
         val pagingData by cache {
             repo.getPagedDataSuspending()
         }
@@ -329,9 +326,9 @@ timerPlugin(timer).test(Loading) {
 }
 ```
 
-### Debugger App
+## Debugger App
 
-![debugger.gif](docs/images/debugger.gif)
+![debugger.gif](docs/images/debugger.gif | width=1280)
 
 
 Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).

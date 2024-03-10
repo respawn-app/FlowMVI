@@ -10,6 +10,7 @@ Here's how the library works at a glance:
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
+
 <details>
 <summary>Version catalogs</summary>
 
@@ -18,20 +19,21 @@ Here's how the library works at a glance:
 flowmvi = "< Badge above 👆🏻 >"
 
 [dependencies]
-# core KMP module
+# Core KMP module
 flowmvi-core = { module = "pro.respawn.flowmvi:core", version.ref = "flowmvi" }
-# test DSL
+# Test DSL
 flowmvi-test = { module = "pro.respawn.flowmvi:test", version.ref = "flowmvi" }
-# compose multiplatform
+# Compose multiplatform
 flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowmvi" }
-# common android
+# Android (common + view-based)
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
-# view-based android
-flowmvi-view = { module = "pro.respawn.flowmvi:android-view", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
-# Remote debugging support
-flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" } 
+# Remote debugging client
+flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
+# Essenty (Decompose) integration
+flowmvi-essenty = { module = "pro.respawn.flowmvi:essenty", version.ref = "flowmvi" }
+flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" } 
 ```
 
 </details>
@@ -42,13 +44,20 @@ flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref
 ```kotlin
 dependencies {
     val flowmvi = "< Badge above 👆🏻 >"
+    // Core KMP module
     commonMainImplementation("pro.respawn.flowmvi:core:$flowmvi")
+    // compose multiplatform
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
+    // saving and restoring state
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
+    // essenty integration
+    commonMainImplementation("pro.respawn.flowmvi:essenty:$flowmvi")
+    commonMainImplementation("pro.respawn.flowmvi:essenty-compose:$flowmvi")
+    // testing DSL
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
-
+    // android integration
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
-    androidMainImplementation("pro.respawn.flowmvi:android-view:$flowmvi")
+    // remote debugging client
     androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
 }
 ```
@@ -60,7 +69,7 @@ dependencies {
 <details>
 <summary>Configure JDK</summary>
 
-The library's minimum JVM target is set to 11 (sadly still not the default).
+The library's minimum JVM target is set to 11 (sadly still not the default in Gradle).
 If you encounter an error:
 
 ```
@@ -291,7 +300,7 @@ Some interesting properties of the store:
 * Store can be launched, stopped, and relaunched again as many times as you want.
   Use `close()`, or cancel the job returned from `start()` to stop the store.
 * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
-  Such subscribers will not receive state updates or actions. Don't forget to launch the store.
+  Such subscribers will not receive state updates or actions. Don't forget to start the store.
 * Stores are created eagerly usually, but the store *can* be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
@@ -391,7 +400,7 @@ You'll likely want to provide some dependencies for the store to use and to crea
 putting all code into the store's builder.
 
 The best way to do this is to create a class that acts as a simple wrapper for your store. By convention, it can
-usually be called `Container`[^1]. Feel free to not use the provided interface, its only purpose is to act as a marker.
+usually be called `Container`. Feel free to not use the provided interface, its only purpose is to act as a marker.
 
 ```kotlin
 private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
@@ -467,9 +476,3 @@ To subscribe to the store, regardless of your platform see [this guide](android.
     * Want more samples? Explore how we created
       a [multiplatform debugger app](https://github.com/respawn-app/FlowMVI/tree/34236773e21e7138a330d7d0fb6c5d0eba21b61e/debugger/server/src/commonMain/kotlin/pro/respawn/flowmvi/debugger/server)
       for FlowMVI using... FlowMVI itself.
-
---- 
-
-[^1]: Although container is a slightly different concept usually, we don't have this kind of separation and we use the
-name "store" for our business logic unit already, so the name was "free" to define what it will mean for
-FlowMVI
