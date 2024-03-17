@@ -9,7 +9,7 @@ import kotlinx.coroutines.CoroutineScope
  * documentation.
  */
 @Stable
-public fun interface SubscriberLifecycle {
+public interface SubscriberLifecycle {
 
     /**
      * Repeat the execution of the [block] using the specified [mode].
@@ -20,4 +20,6 @@ public fun interface SubscriberLifecycle {
      * @see SubscriptionMode
      */
     public suspend fun repeatOnLifecycle(mode: SubscriptionMode, block: suspend CoroutineScope.() -> Unit)
+    public override fun equals(other: Any?): Boolean
+    public override fun hashCode(): Int
 }

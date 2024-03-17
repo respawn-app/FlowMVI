@@ -6,13 +6,14 @@ import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriptionMode
+import pro.respawn.flowmvi.compose.dsl.SubscriberLifecycle
 
 /**
  * Convert this [LifecycleOwner] to a [SubscriberLifecycle].
  */
 @Stable
 public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
-    get() = SubscriberLifecycle { mode, block -> repeatOnLifecycle(mode.asEssentyLifecycle, block = block) }
+    get() = SubscriberLifecycle(this) { mode, block -> repeatOnLifecycle(mode.asEssentyLifecycle, block = block) }
 
 /**
  * Convert this [SubscriptionMode] to an Essenty [Lifecycle.State]

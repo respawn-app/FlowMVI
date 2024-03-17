@@ -6,12 +6,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriptionMode
+import pro.respawn.flowmvi.compose.dsl.SubscriberLifecycle
 
 /**
  * Converts this Android [LifecycleOwner] to a [SubscriberLifecycle].
  */
 @Stable
-public fun Lifecycle.asSubscriberOwner(): SubscriberLifecycle = SubscriberLifecycle { mode, block ->
+public fun Lifecycle.asSubscriberOwner(): SubscriberLifecycle = SubscriberLifecycle(this) { mode, block ->
     repeatOnLifecycle(mode.asLifecycleState, block)
 }
 
