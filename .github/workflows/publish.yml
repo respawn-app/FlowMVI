@@ -41,5 +41,8 @@ jobs:
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Publish to sonatype
+        env:
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
         # It's important to not upload in parallel or duplicate repos will be created
         run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace

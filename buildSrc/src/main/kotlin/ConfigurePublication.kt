@@ -17,7 +17,7 @@ import org.gradle.plugins.signing.Sign
  */
 fun Project.publishMultiplatform() {
     val properties = localProperties()
-    val isReleaseBuild = requireNotNull(properties["release"]).toString().toBooleanStrict()
+    val isReleaseBuild = properties["release"]?.toString().toBoolean()
     val javadocTask = tasks.named("emptyJavadocJar") // TODO: dokka does not support kmp javadocs yet
 
     afterEvaluate {
@@ -33,7 +33,7 @@ fun Project.publishMultiplatform() {
         signPublications(isReleaseBuild, properties)
     }
 
-    tasks.withType<AbstractPublishToMaven> {
+    tasks.withType<AbstractPublishToMaven>().configureEach {
         dependsOn(javadocTask)
     }
 }
@@ -50,6 +50,7 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
             withJavadocJar()
         }
     }
+
     afterEvaluate {
         requireNotNull(extensions.findByType<PublishingExtension>()).apply {
             publications.maybeCreate(Config.publishingVariant, MavenPublication::class).apply {
@@ -63,6 +64,9 @@ fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
         signPublications(isReleaseBuild, properties)
     }
 
+    tasks.withType<AbstractPublishToMaven>().configureEach {
+        dependsOn(tasks.withType<BundleAar>())
+    }
     tasks.withType<Sign>().configureEach {
         dependsOn(tasks.withType<BundleAar>())
     }

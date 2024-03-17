@@ -46,8 +46,8 @@ internal fun MavenPublication.configurePom() = pom {
 }
 
 internal fun PublishingExtension.sonatypeRepository(release: Boolean, localProps: Properties) = repositories {
-    val username = requireNotNull(localProps["sonatypeUsername"]).toString()
-    val password = requireNotNull(localProps["sonatypePassword"]).toString()
+    val username = localProps["sonatypeUsername"]?.toString()
+    val password = localProps["sonatypePassword"]?.toString()
     maven {
         name = "sonatype"
         url = URI(
@@ -64,7 +64,7 @@ internal fun PublishingExtension.sonatypeRepository(release: Boolean, localProps
     }
 }
 
-internal fun Project.signPublications(isRelease: Boolean, localProps: Properties) =
+internal fun Project.signPublications(isRelease: Boolean, localProps: Properties) {
     requireNotNull(extensions.findByType<SigningExtension>()).apply {
         val publishing = requireNotNull(extensions.findByType<PublishingExtension>())
         val signingKey: String? = localProps["signing.key"]?.toString()
@@ -88,3 +88,4 @@ internal fun Project.signPublications(isRelease: Boolean, localProps: Properties
             }
         }
     }
+}
