@@ -45,4 +45,5 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
         # It's important to not upload in parallel or duplicate repos will be created
-        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace
+        # repository creds are broken with gradle 8.6 https://github.com/gradle/gradle/issues/24040
+        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache
