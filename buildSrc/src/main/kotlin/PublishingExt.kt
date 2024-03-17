@@ -46,8 +46,8 @@ internal fun MavenPublication.configurePom() = pom {
 }
 
 internal fun PublishingExtension.sonatypeRepository(release: Boolean, localProps: Properties) = repositories {
-    val username = localProps["sonatypeUsername"]?.toString()
-    val password = localProps["sonatypePassword"]?.toString()
+    val username = localProps["sonatypeUsername"]?.toString() ?: System.getenv("SONATYPE_USERNAME")
+    val password = localProps["sonatypePassword"]?.toString() ?: System.getenv("SONATYPE_PASSWORD")
     maven {
         name = "sonatype"
         url = URI(
@@ -58,8 +58,8 @@ internal fun PublishingExtension.sonatypeRepository(release: Boolean, localProps
             }
         )
         credentials {
-            this.username = username
-            this.password = password
+            this.username = username.takeIf { !it.isNullOrBlank() }
+            this.password = password.takeIf { !it.isNullOrBlank() }
         }
     }
 }
