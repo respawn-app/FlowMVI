@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
@@ -14,7 +15,6 @@ Please use ProvideSubscriberLifecycle() if you want to use composition locals fo
 """
 
 @get:Composable
-@get:ReadOnlyComposable
 internal expect val PlatformLifecycle: SubscriberLifecycle?
 
 /**
@@ -30,8 +30,7 @@ public val LocalSubscriberLifecycle: ProvidableCompositionLocal<SubscriberLifecy
  * an [IllegalArgumentException]
  */
 @Composable
-@ReadOnlyComposable
-public fun requireLifecycle(): SubscriberLifecycle = requireNotNull(
+public fun requireLifecycle(): SubscriberLifecycle = checkNotNull(
     LocalSubscriberLifecycle.current ?: PlatformLifecycle
 ) { MissingLifecycleError }
 
@@ -42,7 +41,7 @@ public fun requireLifecycle(): SubscriberLifecycle = requireNotNull(
  */
 @FlowMVIDSL
 public val DefaultLifecycle: SubscriberLifecycle
-    @Composable @ReadOnlyComposable get() = LocalSubscriberLifecycle.current
+    @Composable get() = LocalSubscriberLifecycle.current
         ?: PlatformLifecycle
         ?: ImmediateLifecycle
 
@@ -58,3 +57,13 @@ public fun ProvideSubscriberLifecycle(
     LocalSubscriberLifecycle provides lifecycleOwner,
     content = content,
 )
+
+/**
+ * Remember a new subscriber lifecycle
+ */
+@FlowMVIDSL
+@Composable
+public fun <T> rememberSubscriberLifecycle(
+    delegate: T,
+    factory: T.() -> SubscriberLifecycle
+): SubscriberLifecycle = remember(delegate) { delegate.factory() }

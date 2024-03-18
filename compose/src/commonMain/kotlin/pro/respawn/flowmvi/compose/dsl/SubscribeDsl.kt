@@ -48,10 +48,10 @@ import pro.respawn.flowmvi.util.immediateOrDefault
 @Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
-    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
+    consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
@@ -91,7 +91,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
  */
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
 ): State<S> {

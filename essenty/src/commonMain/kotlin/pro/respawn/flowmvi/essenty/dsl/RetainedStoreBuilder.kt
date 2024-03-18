@@ -11,7 +11,6 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.essenty.internal.retain
 import pro.respawn.flowmvi.util.nameByType
 
 // keeper

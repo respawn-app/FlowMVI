@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
@@ -14,7 +12,7 @@ import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.compose.android.asSubscriberOwner
+import pro.respawn.flowmvi.compose.android.asSubscriberLifecycle
 import pro.respawn.flowmvi.compose.android.asSubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
 
@@ -33,15 +31,15 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
-@Suppress("NOTHING_TO_INLINE", "ComposableParametersOrdering")
+@Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
+    consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> = subscribe(
-    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
+    lifecycle = rememberSubscriberLifecycle(lifecycleOwner.lifecycle) { asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode,
     consume = consume
 )
@@ -59,13 +57,12 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
-@Suppress("NOTHING_TO_INLINE")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ): State<S> = subscribe(
-    lifecycle = lifecycleOwner.lifecycle.asSubscriberOwner(),
+    lifecycle = rememberSubscriberLifecycle(lifecycleOwner.lifecycle) { asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode
 )

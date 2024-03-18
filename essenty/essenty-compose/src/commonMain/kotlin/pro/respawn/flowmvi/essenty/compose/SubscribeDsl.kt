@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.essenty.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
@@ -25,12 +26,12 @@ import pro.respawn.flowmvi.dsl.subscribe
 @Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleOwner: LifecycleOwner,
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
-    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
+    consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> = subscribe(
-    lifecycle = lifecycleOwner.lifecycle.asSubscriberLifecycle,
+    lifecycle = remember(lifecycleOwner) { lifecycleOwner.lifecycle.asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode,
     consume = consume
 )
@@ -45,10 +46,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S,
  */
 @Composable
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleOwner: LifecycleOwner,
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
 ): State<S> = subscribe(
-    lifecycle = lifecycleOwner.lifecycle.asSubscriberLifecycle,
+    lifecycle = remember(lifecycleOwner) { lifecycleOwner.lifecycle.asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode
 )

@@ -8,4 +8,4 @@ import pro.respawn.flowmvi.compose.api.SubscriptionMode
  * A no-op [SubscriberLifecycle] implementation that does not follow the system lifecycle in any way and ignores
  * [SubscriptionMode]
  */
-public val ImmediateLifecycle: SubscriberLifecycle = SubscriberLifecycle(Unit) { _, block -> coroutineScope(block) }
+public val ImmediateLifecycle: SubscriberLifecycle = SubscriberLifecycle { _, block -> coroutineScope(block) }
