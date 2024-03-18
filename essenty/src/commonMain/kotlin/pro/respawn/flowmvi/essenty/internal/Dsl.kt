@@ -15,3 +15,8 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> retained(
         if (scope != null) start(scope)
     }
 }
+
+@PublishedApi
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.retain(
+    scope: CoroutineScope?
+): RetainedStore<S, I, A> = retained(this, scope)
