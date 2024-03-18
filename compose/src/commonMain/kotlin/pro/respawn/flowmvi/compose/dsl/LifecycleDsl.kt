@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.compose.dsl
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import pro.respawn.flowmvi.api.FlowMVIDSL

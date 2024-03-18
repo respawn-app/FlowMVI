@@ -13,8 +13,8 @@ import pro.respawn.flowmvi.compose.api.SubscriptionMode
 @Stable
 internal val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
     get() = SubscriberLifecycle { mode, block ->
-    repeatOnLifecycle(mode.asLifecycleState, block)
-}
+        repeatOnLifecycle(mode.asLifecycleState, block)
+    }
 
 /**
  * Converts this [SubscriptionMode] to a [Lifecycle.State]
