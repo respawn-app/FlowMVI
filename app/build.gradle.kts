@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.material)
+    implementation(libs.compose.lifecycle.viewmodel)
 
     debugImplementation(libs.compose.tooling)
 }
