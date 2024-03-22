@@ -25,24 +25,25 @@ kotlin {
     )
     sourceSets {
         androidMain.dependencies {
+            api(projects.android)
+
             implementation(libs.compose.foundation)
             implementation(libs.compose.preview)
             implementation(libs.compose.lifecycle.runtime)
-            api(projects.android)
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
             api(projects.core)
             api(projects.compose)
 
             api(libs.essenty.lifecycle)
             api(libs.essenty.lifecycle.coroutines)
             api(libs.essenty.instancekeeper)
+
+            implementation(compose.runtime)
+            implementation(compose.foundation)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
-            implementation(libs.compose.lifecycle.runtime)
         }
     }
 }
