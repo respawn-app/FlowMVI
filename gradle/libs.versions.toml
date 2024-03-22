@@ -1,41 +1,41 @@
 [versions]
-activity = "1.8.2"
+activity = "1.9.0-beta01"
 apiresult = "1.0.3"
-compose = "1.6.3"
+compose = "1.6.4"
 compose-compiler = "1.5.10"
 compose-plugin = "1.6.0"
 composeDetektPlugin = "1.3.0"
-core-ktx = "1.12.0"
-coroutines = "1.8.0"
+core-ktx = "1.13.0-beta01"
+coroutines = "1.8.1-Beta"
 datetime = "0.6.0-RC.2"
+decompose = "2.2.2"
 dependencyAnalysisPlugin = "1.29.0"
 detekt = "1.23.5"
 detektFormattingPlugin = "1.23.5"
 dokka = "1.9.20"
-fragment = "1.6.2"
-gradleAndroid = "8.3.0"
+essenty = "2.0.0-alpha07"
+fragment = "1.7.0-beta01"
+gradleAndroid = "8.4.0-beta01"
 gradleDoctorPlugin = "0.9.1"
 intellij-ide-plugin = "2.0.0-SNAPSHOT"
 junit = "4.13.2"
 kmputils = "1.3.1"
-koin = "3.5.3"
-koin-compose = "1.1.2"
-kotest = "5.8.0"
+koin = "3.5.4-RC1"
+koin-compose = "1.1.3-RC1"
+kotest = "5.8.1"
 kotest-plugin = "5.8.0"
 # @pin
 kotlin = "1.9.22"
 kotlin-collections = "0.3.7"
-kotlin-io = "0.3.1"
+kotlin-io = "0.3.2"
 kotlinx-atomicfu = "0.23.2"
 ktor = "3.0.0-beta-1"
 lifecycle = "2.7.0"
-material = "1.11.0"
+material = "1.12.0-beta01"
 serialization = "1.6.3"
 turbine = "1.1.0"
-uuid = "0.8.2"
+uuid = "0.8.4"
 versionCatalogUpdatePlugin = "0.8.4"
-decompose = "3.0.0-alpha08"
-essenty = "2.0.0-alpha07"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -52,20 +52,18 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-
 # decompose
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
-essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
-essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
-
 # detekt
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
 dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
+essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
+essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
 # junit
 junit = { module = "junit:junit", version.ref = "junit" }
 # kmputils
