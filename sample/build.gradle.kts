@@ -1,32 +1,59 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
+import Config.licenseFile
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
+    id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
 }
 
+private val pluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+
 kotlin {
-    jvm("desktop") {
-        compilations.all {
-            compilerOptions.configure { jvmToolchain(21) }
-        }
-    }
+    applyDefaultHierarchyTemplate()
+
+    // @OptIn(ExperimentalWasmDsl::class)
+    // wasmJs {
+    //     moduleName = "${Config.artifactId}.sample"
+    //     nodejs()
+    //     browser()
+    //     binaries.library()
+    // }
+    // TODO: Enable wasm on kmputils and apiresult
+    jvm("desktop")
+
+    androidTarget()
+
+    sequence {
+        yield(iosX64())
+        yield(iosArm64())
+        yield(iosSimulatorArm64())
+        yield(macosArm64())
+        yield(macosX64())
+    }.toList()
 
     sourceSets {
         val desktopMain by getting
+
         configurations.all {
             exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
         }
-
+        all {
+            languageSettings {
+                progressiveMode = true
+                languageVersion = Config.kotlinVersion.version
+                Config.optIns.forEach { optIn(it) }
+            }
+        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.animation)
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.desktop.components.splitPane)
+            // @OptIn(ExperimentalComposeLibrary::class)
+            // implementation(compose.desktop.components.splitPane)
             implementation(compose.animationGraphics)
             implementation(compose.ui)
             implementation(compose.components.resources)
@@ -41,9 +68,9 @@ kotlin {
 
             implementation(projects.core)
             implementation(projects.essenty.essentyCompose)
-            implementation(projects.debugger.server)
-            implementation(projects.debugger.debuggerCommon)
             implementation(projects.compose)
+            implementation(projects.savedstate)
+            implementation(projects.debugger.debuggerPlugin)
         }
         desktopMain.apply {
             dependencies {
@@ -52,30 +79,30 @@ kotlin {
             }
         }
     }
+
 }
+android {
+    namespace = Config.artifactId
+    configureAndroidLibrary(this)
+}
+
 
 compose.desktop {
     application {
-        mainClass = "${Config.Debugger.namespace}.app.MainKt"
-
-        buildTypes.release.proguard {
-            obfuscate = false
-            optimize = false // TODO: Solve the issues with ktor and compose-desktop...
-            configurationFiles.from(projectDir.resolve("desktop-rules.pro"))
-        }
+        mainClass = "${Config.Sample.namespace}.app.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = Config.Debugger.namespace
+            packageName = Config.namespace
             packageVersion = Config.majorVersionName
-            description = Config.Debugger.appDescription
+            description = Config.Sample.appDescription
             vendor = Config.vendorName
             licenseFile = rootProject.rootDir.resolve(Config.licenseFile)
             val iconDir = rootProject.rootDir.resolve("docs").resolve("images")
             macOS {
-                packageName = Config.Debugger.name
-                dockName = Config.Debugger.name
+                packageName = Config.Sample.name
+                dockName = Config.Sample.name
                 setDockNameSameAsPackageName = false
-                bundleID = Config.Debugger.namespace
+                bundleID = Config.Sample.namespace
                 appCategory = "public.app-category.developer-tools"
                 iconFile = iconDir.resolve("icon_macos.icns")
             }
@@ -84,7 +111,7 @@ compose.desktop {
                 menu = false
                 shortcut = true
                 perUserInstall = true
-                upgradeUuid = Config.Debugger.appId
+                upgradeUuid = Config.Sample.appId
                 iconFile = iconDir.resolve("favicon.ico")
             }
             linux {
@@ -94,8 +121,4 @@ compose.desktop {
             }
         }
     }
-}
-
-dependencies {
-    // debugImplementation(libs.compose.tooling)
 }

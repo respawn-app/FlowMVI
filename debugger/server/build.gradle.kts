@@ -12,6 +12,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core)
+            implementation(projects.compose)
+            implementation(projects.debugger.debuggerCommon)
+
             implementation(compose.components.resources)
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -22,18 +26,14 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(libs.bundles.serialization)
             implementation(libs.bundles.ktor.server)
-            implementation(libs.bundles.kmputils)
+            implementation(applibs.bundles.kmputils)
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.collections)
-            implementation(libs.apiresult)
+            implementation(applibs.apiresult)
             implementation(libs.uuid)
-            implementation(libs.bundles.koin)
+            implementation(applibs.bundles.koin)
             implementation(libs.kotlin.io)
             implementation(libs.kotlin.atomicfu)
-
-            implementation(projects.core)
-            implementation(projects.compose)
-            implementation(projects.debugger.debuggerCommon)
         }
         jvmMain.dependencies {
             implementation(libs.kotlin.coroutines.swing)

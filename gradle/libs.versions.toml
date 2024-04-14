@@ -1,6 +1,4 @@
 [versions]
-activity = "1.9.0-beta01"
-apiresult = "1.0.3"
 compose = "1.6.4"
 compose-compiler = "1.5.11"
 compose-plugin = "1.6.1"
@@ -8,20 +6,16 @@ composeDetektPlugin = "1.3.0"
 core-ktx = "1.13.0-beta01"
 coroutines = "1.8.1-Beta"
 datetime = "0.6.0-RC.2"
-decompose = "2.2.2"
 dependencyAnalysisPlugin = "1.29.0"
 detekt = "1.23.5"
 detektFormattingPlugin = "1.23.5"
 dokka = "1.9.20"
 essenty = "2.0.0-alpha07"
 fragment = "1.7.0-beta01"
-gradleAndroid = "8.3.1"
+gradleAndroid = "8.3.2"
 gradleDoctorPlugin = "0.9.1"
 intellij-ide-plugin = "2.0.0-SNAPSHOT"
 junit = "4.13.2"
-kmputils = "1.3.1"
-koin = "3.5.4-RC1"
-koin-compose = "1.1.3-RC1"
 kotest = "5.8.1"
 kotest-plugin = "5.8.0"
 # @pin
@@ -31,20 +25,20 @@ kotlin-io = "0.3.2"
 kotlinx-atomicfu = "0.23.2"
 ktor = "3.0.0-beta-1"
 lifecycle = "2.7.0"
-material = "1.12.0-beta01"
 serialization = "1.6.3"
 turbine = "1.1.0"
+activity = "1.9.0-beta01"
 uuid = "0.8.4"
+
 versionCatalogUpdatePlugin = "0.8.4"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
-androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
-apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
+androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
+
 # compose
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 compose-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
@@ -52,10 +46,6 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
-# decompose
-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-# detekt
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -64,25 +54,11 @@ dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", v
 essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
 essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
-# junit
 junit = { module = "junit:junit", version.ref = "junit" }
-# kmputils
-kmputils-common = { module = "pro.respawn.kmmutils:common", version.ref = "kmputils" }
-kmputils-coroutines = { module = "pro.respawn.kmmutils:coroutines", version.ref = "kmputils" }
-kmputils-datetime = { module = "pro.respawn.kmmutils:datetime", version.ref = "kmputils" }
-kmputils-inputforms = { module = "pro.respawn.kmmutils:inputforms", version.ref = "kmputils" }
-# koin
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
-# kotest
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
-# kotlin
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -97,6 +73,7 @@ kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-c
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
 # ktor client
+ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -104,7 +81,6 @@ ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = 
 ktor-client-engine = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
 ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.ref = "ktor" }
@@ -115,36 +91,22 @@ ktor-server-dataconversion = { module = "io.ktor:ktor-server-data-conversion", v
 ktor-server-default-headers = { module = "io.ktor:ktor-server-default-headers", version.ref = "ktor" }
 ktor-server-engine = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
-ktor-server-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-server-partialcontent = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
-# ktor server
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-material = { module = "com.google.android.material:material", version.ref = "material" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 [bundles]
-kmputils = [
-    "kmputils-common",
-    "kmputils-coroutines",
-    "kmputils-datetime",
-    "kmputils-inputforms",
-]
-koin = [
-    "koin-android",
-    "koin-compose",
-    "koin-core",
-]
 ktor-client = [
     "ktor-client-auth",
     "ktor-client-contentNegotiation",
     "ktor-client-core",
     "ktor-client-encoding",
     "ktor-client-logging",
-    "ktor-client-serialization",
+    "ktor-serialization-json",
 ]
 ktor-server = [
     "ktor-server-call-logging",
@@ -156,7 +118,7 @@ ktor-server = [
     "ktor-server-default-headers",
     "ktor-server-engine",
     "ktor-server-host-common",
-    "ktor-server-json",
+    "ktor-serialization-json",
     "ktor-server-partialcontent",
     "ktor-server-websockets",
 ]
@@ -166,7 +128,6 @@ serialization = [
     "kotlin-serialization-json",
 ]
 unittest = [
-    "koin-test",
     "kotest-assertions",
     "kotest-framework",
     "kotest-property",
@@ -177,7 +138,6 @@ unittest = [
 ]
 
 [plugins]
-androidApplication = { id = "com.android.application", version.ref = "gradleAndroid" }
 androidLibrary = { id = "com.android.library", version.ref = "gradleAndroid" }
 atomicfu = { id = "kotlinx-atomicfu", version.ref = "kotlinx-atomicfu" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependencyAnalysisPlugin" }
