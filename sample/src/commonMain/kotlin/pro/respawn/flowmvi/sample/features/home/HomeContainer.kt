@@ -7,6 +7,8 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.sample.arch.configuration.StoreConfiguration
 import pro.respawn.flowmvi.sample.arch.configuration.configure
+import pro.respawn.flowmvi.sample.features.home.HomeAction.GoToFeature
+import pro.respawn.flowmvi.sample.features.home.HomeIntent.ClickedFeature
 import pro.respawn.flowmvi.sample.features.home.HomeState.DisplayingHome
 
 private typealias Ctx = PipelineContext<HomeState, HomeIntent, HomeAction>
@@ -23,7 +25,7 @@ internal class HomeContainer(
         }
         reduce { intent ->
             when (intent) {
-                else -> TODO()
+                is ClickedFeature -> action(GoToFeature(intent.value))
             }
         }
     }

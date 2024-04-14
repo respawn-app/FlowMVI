@@ -2,12 +2,19 @@ package pro.respawn.flowmvi.sample.navigation.destination
 
 import androidx.compose.runtime.Composable
 import pro.respawn.flowmvi.sample.features.home.HomeScreen
+import pro.respawn.flowmvi.sample.features.lce.LCEScreen
+import pro.respawn.flowmvi.sample.features.simple.SimpleScreen
+import pro.respawn.flowmvi.sample.navigation.AppNavigator
+import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
+import pro.respawn.flowmvi.sample.navigation.util.ProvideDestinationLocals
 
 @Composable
 fun Destinations(
     destination: Destination,
-    component: RootComponent
+    navigator: RootComponent,
 ) = when (destination) {
-    Destination.Home -> HomeScreen(component)
+    is Destination.Home -> HomeScreen(navigator)
+    is Destination.SimpleFeature -> SimpleScreen(navigator)
+    is Destination.LCEFeature -> LCEScreen(navigator)
 }

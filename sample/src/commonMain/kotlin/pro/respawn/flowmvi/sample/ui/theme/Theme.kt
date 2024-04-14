@@ -103,7 +103,7 @@ internal expect fun rememberColorScheme(dark: Boolean, dynamic: Boolean): ColorS
 @Composable
 fun RespawnTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    useDynamicColors: Boolean = false,
+    useDynamicColors: Boolean = true,
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

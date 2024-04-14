@@ -10,4 +10,6 @@ class RootComponent(context: ComponentContext) :
     DestinationComponent by destinationComponent(null, context) {
 
     override fun home() = navigate(Destination.Home)
+    override fun simpleFeature() = navigate(Destination.SimpleFeature)
+    override fun lceFeature() = navigate(Destination.LCEFeature)
 }

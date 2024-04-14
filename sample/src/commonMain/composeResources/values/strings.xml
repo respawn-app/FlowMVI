@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">FlowMVI</string>
+    <string name="retry">Retry</string>
     <string name="generic_error_message">Unknown error</string>
+    <string name="simple_feature_title">Simplest feature</string>
+    <string name="lce_feature_title">LCE Feature</string>
 </resources>

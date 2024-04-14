@@ -65,6 +65,7 @@ kotlin {
             implementation(applibs.bundles.koin)
             implementation(applibs.apiresult)
             implementation(applibs.decompose.compose)
+            implementation(applibs.compose.codehighlighting)
             implementation(applibs.decompose)
 
             implementation(projects.core)

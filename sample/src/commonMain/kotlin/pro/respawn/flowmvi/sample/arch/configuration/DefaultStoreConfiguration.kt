@@ -12,7 +12,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.sample.util.BuildFlags
-import pro.respawn.flowmvi.sample.util.FileManager
+import pro.respawn.flowmvi.sample.platform.FileManager
 import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver

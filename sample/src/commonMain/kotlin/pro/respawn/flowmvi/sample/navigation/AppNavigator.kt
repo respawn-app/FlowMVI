@@ -1,5 +1,9 @@
 package pro.respawn.flowmvi.sample.navigation
 
-interface AppNavigator {
+import pro.respawn.flowmvi.sample.navigation.util.Navigator
+
+interface AppNavigator : Navigator {
     fun home()
+    fun simpleFeature()
+    fun lceFeature()
 }

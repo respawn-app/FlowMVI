@@ -22,6 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.sample.ui.theme.Opacity
+import pro.respawn.flowmvi.sample.ui.theme.Size.icon
+import pro.respawn.flowmvi.sample.ui.theme.rememberRandomColor
 import pro.respawn.flowmvi.sample.util.noIndicationClickable
 import pro.respawn.kmmutils.common.takeIfValid
 import kotlin.contracts.contract
@@ -98,10 +100,10 @@ fun RMenuItem(
 
 @Composable
 fun RMenuItem(
-    icon: ImageVector?,
-    color: Color,
     title: String,
     modifier: Modifier = Modifier,
+    color: Color = rememberRandomColor(),
+    icon: ImageVector? = null,
     enabled: Boolean = true,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,

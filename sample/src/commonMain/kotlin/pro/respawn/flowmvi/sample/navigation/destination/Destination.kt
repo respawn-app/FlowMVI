@@ -23,4 +23,10 @@ sealed interface Destination {
 
         override val topLevel: Boolean get() = true
     }
+
+    @Serializable
+    data object SimpleFeature : Destination
+
+    @Serializable
+    data object LCEFeature : Destination
 }

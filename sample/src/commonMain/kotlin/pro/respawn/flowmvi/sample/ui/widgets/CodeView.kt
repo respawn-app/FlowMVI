@@ -1,0 +1,78 @@
+package pro.respawn.flowmvi.sample.ui.widgets
+
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
+import dev.snipme.highlights.Highlights
+import dev.snipme.highlights.model.BoldHighlight
+import dev.snipme.highlights.model.ColorHighlight
+import dev.snipme.highlights.model.SyntaxLanguage
+import dev.snipme.highlights.model.SyntaxThemes
+
+val Highlights.annotatedString
+    get() = buildAnnotatedString {
+        append(getCode())
+
+        getHighlights()
+            .filterIsInstance<ColorHighlight>()
+            .forEach {
+                addStyle(
+                    SpanStyle(color = Color(it.rgb).copy(alpha = 1f)),
+                    start = it.location.start,
+                    end = it.location.end,
+                )
+            }
+
+        getHighlights()
+            .filterIsInstance<BoldHighlight>()
+            .forEach {
+                addStyle(
+                    SpanStyle(fontWeight = FontWeight.Bold),
+                    start = it.location.start,
+                    end = it.location.end,
+                )
+            }
+    }
+
+@Composable
+fun CodeText(
+    code: String,
+    darkMode: Boolean = isSystemInDarkTheme(),
+    language: SyntaxLanguage = SyntaxLanguage.KOTLIN,
+    modifier: Modifier = Modifier,
+) {
+    val string = remember(code, darkMode, language) {
+        Highlights.Builder().run {
+            theme(SyntaxThemes.darcula(darkMode))
+            code(code)
+            language(language)
+            build()
+        }.annotatedString
+    }
+    Box(modifier = modifier.horizontalScroll(rememberScrollState())) {
+        Text(
+            text = string,
+            fontSize = 13.sp,
+            fontFamily = FontFamily.Monospace,
+            textAlign = TextAlign.Start,
+            overflow = TextOverflow.Visible,
+            softWrap = false,
+            lineHeight = 16.sp,
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}

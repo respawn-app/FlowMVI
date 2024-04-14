@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.MVIState
 import kotlin.jvm.JvmInline
 
 enum class HomeFeature {
-    Simple
+    Simple, LCE
 }
 
 @Immutable
@@ -28,4 +28,5 @@ internal sealed interface HomeIntent : MVIIntent {
 @Immutable
 internal sealed interface HomeAction : MVIAction {
 
+    data class GoToFeature(val feature: HomeFeature) : HomeAction
 }

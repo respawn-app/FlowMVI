@@ -42,6 +42,7 @@ val TopBarTextStyle
         fontWeight = FontWeight.Normal,
     )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RTopBar(
     modifier: Modifier = Modifier,
@@ -110,7 +111,7 @@ private fun BackIcon(
 ) = AnimatedVisibility(onClick != null, modifier, enter = fadeIn(), exit = fadeOut()) {
     RIcon(
         icon = icon,
-        size = Size.smallIcon,
+        size = Size.icon,
         onClick = onClick ?: {},
     )
 }
