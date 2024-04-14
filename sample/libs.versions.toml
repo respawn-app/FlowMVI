@@ -1,15 +1,17 @@
 [versions]
-decompose = "2.2.2"
+decompose = "3.0.0-beta01"
 apiresult = "1.0.3"
 koin = "3.5.4-RC1"
 koin-compose = "1.1.3-RC1"
 kmputils = "1.3.1"
 material = "1.12.0-beta01"
 activity = "1.9.0-beta01"
+splashscreen = "1.1.0-rc01"
 
 [libraries]
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
+
 
 kmputils-common = { module = "pro.respawn.kmmutils:common", version.ref = "kmputils" }
 kmputils-coroutines = { module = "pro.respawn.kmmutils:coroutines", version.ref = "kmputils" }
@@ -24,6 +26,7 @@ koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
+androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 view-material = { module = "com.google.android.material:material", version.ref = "material" }
 
 [bundles]

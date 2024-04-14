@@ -53,10 +53,12 @@ object Config {
         "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
-        "kotlin.contracts.ExperimentalContracts"
+        "kotlin.contracts.ExperimentalContracts",
+        "org.jetbrains.compose.resources.ExperimentalResourceApi"
     )
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
+        "-Xexpect-actual-classes",
         "-P",
         "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true"
     )
@@ -65,7 +67,7 @@ object Config {
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
-        addAll(optIns.map { "-opt-in=$it" })
+        add("-Xlambdas=indy")
     }
 
     val jvmTarget = JvmTarget.JVM_11

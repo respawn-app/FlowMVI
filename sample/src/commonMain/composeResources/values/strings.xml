@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FlowMVI</string>
+    <string name="generic_error_message">Unknown error</string>
+</resources>

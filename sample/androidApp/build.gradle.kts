@@ -6,7 +6,7 @@ plugins {
 
 android {
     configureAndroid(this)
-    namespace = "${Config.artifactId}.sample"
+    namespace = Config.Sample.namespace
     compileSdk = Config.compileSdk
 
     defaultConfig {
@@ -24,27 +24,18 @@ android {
 }
 
 dependencies {
-    implementation(projects.android)
-    implementation(projects.compose)
-    implementation(projects.savedstate)
-    implementation(projects.debugger.debuggerPlugin)
+    implementation(projects.sample)
 
-    implementation(applibs.bundles.koin)
-    implementation(applibs.koin.android.compose)
     implementation(libs.kotlin.serialization.json)
+    implementation(applibs.bundles.kmputils)
+    implementation(applibs.androidx.splashscreen)
 
-    implementation(libs.androidx.core)
-
-    implementation(libs.compose.ui)
-    implementation(libs.compose.foundation)
-    implementation(libs.compose.material)
     implementation(applibs.compose.activity)
-
-    implementation(libs.compose.preview)
-    implementation(libs.lifecycle.runtime)
-    implementation(libs.lifecycle.viewmodel)
+    implementation(applibs.decompose.compose)
+    implementation(applibs.decompose)
+    implementation(applibs.koin.android)
+    implementation(applibs.koin.android.compose)
     implementation(applibs.view.material)
-    implementation(libs.compose.lifecycle.viewmodel)
 
     debugImplementation(libs.compose.tooling)
 }

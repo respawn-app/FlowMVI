@@ -1,6 +1,5 @@
-import Config.licenseFile
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
@@ -30,12 +29,13 @@ kotlin {
         yield(iosX64())
         yield(iosArm64())
         yield(iosSimulatorArm64())
-        yield(macosArm64())
-        yield(macosX64())
+        // yield(macosArm64())
+        // yield(macosX64())
     }.toList()
 
     sourceSets {
         val desktopMain by getting
+
 
         configurations.all {
             exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
@@ -52,40 +52,54 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.animation)
-            // @OptIn(ExperimentalComposeLibrary::class)
-            // implementation(compose.desktop.components.splitPane)
             implementation(compose.animationGraphics)
             implementation(compose.ui)
             implementation(compose.components.resources)
 
             implementation(libs.bundles.serialization)
-            implementation(applibs.bundles.kmputils)
             implementation(libs.kotlin.datetime)
-            implementation(applibs.apiresult)
             implementation(libs.uuid)
-            implementation(applibs.bundles.koin)
             implementation(libs.kotlin.io)
+
+            implementation(applibs.bundles.kmputils)
+            implementation(applibs.bundles.koin)
+            implementation(applibs.apiresult)
+            implementation(applibs.decompose.compose)
+            implementation(applibs.decompose)
 
             implementation(projects.core)
             implementation(projects.essenty.essentyCompose)
             implementation(projects.compose)
             implementation(projects.savedstate)
+        }
+        nativeMain.dependencies {
             implementation(projects.debugger.debuggerPlugin)
         }
-        desktopMain.apply {
-            dependencies {
-                implementation(libs.kotlin.coroutines.swing)
-                implementation(compose.desktop.currentOs)
-            }
+        desktopMain.dependencies {
+            implementation(projects.debugger.debuggerPlugin)
+            @OptIn(ExperimentalComposeLibrary::class)
+            implementation(compose.desktop.components.splitPane)
+            implementation(libs.kotlin.coroutines.swing)
+            implementation(compose.desktop.currentOs)
         }
-    }
-
+        androidMain.dependencies {
+            implementation(applibs.koin.android)
+        }
+    } // sets
 }
 android {
     namespace = Config.artifactId
     configureAndroidLibrary(this)
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
 }
 
+dependencies {
+    // means androidDebugImplementation
+    debugImplementation(projects.debugger.debuggerPlugin)
+}
 
 compose.desktop {
     application {
