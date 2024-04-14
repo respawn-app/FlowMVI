@@ -6,4 +6,5 @@ interface AppNavigator : Navigator {
     fun home()
     fun simpleFeature()
     fun lceFeature()
+    fun savedStateFeature()
 }

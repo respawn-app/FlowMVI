@@ -16,15 +16,19 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.Font
 import pro.respawn.flowmvi.sample.generated.resources.Res
 import pro.respawn.flowmvi.sample.generated.resources.comfortaa
+import pro.respawn.flowmvi.sample.generated.resources.monaspace_neon
 import pro.respawn.flowmvi.sample.generated.resources.montserrat
 
-val Comfortaa @Composable get() = org.jetbrains.compose.resources.Font(Res.font.comfortaa).toFontFamily()
-val Montserrat @Composable get() = org.jetbrains.compose.resources.Font(Res.font.montserrat).toFontFamily()
+val Comfortaa @Composable get() = Font(Res.font.comfortaa).toFontFamily()
+val Montserrat @Composable get() = Font(Res.font.montserrat).toFontFamily()
+val Monaspace @Composable get() = Font(Res.font.monaspace_neon).toFontFamily()
 
 inline val FontFamily.Companion.Montserrat @Composable get() = pro.respawn.flowmvi.sample.ui.theme.Montserrat
 inline val FontFamily.Companion.Comfortaa @Composable get() = pro.respawn.flowmvi.sample.ui.theme.Comfortaa
+inline val FontFamily.Companion.Monaspace @Composable get() = pro.respawn.flowmvi.sample.ui.theme.Monaspace
 
 private const val FontFeatures = "dlig, liga, kern, zero, locl, size"
 

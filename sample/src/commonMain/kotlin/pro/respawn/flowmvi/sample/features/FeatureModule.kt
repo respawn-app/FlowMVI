@@ -7,9 +7,11 @@ import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.home.HomeContainer
 import pro.respawn.flowmvi.sample.features.lce.LCEContainer
 import pro.respawn.flowmvi.sample.features.lce.LCERepository
+import pro.respawn.flowmvi.sample.features.savedstate.SavedStateContainer
 
 val featureModule = module {
     singleOf(::LCERepository)
     container { new(::HomeContainer) }
     container { new(::LCEContainer) }
+    container { new(::SavedStateContainer) }
 }

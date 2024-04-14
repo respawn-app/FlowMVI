@@ -1,7 +1,10 @@
 package pro.respawn.flowmvi.sample.util
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.MaterialTheme
@@ -9,10 +12,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
@@ -154,4 +159,19 @@ fun String.branded(color: Color = MaterialTheme.colorScheme.primary) = buildAnno
             append(drop(1))
         }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+fun Modifier.bringIntoViewOnFocus() = composed {
+    val coroutineScope = rememberCoroutineScope()
+    val requester = remember { BringIntoViewRequester() }
+
+    bringIntoViewRequester(requester)
+        .onFocusEvent {
+            if (it.isFocused) {
+                coroutineScope.launch {
+                    requester.bringIntoView()
+                }
+            }
+        }
 }

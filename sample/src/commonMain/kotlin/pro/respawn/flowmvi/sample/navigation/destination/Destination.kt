@@ -29,4 +29,7 @@ sealed interface Destination {
 
     @Serializable
     data object LCEFeature : Destination
+
+    @Serializable
+    data object SavedState : Destination
 }

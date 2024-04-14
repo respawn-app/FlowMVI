@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
+import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
 
@@ -51,14 +52,16 @@ val Highlights.annotatedString
 @Composable
 fun CodeText(
     code: String,
+    vararg emphasis: PhraseLocation,
     darkMode: Boolean = isSystemInDarkTheme(),
     language: SyntaxLanguage = SyntaxLanguage.KOTLIN,
     modifier: Modifier = Modifier,
 ) {
-    val string = remember(code, darkMode, language) {
+    val string = remember(code, darkMode, language, emphasis) {
         Highlights.Builder().run {
             theme(SyntaxThemes.darcula(darkMode))
             code(code)
+            emphasis(locations = emphasis)
             language(language)
             build()
         }.annotatedString
@@ -67,7 +70,7 @@ fun CodeText(
         Text(
             text = string,
             fontSize = 13.sp,
-            fontFamily = FontFamily.Monospace,
+            fontFamily = FontFamily.Monospace, // TODO: Monaspace appears to be unsupported by compose?
             textAlign = TextAlign.Start,
             overflow = TextOverflow.Visible,
             softWrap = false,

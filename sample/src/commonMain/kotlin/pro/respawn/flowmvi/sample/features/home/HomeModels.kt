@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.MVIState
 import kotlin.jvm.JvmInline
 
 enum class HomeFeature {
-    Simple, LCE
+    Simple, LCE, SavedState
 }
 
 @Immutable
