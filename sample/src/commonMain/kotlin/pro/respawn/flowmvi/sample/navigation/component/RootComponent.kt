@@ -13,4 +13,5 @@ class RootComponent(context: ComponentContext) :
     override fun simpleFeature() = navigate(Destination.SimpleFeature)
     override fun lceFeature() = navigate(Destination.LCEFeature)
     override fun savedStateFeature() = navigate(Destination.SavedState)
+    override fun diConfigFeature() = navigate(Destination.DiConfig)
 }

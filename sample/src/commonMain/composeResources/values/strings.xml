@@ -5,4 +5,5 @@
     <string name="simple_feature_title">Simplest feature</string>
     <string name="lce_feature_title">LCE Feature</string>
     <string name="savedstate_feature_title">Saved State</string>
+    <string name="di_feature_title">Dependency Injection</string>
 </resources>

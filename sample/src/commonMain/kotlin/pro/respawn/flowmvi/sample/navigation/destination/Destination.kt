@@ -32,4 +32,7 @@ sealed interface Destination {
 
     @Serializable
     data object SavedState : Destination
+
+    @Serializable
+    data object DiConfig : Destination
 }
