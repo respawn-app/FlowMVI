@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.arch.configuration
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
@@ -53,7 +52,7 @@ internal class DefaultStoreConfiguration(
             saveStatePlugin(
                 saver = saver,
                 name = "${name}SavedStatePlugin",
-                context = Dispatchers.IO
+                context = Dispatchers.Default,
             )
         )
     }

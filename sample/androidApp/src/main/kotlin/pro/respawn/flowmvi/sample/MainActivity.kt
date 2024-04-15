@@ -19,7 +19,7 @@ internal class MainActivity : ComponentActivity(), AndroidScopeComponent {
     override val scope by activityRetainedScope()
     private val launcher by fastLazy { AndroidFeatureLauncher(applicationContext) }
     @OptIn(ExperimentalDecomposeApi::class)
-    private val root by fastLazy { retainedComponent { RootComponent(launcher, it) } }
+    private val root by fastLazy { retainedComponent { RootComponent(launcher, it, null) } }
 
     @OptIn(KoinExperimentalAPI::class)
     override fun onCreate(savedInstanceState: Bundle?) {

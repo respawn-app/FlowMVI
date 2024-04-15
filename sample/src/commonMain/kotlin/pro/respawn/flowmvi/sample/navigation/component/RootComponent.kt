@@ -1,18 +1,30 @@
 package pro.respawn.flowmvi.sample.navigation.component
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.router.stack.webhistory.WebHistoryController
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.destination.Destination
 import pro.respawn.flowmvi.sample.platform.PlatformFeatureLauncher
 
-class RootComponent(
+class RootComponent @OptIn(ExperimentalDecomposeApi::class) constructor(
     private val androidFeatures: PlatformFeatureLauncher,
-    context: ComponentContext
+    context: ComponentContext,
+    webHistoryController: WebHistoryController?,
 ) : AppNavigator,
     StackComponent(context),
     DestinationComponent by destinationComponent(null, context) {
 
-
+    init {
+        // TODO
+        // webHistoryController?.attach(
+        //     navigator = stackNav,
+        //     stack = stack,
+        //     getPath = { it.route },
+        //     getConfiguration = { Destination.Home },
+        //     serializer = Destination.serializer(),
+        // )
+    }
     override fun home() = navigate(Destination.Home)
     override fun simpleFeature() = navigate(Destination.SimpleFeature)
     override fun lceFeature() = navigate(Destination.LCEFeature)

@@ -1,6 +1,7 @@
 import org.intellij.lang.annotations.Language
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
@@ -24,14 +25,13 @@ val BuildConfig = """
 kotlin {
     applyDefaultHierarchyTemplate()
 
-    // @OptIn(ExperimentalWasmDsl::class)
-    // wasmJs {
-    //     moduleName = "${Config.artifactId}.sample"
-    //     nodejs()
-    //     browser()
-    //     binaries.library()
-    // }
-    // TODO: Enable wasm on kmputils and apiresult
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        moduleName = "${Config.artifactId}.sample"
+        nodejs()
+        browser()
+        binaries.library()
+    }
     jvm("desktop")
 
     androidTarget()
@@ -46,7 +46,6 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-
 
         configurations.all {
             exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
@@ -77,7 +76,7 @@ kotlin {
             implementation(applibs.bundles.koin)
             implementation(applibs.apiresult)
             implementation(applibs.decompose.compose)
-            implementation(applibs.compose.codehighlighting)
+            // implementation(applibs.compose.codehighlighting)
             implementation(applibs.decompose)
 
             implementation(projects.core)

@@ -5,8 +5,8 @@ package pro.respawn.flowmvi.sample.navigation.destination
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
 import pro.respawn.flowmvi.sample.util.UUIDSerializer
+import pro.respawn.flowmvi.sample.navigation.util.toSnakeCase
 
 @Serializable
 @Immutable
@@ -14,6 +14,7 @@ sealed interface Destination {
 
     val topLevel: Boolean get() = false
     val singleTop: Boolean get() = topLevel
+    val route get() = requireNotNull(this::class.simpleName).toSnakeCase()
 
     override fun equals(other: Any?): Boolean
     override fun hashCode(): Int

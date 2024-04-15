@@ -4,3 +4,8 @@ interface PlatformFeatureLauncher {
 
     fun xmlActivity()
 }
+
+object NoOpPlatformFeatureLauncher : PlatformFeatureLauncher {
+
+    override fun xmlActivity() = Unit
+}

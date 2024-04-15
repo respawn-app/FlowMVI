@@ -12,3 +12,7 @@ internal infix fun Destination.duplicateOf(
 internal inline fun <reified T> InstanceKeeperOwner.retained(
     crossinline block: () -> T
 ) = fastLazy { instanceKeeper.getOrCreateSimple<T> { block() } }
+
+private val humps by fastLazy { "(?<=.)(?=\\p{Upper})".toRegex() }
+
+internal fun String.toSnakeCase() = replace(humps, "_").lowercase()
