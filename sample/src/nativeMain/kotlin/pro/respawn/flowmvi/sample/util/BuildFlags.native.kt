@@ -1,10 +1,8 @@
 package pro.respawn.flowmvi.sample.util
 
+import pro.respawn.flowmvi.BuildFlags
 import kotlin.experimental.ExperimentalNativeApi
 
-actual object BuildFlags {
-
-    @OptIn(ExperimentalNativeApi::class)
-    actual val debuggable: Boolean = kotlin.native.Platform.isDebugBinary
-    actual val platform: Platform = Platform.Apple
-}
+@OptIn(ExperimentalNativeApi::class)
+internal actual val BuildFlags.debuggable get() = kotlin.native.Platform.isDebugBinary
+internal actual val BuildFlags.platform: Platform get() = Platform.Apple

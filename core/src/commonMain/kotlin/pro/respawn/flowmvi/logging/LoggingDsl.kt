@@ -21,7 +21,10 @@ public operator fun StoreLogger?.invoke(
     e: Exception,
 ): Unit = invoke(level, tag) { e.stackTraceToString() }
 
-internal val StoreLogLevel.asSymbol
+/**
+ * Returns an emoji resembling this log level.
+ */
+public val StoreLogLevel.asSymbol: String
     get() = when (this) {
         StoreLogLevel.Trace -> "⚪️"
         StoreLogLevel.Debug -> "🟢"

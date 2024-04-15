@@ -1,10 +1,7 @@
 package pro.respawn.flowmvi.sample.util
 
 import pro.respawn.flowmvi.BuildConfig
+import pro.respawn.flowmvi.BuildFlags
 
-actual object BuildFlags {
-
-    actual val debuggable: Boolean = BuildConfig.DEBUG
-    actual val platform = Platform.Android
-
-}
+internal actual val BuildFlags.debuggable: Boolean get() = BuildConfig.DEBUG
+internal actual val BuildFlags.platform get() = Platform.Android

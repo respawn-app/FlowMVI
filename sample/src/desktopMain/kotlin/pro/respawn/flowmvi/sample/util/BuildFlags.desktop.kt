@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.util
 
-actual object BuildFlags {
+import pro.respawn.flowmvi.BuildFlags
 
-    actual val debuggable: Boolean = true
-    actual val platform = Platform.Desktop
-}
+internal actual val BuildFlags.debuggable: Boolean get() = true
+internal actual val BuildFlags.platform get() = Platform.Desktop

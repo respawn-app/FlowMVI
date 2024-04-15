@@ -35,4 +35,7 @@ sealed interface Destination {
 
     @Serializable
     data object DiConfig : Destination
+
+    @Serializable
+    data object Logging : Destination
 }

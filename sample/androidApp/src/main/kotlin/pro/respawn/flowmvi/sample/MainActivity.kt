@@ -16,7 +16,8 @@ import pro.respawn.kmmutils.common.fastLazy
 internal class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
     override val scope by activityRetainedScope()
-    private val root by fastLazy { retainedComponent { RootComponent(it) } }
+    private val launcher by fastLazy { AndroidFeatureLauncher(applicationContext) }
+    private val root by fastLazy { retainedComponent { RootComponent(launcher, it) } }
 
     @OptIn(KoinExperimentalAPI::class)
     override fun onCreate(savedInstanceState: Bundle?) {

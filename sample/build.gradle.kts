@@ -1,3 +1,4 @@
+import org.intellij.lang.annotations.Language
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
@@ -8,7 +9,17 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
-private val pluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
+@Language("Kotlin")
+// language=kotlin
+val BuildConfig = """
+    package ${Config.namespace}
+
+    internal object BuildFlags {
+        const val VersionName = "${Config.versionName}"
+        const val SupportEmail = "${Config.supportEmail}"
+        const val ProjectDescription = "${Config.Sample.appDescription}"
+    }
+""".trimIndent()
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -136,5 +147,22 @@ compose.desktop {
                 iconFile = iconDir.resolve("icon_512.png")
             }
         }
+    }
+}
+
+val generateBuildConfig by tasks.registering(Sync::class) {
+    from(
+        resources.text.fromString(BuildConfig)
+    ) {
+        rename { "BuildConfig.kt" }
+        into(Config.namespace.replace(".", "/"))
+    }
+    // the target directory
+    into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
+}
+
+kotlin {
+    sourceSets.commonMain {
+        kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
     }
 }

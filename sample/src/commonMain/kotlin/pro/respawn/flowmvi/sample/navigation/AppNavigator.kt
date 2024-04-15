@@ -8,4 +8,6 @@ interface AppNavigator : Navigator {
     fun lceFeature()
     fun savedStateFeature()
     fun diConfigFeature()
+    fun loggingFeature()
+    fun xmlActivity()
 }

@@ -4,10 +4,11 @@ import androidx.compose.runtime.Immutable
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.sample.util.Platform
 import kotlin.jvm.JvmInline
 
-enum class HomeFeature {
-    Simple, LCE, SavedState, DiConfig
+enum class HomeFeature(val platform: Platform? = null) {
+    Simple, LCE, SavedState, DiConfig, Logging, XmlViews(Platform.Android)
 }
 
 @Immutable

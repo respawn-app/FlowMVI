@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <path android:pathData="M11.25 24.23c-5.97-3.45-8.96-5.17-9.22-7.7-0.04-0.35-0.04-0.7 0-1.05 0.26-2.54 3.25-4.26 9.22-7.7 5.97-3.45 8.96-5.18 11.28-4.14 0.32 0.14 0.63 0.32 0.9 0.52C25.5 5.66 25.5 9.11 25.5 16c0 6.9 0 10.34-2.06 11.84-0.28 0.2-0.59 0.38-0.9 0.52-2.33 1.04-5.32-0.69-11.29-4.13Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="-1.63"
+                android:endY="26.81"
+                android:startX="31.97"
+                android:startY="3.72"
+                android:type="linear">
+                <item
+                    android:color="#FF8C73FF"
+                    android:offset="0" />
+                <item
+                    android:color="#FF34C1FF"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M7.77 11.25c3.45-5.97 5.17-8.96 7.7-9.22 0.35-0.04 0.7-0.04 1.05 0 2.54 0.26 4.26 3.25 7.7 9.22 3.45 5.97 5.18 8.96 4.14 11.28-0.14 0.32-0.32 0.63-0.52 0.9-1.5 2.07-4.95 2.07-11.84 2.07-6.9 0-10.34 0-11.84-2.06-0.2-0.28-0.38-0.59-0.52-0.9-1.04-2.33 0.69-5.32 4.13-11.29Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="22.82"
+                android:endY="1.12"
+                android:startX="3.45"
+                android:startY="28.62"
+                android:type="linear">
+                <item
+                    android:color="#FFFF4FEF"
+                    android:offset="0" />
+                <item
+                    android:color="#FFFFA839"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#80FFFFFF"
+        android:pathData="M11.2 15.8l1.29 0.12c0.54 0.05 0.94 0.54 0.89 1.08l-0.43 4.38c-0.12 1.26 0.53 1.57 1.43 0.7l6.19-5.88c0.75-0.73 0.53-1.4-0.5-1.5l-1.28-0.12c-0.55-0.05-0.95-0.54-0.9-1.09l0.43-4.37c0.12-1.26-0.52-1.58-1.43-0.7L10.7 14.3c-0.75 0.72-0.53 1.4 0.5 1.5Z"
+        android:strokeWidth="1.15"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10" />
+</vector>

@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.util
 
-expect object BuildFlags {
+import pro.respawn.flowmvi.BuildFlags
 
-    val debuggable: Boolean
-    val platform: Platform
-}
+internal expect val BuildFlags.debuggable: Boolean
+internal expect val BuildFlags.platform: Platform
