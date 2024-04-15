@@ -26,7 +26,7 @@ object InMemoryLogger : StoreLogger {
     override fun log(level: StoreLogLevel, tag: String?, message: () -> String) {
         // don't display state changes to avoid infinite loops
         if (level == StoreLogLevel.Trace) return
-        logs.update { (it + "${level.asSymbol} ${tag.orEmpty()}: ${message()}").take(MaxLogs) }
+        logs.update { (it + "${level.asSymbol} ${tag.orEmpty()}: ${message()}").takeLast(MaxLogs) }
     }
 }
 
