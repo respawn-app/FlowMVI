@@ -5,7 +5,6 @@ package pro.respawn.flowmvi.sample.features.savedstate
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.sample.util.InputSerializer

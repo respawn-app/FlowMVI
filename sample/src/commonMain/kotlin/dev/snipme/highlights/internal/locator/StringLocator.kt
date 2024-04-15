@@ -1,8 +1,8 @@
 package dev.snipme.highlights.internal.locator
 
-import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.internal.SyntaxTokens.STRING_DELIMITERS
 import dev.snipme.highlights.internal.indicesOf
+import dev.snipme.highlights.model.PhraseLocation
 
 private const val START_INDEX = 0
 private const val TWO_ELEMENTS = 2

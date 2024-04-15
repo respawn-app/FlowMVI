@@ -27,9 +27,10 @@ class Highlights private constructor(
 
         fun themes(darkMode: Boolean) = SyntaxThemes.themes(darkMode)
 
-        fun languages() = SyntaxLanguage.values().toList()
+        fun languages() = SyntaxLanguage.entries
     }
 
+    @Suppress("DataClassShouldBeImmutable")
     data class Builder(
         var code: String = "",
         var language: SyntaxLanguage = SyntaxLanguage.DEFAULT,

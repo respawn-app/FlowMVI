@@ -13,14 +13,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
-import pro.respawn.flowmvi.compose.dsl.subscribe
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.requireLifecycle
+import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.lce.LCEIntent.ClickedRefresh
 import pro.respawn.flowmvi.sample.generated.resources.Res
@@ -32,7 +32,6 @@ import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
-import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 
@@ -87,7 +86,6 @@ internal class LCEContainer(
 fun LCEScreen(
     navigator: Navigator,
 ) = with(container<LCEContainer, _, _, _>()) {
-
     val state by subscribe(requireLifecycle())
 
     RScaffold(

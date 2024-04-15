@@ -53,9 +53,9 @@ val Highlights.annotatedString
 fun CodeText(
     code: String,
     vararg emphasis: PhraseLocation,
+    modifier: Modifier = Modifier,
     darkMode: Boolean = isSystemInDarkTheme(),
     language: SyntaxLanguage = SyntaxLanguage.KOTLIN,
-    modifier: Modifier = Modifier,
 ) {
     val string = remember(code, darkMode, language, emphasis) {
         Highlights.Builder().run {

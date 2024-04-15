@@ -5,8 +5,8 @@ package pro.respawn.flowmvi.sample.navigation.destination
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import pro.respawn.flowmvi.sample.util.UUIDSerializer
 import pro.respawn.flowmvi.sample.navigation.util.toSnakeCase
+import pro.respawn.flowmvi.sample.util.UUIDSerializer
 
 @Serializable
 @Immutable

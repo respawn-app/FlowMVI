@@ -1,8 +1,8 @@
+@file:Suppress("MissingPackageDeclaration")
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.router.stack.webhistory.DefaultWebHistoryController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
 import kotlinx.browser.document
@@ -15,7 +15,6 @@ fun main() {
     val registry = LifecycleRegistry()
     val root = RootComponent(
         androidFeatures = NoOpPlatformFeatureLauncher,
-        webHistoryController = DefaultWebHistoryController(),
         context = DefaultComponentContext(
             lifecycle = registry
         ),

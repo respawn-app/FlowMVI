@@ -14,8 +14,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
-import pro.respawn.flowmvi.compose.dsl.subscribe
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.requireLifecycle
+import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.logging.LoggingAction.SentLog
 import pro.respawn.flowmvi.sample.features.logging.LoggingIntent.ClickedSendLog
@@ -82,7 +82,6 @@ internal class LoggingContainer(
 fun LoggingScreen(
     navigator: Navigator,
 ) = with(container<LoggingContainer, _, _, _>()) {
-
     val listState = rememberLazyListState()
 
     val state by subscribe(requireLifecycle()) {

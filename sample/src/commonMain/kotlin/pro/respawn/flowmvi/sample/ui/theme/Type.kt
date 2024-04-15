@@ -2,9 +2,6 @@
 
 package pro.respawn.flowmvi.sample.ui.theme
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -190,84 +187,3 @@ internal val AppTypography
             )
         }
     }
-
-@Composable
-private fun TypePreview() = RespawnTheme {
-    Column {
-        Text(
-            text = "Display Large",
-            style = MaterialTheme.typography.displayLarge,
-            maxLines = 3
-        )
-        Text(
-            text = "Display Medium",
-            style = MaterialTheme.typography.displayMedium,
-            maxLines = 3
-        )
-        Text(
-            text = "Display Small",
-            style = MaterialTheme.typography.displaySmall,
-            maxLines = 3
-        )
-        Text(
-            text = "Headline Large",
-            style = MaterialTheme.typography.headlineLarge,
-            maxLines = 3
-        )
-        Text(
-            text = "Headline Medium",
-            style = MaterialTheme.typography.headlineMedium,
-            maxLines = 3
-        )
-        Text(
-            text = "Headline Small",
-            style = MaterialTheme.typography.headlineSmall,
-            maxLines = 3
-        )
-        Text(
-            text = "Title Large",
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 3
-        )
-        Text(
-            text = "Title Medium",
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 3
-        )
-        Text(
-            text = "Title Small",
-            style = MaterialTheme.typography.titleSmall,
-            maxLines = 3
-        )
-        Text(
-            text = "Body Large ".repeat(10),
-            style = MaterialTheme.typography.bodyLarge,
-            maxLines = 3
-        )
-        Text(
-            text = "Body Medium ".repeat(10),
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 3
-        )
-        Text(
-            text = "Body Small ".repeat(10),
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 3
-        )
-        Text(
-            text = "Label Large ".repeat(10),
-            style = MaterialTheme.typography.labelLarge,
-            maxLines = 3
-        )
-        Text(
-            text = "Label Medium ".repeat(10),
-            style = MaterialTheme.typography.labelMedium,
-            maxLines = 3
-        )
-        Text(
-            text = "Label Small ".repeat(10),
-            style = MaterialTheme.typography.labelSmall,
-            maxLines = 3
-        )
-    }
-}

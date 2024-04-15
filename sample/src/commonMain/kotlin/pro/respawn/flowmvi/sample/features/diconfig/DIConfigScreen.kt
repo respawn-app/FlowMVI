@@ -75,7 +75,6 @@ internal class DiConfigContainer(
 fun DiConfigScreen(
     navigator: Navigator,
 ) = with(container<DiConfigContainer, _, _, _>()) {
-
     RScaffold(
         onBack = navigator.backNavigator,
         title = stringResource(Res.string.di_feature_title),

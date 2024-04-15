@@ -11,9 +11,7 @@ private val NUMBER_SPECIAL_CHARACTERS = listOf('_')
 
 internal object NumericLiteralLocator {
 
-    fun locate(code: String): List<PhraseLocation> {
-        return findDigitIndices(code)
-    }
+    fun locate(code: String) = findDigitIndices(code)
 
     private fun findDigitIndices(code: String): List<PhraseLocation> {
         val foundPhrases = mutableSetOf<String>()
@@ -21,13 +19,14 @@ internal object NumericLiteralLocator {
 
         val delimiters = TOKEN_DELIMITERS.filterNot { it == "." }.toTypedArray()
 
-        code.split(*delimiters) // Separate words
+        code.split(delimiters = delimiters) // Separate words
             .asSequence() // Manipulate on given word separately
             .filterNot { foundPhrases.contains(it) }
             .filter { it.isNotBlank() } // Filter spaces and others
             .filter {
-                it.first().isDigit() || (NUMBER_START_CHARACTERS.contains(it.first())
-                        && it.getOrNull(1)?.isDigit() == true)
+                it.first().isDigit() ||
+                    NUMBER_START_CHARACTERS.contains(it.first()) &&
+                    it.getOrNull(1)?.isDigit() == true
             } // Find start of literals
             .forEach { number ->
                 // For given literal find all occurrences
@@ -93,10 +92,9 @@ internal object NumericLiteralLocator {
 
         return number.filter {
             it.isDigit() ||
-                    NUMBER_START_CHARACTERS.contains(it) ||
-                    NUMBER_TYPE_CHARACTERS.contains(it) ||
-                    NUMBER_SPECIAL_CHARACTERS.contains(it)
-
+                NUMBER_START_CHARACTERS.contains(it) ||
+                NUMBER_TYPE_CHARACTERS.contains(it) ||
+                NUMBER_SPECIAL_CHARACTERS.contains(it)
         }.length
     }
 

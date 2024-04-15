@@ -2,7 +2,6 @@ package pro.respawn.flowmvi.sample.navigation.component
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
-import com.arkivanov.decompose.router.stack.webhistory.WebHistoryController
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.destination.Destination
 import pro.respawn.flowmvi.sample.platform.PlatformFeatureLauncher
@@ -10,7 +9,6 @@ import pro.respawn.flowmvi.sample.platform.PlatformFeatureLauncher
 class RootComponent @OptIn(ExperimentalDecomposeApi::class) constructor(
     private val androidFeatures: PlatformFeatureLauncher,
     context: ComponentContext,
-    webHistoryController: WebHistoryController?,
 ) : AppNavigator,
     StackComponent(context),
     DestinationComponent by destinationComponent(null, context) {

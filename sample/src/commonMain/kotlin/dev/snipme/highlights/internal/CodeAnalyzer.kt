@@ -60,9 +60,7 @@ internal object CodeAnalyzer {
             else -> snapshot.structure
         }
 
-    private fun analyzeFull(code: String, language: SyntaxLanguage): CodeStructure {
-        return analyzeForLanguage(code, language)
-    }
+    private fun analyzeFull(code: String, language: SyntaxLanguage) = analyzeForLanguage(code, language)
 
     private fun analyzePartial(codeSnapshot: CodeSnapshot, code: String): CodeStructure {
         val difference = CodeComparator.difference(codeSnapshot.code, code)

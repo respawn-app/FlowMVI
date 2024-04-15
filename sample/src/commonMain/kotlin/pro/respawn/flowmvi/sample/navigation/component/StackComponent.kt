@@ -13,14 +13,14 @@ import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
-import pro.respawn.flowmvi.sample.navigation.util.NavResult
-import pro.respawn.flowmvi.sample.navigation.util.duplicateOf
-import pro.respawn.flowmvi.sample.navigation.util.retained
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
-import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.destination.Destination
+import pro.respawn.flowmvi.sample.navigation.util.NavResult
+import pro.respawn.flowmvi.sample.navigation.util.Navigator
+import pro.respawn.flowmvi.sample.navigation.util.duplicateOf
+import pro.respawn.flowmvi.sample.navigation.util.retained
 
 @Stable
 open class StackComponent(context: ComponentContext) : Navigator {

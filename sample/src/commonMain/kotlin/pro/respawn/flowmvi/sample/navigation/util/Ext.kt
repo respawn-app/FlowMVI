@@ -2,8 +2,6 @@ package pro.respawn.flowmvi.sample.navigation.util
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import pro.respawn.kmmutils.common.fastLazy
-
 
 typealias BackHandler = (() -> Unit)?
 

@@ -72,6 +72,7 @@ fun KeyboardActions.Companion.default(
 @Composable
 fun rememberSnackbarHostState() = remember { SnackbarHostState() }
 
+@Suppress("ComposableParametersOrdering")
 @Composable
 fun Modifier.noIndicationClickable(
     enabled: Boolean = true,

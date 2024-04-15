@@ -1,9 +1,9 @@
 package dev.snipme.highlights.internal.locator
 
-import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.internal.SyntaxTokens.COMMENT_DELIMITERS
 import dev.snipme.highlights.internal.indicesOf
 import dev.snipme.highlights.internal.lengthToEOF
+import dev.snipme.highlights.model.PhraseLocation
 
 internal object CommentLocator {
 

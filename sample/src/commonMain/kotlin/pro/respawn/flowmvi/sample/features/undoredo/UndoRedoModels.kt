@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.sample.features.undoredo
 
 import androidx.compose.runtime.Immutable
-import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.kmmutils.inputforms.Input

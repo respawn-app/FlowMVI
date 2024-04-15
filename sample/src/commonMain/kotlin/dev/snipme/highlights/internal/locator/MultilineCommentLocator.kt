@@ -1,8 +1,8 @@
 package dev.snipme.highlights.internal.locator
 
-import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.internal.SyntaxTokens.MULTILINE_COMMENT_DELIMITERS
 import dev.snipme.highlights.internal.indicesOf
+import dev.snipme.highlights.model.PhraseLocation
 
 private const val START_INDEX = 0
 
@@ -17,10 +17,10 @@ internal object MultilineCommentLocator {
         MULTILINE_COMMENT_DELIMITERS.forEach { commentBlock ->
             val (prefix, postfix) = commentBlock
             startIndices.addAll(code.indicesOf(prefix))
-            endIndices.addAll(code.indicesOf(postfix).map { it + (postfix.length) })
+            endIndices.addAll(code.indicesOf(postfix).map { it + postfix.length })
         }
 
-        val endIndex = minOf(startIndices.size, endIndices.size) -1
+        val endIndex = minOf(startIndices.size, endIndices.size) - 1
         for (i in START_INDEX..endIndex) {
             comments.add(Pair(startIndices[i], endIndices[i]))
         }

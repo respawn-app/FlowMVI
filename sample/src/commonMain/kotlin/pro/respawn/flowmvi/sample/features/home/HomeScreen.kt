@@ -57,7 +57,6 @@ import pro.respawn.flowmvi.sample.generated.resources.simple_feature_title
 import pro.respawn.flowmvi.sample.generated.resources.undoredo_feature_title
 import pro.respawn.flowmvi.sample.generated.resources.xml_feature_title
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
-import pro.respawn.flowmvi.sample.navigation.destination.Destination
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
@@ -71,7 +70,6 @@ import pro.respawn.flowmvi.sample.util.platform
 fun HomeScreen(
     navigator: AppNavigator,
 ) = with(container<HomeContainer, _, _, _>()) {
-
     val state by subscribe(requireLifecycle()) { action ->
         when (action) {
             is GoToFeature -> when (action.feature) {

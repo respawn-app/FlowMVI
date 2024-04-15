@@ -74,7 +74,6 @@ internal class SavedStateContainer(
 fun SavedStateScreen(
     navigator: Navigator,
 ) = with(container<SavedStateContainer, _, _, _>()) {
-
     val state by subscribe(requireLifecycle())
 
     RScaffold(

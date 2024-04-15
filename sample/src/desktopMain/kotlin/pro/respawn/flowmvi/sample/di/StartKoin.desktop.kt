@@ -1,1 +1,1 @@
-package pro.respawn.flowmvi.sample.di 
+package pro.respawn.flowmvi.sample.di

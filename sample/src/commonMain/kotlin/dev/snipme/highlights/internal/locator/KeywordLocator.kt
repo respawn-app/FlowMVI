@@ -36,7 +36,7 @@ internal object KeywordLocator {
 
     private fun findKeywords(code: String, keywords: List<String>): Set<String> =
         TOKEN_DELIMITERS.toTypedArray().let { delimiters ->
-            code.split(*delimiters, ignoreCase = true) // Split into words
+            code.split(delimiters = delimiters, ignoreCase = true) // Split into words
                 .asSequence() // Reduce amount of operations
                 .filter { it.isNotBlank() } // Remove empty
                 .map { it.trim() } // Remove whitespaces from phrase

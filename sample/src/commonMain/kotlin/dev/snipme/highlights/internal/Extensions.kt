@@ -14,7 +14,7 @@ fun String.indicesOf(
     indices.add(startIndexOf)
 
     // The found is the only one
-    if (startIndexOf == (lastIndex - phrase.length)) {
+    if (startIndexOf == lastIndex - phrase.length) {
         return indices
     }
 

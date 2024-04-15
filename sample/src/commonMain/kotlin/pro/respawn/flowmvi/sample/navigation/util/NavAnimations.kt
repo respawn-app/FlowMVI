@@ -10,11 +10,11 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
+import pro.respawn.flowmvi.sample.navigation.component.RootComponent
+import pro.respawn.flowmvi.sample.navigation.destination.Destination
 import pro.respawn.flowmvi.sample.navigation.util.NavAnimationDefaults.DefaultNavAnimation
 import pro.respawn.flowmvi.sample.navigation.util.NavAnimationDefaults.NavAnimSpec
-import pro.respawn.flowmvi.sample.navigation.destination.Destination
 
 private object NavAnimationDefaults {
 

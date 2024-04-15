@@ -1,15 +1,15 @@
 package dev.snipme.highlights.internal.locator
 
-import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.internal.SyntaxTokens.TOKEN_DELIMITERS
 import dev.snipme.highlights.internal.indicesOf
+import dev.snipme.highlights.model.PhraseLocation
 
 internal object AnnotationLocator {
 
     fun locate(code: String): List<PhraseLocation> {
         val foundAnnotations = emptyList<String>()
         val locations = mutableSetOf<PhraseLocation>()
-        code.split(*TOKEN_DELIMITERS.toTypedArray())
+        code.split(delimiters = TOKEN_DELIMITERS.toTypedArray())
             .asSequence()
             .filter { it.isNotEmpty() }
             .filter { foundAnnotations.contains(it).not() }

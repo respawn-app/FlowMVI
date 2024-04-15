@@ -60,7 +60,6 @@ private val Description = """
 fun SimpleScreen(
     navigator: Navigator,
 ) = with(simpleStore) {
-
     LaunchedEffect(Unit) { start(this).join() }
 
     val state by subscribe(requireLifecycle())
