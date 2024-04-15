@@ -31,6 +31,7 @@ kotlin {
             implementation(projects.sample)
             implementation(applibs.bundles.koin)
             implementation(applibs.decompose)
+            implementation(libs.essenty.statekeeper)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
