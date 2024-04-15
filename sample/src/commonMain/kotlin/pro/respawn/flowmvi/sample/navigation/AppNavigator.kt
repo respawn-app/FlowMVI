@@ -11,4 +11,5 @@ interface AppNavigator : Navigator {
     fun loggingFeature()
     fun xmlActivity()
     fun undoRedoFeature()
+    fun decomposeFeature()
 }

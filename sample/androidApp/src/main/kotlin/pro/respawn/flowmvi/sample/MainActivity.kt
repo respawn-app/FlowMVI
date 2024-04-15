@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.retainedComponent
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.compose.KoinAndroidContext
@@ -17,6 +18,7 @@ internal class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
     override val scope by activityRetainedScope()
     private val launcher by fastLazy { AndroidFeatureLauncher(applicationContext) }
+    @OptIn(ExperimentalDecomposeApi::class)
     private val root by fastLazy { retainedComponent { RootComponent(launcher, it) } }
 
     @OptIn(KoinExperimentalAPI::class)

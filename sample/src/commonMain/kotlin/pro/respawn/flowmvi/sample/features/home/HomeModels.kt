@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.sample.util.Platform
 import kotlin.jvm.JvmInline
 
 enum class HomeFeature(val platform: Platform? = null) {
-    Simple, LCE, SavedState, DiConfig, Logging, UndoRedo, XmlViews(Platform.Android)
+    Simple, LCE, SavedState, DiConfig, Logging, UndoRedo, Decompose, XmlViews(Platform.Android)
 }
 
 @Immutable

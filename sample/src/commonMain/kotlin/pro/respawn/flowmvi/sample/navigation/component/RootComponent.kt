@@ -21,4 +21,5 @@ class RootComponent(
     override fun loggingFeature() = navigate(Destination.Logging)
     override fun xmlActivity() = androidFeatures.xmlActivity()
     override fun undoRedoFeature() = navigate(Destination.UndoRedo)
+    override fun decomposeFeature() = navigate(Destination.Decompose)
 }

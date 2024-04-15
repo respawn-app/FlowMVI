@@ -82,6 +82,7 @@ kotlin {
 
             implementation(projects.core)
             implementation(projects.essenty.essentyCompose)
+            implementation(projects.essenty)
             implementation(projects.compose)
             implementation(projects.savedstate)
         }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Help
 import androidx.compose.material.icons.automirrored.rounded.Subject
 import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.AccountTree
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Refresh
@@ -34,6 +35,7 @@ import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.home.HomeAction.GoToFeature
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.Decompose
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.DiConfig
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.LCE
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Logging
@@ -45,6 +47,7 @@ import pro.respawn.flowmvi.sample.features.home.HomeIntent.ClickedFeature
 import pro.respawn.flowmvi.sample.features.home.HomeState.DisplayingHome
 import pro.respawn.flowmvi.sample.generated.resources.Res
 import pro.respawn.flowmvi.sample.generated.resources.app_name
+import pro.respawn.flowmvi.sample.generated.resources.decompose_feature_title
 import pro.respawn.flowmvi.sample.generated.resources.di_feature_title
 import pro.respawn.flowmvi.sample.generated.resources.ic_flowmvi_32
 import pro.respawn.flowmvi.sample.generated.resources.lce_feature_title
@@ -79,6 +82,7 @@ fun HomeScreen(
                 Logging -> navigator.loggingFeature()
                 XmlViews -> navigator.xmlActivity()
                 UndoRedo -> navigator.undoRedoFeature()
+                Decompose -> navigator.decomposeFeature()
             }
         }
     }
@@ -133,6 +137,7 @@ private val HomeFeature.title
         Logging -> Res.string.logging_feature_title
         XmlViews -> Res.string.xml_feature_title
         UndoRedo -> Res.string.undoredo_feature_title
+        Decompose -> Res.string.decompose_feature_title
     }
 
 private val HomeFeature.icon
@@ -144,6 +149,7 @@ private val HomeFeature.icon
         Logging -> Icons.AutoMirrored.Rounded.Subject
         XmlViews -> Icons.Rounded.Code
         UndoRedo -> Icons.AutoMirrored.Rounded.Undo
+        Decompose -> Icons.Rounded.AccountTree
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform

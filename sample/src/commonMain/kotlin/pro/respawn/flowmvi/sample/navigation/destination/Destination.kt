@@ -41,4 +41,7 @@ sealed interface Destination {
 
     @Serializable
     data object UndoRedo : Destination
+
+    @Serializable
+    data object Decompose : Destination
 }

@@ -39,7 +39,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 private const val Description = """
     LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code.
     
-    You can represent the LCE states as a sealed class family an easy to understand structure.
+    You can represent the LCE states as a sealed class family - an easy to understand structure.
     
     The library can handle any exceptions that your logic throws for you, setting the appropriate state.
     Try refreshing the items and the screen can show you an error sometimes.

@@ -16,6 +16,7 @@ fun AppContent(
         Children(root.stack, animation = defaultNavAnimation(root)) { child ->
             ProvideDestinationLocals(child.instance) {
                 Destinations(
+                    component = child.instance,
                     destination = child.configuration,
                     navigator = root,
                 )
