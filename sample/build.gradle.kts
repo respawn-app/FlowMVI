@@ -36,13 +36,13 @@ kotlin {
 
     androidTarget()
 
-    sequence {
-        yield(iosX64())
-        yield(iosArm64())
-        yield(iosSimulatorArm64())
-        // yield(macosArm64())
-        // yield(macosX64())
-    }.toList()
+    // sequence {
+    //     yield(iosX64())
+    //     yield(iosArm64())
+    //     yield(iosSimulatorArm64())
+    //     // yield(macosArm64())
+    //     // yield(macosX64())
+    // }.toList()
 
     sourceSets {
         val desktopMain by getting
