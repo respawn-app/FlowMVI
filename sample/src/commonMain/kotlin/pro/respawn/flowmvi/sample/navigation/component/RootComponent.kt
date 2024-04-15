@@ -20,4 +20,5 @@ class RootComponent(
     override fun diConfigFeature() = navigate(Destination.DiConfig)
     override fun loggingFeature() = navigate(Destination.Logging)
     override fun xmlActivity() = androidFeatures.xmlActivity()
+    override fun undoRedoFeature() = navigate(Destination.UndoRedo)
 }

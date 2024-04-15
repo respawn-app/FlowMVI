@@ -1,9 +1,11 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -30,39 +32,41 @@ public class UndoRedo(
         require(maxQueueSize > 0) { "Queue size less than 1 is not allowed, you provided: $maxQueueSize" }
     }
 
-    private val queue by atomic<CappedMutableList<Event>>(CappedMutableList(maxQueueSize))
+    private val _queue by atomic<CappedMutableList<Event>>(CappedMutableList(maxQueueSize))
     private val _index = MutableStateFlow(-1)
     private val lock = Mutex()
 
     /**
-     * Current index of the queue.
-     * Larger value means newer, but not larger than [maxQueueSize].
-     *
-     * When the index is equal to -1, the undo queue is empty.
-     * An index of 0 means that there is one event to undo.
+     * Current index of the queue
      */
     public val index: StateFlow<Int> = _index.asStateFlow()
 
     /**
-     * Whether the event queue is empty. Does not take [index] into account
+     * Current state of the [Queue].
+     * For synchronous / initial queue value access, see [canUndo], [canRedo], [queueSize]
      */
-    public val isQueueEmpty: Boolean get() = queue.isEmpty()
+    public val queue: Flow<Queue> = _index.asStateFlow().map { i -> Queue(i, canUndo, canRedo) }
+
+    /**
+     * Whether the event queue is empty. Does not take [Queue.index] into account
+     */
+    public val isQueueEmpty: Boolean get() = _queue.isEmpty()
 
     /**
      * The current queue size of the plugin.
      * This queue size does **not** consider current index and allows to get the total amount of events stored
      */
-    public val queueSize: Int get() = queue.size
+    public val queueSize: Int get() = _queue.size
 
     /**
      * Whether the plugin can [undo] at this moment.
      */
-    public val canUndo: Boolean get() = !isQueueEmpty && index.value >= 0
+    public val canUndo: Boolean get() = !isQueueEmpty && _index.value >= 0
 
     /**
      * Whether the plugin can [redo] at this moment.
      */
-    public val canRedo: Boolean get() = !isQueueEmpty && index.value < queue.lastIndex
+    public val canRedo: Boolean get() = !isQueueEmpty && _index.value < _queue.lastIndex
 
     /**
      * Add a given [undo] and [redo] to the queue.
@@ -74,9 +78,9 @@ public class UndoRedo(
         redo: suspend () -> Unit,
         undo: suspend () -> Unit,
     ): Int = lock.withLock {
-        with(queue) {
+        with(_queue) {
             if (doImmediately) redo()
-            val range = index.value.coerceAtLeast(0) + 1..lastIndex
+            val range = _index.value.coerceAtLeast(0) + 1..lastIndex
             if (!range.isEmpty()) removeAll(slice(range))
             add(Event(redo, undo))
             lastIndex.also { _index.value = it }
@@ -93,40 +97,40 @@ public class UndoRedo(
     ): Int = invoke(redo = { intent(intent) }, undo = undo, doImmediately = true)
 
     /**
-     * Undo the event at current [index].
+     * Undo the event at current [_index].
      * **You cannot undo and redo while another undo/redo is running!**
      */
     public suspend fun undo(require: Boolean = false): Int = lock.withLock {
         if (!canUndo) {
-            require(!require) { "Tried to undo action #${index.value} but nothing was in the queue" }
+            require(!require) { "Tried to undo action #${_index.value} but nothing was in the queue" }
             -1
         } else {
-            val i = index.value.coerceIn(queue.indices)
-            queue[i].undo()
+            val i = _index.value.coerceIn(_queue.indices)
+            _queue[i].undo()
             (i - 1).also { _index.value = it }
         }
     }
 
     /**
-     * Redo the event at current [index].
+     * Redo the event at current [_index].
      * **You cannot undo and redo while another undo/redo is running!**
      */
     public suspend fun redo(require: Boolean = false): Int = lock.withLock {
         if (!canRedo) {
-            require(!require) { "Tried to redo but queue already at the last index of ${queue.lastIndex}" }
-            queue.lastIndex
+            require(!require) { "Tried to redo but queue already at the last index of ${_queue.lastIndex}" }
+            _queue.lastIndex
         } else {
-            val i = index.value.coerceIn(queue.indices)
-            queue[i].redo()
+            val i = _index.value.coerceIn(_queue.indices)
+            _queue[i].redo()
             (i + 1).also { _index.value = it }
         }
     }
 
     /**
-     * Clear the queue of events and reset [index] to -1
+     * Clear the queue of events and reset [_index] to -1
      */
     public fun reset(): Unit = _index.update {
-        queue.clear()
+        _queue.clear()
         -1
     }
 
@@ -150,6 +154,23 @@ public class UndoRedo(
 
         override fun toString(): String = "UndoRedoPlugin.Event"
     }
+
+    /**
+     * Undo/redo queue representation
+     *
+     * @param index Current index of the queue.
+     * Larger value means newer, but not larger than [maxQueueSize].
+     * When the index is equal to -1, the undo queue is empty.
+     * An index of 0 means that there is one event to undo.
+     * @param canUndo whether there are actions to undo
+     * @param canRedo whether there are actions to redo
+     * @see _queue
+     */
+    public data class Queue(
+        val index: Int,
+        val canUndo: Boolean,
+        val canRedo: Boolean,
+    )
 }
 
 /**

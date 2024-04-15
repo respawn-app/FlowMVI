@@ -46,6 +46,7 @@ private const val Description = """
     For example, the code below sends logs back to the store to display on-screen
 """
 
+//language=kotlin
 private const val Code = """
 object InMemoryLogger : StoreLogger {
 

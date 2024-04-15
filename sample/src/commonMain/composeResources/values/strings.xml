@@ -8,4 +8,5 @@
     <string name="di_feature_title">Dependency Injection</string>
     <string name="logging_feature_title">Logging</string>
     <string name="xml_feature_title">Android XML Support</string>
+    <string name="undoredo_feature_title">Undo/Redo</string>
 </resources>

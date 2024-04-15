@@ -10,4 +10,5 @@ interface AppNavigator : Navigator {
     fun diConfigFeature()
     fun loggingFeature()
     fun xmlActivity()
+    fun undoRedoFeature()
 }

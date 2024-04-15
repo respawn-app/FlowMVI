@@ -38,4 +38,7 @@ sealed interface Destination {
 
     @Serializable
     data object Logging : Destination
+
+    @Serializable
+    data object UndoRedo : Destination
 }

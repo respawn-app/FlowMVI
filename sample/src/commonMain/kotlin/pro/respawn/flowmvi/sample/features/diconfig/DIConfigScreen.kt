@@ -36,6 +36,7 @@ on debug builds only and abstracts away from all the state saving logic.
 It also provides a configuration for unit-testing stores.
 """
 
+//language=kotlin
 private const val Code = """
 internal class DiConfigContainer(
     configuration: StoreConfiguration,

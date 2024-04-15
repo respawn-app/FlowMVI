@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.sample.ui.widgets
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,6 +10,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,8 +48,9 @@ fun RIcon(
     size: Dp = Size.icon,
     color: Color = Color.Unspecified,
     enabled: Boolean = true,
-    alpha: Float = 1f,
+    enabledAlpha: Float = 1f,
 ) {
+    val alpha by animateFloatAsState(if (enabled) enabledAlpha else Opacity.disabled)
     Box(
         modifier = modifier
             .clickable(

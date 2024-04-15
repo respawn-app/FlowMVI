@@ -15,7 +15,7 @@ object CornerRadius {
 object Size {
 
     val bottomBar = 68.dp
-    val icon = 22.dp
+    val icon = 28.dp
     val smallIcon = 18.dp
     val fab = 56.dp
     val touchTarget = 40.dp // iOS accessibility recommended (android is 48)

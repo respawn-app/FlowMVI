@@ -43,6 +43,7 @@ private const val Description = """
     Try typing something into the box below and then reopen the app - your input will be remembered!
 """
 
+//language=kotlin
 private const val Code = """
 internal class SavedStateContainer(
     fileManager: FileManager,

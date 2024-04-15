@@ -10,6 +10,7 @@ import pro.respawn.flowmvi.sample.features.lce.LCEContainer
 import pro.respawn.flowmvi.sample.features.lce.LCERepository
 import pro.respawn.flowmvi.sample.features.logging.LoggingContainer
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateContainer
+import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoContainer
 
 val featureModule = module {
     singleOf(::LCERepository)
@@ -18,4 +19,5 @@ val featureModule = module {
     container { new(::SavedStateContainer) }
     container { new(::DiConfigContainer) }
     container { new(::LoggingContainer) }
+    container { new(::UndoRedoContainer) }
 }

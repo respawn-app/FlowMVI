@@ -46,6 +46,7 @@ private const val Description = """
     This example also demonstrates how you can inject dependencies into your stores and create additional functions
 """
 
+//language=kotlin
 private const val Code = """
 private typealias Ctx = PipelineContext<LCEState, LCEIntent, LCEAction>
 
