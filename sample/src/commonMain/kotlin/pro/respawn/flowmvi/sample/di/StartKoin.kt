@@ -8,7 +8,7 @@ import org.koin.dsl.KoinAppDeclaration
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogLevel
 
-val Level.asStoreLogLevel
+private val Level.asStoreLogLevel
     get() = when (this) {
         Level.NONE -> StoreLogLevel.Trace
         Level.DEBUG -> StoreLogLevel.Debug
@@ -17,13 +17,14 @@ val Level.asStoreLogLevel
         Level.ERROR -> StoreLogLevel.Error
     }
 
-val KoinLogger = object : Logger() {
+@PublishedApi
+internal val KoinLogger = object : Logger() {
     override fun display(level: Level, msg: String) {
         PlatformStoreLogger.log(level.asStoreLogLevel, "Koin") { msg }
     }
 }
 
-internal inline fun startKoin(
+inline fun startKoin(
     modules: List<Module> = emptyList(),
     crossinline configure: KoinAppDeclaration = { }
 ): KoinApplication = org.koin.core.context.startKoin {

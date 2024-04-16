@@ -10,10 +10,11 @@ import com.arkivanov.essenty.statekeeper.StateKeeperDispatcher
 import kotlinx.browser.document
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
+import org.w3c.dom.Document
+import pro.respawn.flowmvi.sample.di.startKoin
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 import pro.respawn.flowmvi.sample.platform.NoOpPlatformFeatureLauncher
-import org.w3c.dom.Document
 import pro.respawn.flowmvi.sample.util.Json
 
 private const val KEY_SAVED_STATE = "saved_state"
@@ -29,6 +30,7 @@ internal fun String.decodeSerializableContainer(): SerializableContainer? = try 
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
+    startKoin()
     val registry = LifecycleRegistry()
     val stateKeeper = StateKeeperDispatcher(
         savedState = localStorage.getItem(KEY_SAVED_STATE)?.decodeSerializableContainer()
