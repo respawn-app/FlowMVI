@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <style name="Theme.MVI" parent="" />
-
-    <style name="Theme.MVI.View" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
-</resources>

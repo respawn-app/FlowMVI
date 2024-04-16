@@ -32,11 +32,11 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation(libs.bundles.serialization)
-            implementation(libs.bundles.kmputils)
+            implementation(applibs.bundles.kmputils)
             implementation(libs.kotlin.datetime)
-            implementation(libs.apiresult)
+            implementation(applibs.apiresult)
             implementation(libs.uuid)
-            implementation(libs.bundles.koin)
+            implementation(applibs.bundles.koin)
             implementation(libs.kotlin.io)
 
             implementation(projects.core)
@@ -56,7 +56,8 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "${Config.namespace}.debugger.app.MainKt"
+        mainClass = "${Config.Debugger.namespace}.app.MainKt"
+
         buildTypes.release.proguard {
             obfuscate = false
             optimize = false // TODO: Solve the issues with ktor and compose-desktop...
@@ -64,17 +65,17 @@ compose.desktop {
         }
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = Config.namespace
+            packageName = Config.Debugger.namespace
             packageVersion = Config.majorVersionName
-            description = Config.debuggerPluginDescription
+            description = Config.Debugger.appDescription
             vendor = Config.vendorName
             licenseFile = rootProject.rootDir.resolve(Config.licenseFile)
             val iconDir = rootProject.rootDir.resolve("docs").resolve("images")
             macOS {
-                packageName = Config.debuggerName
-                dockName = Config.debuggerName
+                packageName = Config.Debugger.name
+                dockName = Config.Debugger.name
                 setDockNameSameAsPackageName = false
-                bundleID = "${Config.namespace}.debugger"
+                bundleID = Config.Debugger.namespace
                 appCategory = "public.app-category.developer-tools"
                 iconFile = iconDir.resolve("icon_macos.icns")
             }
@@ -83,7 +84,7 @@ compose.desktop {
                 menu = false
                 shortcut = true
                 perUserInstall = true
-                upgradeUuid = Config.debuggerAppId
+                upgradeUuid = Config.Debugger.appId
                 iconFile = iconDir.resolve("favicon.ico")
             }
             linux {

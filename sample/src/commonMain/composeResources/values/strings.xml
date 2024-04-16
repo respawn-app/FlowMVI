@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">FlowMVI</string>
+    <string name="retry">Retry</string>
+    <string name="generic_error_message">Unknown error</string>
+    <string name="simple_feature_title">Simplest feature</string>
+    <string name="lce_feature_title">LCE | Error Handling</string>
+    <string name="savedstate_feature_title">Saved State</string>
+    <string name="di_feature_title">Dependency Injection</string>
+    <string name="logging_feature_title">Logging</string>
+    <string name="xml_feature_title">Android XML Support</string>
+    <string name="undoredo_feature_title">Undo/Redo</string>
+    <string name="decompose_feature_title">Decompose | Essenty Integration</string>
+</resources>

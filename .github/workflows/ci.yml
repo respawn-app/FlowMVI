@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew detektAll
 
       - name: Build
-        run: ./gradlew assemble --stacktrace
+        run: ./gradlew assemble --stacktrace --no-configuration-cache
 
       - name: Unit tests
-        run: ./gradlew allTests --stacktrace
+        run: ./gradlew allTests --stacktrace --no-configuration-cache

@@ -24,18 +24,28 @@ dependencyResolutionManagement {
     // REQUIRED for IDE module configuration to resolve IDE platform
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
+        mavenLocal()
         google()
-        // kmm plugin adds "ivy" repo as part of the apply block
+        mavenCentral()
         ivyNative()
         node()
-        mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+
+    dependencyResolutionManagement {
+        versionCatalogs {
+            create("applibs") {
+                from(files("sample/libs.versions.toml"))
+            }
+        }
     }
 }
 
 rootProject.name = "FlowMVI"
 
-include(":app")
+include(":sample")
+include(":sample:androidApp")
+include(":sample:wasmApp")
 include(":test")
 include(":core")
 include(":android")

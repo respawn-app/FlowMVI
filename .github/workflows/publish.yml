@@ -40,6 +40,9 @@ jobs:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
+      - name: Assemble android sample
+        run: ./gradlew :sample:androidApp:assembleRelease
+
       - name: Publish to sonatype
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
@@ -47,3 +50,51 @@ jobs:
         # It's important to not upload in parallel or duplicate repos will be created
         # repository creds are broken with gradle 8.6 https://github.com/gradle/gradle/issues/24040
         run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache
+
+      - name: Generate Changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        id: build_changelog
+        with:
+          commitMode: true
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}",
+              "categories": [
+                {
+                    "title": "## Feature",
+                    "labels": ["feat", "feature"]
+                },
+                {
+                    "title": "## Fix",
+                    "labels": ["fix", "bug"]
+                },
+                {
+                    "title": "## Other",
+                    "labels": []
+                },
+                {
+                    "title": "## Docs",
+                    "labels": ["doc", "docs"]
+                }
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+                  "target": "$1"
+                }
+              ],
+            }
+
+      - name: Create GH release
+        uses: ncipollo/release-action@v1.14.0
+        id: create_release
+        with:
+          draft: true
+          artifactErrorsFailBuild: true
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          artifacts: sample/androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk
+          body: ${{steps.build_changelog.outputs.changelog}}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

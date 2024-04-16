@@ -30,9 +30,22 @@ object Config {
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
     const val vendorId = "respawn-app"
-    const val debuggerPluginDescription = "A debugger tool for FlowMVI - $description"
-    const val debuggerName = "FlowMVI Debugger"
-    const val debuggerAppId = "fd36c0cc-ae50-4aad-8579-f37e1e8af99c"
+
+    object Debugger {
+
+        const val namespace = "${Config.namespace}.debugger"
+        const val appDescription = "A debugger tool for FlowMVI - $description"
+        const val name = "FlowMVI Debugger"
+        const val appId = "fd36c0cc-ae50-4aad-8579-f37e1e8af99c"
+    }
+
+    object Sample {
+
+        const val namespace = "${Config.namespace}.sample"
+        const val appDescription = "Sample app for FlowMVI - $description"
+        const val name = "FlowMVI Sample"
+        const val appId = "a7f6783f-2bb5-433d-9e5c-9f608ddd42d5"
+    }
     // kotlin
 
     val optIns = listOf(
@@ -40,10 +53,12 @@ object Config {
         "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
-        "kotlin.contracts.ExperimentalContracts"
+        "kotlin.contracts.ExperimentalContracts",
+        "org.jetbrains.compose.resources.ExperimentalResourceApi"
     )
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
+        "-Xexpect-actual-classes",
         "-P",
         "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true"
     )
@@ -52,7 +67,7 @@ object Config {
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
-        addAll(optIns.map { "-opt-in=$it" })
+        add("-Xlambdas=indy")
     }
 
     val jvmTarget = JvmTarget.JVM_11
