@@ -1,6 +1,9 @@
 package pro.respawn.flowmvi.sample.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 import pro.respawn.flowmvi.sample.navigation.destination.Destinations
@@ -13,7 +16,11 @@ fun AppContent(
     root: RootComponent
 ) = ProvideDestinationLocals(root) {
     RespawnTheme(useDynamicColors = true) {
-        Children(root.stack, animation = defaultNavAnimation(root)) { child ->
+        Children(
+            stack = root.stack,
+            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+            animation = defaultNavAnimation(root),
+        ) { child ->
             ProvideDestinationLocals(child.instance) {
                 Destinations(
                     component = child.instance,

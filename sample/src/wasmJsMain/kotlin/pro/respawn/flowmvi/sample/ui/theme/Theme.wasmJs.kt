@@ -1,10 +1,10 @@
 package pro.respawn.flowmvi.sample.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 
 @Composable
 internal actual fun rememberColorScheme(
     dark: Boolean,
     dynamic: Boolean,
-    // https://github.com/JetBrains/compose-multiplatform/issues/4637
-) = DarkColors
+) = remember(dark) { if (dark) DarkColors else LightColors }

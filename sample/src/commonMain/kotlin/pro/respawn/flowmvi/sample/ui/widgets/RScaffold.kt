@@ -39,8 +39,6 @@ object RScaffoldDefaults {
             WindowInsetsSides.Horizontal + WindowInsetsSides.Top
         )
 
-    val fullWindowInsets @Composable get() = ScaffoldDefaults.contentWindowInsets
-
     val FabPosition = Material3FabPosition.End
     val contentColor @Composable get() = MaterialTheme.colorScheme.onBackground
 
