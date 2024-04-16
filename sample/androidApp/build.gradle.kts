@@ -49,7 +49,8 @@ android {
         }
         release {
             ndk.debugSymbolLevel = "FULL"
-            isShrinkResources = Config.isMinifyEnabledRelease
+            isShrinkResources = true
+            isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("release")
         }
     }
