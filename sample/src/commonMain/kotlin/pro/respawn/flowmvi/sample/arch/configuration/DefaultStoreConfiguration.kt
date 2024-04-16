@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 internal class DefaultStoreConfiguration(
@@ -29,11 +30,13 @@ internal class DefaultStoreConfiguration(
     override fun <S : MVIState> saver(
         serializer: KSerializer<S>,
         fileName: String,
-    ): Saver<S> = CompressedFileSaver(
-        dir = cacheDir,
-        fileName = "$fileName.gz",
-        recover = NullRecover
-    ).let { JsonSaver(json, serializer, it) }
+    ): Saver<S> {
+        return CompressedFileSaver(
+            dir = cacheDir ?: return NoOpSaver(),
+            fileName = "$fileName.gz",
+            recover = NullRecover
+        ).let { JsonSaver(json, serializer, it) }
+    }
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,

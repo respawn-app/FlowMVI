@@ -30,6 +30,7 @@ kotlin {
         nodejs()
         browser()
         binaries.library()
+        applyBinaryen()
     }
     jvm("desktop")
 
@@ -45,6 +46,7 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
 
         configurations.all {
             exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
@@ -96,6 +98,9 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(applibs.koin.android)
+        }
+        wasmJsMain.dependencies {
+            implementation(applibs.okio.fakefsys)
         }
     } // sets
 }

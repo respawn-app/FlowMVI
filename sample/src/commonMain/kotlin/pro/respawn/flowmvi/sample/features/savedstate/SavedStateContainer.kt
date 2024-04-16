@@ -28,7 +28,7 @@ internal class SavedStateContainer(
         // can also be injected, defined here for illustration purposes
         // see "StoreConfiguration" for injection setup
         serializeState(
-            dir = fileManager.cacheDir("state"),
+            dir = fileManager.cacheDir("state") ?: "",
             json = json,
             serializer = DisplayingInput.serializer(),
             recover = NullRecover,

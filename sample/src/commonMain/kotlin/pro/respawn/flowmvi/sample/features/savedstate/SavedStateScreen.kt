@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.BuildFlags
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateFeatureState.DisplayingInput
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateIntent.ChangedInput
@@ -31,6 +33,8 @@ import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.util.Platform
+import pro.respawn.flowmvi.sample.util.platform
 
 private const val Description = """
     Saved state plugin allows you to persist a state of a store into a file or other place in about 5 lines of code
@@ -96,6 +100,13 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
         ) {
             Text(Description.trimIndent())
             Spacer(Modifier.height(24.dp))
+            if (BuildFlags.platform == Platform.Web) {
+                Text(
+                    "You are on web, where persisting files to file system is not supported, " +
+                            "so the data will not be saved",
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             RTextInput(
                 input = input,
                 onTextChange = { intent(ChangedInput(it)) },
