@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -37,6 +37,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RIcon
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 private const val Description = """
 FlowMVI provides undo/redo functionality out of the box, installed as a simple plugin.
@@ -110,7 +111,10 @@ fun UndoRedoScreen(
 private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     state: UndoRedoState,
 ) = Column(
-    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 12.dp),
+    modifier = Modifier.fillMaxHeight()
+        .adaptiveWidth()
+        .padding(horizontal = 12.dp)
+        .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
 ) {

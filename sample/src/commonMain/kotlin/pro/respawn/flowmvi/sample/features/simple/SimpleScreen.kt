@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.sample.features.simple
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -27,6 +27,7 @@ import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 //language=kotlin
 private const val Code = """
@@ -77,7 +78,8 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
     state: SimpleState,
 ) = Column(
     modifier = Modifier
-        .fillMaxSize()
+        .fillMaxHeight()
+        .adaptiveWidth()
         .padding(horizontal = 12.dp)
         .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.Center,

@@ -34,6 +34,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.Platform
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.platform
 
 private const val Description = """
@@ -94,7 +95,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
 ) = TypeCrossfade(state) {
     when (this) {
         is DisplayingInput -> Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).adaptiveWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -102,8 +103,10 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             Spacer(Modifier.height(24.dp))
             if (BuildFlags.platform == Platform.Web) {
                 Text(
-                    "You are on web, where persisting files to file system is not supported, " +
-                            "so the data will not be saved",
+                    text = """
+                        You are on web, where persisting files to file system is not supported, 
+                        so the data will not be saved
+                    """.trimIndent(),
                     color = MaterialTheme.colorScheme.error,
                 )
             }

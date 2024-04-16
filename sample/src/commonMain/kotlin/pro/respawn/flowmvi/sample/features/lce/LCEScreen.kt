@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +33,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 private const val Description = """
     LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code.
@@ -105,7 +105,11 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
         is LCEState.Error -> RErrorView(e, onRetry = { intent(ClickedRefresh) })
         is LCEState.Loading -> CircularProgressIndicator()
         is LCEState.Content -> Box {
-            LazyColumn(modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth()) {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .adaptiveWidth()
+            ) {
                 item {
                     Column(modifier = Modifier) {
                         Text(Description.trimIndent())

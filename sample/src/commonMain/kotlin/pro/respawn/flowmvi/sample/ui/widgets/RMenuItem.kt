@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.sample.ui.theme.Opacity
 import pro.respawn.flowmvi.sample.ui.theme.Size.icon
 import pro.respawn.flowmvi.sample.ui.theme.rememberRandomColor
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.noIndicationClickable
 import pro.respawn.kmmutils.common.takeIfValid
 import kotlin.contracts.contract
@@ -49,6 +50,7 @@ fun RMenuItem(
         modifier = modifier
             .padding(horizontal = 4.dp, vertical = 4.dp)
             .animateContentSize()
+            .adaptiveWidth()
             .then(if (onClick != null) Modifier.noIndicationClickable(onClick = onClick) else Modifier),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

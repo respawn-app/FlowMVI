@@ -63,6 +63,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.platform
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,7 +100,9 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
         is HomeState.Loading -> CircularProgressIndicator()
         is DisplayingHome -> Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize()
+                .adaptiveWidth()
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
         ) {
             Icon(

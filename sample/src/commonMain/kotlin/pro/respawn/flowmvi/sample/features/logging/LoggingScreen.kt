@@ -37,6 +37,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 private const val Description = """
     FlowMVI provides a multiplatform logging setup out of the box.
@@ -107,7 +108,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
         is LoggingState.Loading -> CircularProgressIndicator()
         is LoggingState.Error -> RErrorView(e)
         is DisplayingLogs -> LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().adaptiveWidth(),
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

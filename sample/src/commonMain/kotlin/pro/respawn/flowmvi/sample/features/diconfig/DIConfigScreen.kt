@@ -23,6 +23,7 @@ import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 private const val Description = """
 FlowMVI lets you to inject and reuse store configurations.
@@ -85,7 +86,10 @@ fun DiConfigScreen(
 
 @Composable
 private fun DiConfigScreenContent() = Column(
-    modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp).verticalScroll(rememberScrollState()),
+    modifier = Modifier.fillMaxSize()
+        .adaptiveWidth()
+        .padding(horizontal = 12.dp)
+        .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
 ) {

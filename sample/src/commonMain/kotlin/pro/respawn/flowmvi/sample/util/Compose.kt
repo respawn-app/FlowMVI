@@ -3,6 +3,9 @@ package pro.respawn.flowmvi.sample.util
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActionScope
@@ -37,8 +40,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.sample.ui.theme.Size
 import pro.respawn.kmmutils.common.isValid
 
 fun CoroutineScope.snackbar(
@@ -71,6 +76,10 @@ fun KeyboardActions.Companion.default(
 
 @Composable
 fun rememberSnackbarHostState() = remember { SnackbarHostState() }
+
+fun Modifier.minTouchTarget() = defaultMinSize(Size.touchTarget, Size.touchTarget)
+
+fun Modifier.adaptiveWidth(maxWidth: Dp = 600.dp) = widthIn(max = maxWidth).fillMaxWidth()
 
 @Suppress("ComposableParametersOrdering")
 @Composable

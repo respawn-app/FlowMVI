@@ -44,6 +44,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.util.adaptiveWidth
 
 private const val Description = """
     This feature showcases FlowMVI <> Essenty integration.
@@ -133,7 +134,10 @@ private fun DecomposeScreenContent(
             Text("Simulating loading of pages")
         }
         is DisplayingPages -> Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .fillMaxSize()
+                .adaptiveWidth()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(Description.trimIndent(), modifier = Modifier.padding(horizontal = 12.dp))
