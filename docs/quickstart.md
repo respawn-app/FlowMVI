@@ -472,7 +472,7 @@ To subscribe to the store, regardless of your platform see [this guide](android.
 * [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
   about how our team has used the library to improve performance and stability of our app, with practical examples.
 * Explore
-  the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/app/src/main/kotlin/pro/respawn/flowmvi/sample)
+  the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/src/commonMain/kotlin/pro/respawn/flowmvi/sample)
     * Want more samples? Explore how we created
       a [multiplatform debugger app](https://github.com/respawn-app/FlowMVI/tree/34236773e21e7138a330d7d0fb6c5d0eba21b61e/debugger/server/src/commonMain/kotlin/pro/respawn/flowmvi/debugger/server)
       for FlowMVI using... FlowMVI itself.

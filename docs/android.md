@@ -181,10 +181,6 @@ private fun CounterScreenPreview(
 }
 ```
 
-See
-the [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/compose/ComposeScreen.kt)
-for a more elaborate example.
-
 ## View
 
 For a View-based project, the logic is essentially the same.
@@ -222,6 +218,3 @@ class CounterFragment : Fragment() {
     }
 }
 ```
-
-See the [Sample app](https://github.com/respawn-app/FlowMVI/blob/master/app/src/main/kotlin/pro/respawn/flowmvi/sample/view/BasicActivity.kt)
-for a more elaborate example.

@@ -158,8 +158,8 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     from(
         resources.text.fromString(BuildConfig)
     ) {
-        rename { "BuildConfig.kt" }
-        into(Config.namespace.replace(".", "/"))
+        rename { "BuildFlags.kt" }
+        into(Config.Sample.namespace.replace(".", "/"))
     }
     // the target directory
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
