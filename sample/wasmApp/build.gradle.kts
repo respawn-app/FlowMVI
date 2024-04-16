@@ -32,6 +32,7 @@ kotlin {
             implementation(applibs.bundles.koin)
             implementation(applibs.decompose)
             implementation(libs.essenty.statekeeper)
+            implementation(libs.kotlin.serialization.json)
 
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -45,7 +46,6 @@ kotlin {
 
 compose.experimental {
     web {
-        application {
-        }
+        application { }
     }
 }
