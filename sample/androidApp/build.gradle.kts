@@ -6,7 +6,7 @@ plugins {
 
 android {
     configureAndroid(this)
-    namespace = Config.Sample.namespace
+    namespace = "${Config.Sample.namespace}.app"
     compileSdk = Config.compileSdk
 
     defaultConfig {

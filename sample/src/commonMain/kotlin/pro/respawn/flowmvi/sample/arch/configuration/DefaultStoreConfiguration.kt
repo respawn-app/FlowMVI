@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow.SUSPEND
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import pro.respawn.flowmvi.BuildFlags
+import pro.respawn.flowmvi.sample.BuildFlags
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

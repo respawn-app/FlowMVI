@@ -13,11 +13,10 @@ plugins {
 @Language("Kotlin")
 // language=kotlin
 val BuildConfig = """
-    package ${Config.namespace}
+    package ${Config.Sample.namespace}
 
     internal object BuildFlags {
         const val VersionName = "${Config.versionName}"
-        const val SupportEmail = "${Config.supportEmail}"
         const val ProjectDescription = "${Config.Sample.appDescription}"
     }
 """.trimIndent()
@@ -27,7 +26,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "${Config.artifactId}.sample"
+        moduleName = Config.Sample.namespace
         nodejs()
         browser()
         binaries.library()
@@ -101,7 +100,7 @@ kotlin {
     } // sets
 }
 android {
-    namespace = Config.artifactId
+    namespace = Config.Sample.namespace
     configureAndroidLibrary(this)
     buildFeatures {
         buildConfig = true

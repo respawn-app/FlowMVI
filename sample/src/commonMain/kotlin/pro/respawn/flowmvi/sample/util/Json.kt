@@ -2,7 +2,7 @@ package pro.respawn.flowmvi.sample.util
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import pro.respawn.flowmvi.BuildFlags
+import pro.respawn.flowmvi.sample.BuildFlags
 
 @OptIn(ExperimentalSerializationApi::class)
 val Json = Json {

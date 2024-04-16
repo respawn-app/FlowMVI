@@ -1,6 +1,6 @@
 package pro.respawn.flowmvi.sample.util
 
-import pro.respawn.flowmvi.BuildFlags
+import pro.respawn.flowmvi.sample.BuildFlags
 import kotlin.experimental.ExperimentalNativeApi
 
 @OptIn(ExperimentalNativeApi::class)
