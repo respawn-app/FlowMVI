@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
 }
 
-
 val copyWasmResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java) {
     from(project(":sample").file("src/commonMain/composeResources"))
     into("build/processedResources/wasmJs/main")
