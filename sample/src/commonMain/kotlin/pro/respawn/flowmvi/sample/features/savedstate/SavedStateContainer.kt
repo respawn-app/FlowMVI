@@ -27,15 +27,12 @@ internal class SavedStateContainer(
 
         // can also be injected, defined here for illustration purposes
         // see "StoreConfiguration" for injection setup
-        // Saved state is not supported on wasm yet
-        fileManager.cacheDir("state")?.let {
-            serializeState(
-                dir = it,
-                json = json,
-                serializer = DisplayingInput.serializer(),
-                recover = NullRecover,
-            )
-        }
+        serializeState(
+            dir = fileManager.cacheDir(name!!),
+            json = json,
+            serializer = DisplayingInput.serializer(),
+            recover = NullRecover,
+        )
 
         reduce { intent ->
             when (intent) {
