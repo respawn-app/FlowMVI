@@ -17,7 +17,7 @@ plugin system and a rich DSL.
 ## Quickstart:
 
 * Sample App ![badge-wasm] :
-  [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=for-the-badge&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample)
+  [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample)
 * Documentation:
   [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/)
 * KDoc:
