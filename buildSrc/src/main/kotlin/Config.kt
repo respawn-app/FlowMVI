@@ -15,6 +15,7 @@ object Config {
 
     const val artifactId = "$group.$artifact"
 
+    const val versionCode = 2
     const val majorRelease = 2
     const val minorRelease = 5
     const val patch = 0

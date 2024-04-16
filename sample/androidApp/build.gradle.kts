@@ -13,13 +13,48 @@ android {
         applicationId = Config.artifactId
         minSdk = Config.appMinSdk
         targetSdk = Config.targetSdk
-        versionCode = 1
+        versionCode = Config.versionCode
         versionName = Config.versionName
     }
     buildFeatures {
         buildConfig = true
         compose = true
         viewBinding = true
+    }
+    applicationVariants.all {
+        setProperty("archivesBaseName", Config.Sample.namespace)
+        outputs
+            .matching { "apk" in it.outputFile.extension }
+            .all {
+                this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                outputFileName = "${Config.Sample.namespace}-$versionCode.apk"
+            }
+    }
+    signingConfigs {
+        val props = localProperties()
+        val passwd = props["signing.password"].toString().trim()
+        create("release") {
+            keyAlias = "key"
+            keyPassword = passwd
+            storeFile = File(rootDir, "certificates/keystore.jks")
+            storePassword = passwd.trim()
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("debug")
+            versionNameSuffix = "-debug"
+            isShrinkResources = Config.isMinifyEnabledDebug
+        }
+        release {
+            ndk.debugSymbolLevel = "FULL"
+            isShrinkResources = Config.isMinifyEnabledRelease
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
 }
 
