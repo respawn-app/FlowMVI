@@ -14,12 +14,21 @@ import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
+import pro.respawn.flowmvi.sample.BuildFlags
 import pro.respawn.flowmvi.sample.generated.resources.Res
 import pro.respawn.flowmvi.sample.generated.resources.comfortaa
 import pro.respawn.flowmvi.sample.generated.resources.monaspace_neon
 import pro.respawn.flowmvi.sample.generated.resources.montserrat
+import pro.respawn.flowmvi.sample.util.Platform
+import pro.respawn.flowmvi.sample.util.platform
 
-val Comfortaa @Composable get() = Font(Res.font.comfortaa).toFontFamily()
+val Comfortaa
+    @Composable get() = if (BuildFlags.platform == Platform.Web)
+        // https://github.com/JetBrains/compose-multiplatform/issues/4635
+        FontFamily.Default
+    else
+        Font(Res.font.comfortaa).toFontFamily()
+
 val Montserrat @Composable get() = Font(Res.font.montserrat).toFontFamily()
 val Monaspace @Composable get() = Font(Res.font.monaspace_neon).toFontFamily()
 
