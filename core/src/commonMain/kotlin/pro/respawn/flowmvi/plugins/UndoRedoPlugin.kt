@@ -37,7 +37,11 @@ public class UndoRedo(
     private val lock = Mutex()
 
     /**
-     * Current index of the queue
+     * Current index of the queue.
+     *
+     * Larger value means newer, but not larger than [maxQueueSize].
+     * When the index is equal to -1, the undo queue is empty.
+     * An index of 0 means that there is one event to undo.
      */
     public val index: StateFlow<Int> = _index.asStateFlow()
 
