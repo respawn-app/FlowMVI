@@ -13,11 +13,15 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
+import pro.respawn.flowmvi.savedstate.util.DefaultJson
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
 import kotlin.coroutines.CoroutineContext
 
@@ -37,26 +41,28 @@ import kotlin.coroutines.CoroutineContext
 @FlowMVIDSL
 public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAction> serializeStatePlugin(
     dir: String,
-    json: Json,
     serializer: KSerializer<T>,
+    json: Json = DefaultJson,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     filename: String = serializer.descriptor.serialName,
     fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
+    logger: StoreLogger = PlatformStoreLogger,
     resetOnException: Boolean = true,
+    name: String? = "$filename$PluginNameSuffix",
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> = saveStatePlugin(
-    saver = TypedSaver<T, _>(
-        JsonSaver(
-            json = json,
-            serializer = serializer,
-            delegate = CompressedFileSaver(Path(dir, "$filename$fileExtension").name, ThrowRecover),
-            recover = recover
-        )
-    ),
+    saver = JsonSaver(
+        json = json,
+        serializer = serializer,
+        delegate = CompressedFileSaver(Path(dir, "$filename$fileExtension").name, ThrowRecover),
+        recover = recover
+    )
+        .let { TypedSaver<T, S>(it) }
+        .let { LoggingSaver(it, logger) },
     behaviors = behaviors,
     context = context,
-    name = "$filename$PluginNameSuffix",
+    name = name,
     resetOnException = resetOnException
 )
 
@@ -77,16 +83,16 @@ public inline fun <
         A : MVIAction
         > StoreBuilder<S, I, A>.serializeState(
     dir: String,
-    json: Json,
+    json: Json = DefaultJson,
     serializer: KSerializer<T>,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     fileExtension: String = ".json",
     filename: String = serializer.descriptor.serialName,
+    name: String? = "${this.name ?: filename}$PluginNameSuffix",
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
-): Unit = install(
-    serializeStatePlugin<T, S, I, A>(
+): Unit = serializeStatePlugin<T, S, I, A>(
         dir = dir,
         json = json,
         filename = filename,
@@ -96,5 +102,6 @@ public inline fun <
         recover = recover,
         serializer = serializer,
         fileExtension = fileExtension,
-    )
-)
+    name = name,
+    logger = this.logger,
+).let(::install)
