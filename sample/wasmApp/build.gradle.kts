@@ -14,9 +14,12 @@ val copyWasmResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.
 }
 
 afterEvaluate {
-    project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
-    project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
-    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
+    tasks {
+        getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
+        getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
+        getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
+        getByName("wasmJsJar").dependsOn(copyWasmResources)
+    }
 }
 
 kotlin {
