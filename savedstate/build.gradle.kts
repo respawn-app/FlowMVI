@@ -1,17 +1,44 @@
 plugins {
-    id("pro.respawn.shared-library")
+    kotlin("multiplatform")
     alias(libs.plugins.serialization)
+    id("com.android.library")
+    id("maven-publish")
+    signing
+}
+
+kotlin {
+    configureMultiplatform(this) {
+        common {
+            group("nonBrowser") {
+                withJvm()
+                withNative()
+                withAndroidTarget()
+            }
+            group("browser") {
+                withWasm()
+                withJs()
+            }
+        }
+    }
+
+    sourceSets {
+        nativeMain.dependencies {
+            implementation(libs.kotlin.io)
+        }
+        androidMain.dependencies {
+            api(libs.lifecycle.savedstate)
+        }
+        commonMain.dependencies {
+            api(projects.core)
+            api(libs.kotlin.serialization.json)
+            implementation(libs.kotlin.atomicfu)
+        }
+    }
 }
 
 android {
+    configureAndroidLibrary(this)
     namespace = "${Config.namespace}.savedstate"
 }
 
-dependencies {
-    commonMainApi(projects.core)
-    commonMainApi(libs.kotlin.serialization.json)
-    commonMainImplementation(libs.kotlin.atomicfu)
-    commonMainImplementation(libs.kotlin.io)
-
-    androidMainApi(libs.lifecycle.savedstate)
-}
+publishMultiplatform()

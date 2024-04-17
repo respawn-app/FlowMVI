@@ -1,9 +1,6 @@
 package pro.respawn.flowmvi.savedstate.dsl
 
-import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
+import kotlinx.io.files.Path
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.platform.FileAccess
@@ -19,25 +16,17 @@ import pro.respawn.flowmvi.savedstate.platform.FileAccess
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
 public inline fun <T> DefaultFileSaver(
-    path: String,
-    crossinline write: suspend (data: T?, toPath: String) -> Unit,
-    crossinline read: suspend (fromPath: String) -> T?,
+    dir: String,
+    fileName: String,
+    crossinline write: suspend (data: T?, to: Path) -> Unit,
+    crossinline read: suspend (from: Path) -> T?,
     crossinline recover: suspend (Exception) -> T?,
-): Saver<T> = object : Saver<T> {
-
-    // prevent concurrent file access
-    private val mutex = Mutex()
-
-    override suspend fun recover(e: Exception): T? = recover.invoke(e)
-
-    // prevent partial writes
-    override suspend fun save(state: T?) = withContext(NonCancellable) {
-        mutex.withLock { write(state, path) }
-    }
-
-    // allow cancelling reads (no "NonCancellable here")
-    override suspend fun restore(): T? = mutex.withLock { read(path) }
-}
+): Saver<T> = DefaultFileSaver(
+    path = Path(dir, fileName).name,
+    write = { data: T?, path: String -> write(data, Path(path)) },
+    read = { path -> read(Path(path)) },
+    recover = recover,
+)
 
 /**
  * A [DefaultFileSaver] implementation that saves [String] state to the file system.
@@ -50,13 +39,15 @@ public inline fun <T> DefaultFileSaver(
  * @see Saver
  */
 public fun FileSaver(
-    path: String,
+    dir: String,
+    fileName: String,
     recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
-    path = path,
+    dir = dir,
+    fileName = fileName,
     recover = recover,
-    write = FileAccess::write,
-    read = FileAccess::read,
+    write = { data, path -> FileAccess.write(data, path.name) },
+    read = { path -> FileAccess.read(path.name) },
 )
 
 /**
@@ -73,11 +64,13 @@ public fun FileSaver(
  * @see Saver
  */
 public fun CompressedFileSaver(
-    path: String,
+    dir: String,
+    fileName: String,
     recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
-    path = path,
+    dir = dir,
+    fileName = fileName,
     recover = recover,
-    write = FileAccess::writeCompressed,
-    read = FileAccess::readCompressed,
+    write = { data, path -> FileAccess.writeCompressed(data, path.name) },
+    read = { path -> FileAccess.readCompressed(path.name) },
 )

@@ -1,6 +1,8 @@
 package pro.respawn.flowmvi.savedstate.util
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.savedstate.api.Saver
 
 @PublishedApi
@@ -29,4 +31,14 @@ internal suspend fun <S> Saver<S>.restoreCatching(): S? = try {
     throw e
 } catch (expected: Exception) {
     recover(expected)
+}
+
+@PublishedApi
+@OptIn(ExperimentalSerializationApi::class)
+internal val DefaultJson: Json = Json {
+    decodeEnumsCaseInsensitive = true
+    explicitNulls = false
+    coerceInputValues = true
+    allowTrailingComma = true
+    useAlternativeNames = true
 }
