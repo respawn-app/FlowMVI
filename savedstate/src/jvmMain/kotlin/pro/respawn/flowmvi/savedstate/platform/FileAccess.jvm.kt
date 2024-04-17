@@ -16,7 +16,7 @@ internal actual object FileAccess {
         outputStream()
     }
 
-    private fun InputStream.readOrNull() = reader().use { it.readText() }.takeIf { it.isNotBlank() }
+    private fun InputStream.readOrNull() = bufferedReader().use { it.readText() }.takeIf { it.isNotBlank() }
 
     actual suspend fun writeCompressed(data: String?, path: String) = withContext(Dispatchers.IO) {
         val file = File(path)
@@ -24,7 +24,7 @@ internal actual object FileAccess {
             file.delete()
             return@withContext
         }
-        file.outputStreamOrEmpty().let(::GZIPOutputStream).writer().use { it.write(data) }
+        file.outputStreamOrEmpty().let(::GZIPOutputStream).bufferedWriter().use { it.write(data) }
     }
 
     actual suspend fun readCompressed(path: String): String? = withContext(Dispatchers.IO) {
@@ -39,7 +39,7 @@ internal actual object FileAccess {
             file.delete()
             return@withContext
         }
-        file.outputStreamOrEmpty().writer().use { it.write(data) }
+        file.outputStreamOrEmpty().bufferedWriter().use { it.write(data) }
     }
 
     actual suspend fun read(path: String): String? = withContext(Dispatchers.IO) {
