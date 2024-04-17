@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 internal class DefaultStoreConfiguration(
@@ -47,7 +48,7 @@ internal class DefaultStoreConfiguration(
         }
         if (saver != null) install(
             saveStatePlugin(
-                saver = saver,
+                saver = LoggingSaver(saver, tag = name, logger = logger),
                 name = "${name}SavedStatePlugin",
                 context = Dispatchers.Default,
             )
