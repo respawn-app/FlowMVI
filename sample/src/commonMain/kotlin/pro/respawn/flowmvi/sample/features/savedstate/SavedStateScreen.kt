@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.sample.features.savedstate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -93,7 +94,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
 ) = TypeCrossfade(state) {
     when (this) {
         is DisplayingInput -> Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).adaptiveWidth(),
+            modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState()).adaptiveWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
