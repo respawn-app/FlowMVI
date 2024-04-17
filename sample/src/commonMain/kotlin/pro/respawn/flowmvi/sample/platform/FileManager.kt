@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.sample.platform
 
 interface FileManager {
-    fun cacheDir(relative: String): String
+
+    fun cacheFile(dir: String, filename: String): String
 }

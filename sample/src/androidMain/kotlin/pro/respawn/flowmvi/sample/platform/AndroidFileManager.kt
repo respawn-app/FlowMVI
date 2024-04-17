@@ -6,5 +6,5 @@ class AndroidFileManager(context: Context) : FileManager {
 
     private val cacheDir = context.cacheDir
 
-    override fun cacheDir(relative: String): String = cacheDir.resolve(relative).absolutePath
+    override fun cacheFile(dir: String, filename: String): String = cacheDir.resolve(dir).resolve(filename).absolutePath
 }

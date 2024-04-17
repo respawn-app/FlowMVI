@@ -4,9 +4,7 @@ import java.io.File
 
 class JvmFileManager : FileManager {
 
-    private val cacheDir by lazy {
-        File("cache").apply { mkdirs() }
-    }
+    private val cacheDir by lazy { File(".cache").apply { mkdirs() } }
 
-    override fun cacheDir(relative: String): String = cacheDir.resolve(relative).absolutePath
+    override fun cacheFile(dir: String, filename: String): String = cacheDir.resolve(dir).resolve(filename).absolutePath
 }

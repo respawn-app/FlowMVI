@@ -162,7 +162,7 @@ fun Modifier.fadingEdge(
 @Composable
 fun String.branded(color: Color = MaterialTheme.colorScheme.primary) = buildAnnotatedString {
     when {
-        !isValid -> return@buildAnnotatedString
+        !isValid() -> return@buildAnnotatedString
         !first().isLetterOrDigit() -> return AnnotatedString(this@branded)
         else -> {
             withStyle(style = SpanStyle(color = color)) { append(first()) }

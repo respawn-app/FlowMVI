@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
@@ -7,6 +9,7 @@ plugins {
 }
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     configureMultiplatform(this) {
         common {
             group("nonBrowser") {
@@ -22,6 +25,7 @@ kotlin {
     }
 
     sourceSets {
+        val nonBrowserMain by getting
         nativeMain.dependencies {
             implementation(libs.kotlin.io)
         }
@@ -32,6 +36,9 @@ kotlin {
             api(projects.core)
             api(libs.kotlin.serialization.json)
             implementation(libs.kotlin.atomicfu)
+        }
+        nonBrowserMain.dependencies {
+            implementation(libs.kotlin.io)
         }
     }
 }

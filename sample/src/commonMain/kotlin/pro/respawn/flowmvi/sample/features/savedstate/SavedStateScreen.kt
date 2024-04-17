@@ -52,14 +52,12 @@ private const val Description = """
 private const val Code = """
 internal class SavedStateContainer(
     fileManager: FileManager,
-    json: Json,
 ) : Container<State, Intent, Nothing> {
 
     override val store = store(DisplayingInput()) {
 
         serializeState(
             dir = fileManager.cacheDir("state"),
-            json = json,
             serializer = DisplayingInput.serializer(),
         )
 
@@ -118,7 +116,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             )
             Spacer(Modifier.height(24.dp))
             @Suppress("MagicNumber")
-            CodeText(Code, PhraseLocation(183, 338))
+            CodeText(Code, PhraseLocation(167, 297))
         }
     }
 }

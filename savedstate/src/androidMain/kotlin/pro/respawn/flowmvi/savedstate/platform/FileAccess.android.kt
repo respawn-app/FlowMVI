@@ -12,7 +12,7 @@ import java.util.zip.GZIPOutputStream
 internal actual object FileAccess {
 
     private fun File.outputStreamOrEmpty() = run {
-        mkdirs()
+        parentFile?.mkdirs()
         createNewFile()
         outputStream()
     }
