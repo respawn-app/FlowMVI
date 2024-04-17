@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -67,15 +68,17 @@ fun CodeText(
         }.annotatedString
     }
     Box(modifier = modifier.horizontalScroll(rememberScrollState())) {
-        Text(
-            text = string,
-            fontSize = 13.sp,
-            fontFamily = FontFamily.Monospace, // TODO: Monaspace appears to be unsupported by compose?
-            textAlign = TextAlign.Start,
-            overflow = TextOverflow.Visible,
-            softWrap = false,
-            lineHeight = 16.sp,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        SelectionContainer {
+            Text(
+                text = string,
+                fontSize = 13.sp,
+                fontFamily = FontFamily.Monospace, // TODO: Monaspace appears to be unsupported by compose?
+                textAlign = TextAlign.Start,
+                overflow = TextOverflow.Visible,
+                softWrap = false,
+                lineHeight = 16.sp,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
