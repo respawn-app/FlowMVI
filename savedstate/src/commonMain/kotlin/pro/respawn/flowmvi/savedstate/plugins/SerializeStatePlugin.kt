@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.savedstate.plugins
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -9,50 +10,56 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
+import pro.respawn.flowmvi.savedstate.util.DefaultJson
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
-import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**
  * An overload of [saveStatePlugin] that is configured with some default values for convenience.
  *
- * This overload will save a GZip-compressed JSON of the state value of type [T] to a file
- * in the [dir] directory and named [filename] with a specified [fileExtension].
+ * This overload will save a GZip-compressed JSON  (if supported by the platform) of the state value of type [T] to a
+ * platform-dependent place. For example, on native platforms, a File specified by [path].
+ * On browser platforms, to a local storage.
  *
  * * This will save the state according to the [behaviors] specified in [SaveBehavior.Default].
  * * By default, this will use [Dispatchers.Default] to save the state ([context]).
  * * This will only compress the JSON if the platform permits it (Android, JVM). ([CompressedFileSaver]).
  * * This will reset the state on exceptions in the store ([resetOnException]).
  * * This will invoke [recover] if an exception is encountered when saving or restoring the state.
+ * * By default this will throw if the state cannot be read or saved ([recover]).
  */
+@OptIn(ExperimentalSerializationApi::class)
 @FlowMVIDSL
 public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAction> serializeStatePlugin(
-    dir: String,
-    json: Json,
+    path: String,
     serializer: KSerializer<T>,
+    json: Json = DefaultJson,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    filename: String = nameByType<T>() ?: "State",
-    fileExtension: String = ".json",
+    name: String? = serializer.descriptor.serialName.plus(PluginNameSuffix),
     context: CoroutineContext = Dispatchers.Default,
+    logger: StoreLogger = PlatformStoreLogger,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> = saveStatePlugin(
-    saver = TypedSaver<T, _>(
-        JsonSaver(
-            json = json,
-            serializer = serializer,
-            delegate = CompressedFileSaver(dir, "$filename$fileExtension", ThrowRecover),
-            recover = recover
-        )
-    ),
+    saver = JsonSaver(
+        json = json,
+        serializer = serializer,
+        delegate = CompressedFileSaver(path, ThrowRecover),
+        recover = recover
+    )
+        .let { TypedSaver<T, S>(it) }
+        .let { LoggingSaver(it, logger) },
     behaviors = behaviors,
     context = context,
-    name = "$filename$PluginNameSuffix",
+    name = name,
     resetOnException = resetOnException
 )
 
@@ -63,6 +70,7 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
  *
  * @see serializeStatePlugin
  */
+@OptIn(ExperimentalSerializationApi::class)
 @Suppress("Indentation") // detekt <> IDE conflict
 @FlowMVIDSL
 public inline fun <
@@ -71,24 +79,22 @@ public inline fun <
     I : MVIIntent,
     A : MVIAction
     > StoreBuilder<S, I, A>.serializeState(
-    dir: String,
-    json: Json,
+    path: String,
     serializer: KSerializer<T>,
+    json: Json = DefaultJson,
+    name: String? = "${this.name ?: serializer.descriptor.serialName}$PluginNameSuffix",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    fileExtension: String = ".json",
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
-): Unit = install(
-    serializeStatePlugin<T, S, I, A>(
-        dir = dir,
-        json = json,
-        filename = nameByType<T>() ?: "State",
-        context = context,
-        behaviors = behaviors,
-        resetOnException = resetOnException,
-        recover = recover,
-        serializer = serializer,
-        fileExtension = fileExtension,
-    )
-)
+): Unit = serializeStatePlugin<T, S, I, A>(
+    path = path,
+    json = json,
+    name = name,
+    context = context,
+    behaviors = behaviors,
+    logger = this.logger,
+    resetOnException = resetOnException,
+    recover = recover,
+    serializer = serializer,
+).let(::install)

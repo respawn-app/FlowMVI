@@ -24,7 +24,7 @@
         </activity>
 
         <activity
-            android:name=".XmlActivity"
+            android:name="pro.respawn.flowmvi.sample.ui.screens.XmlActivity"
             android:exported="false">
         </activity>
     </application>

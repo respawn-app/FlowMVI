@@ -17,26 +17,21 @@ import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
-import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 internal class DefaultStoreConfiguration(
-    files: FileManager,
+    private val files: FileManager,
     private val json: Json,
 ) : StoreConfiguration {
-
-    private val cacheDir = files.cacheDir(StoreCacheDirName)
 
     override fun <S : MVIState> saver(
         serializer: KSerializer<S>,
         fileName: String,
-    ): Saver<S> {
-        return CompressedFileSaver(
-            dir = cacheDir ?: return NoOpSaver(),
-            fileName = "$fileName.gz",
-            recover = NullRecover
-        ).let { JsonSaver(json, serializer, it) }
-    }
+    ) = CompressedFileSaver(
+        path = files.cacheFile("states", "$fileName.json"),
+        recover = NullRecover
+    ).let { JsonSaver(json, serializer, it) }
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,
@@ -53,7 +48,7 @@ internal class DefaultStoreConfiguration(
         }
         if (saver != null) install(
             saveStatePlugin(
-                saver = saver,
+                saver = LoggingSaver(saver, tag = name, logger = logger),
                 name = "${name}SavedStatePlugin",
                 context = Dispatchers.Default,
             )

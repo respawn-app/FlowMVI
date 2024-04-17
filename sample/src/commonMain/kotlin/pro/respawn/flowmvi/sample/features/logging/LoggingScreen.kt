@@ -2,7 +2,7 @@ package pro.respawn.flowmvi.sample.features.logging
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -108,7 +108,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
         is LoggingState.Loading -> CircularProgressIndicator()
         is LoggingState.Error -> RErrorView(e)
         is DisplayingLogs -> LazyColumn(
-            modifier = Modifier.fillMaxSize().adaptiveWidth(),
+            modifier = Modifier.fillMaxHeight().adaptiveWidth(),
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

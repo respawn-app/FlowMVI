@@ -2,5 +2,5 @@ package pro.respawn.flowmvi.sample.platform
 
 internal class BrowserFileManager : FileManager {
 
-    override fun cacheDir(relative: String): String = "cache/$relative"
+    override fun cacheFile(dir: String, filename: String): String = "cache/$dir/$filename"
 }

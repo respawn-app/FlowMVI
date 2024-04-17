@@ -10,6 +10,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.scope.activityRetainedScope
 import org.koin.core.annotation.KoinExperimentalAPI
+import pro.respawn.flowmvi.sample.navigation.AndroidFeatureLauncher
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 import pro.respawn.kmmutils.common.fastLazy

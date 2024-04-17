@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.sample.features.diconfig
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -11,11 +11,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
+import pro.respawn.flowmvi.compose.dsl.requireLifecycle
+import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.generated.resources.Res
 import pro.respawn.flowmvi.sample.generated.resources.di_feature_title
@@ -76,17 +79,19 @@ internal class DiConfigContainer(
 fun DiConfigScreen(
     navigator: Navigator,
 ) = with(container<DiConfigContainer, _, _, _>()) {
+    val state by subscribe(requireLifecycle())
     RScaffold(
         onBack = navigator.backNavigator,
         title = stringResource(Res.string.di_feature_title),
     ) {
-        DiConfigScreenContent()
+        DiConfigScreenContent(state)
     }
 }
 
 @Composable
-private fun DiConfigScreenContent() = Column(
-    modifier = Modifier.fillMaxSize()
+private fun DiConfigScreenContent(state: PersistedCounterState) = Column(
+    modifier = Modifier
+        .fillMaxHeight()
         .adaptiveWidth()
         .padding(horizontal = 12.dp)
         .verticalScroll(rememberScrollState()),
@@ -94,6 +99,8 @@ private fun DiConfigScreenContent() = Column(
     verticalArrangement = Arrangement.Top,
 ) {
     Text(Description.trimIndent())
+    Spacer(Modifier.height(12.dp))
+    Text("Persisted counter state: ${state.counter}")
     Spacer(Modifier.height(12.dp))
     CodeText(Code, PhraseLocation(start = 198, end = 357))
 }

@@ -9,8 +9,11 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.dsl.MapSaver
 import pro.respawn.flowmvi.savedstate.dsl.ParcelableSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
@@ -36,13 +39,14 @@ import kotlin.coroutines.CoroutineContext
 public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction> parcelizeStatePlugin(
     handle: SavedStateHandle,
     context: CoroutineContext = Dispatchers.IO,
-    key: String = nameByType<T>() ?: "State",
+    key: String = "${requireNotNull(nameByType<T>())}State",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     resetOnException: Boolean = true,
-    name: String = "$key$PluginNameSuffix",
+    logger: StoreLogger = PlatformStoreLogger,
+    name: String? = "$key$PluginNameSuffix",
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): StorePlugin<S, I, A> where T : Parcelable, T : S = saveStatePlugin(
-    saver = TypedSaver<T, _>(ParcelableSaver(handle, key, recover)),
+    saver = LoggingSaver(TypedSaver<T, S>(ParcelableSaver(handle, key, recover)), logger),
     context = context,
     name = name,
     behaviors = behaviors,
@@ -63,11 +67,21 @@ public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction
 public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.parcelizeState(
     handle: SavedStateHandle,
     context: CoroutineContext = Dispatchers.IO,
-    key: String = "${this.name ?: nameByType<T>().orEmpty()}State",
+    key: String = "${this.name ?: requireNotNull(nameByType<T>())}State",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    name: String = "$key$PluginNameSuffix",
+    name: String? = "$key$PluginNameSuffix",
     resetOnException: Boolean = true,
+    logger: StoreLogger = this.logger,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): Unit where T : Parcelable, T : S = install(
-    parcelizeStatePlugin(handle, context, key, behaviors, resetOnException, name, recover)
+    parcelizeStatePlugin(
+        handle = handle,
+        context = context,
+        key = key,
+        behaviors = behaviors,
+        resetOnException = resetOnException,
+        logger = logger,
+        name = name,
+        recover = recover
+    )
 )

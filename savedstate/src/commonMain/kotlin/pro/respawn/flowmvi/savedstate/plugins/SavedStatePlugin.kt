@@ -29,7 +29,6 @@ import pro.respawn.flowmvi.savedstate.util.EmptyBehaviorsMessage
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
 import pro.respawn.flowmvi.savedstate.util.restoreCatching
 import pro.respawn.flowmvi.savedstate.util.saveCatching
-import pro.respawn.flowmvi.util.nameByType
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -62,7 +61,7 @@ import kotlin.coroutines.CoroutineContext
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     saver: Saver<S>,
     context: CoroutineContext,
-    name: String? = null,
+    name: String? = PluginNameSuffix,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     resetOnException: Boolean = true,
 ): StorePlugin<S, I, A> = plugin {
@@ -119,6 +118,6 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuil
     saver: Saver<S>,
     context: CoroutineContext,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    name: String? = "${this.name ?: nameByType<S>().orEmpty()}$PluginNameSuffix",
+    name: String? = "${this.name.orEmpty()}$PluginNameSuffix",
     resetOnException: Boolean = true,
 ): Unit = install(saveStatePlugin(saver, context, name, behaviors, resetOnException))

@@ -173,4 +173,3 @@ hs_err_pid*
 /.idea/deploymentTargetSelector.xml
 **/plugin_encrypted_key.pem
 **/plugin_rsa_private_key.pem
-/certificates/keystore.jks

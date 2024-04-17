@@ -4,10 +4,9 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
+import pro.respawn.flowmvi.savedstate.platform.FileAccess
 
 /**
  * A [Saver] implementation that saves the given state to a file in a specified [dir] and [fileName].
@@ -20,38 +19,24 @@ import pro.respawn.flowmvi.savedstate.api.ThrowRecover
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
 public inline fun <T> DefaultFileSaver(
-    dir: String,
-    fileName: String,
-    crossinline write: suspend (data: T, to: Path) -> Unit,
-    crossinline read: suspend (from: Path) -> T?,
+    path: String,
+    crossinline write: suspend (data: T?, toPath: String) -> Unit,
+    crossinline read: suspend (fromPath: String) -> T?,
     crossinline recover: suspend (Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
-    val directory = Path(dir)
-    val file = Path(directory, fileName)
 
     // prevent concurrent file access
     private val mutex = Mutex()
 
     override suspend fun recover(e: Exception): T? = recover.invoke(e)
-    override suspend fun save(
-        state: T?
-    ) = withContext(NonCancellable) { // prevent partial writes
-        mutex.withLock {
-            with(SystemFileSystem) {
-                if (state == null) {
-                    delete(file, false)
-                } else {
-                    createDirectories(directory)
-                    write(state, file)
-                }
-            }
-        }
+
+    // prevent partial writes
+    override suspend fun save(state: T?) = withContext(NonCancellable) {
+        mutex.withLock { write(state, path) }
     }
 
     // allow cancelling reads (no "NonCancellable here")
-    override suspend fun restore(): T? = mutex.withLock {
-        file.takeIf { SystemFileSystem.exists(file) }?.let { read(it) }
-    }
+    override suspend fun restore(): T? = mutex.withLock { read(path) }
 }
 
 /**
@@ -65,15 +50,13 @@ public inline fun <T> DefaultFileSaver(
  * @see Saver
  */
 public fun FileSaver(
-    dir: String,
-    fileName: String,
+    path: String,
     recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
-    dir = dir,
-    fileName = fileName,
+    path = path,
     recover = recover,
-    write = ::write,
-    read = ::read,
+    write = FileAccess::write,
+    read = FileAccess::read,
 )
 
 /**
@@ -90,13 +73,11 @@ public fun FileSaver(
  * @see Saver
  */
 public fun CompressedFileSaver(
-    dir: String,
-    fileName: String,
+    path: String,
     recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
-    dir = dir,
-    fileName = fileName,
+    path = path,
     recover = recover,
-    write = ::writeCompressed,
-    read = ::readCompressed,
+    write = FileAccess::writeCompressed,
+    read = FileAccess::readCompressed,
 )
