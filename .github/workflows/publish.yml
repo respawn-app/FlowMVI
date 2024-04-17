@@ -95,7 +95,7 @@ jobs:
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
-          artifacts: sample/androidApp/build/outputs/apk/release/androidApp-release-unsigned.apk
+          artifacts: sample/androidApp/build/outputs/apk/release/*
           body: ${{steps.build_changelog.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ github.token }}
