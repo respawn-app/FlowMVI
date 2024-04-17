@@ -36,7 +36,7 @@ import kotlin.coroutines.CoroutineContext
 public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction> parcelizeStatePlugin(
     handle: SavedStateHandle,
     context: CoroutineContext = Dispatchers.IO,
-    key: String = nameByType<T>() ?: "State",
+    key: String = "${requireNotNull(nameByType<T>())}State",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     resetOnException: Boolean = true,
     name: String = "$key$PluginNameSuffix",
@@ -63,7 +63,7 @@ public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction
 public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.parcelizeState(
     handle: SavedStateHandle,
     context: CoroutineContext = Dispatchers.IO,
-    key: String = "${this.name ?: nameByType<T>().orEmpty()}State",
+    key: String = "${this.name ?: requireNotNull(nameByType<T>())}State",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     name: String = "$key$PluginNameSuffix",
     resetOnException: Boolean = true,

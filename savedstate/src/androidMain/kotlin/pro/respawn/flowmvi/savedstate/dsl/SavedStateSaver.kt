@@ -33,6 +33,6 @@ public fun <T> SavedStateHandleSaver(
  */
 public inline fun <reified T> ParcelableSaver(
     handle: SavedStateHandle,
-    key: String = nameByType<T>() ?: "State",
+    key: String = "${requireNotNull(nameByType<T>())}State",
     noinline recover: suspend (e: Exception) -> T? = ThrowRecover,
 ): Saver<T> where T : Parcelable, T : MVIState = SavedStateHandleSaver(handle, key, recover)
