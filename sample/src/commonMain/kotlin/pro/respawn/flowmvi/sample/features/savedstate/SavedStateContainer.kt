@@ -9,7 +9,6 @@ import pro.respawn.flowmvi.sample.arch.configuration.configure
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateFeatureState.DisplayingInput
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateIntent.ChangedInput
 import pro.respawn.flowmvi.sample.platform.FileManager
-import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.plugins.serializeState
 import pro.respawn.kmmutils.inputforms.dsl.input

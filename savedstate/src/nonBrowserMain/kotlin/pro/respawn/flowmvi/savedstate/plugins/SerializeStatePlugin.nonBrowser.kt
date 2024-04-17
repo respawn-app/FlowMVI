@@ -77,11 +77,11 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
 @FlowMVIDSL
 @Deprecated("Please use an overload that explicitly provides a full path")
 public inline fun <
-        reified T : S,
-        reified S : MVIState,
-        I : MVIIntent,
-        A : MVIAction
-        > StoreBuilder<S, I, A>.serializeState(
+    reified T : S,
+    reified S : MVIState,
+    I : MVIIntent,
+    A : MVIAction
+    > StoreBuilder<S, I, A>.serializeState(
     dir: String,
     json: Json = DefaultJson,
     serializer: KSerializer<T>,
@@ -93,15 +93,15 @@ public inline fun <
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): Unit = serializeStatePlugin<T, S, I, A>(
-        dir = dir,
-        json = json,
-        filename = filename,
-        context = context,
-        behaviors = behaviors,
-        resetOnException = resetOnException,
-        recover = recover,
-        serializer = serializer,
-        fileExtension = fileExtension,
+    dir = dir,
+    json = json,
+    filename = filename,
+    context = context,
+    behaviors = behaviors,
+    resetOnException = resetOnException,
+    recover = recover,
+    serializer = serializer,
+    fileExtension = fileExtension,
     name = name,
     logger = this.logger,
 ).let(::install)
