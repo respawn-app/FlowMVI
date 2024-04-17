@@ -19,7 +19,6 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
-        viewBinding = true
     }
     applicationVariants.all {
         setProperty("archivesBaseName", Config.Sample.namespace)

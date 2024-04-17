@@ -97,6 +97,9 @@ kotlin {
             implementation(compose.desktop.currentOs)
         }
         androidMain.dependencies {
+            implementation(projects.android)
+            implementation(applibs.view.constraintlayout)
+            implementation(applibs.view.material)
             implementation(applibs.koin.android)
         }
         wasmJsMain.dependencies {
@@ -108,6 +111,7 @@ android {
     namespace = Config.Sample.namespace
     configureAndroidLibrary(this)
     buildFeatures {
+        viewBinding = true
         buildConfig = true
         compose = true
     }

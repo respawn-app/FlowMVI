@@ -1,11 +1,18 @@
 package pro.respawn.flowmvi.sample.di
 
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.qualifier
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import pro.respawn.flowmvi.android.StoreViewModel
+import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityContainer
 import pro.respawn.flowmvi.sample.platform.AndroidFileManager
 import pro.respawn.flowmvi.sample.platform.FileManager
 
 actual val platformAppModule = module {
     singleOf(::AndroidFileManager) bind FileManager::class
+    factoryOf(::XmlActivityContainer)
+    viewModel(qualifier<XmlActivityContainer>()) { StoreViewModel(get<XmlActivityContainer>()) }
 }

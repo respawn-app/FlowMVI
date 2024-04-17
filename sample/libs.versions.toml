@@ -7,6 +7,7 @@ material = "1.12.0-rc01"
 activity = "1.9.0-rc01"
 okio = "3.9.0"
 splashscreen = "1.1.0-rc01"
+xml-constraintlayout = "2.2.0-alpha13"
 #codehighlights = "0.8.0"
 
 [libraries]
@@ -29,6 +30,7 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 view-material = { module = "com.google.android.material:material", version.ref = "material" }
+view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "xml-constraintlayout" }
 
 #compose-codehighlighting = { module = "dev.snipme:highlights", version.ref = "codehighlights" }
 

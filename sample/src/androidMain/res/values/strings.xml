@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="increment_counter">Increment counter</string>
+    <string name="incremented_counter_message">Incremented counter</string>
+    <string name="counter_template">
+        This feature showcases how you can implement multiplatform business logic and hook it up to a native UI.
+        In this case, this activity is implemented using XML, but the store is in the shared module.
+        \n\nFlowMVI provides a way to wrap your stores in ViewModels and automatically start/stop them as needed, then inject them
+        into your UI components.
+        \n\nAs needed, you can even persist the state of a store into a platform-dependent container, i.e. SavedInstanceState
+        \nCounter : %d
+    </string>
+    <string name="error_message">Unknown error</string>
+</resources>
