@@ -31,9 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.vectorResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.api.SubscriptionMode
-import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.CopyToClipboard
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
@@ -48,7 +47,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets.TimelineM
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
 import pro.respawn.flowmvi.server.generated.resources.Res
-import pro.respawn.flowmvi.server.generated.resources.icon_192
+import pro.respawn.flowmvi.server.generated.resources.icon_nobg_32
 import java.time.format.DateTimeFormatter
 
 /**
@@ -89,7 +88,7 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
-                painter = painterResource(Res.drawable.icon_192),
+                painter = painterResource(Res.drawable.icon_nobg_32),
                 modifier = Modifier.padding(64.dp).size(120.dp),
                 contentDescription = null,
             )

@@ -10,6 +10,11 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
+compose.resources {
+    packageOfResClass = Config.Sample.namespace
+    publicResClass = true
+}
+
 @Language("Kotlin")
 // language=kotlin
 val BuildConfig = """
