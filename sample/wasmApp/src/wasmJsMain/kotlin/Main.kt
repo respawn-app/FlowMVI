@@ -1,6 +1,6 @@
 @file:Suppress("MissingPackageDeclaration")
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
@@ -47,9 +47,8 @@ fun main() {
         localStorage.setItem(KEY_SAVED_STATE, stateKeeper.save().encodeToString())
         null
     }
-    CanvasBasedWindow(
-        canvasElementId = "ComposeTarget",
-        title = "FlowMVI",
+    ComposeViewport(
+        viewportContainer = "app",
     ) { AppContent(root) }
 }
 

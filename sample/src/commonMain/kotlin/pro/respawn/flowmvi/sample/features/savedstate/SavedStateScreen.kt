@@ -18,30 +18,30 @@ import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateFeatureState.DisplayingInput
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateIntent.ChangedInput
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.savedstate_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
     Saved state plugin allows you to persist a state of a store into a file or other place in about 5 lines of code
-    
+    \n\n
     The state is automatically compressed, written, and then restored when your store starts, all in the background
-    
+    \n\n
     You can decorate state saving/restoration logic with custom Savers and inject it transparently to the rest 
-    of the code of your app
-    
-    Try typing something into the box below and then reopen the app - your input will be remembered!
+    of the code of your app. 
+    \n\n
+    Try typing something into the box below and then reopen the app - your input will be remembered! 
 """
 
 //language=kotlin
@@ -73,7 +73,7 @@ internal class SavedStateContainer(
 fun SavedStateScreen(
     navigator: Navigator,
 ) = with(container<SavedStateContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.savedstate_feature_title),
@@ -93,7 +93,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(Description.trimIndent())
+            Text(Description.formatAsMultiline())
             Spacer(Modifier.height(24.dp))
             RTextInput(
                 input = input,

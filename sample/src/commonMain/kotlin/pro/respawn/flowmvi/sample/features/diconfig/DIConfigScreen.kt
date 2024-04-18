@@ -17,26 +17,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.di_feature_title
+import pro.respawn.flowmvi.sample.di_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-FlowMVI lets you to inject and reuse store configurations.
-You can inject any plugins into your store, including saved state plugin!
+FlowMVI lets you inject and reuse store configurations. 
+You can inject any plugins into your store, including saved state plugin! 
 This allows you to provide not only test doubles for your stores, but also different configurations 
 based on release/debug builds and environments.
-
+\n\n
 The sample app repository sets up an injectable configuration that automatically enables remote debugging
-on debug builds only and abstracts away from all the state saving logic.
-
+on debug builds only and abstracts away from all the state saving logic. 
+\n\n
 It also provides a configuration for unit-testing stores.
 """
 
@@ -79,7 +79,7 @@ internal class DiConfigContainer(
 fun DiConfigScreen(
     navigator: Navigator,
 ) = with(container<DiConfigContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
     RScaffold(
         onBack = navigator.backNavigator,
         title = stringResource(Res.string.di_feature_title),
@@ -98,7 +98,7 @@ private fun DiConfigScreenContent(state: PersistedCounterState) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
 ) {
-    Text(Description.trimIndent())
+    Text(Description.formatAsMultiline())
     Spacer(Modifier.height(12.dp))
     Text("Persisted counter state: ${state.counter}")
     Spacer(Modifier.height(12.dp))

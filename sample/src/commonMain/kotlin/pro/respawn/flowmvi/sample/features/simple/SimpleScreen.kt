@@ -18,16 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.simple_feature_title
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 //language=kotlin
 private const val Code = """
@@ -49,12 +49,13 @@ val simpleStore = store<_, _>(SimpleState()) {
 }
 """
 
-private val Description = """
-    Simple Feature showcases how you can start using FlowMVI with the bare minimum.
+private const val Description = """
+    Simple Feature showcases how you can start using FlowMVI with the bare minimum. 
     FlowMVI allows you to create full-fledged multiplatform MVI business 
-    logic components in about 10 lines of code.
-    See other features for advanced examples of LCE, DI, saving state & lots of other stuff.
-""".trimIndent()
+    logic components in about 10 lines of code. 
+    \n\n
+    See other features for advanced examples of LCE, DI, saving state & lots of other stuff. 
+"""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +64,7 @@ fun SimpleScreen(
 ) = with(simpleStore) {
     LaunchedEffect(Unit) { start(this).join() }
 
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.simple_feature_title),
@@ -85,7 +86,7 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    Text(Description)
+    Text(Description.formatAsMultiline())
     Spacer(Modifier.height(12.dp))
     Text(text = "Counter = ${state.counter}")
     Spacer(Modifier.height(12.dp))

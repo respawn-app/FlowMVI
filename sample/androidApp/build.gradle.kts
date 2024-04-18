@@ -26,7 +26,7 @@ android {
             .matching { "apk" in it.outputFile.extension }
             .all {
                 this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-                outputFileName = "${Config.Sample.namespace}-$versionCode.apk"
+                outputFileName = "${Config.Sample.namespace}.apk"
             }
     }
     signingConfigs {
@@ -71,6 +71,4 @@ dependencies {
     implementation(applibs.koin.android)
     implementation(applibs.koin.android.compose)
     implementation(applibs.view.material)
-
-    debugImplementation(libs.compose.tooling)
 }

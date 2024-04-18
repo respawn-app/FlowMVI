@@ -22,14 +22,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.logging.LoggingAction.SentLog
 import pro.respawn.flowmvi.sample.features.logging.LoggingIntent.ClickedSendLog
 import pro.respawn.flowmvi.sample.features.logging.LoggingState.DisplayingLogs
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.logging_feature_title
+import pro.respawn.flowmvi.sample.logging_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
@@ -38,13 +37,14 @@ import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-    FlowMVI provides a multiplatform logging setup out of the box.
+    FlowMVI provides a multiplatform logging setup out of the box. 
     You can see everything that happens in the store in your device's console or customize the logging to print to any
-    source you wish.
-    
-    For example, the code below sends logs back to the store to display on-screen
+    source you wish. 
+    \n\n
+    For example, the code below sends logs back to the store to display on-screen. 
 """
 
 //language=kotlin
@@ -85,7 +85,7 @@ fun LoggingScreen(
 ) = with(container<LoggingContainer, _, _, _>()) {
     val listState = rememberLazyListState()
 
-    val state by subscribe(requireLifecycle()) {
+    val state by subscribe {
         when (it) {
             is SentLog -> listState.animateScrollToItem(it.logsSize)
         }
@@ -117,7 +117,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 12.dp),
                 ) {
-                    Text(Description.trimIndent())
+                    Text(Description.formatAsMultiline())
                     Spacer(Modifier.height(12.dp))
                     CodeText(Code)
                     Spacer(Modifier.height(12.dp))

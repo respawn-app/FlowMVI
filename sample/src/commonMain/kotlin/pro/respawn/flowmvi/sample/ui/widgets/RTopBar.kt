@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.app_name
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.app_name
 import pro.respawn.flowmvi.sample.ui.theme.Montserrat
 import pro.respawn.flowmvi.sample.ui.theme.Size
 import pro.respawn.flowmvi.sample.util.branded

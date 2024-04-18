@@ -3,6 +3,11 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
 }
+
+compose.resources {
+    publicResClass = true
+}
+
 kotlin {
     jvm {
         compilations.all {

@@ -18,7 +18,7 @@ internal val ClientEvent.type
 
 // TODO: Need a custom layout for some events, create a composable
 @Stable
-@Suppress("MultilineRawStringIndentation", "StringShouldBeRawString")
+@Suppress("StringShouldBeRawString")
 internal val ClientEvent.representation: String
     get() = when (this) {
         is ClientEvent.StoreConnected -> "Connected $name ($id)"
@@ -28,13 +28,13 @@ internal val ClientEvent.representation: String
         is ClientEvent.StoreIntent -> "$name:\n\n${data.prettyPrintToString()}"
         is ClientEvent.StoreStarted -> "$name started"
         is ClientEvent.StoreStateChanged -> """
-${from.name} ---> 
+            ${from.name} ---> 
 
-${from.body.prettyPrintToString()} 
+            ${from.body.prettyPrintToString()} 
 
-<--- ${to.name}
+            <--- ${to.name}
 
-${to.body.prettyPrintToString()}
+            ${to.body.prettyPrintToString()}
         """.trimIndent()
         is ClientEvent.StoreStopped -> "$name stopped"
         is ClientEvent.StoreSubscribed -> "Subscription count changed to $newSubscriptionCount"

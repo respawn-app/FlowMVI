@@ -27,9 +27,8 @@ kotlin {
         androidMain.dependencies {
             api(projects.android)
 
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.preview)
-            implementation(libs.compose.lifecycle.runtime)
+            implementation(compose.foundation)
+            implementation(compose.preview)
         }
         commonMain.dependencies {
             api(projects.core)
@@ -38,6 +37,7 @@ kotlin {
             api(libs.essenty.lifecycle)
             api(libs.essenty.lifecycle.coroutines)
             api(libs.essenty.instancekeeper)
+            api(libs.lifecycle.runtime)
 
             implementation(compose.runtime)
             implementation(compose.foundation)

@@ -10,6 +10,11 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
+compose.resources {
+    packageOfResClass = Config.Sample.namespace
+    publicResClass = true
+}
+
 @Language("Kotlin")
 // language=kotlin
 val BuildConfig = """
@@ -48,9 +53,6 @@ kotlin {
         val desktopMain by getting
         val wasmJsMain by getting
 
-        configurations.all {
-            exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
-        }
         all {
             languageSettings {
                 progressiveMode = true

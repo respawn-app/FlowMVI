@@ -15,7 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -92,7 +92,7 @@ internal fun IntentReceiver<TimelineIntent>.FocusedEventLayout(
                         ) { Icon(Icons.Rounded.Close, contentDescription = null) }
                     }
                 }
-                Divider()
+                HorizontalDivider()
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .horizontalScroll(rememberScrollState())

@@ -23,7 +23,7 @@ import pro.respawn.flowmvi.dsl.subscribe
  */
 @Composable
 @FlowMVIDSL
-public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
+public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
 ): State<S> where T : LifecycleOwner, T : ImmutableContainer<S, I, A> = store.subscribe(
     lifecycle = rememberSubscriberLifecycle(lifecycle) { asSubscriberLifecycle },
@@ -39,9 +39,9 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
 @Composable
 @FlowMVIDSL
 @Suppress("ComposableParametersOrdering")
-public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
+public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
-    noinline consume: suspend CoroutineScope.(action: A) -> Unit,
+    consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> where T : LifecycleOwner, T : ImmutableContainer<S, I, A> = store.subscribe(
     lifecycle = rememberSubscriberLifecycle(lifecycle) { asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode,

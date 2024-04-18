@@ -6,9 +6,36 @@ import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
 import pro.respawn.flowmvi.compose.api.SubscriptionMode
+import androidx.lifecycle.Lifecycle.State as ALifecycleState
 
 /**
  * Convert this [LifecycleOwner] to a [SubscriberLifecycle].
+ */
+@Stable
+public val Lifecycle.State.asAndroidxLifecycle: ALifecycleState
+    get() = when (this) {
+        Lifecycle.State.DESTROYED -> ALifecycleState.DESTROYED
+        Lifecycle.State.INITIALIZED -> ALifecycleState.INITIALIZED
+        Lifecycle.State.CREATED -> ALifecycleState.CREATED
+        Lifecycle.State.STARTED -> ALifecycleState.STARTED
+        Lifecycle.State.RESUMED -> ALifecycleState.RESUMED
+    }
+
+/**
+ * Convert this [SubscriptionMode] to an Essenty [Lifecycle.State]
+ */
+@Stable
+public val ALifecycleState.asEssentyLifecycle: Lifecycle.State
+    get() = when (this) {
+        ALifecycleState.DESTROYED -> Lifecycle.State.DESTROYED
+        ALifecycleState.INITIALIZED -> Lifecycle.State.INITIALIZED
+        ALifecycleState.CREATED -> Lifecycle.State.CREATED
+        ALifecycleState.STARTED -> Lifecycle.State.STARTED
+        ALifecycleState.RESUMED -> Lifecycle.State.RESUMED
+    }
+
+/**
+ * Convert this Essenty [Lifecycle] to the [Subscriber
  */
 @Stable
 public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle

@@ -18,15 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.lce.LCEIntent.ClickedRefresh
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.lce_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.retry
+import pro.respawn.flowmvi.sample.lce_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.retry
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
@@ -34,15 +33,16 @@ import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-    LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code.
-    
-    You can represent the LCE states as a sealed class family - an easy to understand structure.
-    
-    The library can handle any exceptions that your logic throws for you, setting the appropriate state.
-    Try refreshing the items and the screen can show you an error sometimes.
-    This example also demonstrates how you can inject dependencies into your stores and create additional functions
+    LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code. 
+    \n\n
+    You can represent the LCE states as a sealed class family - an easy to understand structure. 
+    \n\n
+    The library can handle any exceptions that your logic throws for you, setting the appropriate state. 
+    Try refreshing the items and the screen can show you an error sometimes. 
+    This example also demonstrates how you can inject dependencies into your stores and create additional functions. 
 """
 
 //language=kotlin
@@ -86,7 +86,7 @@ internal class LCEContainer(
 fun LCEScreen(
     navigator: Navigator,
 ) = with(container<LCEContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.lce_feature_title),
@@ -112,7 +112,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
             ) {
                 item {
                     Column(modifier = Modifier) {
-                        Text(Description.trimIndent())
+                        Text(Description.formatAsMultiline())
                         Spacer(Modifier.height(12.dp))
                         CodeText(Code)
                         Spacer(Modifier.height(12.dp))

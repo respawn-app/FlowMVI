@@ -83,7 +83,7 @@ jobs:
                   "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
                   "target": "$1"
                 }
-              ],
+              ]
             }
 
       - name: Create GH release
@@ -93,9 +93,8 @@ jobs:
           draft: true
           artifactErrorsFailBuild: true
           prerelease: false
-          release_name: ${{ steps.version.outputs.version }}
-          tag_name: ${{ github.ref }}
-          artifacts: sample/androidApp/build/outputs/apk/release/*
+          tag: ${{ github.ref }}
+          artifacts: sample/androidApp/build/outputs/apk/release/pro.respawn.flowmvi.sample.apk
           body: ${{steps.build_changelog.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ github.token }}

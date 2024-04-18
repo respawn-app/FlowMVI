@@ -185,3 +185,5 @@ fun Modifier.bringIntoViewOnFocus() = composed {
             }
         }
 }
+
+fun String.formatAsMultiline() = trimIndent().replace("\n", "").replace("\\n", "\n")
