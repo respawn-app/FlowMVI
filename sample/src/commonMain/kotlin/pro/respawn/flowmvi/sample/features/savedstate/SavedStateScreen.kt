@@ -19,10 +19,10 @@ import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateFeatureState.DisplayingInput
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateIntent.ChangedInput
-import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.savedstate_feature_title

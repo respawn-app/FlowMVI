@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.logging.LoggingAction.SentLog
 import pro.respawn.flowmvi.sample.features.logging.LoggingIntent.ClickedSendLog
 import pro.respawn.flowmvi.sample.features.logging.LoggingState.DisplayingLogs
-import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.logging_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator

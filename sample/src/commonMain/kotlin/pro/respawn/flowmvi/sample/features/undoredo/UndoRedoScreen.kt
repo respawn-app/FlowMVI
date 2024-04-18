@@ -24,11 +24,11 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ChangedInput
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedRedo
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedUndo
-import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText

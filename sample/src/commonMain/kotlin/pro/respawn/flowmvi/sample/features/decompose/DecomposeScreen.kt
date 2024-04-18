@@ -33,11 +33,11 @@ import com.arkivanov.essenty.instancekeeper.getOrCreate
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.essenty.compose.subscribe
 import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.decompose_feature_title
 import pro.respawn.flowmvi.sample.features.decompose.PageIntent.ClickedIncrementCounter
 import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.DisplayingPages
 import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.Error
 import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.Loading
-import pro.respawn.flowmvi.sample.decompose_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText

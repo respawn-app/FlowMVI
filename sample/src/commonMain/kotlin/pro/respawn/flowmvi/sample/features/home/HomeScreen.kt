@@ -2,7 +2,9 @@ package pro.respawn.flowmvi.sample.features.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -32,7 +34,11 @@ import org.jetbrains.compose.resources.vectorResource
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.BuildFlags
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.app_name
 import pro.respawn.flowmvi.sample.arch.di.container
+import pro.respawn.flowmvi.sample.decompose_feature_title
+import pro.respawn.flowmvi.sample.di_feature_title
 import pro.respawn.flowmvi.sample.features.home.HomeAction.GoToFeature
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Decompose
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.DiConfig
@@ -44,10 +50,6 @@ import pro.respawn.flowmvi.sample.features.home.HomeFeature.UndoRedo
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.XmlViews
 import pro.respawn.flowmvi.sample.features.home.HomeIntent.ClickedFeature
 import pro.respawn.flowmvi.sample.features.home.HomeState.DisplayingHome
-import pro.respawn.flowmvi.sample.Res
-import pro.respawn.flowmvi.sample.app_name
-import pro.respawn.flowmvi.sample.decompose_feature_title
-import pro.respawn.flowmvi.sample.di_feature_title
 import pro.respawn.flowmvi.sample.ic_flowmvi_32
 import pro.respawn.flowmvi.sample.lce_feature_title
 import pro.respawn.flowmvi.sample.logging_feature_title
@@ -115,6 +117,7 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
+            Spacer(Modifier.height(12.dp))
             HomeFeature.entries.forEachIndexed { i, item ->
                 RMenuItem(
                     enabled = item.enabled,

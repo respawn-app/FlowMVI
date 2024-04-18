@@ -3,9 +3,9 @@ package pro.respawn.flowmvi.essenty.compose
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
+import pro.respawn.flowmvi.compose.dsl.CurrentLifecycle
 import pro.respawn.flowmvi.compose.dsl.LocalSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
-import pro.respawn.flowmvi.compose.dsl.CurrentLifecycle
 
 /**
  * Provides a local Essenty lifecycle [owner] through a [LocalSubscriberLifecycle].

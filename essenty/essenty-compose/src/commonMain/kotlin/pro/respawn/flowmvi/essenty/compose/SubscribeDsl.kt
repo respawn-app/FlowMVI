@@ -2,7 +2,6 @@ package pro.respawn.flowmvi.essenty.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
