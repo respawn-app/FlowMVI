@@ -36,7 +36,7 @@ inline val FontFamily.Companion.Montserrat @Composable get() = pro.respawn.flowm
 inline val FontFamily.Companion.Comfortaa @Composable get() = pro.respawn.flowmvi.sample.ui.theme.Comfortaa
 inline val FontFamily.Companion.Monaspace @Composable get() = pro.respawn.flowmvi.sample.ui.theme.Monaspace
 
-private const val FontFeatures = "dlig, liga, kern, zero, locl, size"
+private val FontFeatures = "dlig, liga, kern, zero, locl, size".takeUnless { BuildFlags.platform == Platform.Web }
 
 // region Typography
 internal val AppTypography
