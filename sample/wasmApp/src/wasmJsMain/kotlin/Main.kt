@@ -47,9 +47,7 @@ fun main() {
         localStorage.setItem(KEY_SAVED_STATE, stateKeeper.save().encodeToString())
         null
     }
-    ComposeViewport(
-        viewportContainer = "app",
-    ) { AppContent(root) }
+    ComposeViewport("app") { AppContent(root) }
 }
 
 private fun LifecycleRegistry.attachToDocument() {

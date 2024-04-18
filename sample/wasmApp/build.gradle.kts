@@ -27,7 +27,6 @@ kotlin {
     wasmJs {
         moduleName = "composeApp"
         browser {
-            testTask { enabled = false }
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer(port = 8081)).apply {
@@ -37,6 +36,7 @@ kotlin {
                     }
                 }
             }
+            testTask { enabled = false }
         }
         binaries.executable()
     }

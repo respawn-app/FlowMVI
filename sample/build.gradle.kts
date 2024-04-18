@@ -12,7 +12,7 @@ plugins {
 
 compose.resources {
     packageOfResClass = Config.Sample.namespace
-    publicResClass = true
+    publicResClass = false
 }
 
 @Language("Kotlin")
@@ -25,6 +25,15 @@ val BuildConfig = """
         const val ProjectDescription = "${Config.Sample.appDescription}"
     }
 """.trimIndent()
+
+val generateBuildConfig by tasks.registering(Sync::class) {
+    from(resources.text.fromString(BuildConfig)) {
+        rename { "BuildFlags.kt" }
+        into(Config.Sample.namespace.replace(".", "/"))
+    }
+    // the target directory
+    into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
+}
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -60,33 +69,36 @@ kotlin {
                 Config.optIns.forEach { optIn(it) }
             }
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.animation)
-            implementation(compose.animationGraphics)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
+        commonMain {
+            kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
+                implementation(compose.animation)
+                implementation(compose.animationGraphics)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
 
-            implementation(libs.bundles.serialization)
-            implementation(libs.kotlin.datetime)
-            implementation(libs.uuid)
-            implementation(libs.kotlin.io)
+                implementation(libs.bundles.serialization)
+                implementation(libs.kotlin.datetime)
+                implementation(libs.uuid)
+                implementation(libs.kotlin.io)
 
-            implementation(applibs.bundles.kmputils)
-            implementation(applibs.bundles.koin)
-            implementation(applibs.apiresult)
-            implementation(applibs.decompose.compose)
-            // implementation(applibs.compose.codehighlighting)
-            implementation(applibs.decompose)
+                implementation(applibs.bundles.kmputils)
+                implementation(applibs.bundles.koin)
+                implementation(applibs.apiresult)
+                implementation(applibs.decompose.compose)
+                // implementation(applibs.compose.codehighlighting)
+                implementation(applibs.decompose)
 
-            implementation(projects.core)
-            implementation(projects.essenty.essentyCompose)
-            implementation(projects.essenty)
-            implementation(projects.compose)
-            implementation(projects.savedstate)
+                implementation(projects.core)
+                implementation(projects.essenty.essentyCompose)
+                implementation(projects.essenty)
+                implementation(projects.compose)
+                implementation(projects.savedstate)
+            }
         }
         nativeMain.dependencies {
             implementation(projects.debugger.debuggerPlugin)
@@ -157,22 +169,5 @@ compose.desktop {
                 iconFile = iconDir.resolve("icon_512.png")
             }
         }
-    }
-}
-
-val generateBuildConfig by tasks.registering(Sync::class) {
-    from(
-        resources.text.fromString(BuildConfig)
-    ) {
-        rename { "BuildFlags.kt" }
-        into(Config.Sample.namespace.replace(".", "/"))
-    }
-    // the target directory
-    into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
-}
-
-kotlin {
-    sourceSets.commonMain {
-        kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
     }
 }
