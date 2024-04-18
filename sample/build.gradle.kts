@@ -48,9 +48,6 @@ kotlin {
         val desktopMain by getting
         val wasmJsMain by getting
 
-        configurations.all {
-            exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
-        }
         all {
             languageSettings {
                 progressiveMode = true

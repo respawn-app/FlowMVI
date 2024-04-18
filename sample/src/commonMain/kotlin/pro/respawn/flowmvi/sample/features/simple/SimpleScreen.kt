@@ -63,7 +63,7 @@ fun SimpleScreen(
 ) = with(simpleStore) {
     LaunchedEffect(Unit) { start(this).join() }
 
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.simple_feature_title),

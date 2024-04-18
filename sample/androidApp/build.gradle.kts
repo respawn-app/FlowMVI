@@ -71,6 +71,4 @@ dependencies {
     implementation(applibs.koin.android)
     implementation(applibs.koin.android.compose)
     implementation(applibs.view.material)
-
-    debugImplementation(libs.compose.tooling)
 }

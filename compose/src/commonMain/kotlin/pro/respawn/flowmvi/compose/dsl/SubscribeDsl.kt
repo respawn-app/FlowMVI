@@ -1,110 +1,83 @@
-@file:OptIn(DelicateStoreApi::class)
-
 package pro.respawn.flowmvi.compose.dsl
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.api.DelicateStoreApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
-import pro.respawn.flowmvi.compose.api.SubscriptionMode
+import pro.respawn.flowmvi.api.StateConsumer
+import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
-import pro.respawn.flowmvi.util.immediateOrDefault
+import kotlin.jvm.JvmName
 
 /**
- * A function to subscribe to the store that follows the system lifecycle.
- *
- * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
- * * Provided [consume] parameter will be used to consume actions that come from the store.
- * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
- *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
- *
- *  [lifecycle] is an instance of the lifecycle wrapper used to execute the subscription event.
- *  * The provided implementation must follow the contract outlined in [SubscriberLifecycle]. This instance can be
- *  provided automatically on Android, but must be implemented manually on other platforms for now.
- *  * If you have provided a lifecycle via [LocalSubscriberLifecycle], use [requireLifecycle].
- *  * If you don't want to provide a lifecycle, use [DefaultLifecycle] to fall back to a no-op implementation if needed
- *
- *
- * @param mode the subscription mode that should be reached in order to subscribe to the store. At specified moments
- * in the UI lifecycle (Activity, Composable, Window etc), the store will subscribe and unsubscribe from the store.
- * @param consume a lambda to consume actions with.
- * @return the [State] that contains the current state.
- * @see ImmutableStore.subscribe
- * @see subscribe
+ *  Subscribe to the [store] lifecycle-aware.
+ *  @param consume called on each new action. Implement action handling here.
+ *  @param render called each time the state changes. Render state here.
+ *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ *  @see repeatOnLifecycle
  */
-@Suppress("ComposableParametersOrdering")
-@Composable
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
-    mode: SubscriptionMode = SubscriptionMode.Started,
-    consume: suspend CoroutineScope.(action: A) -> Unit,
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
-        withContext(Dispatchers.Main.immediateOrDefault) {
-            lifecycle.repeatOnLifecycle(mode) {
-                subscribe(
-                    store = this@subscribe,
-                    consume = { block(it) },
-                    render = { state.value = it }
-                ).join()
-            }
-        }
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe(
+    store: Store<S, I, A>,
+    noinline consume: suspend (action: A) -> Unit,
+    crossinline render: suspend (state: S) -> Unit,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): Job = lifecycleScope.launch(Dispatchers.Main.immediate) {
+    // https://github.com/Kotlin/kotlinx.coroutines/issues/2886
+    // TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
+    repeatOnLifecycle(lifecycleState) {
+        this@repeatOnLifecycle.subscribe(store, consume, render)
     }
-    return state
 }
 
 /**
- * A function to subscribe to the store that follows the system lifecycle.
- *
- * * This function will assign the store a new subscriber when invoked, then populate the returned [State] with new states.
- * * Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
- *   Such subscribers will not receive state updates or actions. Don't forget to launch the store.
- *
- *  [lifecycle] is an instance of the lifecycle wrapper used to execute the subscription event.
- *  * The provided implementation must follow the contract outlined in [SubscriberLifecycle]. This instance can be
- *  provided automatically on Android, but must be implemented manually on other platforms for now.
- *  * If you have provided a lifecycle via [LocalSubscriberLifecycle], use [requireLifecycle].
- *  * If you don't want to provide a lifecycle, use [DefaultLifecycle] to fall back to a no-op implementation if needed
- *
- *
- * @param mode the subscription mode that should be reached in order to subscribe to the store. At specified moments
- * in the UI lifecycle (Activity, Composable, Window etc), the store will subscribe and unsubscribe from the store.
- * @return the [State] that contains the current state.
- * @see ImmutableStore.subscribe
- * @see subscribe
+ *  Subscribe to the [store] lifecycle-aware.
+ *  @param render called each time the state changes. Render state here.
+ *  @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ *  @see repeatOnLifecycle
  */
-@Composable
 @FlowMVIDSL
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
-    mode: SubscriptionMode = SubscriptionMode.Started,
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
-        withContext(Dispatchers.Main.immediateOrDefault) {
-            lifecycle.repeatOnLifecycle(mode) {
-                subscribe(
-                    store = this@subscribe,
-                    render = { state.value = it }
-                ).join()
-            }
-        }
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.subscribe(
+    store: Store<S, I, A>,
+    crossinline render: suspend (state: S) -> Unit,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): Job = lifecycleScope.launch(Dispatchers.Main.immediate) {
+    // https://github.com/Kotlin/kotlinx.coroutines/issues/2886
+    // TL;DR: uses immediate dispatcher to circumvent prompt cancellation fallacy (and missed events)
+    repeatOnLifecycle(lifecycleState) {
+        this@repeatOnLifecycle.subscribe(store, render)
     }
-    return state
 }
+
+/**
+ * Subscribe to the store lifecycle-aware.
+ * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ * @see repeatOnLifecycle
+ */
+@JvmName("subscribeAndConsume")
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
+    provider: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): Job where T : LifecycleOwner, T : StateConsumer<S>, T : ActionConsumer<A> =
+    subscribe(provider, ::consume, ::render, lifecycleState)
+
+/**
+ * Subscribe to the store lifecycle-aware. This function will not collect the store's actions.
+ * @param lifecycleState the minimum lifecycle state the [LifecycleOwner] must be in to receive updates.
+ * @see repeatOnLifecycle
+ */
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.subscribe(
+    provider: Store<S, I, A>,
+    lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
+): Job where T : LifecycleOwner, T : StateConsumer<S> =
+    subscribe(provider, ::render, lifecycleState)

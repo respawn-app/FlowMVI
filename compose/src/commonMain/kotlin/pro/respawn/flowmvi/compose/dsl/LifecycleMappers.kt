@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.compose.android
+package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.Lifecycle

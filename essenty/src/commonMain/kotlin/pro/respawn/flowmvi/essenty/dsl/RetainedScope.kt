@@ -11,10 +11,8 @@ import pro.respawn.flowmvi.essenty.internal.RetainedScope
 import pro.respawn.flowmvi.util.immediateOrDefault
 import kotlin.coroutines.CoroutineContext
 
-private const val DefaultScopeKey = "CoroutineScope"
-
 internal fun createRetainedScope(
-    context: CoroutineContext = Dispatchers.Main.immediateOrDefault
+    context: CoroutineContext = Dispatchers.Main.immediateOrDefault,
 ): RetainedScope = object : RetainedScope, CoroutineScope by CoroutineScope(context + SupervisorJob(context[Job])) {}
 
 /**
@@ -25,7 +23,7 @@ internal fun createRetainedScope(
  */
 public fun InstanceKeeper.retainedScope(
     context: CoroutineContext = Dispatchers.Main.immediateOrDefault,
-    key: String = DefaultScopeKey,
+    key: Any = CoroutineScope::class,
 ): CoroutineScope = getOrCreate(key) { createRetainedScope(context) }
 
 /**
@@ -36,5 +34,5 @@ public fun InstanceKeeper.retainedScope(
  */
 public fun InstanceKeeperOwner.retainedScope(
     context: CoroutineContext = Dispatchers.Main.immediateOrDefault,
-    key: String = DefaultScopeKey,
+    key: Any = CoroutineScope::class,
 ): CoroutineScope = instanceKeeper.retainedScope(context, key)

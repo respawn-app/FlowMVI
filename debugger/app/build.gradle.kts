@@ -16,31 +16,26 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-        configurations.all {
-            exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-android")
-        }
 
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.animation)
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.desktop.components.splitPane)
             implementation(compose.animationGraphics)
             implementation(compose.ui)
             implementation(compose.components.resources)
 
-            implementation(libs.bundles.serialization)
-            implementation(applibs.bundles.kmputils)
-            implementation(libs.kotlin.datetime)
             implementation(applibs.apiresult)
-            implementation(libs.uuid)
+            implementation(applibs.bundles.kmputils)
             implementation(applibs.bundles.koin)
+
+            implementation(libs.bundles.serialization)
+            implementation(libs.kotlin.datetime)
+            implementation(libs.uuid)
             implementation(libs.kotlin.io)
 
             implementation(projects.core)
-            implementation(projects.essenty.essentyCompose)
             implementation(projects.debugger.server)
             implementation(projects.debugger.debuggerCommon)
             implementation(projects.compose)
@@ -49,6 +44,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.coroutines.swing)
                 implementation(compose.desktop.currentOs)
+                implementation(compose.preview)
             }
         }
     }
@@ -94,8 +90,4 @@ compose.desktop {
             }
         }
     }
-}
-
-dependencies {
-    // debugImplementation(libs.compose.tooling)
 }

@@ -71,7 +71,7 @@ import pro.respawn.flowmvi.sample.util.platform
 fun HomeScreen(
     navigator: AppNavigator,
 ) = with(container<HomeContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle()) { action ->
+    val state by subscribe { action ->
         when (action) {
             is GoToFeature -> when (action.feature) {
                 Simple -> navigator.simpleFeature()

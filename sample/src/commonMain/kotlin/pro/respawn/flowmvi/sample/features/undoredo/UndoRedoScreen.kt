@@ -97,7 +97,7 @@ internal class UndoRedoContainer : Container<UndoRedoState, UndoRedoIntent, Undo
 fun UndoRedoScreen(
     navigator: Navigator,
 ) = with(container<UndoRedoContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.undoredo_feature_title),

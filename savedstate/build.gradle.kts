@@ -30,7 +30,7 @@ kotlin {
             implementation(libs.kotlin.io)
         }
         androidMain.dependencies {
-            api(libs.lifecycle.savedstate)
+            api(libs.androidx.lifecycle.savedstate)
         }
         commonMain.dependencies {
             api(projects.core)

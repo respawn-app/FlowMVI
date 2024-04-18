@@ -73,7 +73,7 @@ internal class SavedStateContainer(
 fun SavedStateScreen(
     navigator: Navigator,
 ) = with(container<SavedStateContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.savedstate_feature_title),

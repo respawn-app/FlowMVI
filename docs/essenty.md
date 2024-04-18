@@ -73,7 +73,7 @@ class CounterComponent(
 The base `compose` artifact already provides you with everything that is necessary to implement lifecycle support.
 The `essenty-compose` artifact simplifies the provision of lifecycle to the UI that subscribes to the stores.
 When you create a component, it is assigned a new `Lifecycle` instance by Decompose.
-This lifecycle will be used on the UI to correctly subscribe to the store.
+This lifecycle can be used on the UI to correctly subscribe to the store.
 
 ```kotlin
 @Composable
@@ -105,12 +105,10 @@ fun CounterScreen(component: CounterComponent) {
     
     // do this somewhere in your navigation logic
     ProvideSubscriberLifecycle(component) {
-        val state by component.store.subscribe(requireLifecycle())
+        val state by component.store.subscribe()
     }
 }
 ```
 
-The `requireLifecycle()` function will try to first find the lifecycle you provided. If not found, it will try to
-resolve the system lifecycle, and if still not found, it will throw. If you don't want to throw and are willing to
-sacrifice the lifecycle subscription if there is no lifecycle present, you can use `DefaultLifecycle` property
-instead.
+The `DefaultLifecycle` property will try to first find the lifecycle you provided. If not found, it will try to
+resolve the system lifecycle (which should always be present since compose 1.6.10).

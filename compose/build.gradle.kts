@@ -31,23 +31,19 @@ kotlin {
     )
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.preview)
+            implementation(compose.preview)
             implementation(projects.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
+            implementation(libs.lifecycle.runtime)
             api(projects.core)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
         }
     }
-}
-
-dependencies {
-    debugImplementation(libs.compose.tooling)
 }
 
 publishMultiplatform()

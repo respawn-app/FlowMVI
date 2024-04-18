@@ -85,7 +85,7 @@ fun LoggingScreen(
 ) = with(container<LoggingContainer, _, _, _>()) {
     val listState = rememberLazyListState()
 
-    val state by subscribe(requireLifecycle()) {
+    val state by subscribe {
         when (it) {
             is SentLog -> listState.animateScrollToItem(it.logsSize)
         }

@@ -86,7 +86,7 @@ internal class LCEContainer(
 fun LCEScreen(
     navigator: Navigator,
 ) = with(container<LCEContainer, _, _, _>()) {
-    val state by subscribe(requireLifecycle())
+    val state by subscribe()
 
     RScaffold(
         title = stringResource(Res.string.lce_feature_title),
