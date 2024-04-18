@@ -73,6 +73,7 @@ compose.desktop {
                 bundleID = Config.Debugger.namespace
                 appCategory = "public.app-category.developer-tools"
                 iconFile = iconDir.resolve("icon_macos.icns")
+                minimumSystemVersion = "12.0"
             }
             windows {
                 dirChooser = true
