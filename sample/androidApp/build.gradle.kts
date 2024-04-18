@@ -26,7 +26,7 @@ android {
             .matching { "apk" in it.outputFile.extension }
             .all {
                 this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-                outputFileName = "${Config.Sample.namespace}-$versionCode.apk"
+                outputFileName = "${Config.Sample.namespace}.apk"
             }
     }
     signingConfigs {
