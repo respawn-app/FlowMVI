@@ -17,11 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.arch.di.container
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.di_feature_title
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.di_feature_title
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText

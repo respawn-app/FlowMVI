@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import pro.respawn.flowmvi.sample.BuildFlags
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.comfortaa
-import pro.respawn.flowmvi.sample.generated.resources.monaspace_neon
-import pro.respawn.flowmvi.sample.generated.resources.montserrat
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.comfortaa
+import pro.respawn.flowmvi.sample.monaspace_neon
+import pro.respawn.flowmvi.sample.montserrat
 import pro.respawn.flowmvi.sample.util.Platform
 import pro.respawn.flowmvi.sample.util.platform
 

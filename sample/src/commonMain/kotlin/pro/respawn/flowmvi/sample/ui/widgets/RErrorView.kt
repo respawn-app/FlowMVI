@@ -13,9 +13,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.generic_error_message
-import pro.respawn.flowmvi.sample.generated.resources.retry
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.generic_error_message
+import pro.respawn.flowmvi.sample.retry
 
 @Composable
 fun RErrorView(

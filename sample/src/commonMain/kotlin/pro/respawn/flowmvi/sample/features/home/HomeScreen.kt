@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.BuildFlags
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -45,26 +44,26 @@ import pro.respawn.flowmvi.sample.features.home.HomeFeature.UndoRedo
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.XmlViews
 import pro.respawn.flowmvi.sample.features.home.HomeIntent.ClickedFeature
 import pro.respawn.flowmvi.sample.features.home.HomeState.DisplayingHome
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.app_name
-import pro.respawn.flowmvi.sample.generated.resources.decompose_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.di_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.ic_flowmvi_32
-import pro.respawn.flowmvi.sample.generated.resources.lce_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.logging_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.savedstate_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.simple_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.undoredo_feature_title
-import pro.respawn.flowmvi.sample.generated.resources.xml_feature_title
+import pro.respawn.flowmvi.sample.Res
+import pro.respawn.flowmvi.sample.app_name
+import pro.respawn.flowmvi.sample.decompose_feature_title
+import pro.respawn.flowmvi.sample.di_feature_title
+import pro.respawn.flowmvi.sample.ic_flowmvi_32
+import pro.respawn.flowmvi.sample.lce_feature_title
+import pro.respawn.flowmvi.sample.logging_feature_title
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.savedstate_feature_title
+import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
+import pro.respawn.flowmvi.sample.undoredo_feature_title
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.platform
+import pro.respawn.flowmvi.sample.xml_feature_title
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

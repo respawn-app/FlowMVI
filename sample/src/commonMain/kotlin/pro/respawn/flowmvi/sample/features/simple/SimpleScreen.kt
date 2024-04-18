@@ -18,12 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
-import pro.respawn.flowmvi.sample.generated.resources.Res
-import pro.respawn.flowmvi.sample.generated.resources.simple_feature_title
+import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
