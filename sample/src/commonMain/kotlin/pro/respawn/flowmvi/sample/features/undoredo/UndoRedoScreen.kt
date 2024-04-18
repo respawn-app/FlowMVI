@@ -119,7 +119,11 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
 ) {
     Text(Description.trimIndent())
     Spacer(Modifier.height(12.dp))
-    Row(modifier = Modifier.widthIn(min = 400.dp), horizontalArrangement = Arrangement.End) {
+    Row(
+        modifier = Modifier.widthIn(min = 400.dp),
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text("Index: ${state.index}")
         Spacer(Modifier.weight(1f))
         RIcon(
