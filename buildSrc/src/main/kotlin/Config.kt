@@ -19,7 +19,7 @@ object Config {
     const val majorRelease = 2
     const val minorRelease = 5
     const val patch = 0
-    const val postfix = "-alpha08" // include dash (-)
+    const val postfix = "-alpha09" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
