@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.sample.features.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -101,7 +101,7 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
         is HomeState.Loading -> CircularProgressIndicator()
         is DisplayingHome -> Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxHeight()
                 .adaptiveWidth()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,

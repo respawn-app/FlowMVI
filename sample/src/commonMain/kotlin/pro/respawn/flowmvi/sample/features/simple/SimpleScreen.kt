@@ -27,6 +27,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 //language=kotlin
 private const val Code = """
@@ -48,12 +49,13 @@ val simpleStore = store<_, _>(SimpleState()) {
 }
 """
 
-private val Description = """
-    Simple Feature showcases how you can start using FlowMVI with the bare minimum.
+private const val Description = """
+    Simple Feature showcases how you can start using FlowMVI with the bare minimum. 
     FlowMVI allows you to create full-fledged multiplatform MVI business 
-    logic components in about 10 lines of code.
-    See other features for advanced examples of LCE, DI, saving state & lots of other stuff.
-""".trimIndent()
+    logic components in about 10 lines of code. 
+    \n\n
+    See other features for advanced examples of LCE, DI, saving state & lots of other stuff. 
+"""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +86,7 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    Text(Description)
+    Text(Description.formatAsMultiline())
     Spacer(Modifier.height(12.dp))
     Text(text = "Counter = ${state.counter}")
     Spacer(Modifier.height(12.dp))

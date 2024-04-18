@@ -33,15 +33,16 @@ import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-    LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code.
-    
-    You can represent the LCE states as a sealed class family - an easy to understand structure.
-    
-    The library can handle any exceptions that your logic throws for you, setting the appropriate state.
-    Try refreshing the items and the screen can show you an error sometimes.
-    This example also demonstrates how you can inject dependencies into your stores and create additional functions
+    LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code. 
+    \n\n
+    You can represent the LCE states as a sealed class family - an easy to understand structure. 
+    \n\n
+    The library can handle any exceptions that your logic throws for you, setting the appropriate state. 
+    Try refreshing the items and the screen can show you an error sometimes. 
+    This example also demonstrates how you can inject dependencies into your stores and create additional functions. 
 """
 
 //language=kotlin
@@ -111,7 +112,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
             ) {
                 item {
                     Column(modifier = Modifier) {
-                        Text(Description.trimIndent())
+                        Text(Description.formatAsMultiline())
                         Spacer(Modifier.height(12.dp))
                         CodeText(Code)
                         Spacer(Modifier.height(12.dp))

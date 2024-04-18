@@ -26,16 +26,17 @@ import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-FlowMVI lets you to inject and reuse store configurations.
-You can inject any plugins into your store, including saved state plugin!
+FlowMVI lets you inject and reuse store configurations. 
+You can inject any plugins into your store, including saved state plugin! 
 This allows you to provide not only test doubles for your stores, but also different configurations 
 based on release/debug builds and environments.
-
+\n\n
 The sample app repository sets up an injectable configuration that automatically enables remote debugging
-on debug builds only and abstracts away from all the state saving logic.
-
+on debug builds only and abstracts away from all the state saving logic. 
+\n\n
 It also provides a configuration for unit-testing stores.
 """
 
@@ -97,7 +98,7 @@ private fun DiConfigScreenContent(state: PersistedCounterState) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
 ) {
-    Text(Description.trimIndent())
+    Text(Description.formatAsMultiline())
     Spacer(Modifier.height(12.dp))
     Text("Persisted counter state: ${state.counter}")
     Spacer(Modifier.height(12.dp))

@@ -46,11 +46,12 @@ import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-    This feature showcases FlowMVI <> Essenty integration.
-    No matter how far you scroll or how you rotate your device, this page will retain its state.
-    
+    This feature showcases FlowMVI <> Essenty integration. 
+    No matter how far you scroll or how you rotate your device, this page will retain its state. 
+    \n\n
     FlowMVI doesn't need Decompose to function - instead, it uses Essenty's API directly to 
     provide subscription lifecycle support and retaining store instances.
 """
@@ -141,7 +142,10 @@ private fun DecomposeScreenContent(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(Description.trimIndent(), modifier = Modifier.padding(horizontal = 12.dp))
+            Text(
+                text = Description.formatAsMultiline(),
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
             Pages(
                 pages = pagesComponent.pages,
                 onPageSelected = { pagesComponent.navigator.select(it) },

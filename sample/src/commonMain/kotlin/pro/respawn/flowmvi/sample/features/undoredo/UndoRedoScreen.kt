@@ -37,11 +37,13 @@ import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.undoredo_feature_title
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-FlowMVI provides undo/redo functionality out of the box, installed as a simple plugin.
-The plugin handles the queue, max undos, errors and store lifecycle for you.
-Type something into the box below, then try undoing / redoing your actions.
+FlowMVI provides undo/redo functionality out of the box, installed as a simple plugin. 
+The plugin handles the queue, max undos, errors and store lifecycle for you. 
+\n\n
+Type something into the box below, then try undoing / redoing your actions. 
 """
 
 //language=kotlin
@@ -117,7 +119,7 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
 ) {
-    Text(Description.trimIndent())
+    Text(Description.formatAsMultiline())
     Spacer(Modifier.height(12.dp))
     Row(
         modifier = Modifier.widthIn(min = 400.dp),

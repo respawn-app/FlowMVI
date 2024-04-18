@@ -31,16 +31,17 @@ import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
     Saved state plugin allows you to persist a state of a store into a file or other place in about 5 lines of code
-    
+    \n\n
     The state is automatically compressed, written, and then restored when your store starts, all in the background
-    
+    \n\n
     You can decorate state saving/restoration logic with custom Savers and inject it transparently to the rest 
-    of the code of your app
-    
-    Try typing something into the box below and then reopen the app - your input will be remembered!
+    of the code of your app. 
+    \n\n
+    Try typing something into the box below and then reopen the app - your input will be remembered! 
 """
 
 //language=kotlin
@@ -92,7 +93,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(Description.trimIndent())
+            Text(Description.formatAsMultiline())
             Spacer(Modifier.height(24.dp))
             RTextInput(
                 input = input,

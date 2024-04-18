@@ -37,13 +37,14 @@ import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
+import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
-    FlowMVI provides a multiplatform logging setup out of the box.
+    FlowMVI provides a multiplatform logging setup out of the box. 
     You can see everything that happens in the store in your device's console or customize the logging to print to any
-    source you wish.
-    
-    For example, the code below sends logs back to the store to display on-screen
+    source you wish. 
+    \n\n
+    For example, the code below sends logs back to the store to display on-screen. 
 """
 
 //language=kotlin
@@ -116,7 +117,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 12.dp),
                 ) {
-                    Text(Description.trimIndent())
+                    Text(Description.formatAsMultiline())
                     Spacer(Modifier.height(12.dp))
                     CodeText(Code)
                     Spacer(Modifier.height(12.dp))
