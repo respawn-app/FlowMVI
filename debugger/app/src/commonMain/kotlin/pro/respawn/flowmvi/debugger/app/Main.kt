@@ -11,8 +11,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinContext
 import pro.respawn.flowmvi.debugger.app.di.koin
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineScreen
-import pro.respawn.flowmvi.debugger.server.ui.theme.Resources
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
+import pro.respawn.flowmvi.server.generated.resources.icon_nobg_32
+import pro.respawn.flowmvi.server.generated.resources.Res as UiR
 
 @OptIn(ExperimentalResourceApi::class)
 fun main() {
@@ -24,7 +25,7 @@ fun main() {
         )
         Window(
             onCloseRequest = ::exitApplication,
-            icon = painterResource(Resources.projectIcon),
+            icon = painterResource(UiR.drawable.icon_nobg_32),
             title = "FlowMVI Debugger",
             state = state,
         ) {
