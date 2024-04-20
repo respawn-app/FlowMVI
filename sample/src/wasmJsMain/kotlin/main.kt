@@ -1,7 +1,7 @@
 @file:Suppress("MissingPackageDeclaration", "Filename")
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.ComposeViewport
+import androidx.compose.ui.window.CanvasBasedWindow
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.stack.webhistory.DefaultWebHistoryController
@@ -49,7 +49,7 @@ fun main() {
         localStorage.setItem(KEY_SAVED_STATE, stateKeeper.save().encodeToString())
         null
     }
-    ComposeViewport("app") { AppContent(root) }
+    CanvasBasedWindow { AppContent(root) }
 }
 
 private fun LifecycleRegistry.attachToDocument() {
