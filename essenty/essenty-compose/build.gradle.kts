@@ -25,8 +25,6 @@ kotlin {
     )
     sourceSets {
         androidMain.dependencies {
-            api(projects.android)
-
             implementation(compose.foundation)
             implementation(compose.preview)
         }

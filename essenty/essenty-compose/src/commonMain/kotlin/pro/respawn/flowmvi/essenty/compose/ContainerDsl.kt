@@ -26,8 +26,8 @@ import pro.respawn.flowmvi.dsl.subscribe
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
 ): State<S> where T : LifecycleOwner, T : ImmutableContainer<S, I, A> = store.subscribe(
-    lifecycle = rememberSubscriberLifecycle(lifecycle) { asSubscriberLifecycle },
-    mode = lifecycleState.asSubscriptionMode
+    lifecycle = rememberSubscriberLifecycle(this) { lifecycle.asSubscriberLifecycle },
+    mode = lifecycleState.asSubscriptionMode,
 )
 
 /**
@@ -43,7 +43,7 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
     consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> where T : LifecycleOwner, T : ImmutableContainer<S, I, A> = store.subscribe(
-    lifecycle = rememberSubscriberLifecycle(lifecycle) { asSubscriberLifecycle },
+    lifecycle = rememberSubscriberLifecycle(this) { lifecycle.asSubscriberLifecycle },
     mode = lifecycleState.asSubscriptionMode,
     consume = consume,
 )

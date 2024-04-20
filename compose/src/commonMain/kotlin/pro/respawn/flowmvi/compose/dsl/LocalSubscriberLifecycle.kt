@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
+import pro.respawn.flowmvi.api.SubscriberLifecycle
 
 /**
  * A local composition [SubscriberLifecycle] instance. May return `null` if no lifecycle was provided.
@@ -45,7 +45,22 @@ public fun <T> rememberSubscriberLifecycle(
  * Get the current provided subscriber lifecycle, or if not found, fall back to the platform-provided lifecycle
  */
 @FlowMVIDSL
-public val CurrentLifecycle: SubscriberLifecycle
+public val DefaultLifecycle: SubscriberLifecycle
     @Composable
     get() = LocalSubscriberLifecycle.current
         ?: rememberSubscriberLifecycle(LocalLifecycleOwner.current) { lifecycle.asSubscriberLifecycle }
+
+/**
+ * Require [LocalSubscriberLifecycle] to be provided using a composition local.
+ *
+ * For a fallback behavior, use [DefaultLifecycle].
+ */
+@Composable
+@FlowMVIDSL
+public fun requireLifecycle(): SubscriberLifecycle = requireNotNull(LocalSubscriberLifecycle.current) {
+    """
+        Subscriber lifecycle was required but not found. 
+        Please either provide a lifecycle using LocalSubscriberLifecycle, pass the lifecycle manually,
+        or use DefaultLifecycle to fall back to system lifecycle.
+    """.trimIndent()
+}

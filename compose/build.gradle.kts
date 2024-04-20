@@ -30,15 +30,12 @@ kotlin {
         windows = false,
     )
     sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(projects.android)
-        }
         commonMain.dependencies {
+            api(projects.core)
+            api(libs.lifecycle.runtime)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(libs.lifecycle.runtime)
-            api(projects.core)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)

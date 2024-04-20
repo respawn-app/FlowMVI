@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.compose.api
+package pro.respawn.flowmvi.api
 
 /**
  * Subscription mode of the UI element with a dedicated lifecycle.
