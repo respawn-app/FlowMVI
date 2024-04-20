@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -110,6 +111,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             Spacer(Modifier.height(24.dp))
             @Suppress("MagicNumber")
             CodeText(Code, PhraseLocation(167, 297))
+            Spacer(Modifier.navigationBarsPadding())
         }
     }
 }

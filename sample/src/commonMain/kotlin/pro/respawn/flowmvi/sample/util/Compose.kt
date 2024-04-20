@@ -3,8 +3,13 @@ package pro.respawn.flowmvi.sample.util
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -187,3 +192,7 @@ fun Modifier.bringIntoViewOnFocus() = composed {
 }
 
 fun String.formatAsMultiline() = trimIndent().replace("\n", "").replace("\\n", "\n")
+
+@Composable
+fun WindowInsets.Companion.verticalListPaddings() =
+    WindowInsets.navigationBars.only(WindowInsetsSides.Bottom).asPaddingValues()

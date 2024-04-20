@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -148,4 +149,5 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     )
     Spacer(Modifier.height(12.dp))
     CodeText(Code)
+    Spacer(Modifier.navigationBarsPadding())
 }
