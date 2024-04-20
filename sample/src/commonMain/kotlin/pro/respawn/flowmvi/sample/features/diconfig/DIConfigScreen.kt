@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -79,7 +80,7 @@ internal class DiConfigContainer(
 fun DiConfigScreen(
     navigator: Navigator,
 ) = with(container<DiConfigContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle )
     RScaffold(
         onBack = navigator.backNavigator,
         title = stringResource(Res.string.di_feature_title),

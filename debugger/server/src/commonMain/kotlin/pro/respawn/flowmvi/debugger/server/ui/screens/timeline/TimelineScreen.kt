@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.CopyToClipboard
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
@@ -59,7 +60,7 @@ fun TimelineScreen() {
     val listState = rememberLazyListState()
     val clipboard = LocalClipboardManager.current
     with(store) {
-        val state by subscribe {
+        val state by subscribe(DefaultLifecycle) {
             when (it) {
                 is ScrollToItem -> listState.animateScrollToItem(it.index)
                 is CopyToClipboard -> clipboard.setText(AnnotatedString(it.text))

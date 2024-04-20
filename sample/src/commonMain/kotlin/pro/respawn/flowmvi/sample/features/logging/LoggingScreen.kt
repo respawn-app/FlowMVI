@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -85,7 +86,7 @@ fun LoggingScreen(
 ) = with(container<LoggingContainer, _, _, _>()) {
     val listState = rememberLazyListState()
 
-    val state by subscribe {
+    val state by subscribe(DefaultLifecycle) {
         when (it) {
             is SentLog -> listState.animateScrollToItem(it.logsSize)
         }

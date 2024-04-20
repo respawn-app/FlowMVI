@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.BuildFlags
 import pro.respawn.flowmvi.sample.Res
@@ -72,7 +73,7 @@ import pro.respawn.flowmvi.sample.xml_feature_title
 fun HomeScreen(
     navigator: AppNavigator,
 ) = with(container<HomeContainer, _, _, _>()) {
-    val state by subscribe { action ->
+    val state by subscribe(DefaultLifecycle) { action ->
         when (action) {
             is GoToFeature -> when (action.feature) {
                 Simple -> navigator.simpleFeature()

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -86,7 +87,7 @@ internal class LCEContainer(
 fun LCEScreen(
     navigator: Navigator,
 ) = with(container<LCEContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.lce_feature_title),

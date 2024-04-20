@@ -8,8 +8,8 @@ android {
 
 dependencies {
     api(projects.core)
-    api(libs.lifecycle.runtime)
-    api(libs.lifecycle.viewmodel)
+    // api(libs.lifecycle.runtime)
+    // api(libs.lifecycle.viewmodel)
     api(libs.kotlin.coroutines.android)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.activity)

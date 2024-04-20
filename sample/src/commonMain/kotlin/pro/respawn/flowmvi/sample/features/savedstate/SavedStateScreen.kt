@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -73,7 +74,7 @@ internal class SavedStateContainer(
 fun SavedStateScreen(
     navigator: Navigator,
 ) = with(container<SavedStateContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.savedstate_feature_title),

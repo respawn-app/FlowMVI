@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
@@ -64,7 +65,7 @@ fun SimpleScreen(
 ) = with(simpleStore) {
     LaunchedEffect(Unit) { start(this).join() }
 
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.simple_feature_title),
