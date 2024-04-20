@@ -146,7 +146,7 @@ tasks {
 rootProject.plugins.withType<YarnPlugin>().configureEach {
     rootProject.the<YarnRootExtension>().apply {
         yarnLockMismatchReport = YarnLockMismatchReport.WARNING // NONE | FAIL | FAIL_AFTER_BUILD
-        reportNewYarnLock = false // true
-        yarnLockAutoReplace = false // true
+        reportNewYarnLock = true
+        yarnLockAutoReplace = true
     }
 }
