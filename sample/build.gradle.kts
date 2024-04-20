@@ -128,7 +128,6 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.essenty.statekeeper)
-
         }
     } // sets
 }
@@ -192,7 +191,6 @@ dependencies {
 }
 compose {
     android {
-
     }
     resources {
         packageOfResClass = Config.Sample.namespace

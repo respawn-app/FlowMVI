@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(libs.plugins.androidLibrary.id)
@@ -16,6 +18,7 @@ android {
 }
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     configureMultiplatform(
         ext = this,
         jvm = true,
