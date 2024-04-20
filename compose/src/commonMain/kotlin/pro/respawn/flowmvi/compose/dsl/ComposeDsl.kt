@@ -22,6 +22,7 @@ import pro.respawn.flowmvi.api.SubscriberLifecycle
 import pro.respawn.flowmvi.api.SubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.util.immediateOrDefault
+import kotlin.jvm.JvmName
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -41,6 +42,7 @@ import pro.respawn.flowmvi.util.immediateOrDefault
 @Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
+@JvmName("subscribeConsume")
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,

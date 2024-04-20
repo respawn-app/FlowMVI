@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.dsl.subscribe
+import kotlin.jvm.JvmName
 
 /**
  * An alias for [subscribe] that uses the provided Essenty [LifecycleOwner] for subscription.
@@ -21,6 +22,7 @@ import pro.respawn.flowmvi.dsl.subscribe
  * @see subscribe
  */
 @Suppress("ComposableParametersOrdering")
+@JvmName("subscribeConsume")
 @Composable
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
