@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.dsl.subscribe
+import kotlin.jvm.JvmName
 
 /**
  * An alias for [subscribe] that subscribes to `this` [Container] using its lifecycle.
@@ -38,6 +39,7 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
  */
 @Composable
 @FlowMVIDSL
+@JvmName("subscribeConsume")
 @Suppress("ComposableParametersOrdering")
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
