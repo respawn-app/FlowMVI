@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.sample.app
+package pro.respawn.flowmvi.sample
 
 import android.app.Application
 import pro.respawn.flowmvi.sample.di.startKoin

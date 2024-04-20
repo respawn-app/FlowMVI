@@ -11,4 +11,5 @@
         \nCounter : %d
     </string>
     <string name="error_message">Unknown error</string>
+    <string name="app_name">FlowMVI</string>
 </resources>

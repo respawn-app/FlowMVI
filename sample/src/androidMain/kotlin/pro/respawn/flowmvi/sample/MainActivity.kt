@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.sample.app
+package pro.respawn.flowmvi.sample
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

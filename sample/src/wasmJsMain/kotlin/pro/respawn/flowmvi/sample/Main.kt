@@ -1,4 +1,6 @@
 @file:Suppress("MissingPackageDeclaration")
+
+package pro.respawn.flowmvi.sample
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
