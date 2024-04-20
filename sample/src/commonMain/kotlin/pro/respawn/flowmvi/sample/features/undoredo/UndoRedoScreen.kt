@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -98,7 +100,7 @@ internal class UndoRedoContainer : Container<UndoRedoState, UndoRedoIntent, Undo
 fun UndoRedoScreen(
     navigator: Navigator,
 ) = with(container<UndoRedoContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.undoredo_feature_title),
@@ -147,4 +149,5 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     )
     Spacer(Modifier.height(12.dp))
     CodeText(Code)
+    Spacer(Modifier.navigationBarsPadding())
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
@@ -64,7 +66,7 @@ fun SimpleScreen(
 ) = with(simpleStore) {
     LaunchedEffect(Unit) { start(this).join() }
 
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.simple_feature_title),
@@ -96,4 +98,5 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
     )
     Spacer(Modifier.height(12.dp))
     CodeText(code = Code)
+    Spacer(Modifier.navigationBarsPadding())
 }

@@ -8,4 +8,7 @@
     </style>
 
     <style name="Theme.MVI" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+
+    <color name="ic_launcher_background">#1E1A1D</color>
+
 </resources>

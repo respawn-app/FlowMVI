@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -34,6 +36,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
+import pro.respawn.flowmvi.sample.util.verticalListPaddings
 
 private const val Description = """
     LCE Feature showcases how you can build a simple loading-content-error type of screen in 50 lines of code. 
@@ -86,7 +89,7 @@ internal class LCEContainer(
 fun LCEScreen(
     navigator: Navigator,
 ) = with(container<LCEContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.lce_feature_title),
@@ -106,6 +109,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
         is LCEState.Loading -> CircularProgressIndicator()
         is LCEState.Content -> Box {
             LazyColumn(
+                contentPadding = WindowInsets.verticalListPaddings(),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .adaptiveWidth()
@@ -131,6 +135,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
             ) {
                 Text(stringResource(Res.string.retry))
             }
+            Spacer(Modifier.height(64.dp))
         } // box
     }
 }

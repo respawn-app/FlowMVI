@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(libs.plugins.androidLibrary.id)
@@ -16,6 +18,7 @@ android {
 }
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     configureMultiplatform(
         ext = this,
         jvm = true,
@@ -30,15 +33,12 @@ kotlin {
         windows = false,
     )
     sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(projects.android)
-        }
         commonMain.dependencies {
+            api(projects.core)
+            api(libs.lifecycle.runtime)
+
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(libs.lifecycle.runtime)
-            api(projects.core)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)

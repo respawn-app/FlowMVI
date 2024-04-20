@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.sample.features.logging
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -38,6 +40,7 @@ import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
+import pro.respawn.flowmvi.sample.util.verticalListPaddings
 
 private const val Description = """
     FlowMVI provides a multiplatform logging setup out of the box. 
@@ -85,7 +88,7 @@ fun LoggingScreen(
 ) = with(container<LoggingContainer, _, _, _>()) {
     val listState = rememberLazyListState()
 
-    val state by subscribe {
+    val state by subscribe(DefaultLifecycle) {
         when (it) {
             is SentLog -> listState.animateScrollToItem(it.logsSize)
         }
@@ -109,6 +112,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
         is LoggingState.Error -> RErrorView(e)
         is DisplayingLogs -> LazyColumn(
             modifier = Modifier.fillMaxHeight().adaptiveWidth(),
+            contentPadding = WindowInsets.verticalListPaddings(),
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

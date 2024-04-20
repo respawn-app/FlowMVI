@@ -1,18 +1,13 @@
 import org.intellij.lang.annotations.Language
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
-    id(libs.plugins.androidLibrary.id)
+    id(applibs.plugins.android.application.id)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.serialization)
-}
-
-compose.resources {
-    packageOfResClass = Config.Sample.namespace
-    publicResClass = false
 }
 
 @Language("Kotlin")
@@ -41,9 +36,19 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = Config.Sample.namespace
-        nodejs()
-        browser()
-        binaries.library()
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer(port = 8081)).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(project.projectDir.path)
+                    }
+                }
+            }
+            testTask { enabled = false }
+        }
+        binaries.executable()
         applyBinaryen()
     }
     jvm("desktop")
@@ -105,8 +110,6 @@ kotlin {
         }
         desktopMain.dependencies {
             implementation(projects.debugger.debuggerPlugin)
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.desktop.components.splitPane)
             implementation(libs.kotlin.coroutines.swing)
             implementation(compose.desktop.currentOs)
         }
@@ -115,19 +118,70 @@ kotlin {
             implementation(applibs.view.constraintlayout)
             implementation(applibs.view.material)
             implementation(applibs.koin.android)
+
+            implementation(applibs.androidx.splashscreen)
+
+            implementation(applibs.compose.activity)
+            implementation(applibs.koin.android)
+            implementation(applibs.koin.android.compose)
+            implementation(applibs.view.material)
         }
         wasmJsMain.dependencies {
-            implementation(applibs.okio.fakefsys)
+            implementation(libs.essenty.statekeeper)
         }
     } // sets
 }
 android {
     namespace = Config.Sample.namespace
-    configureAndroidLibrary(this)
+    configureAndroid(this)
     buildFeatures {
         viewBinding = true
         buildConfig = true
         compose = true
+    }
+    defaultConfig {
+        compileSdk = Config.compileSdk
+        applicationId = Config.artifactId
+        minSdk = Config.appMinSdk
+        targetSdk = Config.targetSdk
+        versionCode = Config.versionCode
+        versionName = Config.versionName
+    }
+    applicationVariants.all {
+        setProperty("archivesBaseName", Config.Sample.namespace)
+        outputs
+            .matching { "apk" in it.outputFile.extension }
+            .all {
+                this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                outputFileName = "${Config.Sample.namespace}.apk"
+            }
+    }
+    signingConfigs {
+        val props = localProperties()
+        val passwd = props["signing.password"].toString().trim()
+        create("release") {
+            keyAlias = "key"
+            keyPassword = passwd
+            storeFile = File(rootDir, "certificates/keystore.jks")
+            storePassword = passwd.trim()
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("debug")
+            versionNameSuffix = "-debug"
+            isShrinkResources = Config.isMinifyEnabledDebug
+        }
+        release {
+            ndk.debugSymbolLevel = "FULL"
+            isShrinkResources = true
+            isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
+        }
+    }
+    androidResources {
+        generateLocaleConfig = false
     }
 }
 
@@ -135,38 +189,50 @@ dependencies {
     // means androidDebugImplementation
     debugImplementation(projects.debugger.debuggerPlugin)
 }
+compose {
+    android {
+    }
+    resources {
+        packageOfResClass = Config.Sample.namespace
+        publicResClass = false
+    }
 
-compose.desktop {
-    application {
-        mainClass = "${Config.Sample.namespace}.app.MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = Config.namespace
-            packageVersion = Config.majorVersionName
-            description = Config.Sample.appDescription
-            vendor = Config.vendorName
-            licenseFile = rootProject.rootDir.resolve(Config.licenseFile)
-            val iconDir = rootProject.rootDir.resolve("docs").resolve("images")
-            macOS {
-                packageName = Config.Sample.name
-                dockName = Config.Sample.name
-                setDockNameSameAsPackageName = false
-                bundleID = Config.Sample.namespace
-                appCategory = "public.app-category.developer-tools"
-                iconFile = iconDir.resolve("icon_macos.icns")
-            }
-            windows {
-                dirChooser = true
-                menu = false
-                shortcut = true
-                perUserInstall = true
-                upgradeUuid = Config.Sample.appId
-                iconFile = iconDir.resolve("favicon.ico")
-            }
-            linux {
-                debMaintainer = Config.supportEmail
-                appCategory = "Development"
-                iconFile = iconDir.resolve("icon_512.png")
+    experimental {
+        web.application { }
+    }
+
+    desktop {
+        application {
+            mainClass = "${Config.Sample.namespace}.MainKt"
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
+                packageName = Config.namespace
+                packageVersion = Config.majorVersionName
+                description = Config.Sample.appDescription
+                vendor = Config.vendorName
+                licenseFile = rootProject.rootDir.resolve(Config.licenseFile)
+                val iconDir = rootProject.rootDir.resolve("docs").resolve("images")
+                macOS {
+                    packageName = Config.Sample.name
+                    dockName = Config.Sample.name
+                    setDockNameSameAsPackageName = false
+                    bundleID = Config.Sample.namespace
+                    appCategory = "public.app-category.developer-tools"
+                    iconFile = iconDir.resolve("icon_macos.icns")
+                }
+                windows {
+                    dirChooser = true
+                    menu = false
+                    shortcut = true
+                    perUserInstall = true
+                    upgradeUuid = Config.Sample.appId
+                    iconFile = iconDir.resolve("favicon.ico")
+                }
+                linux {
+                    debMaintainer = Config.supportEmail
+                    appCategory = "Development"
+                    iconFile = iconDir.resolve("icon_512.png")
+                }
             }
         }
     }

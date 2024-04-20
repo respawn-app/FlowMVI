@@ -4,8 +4,9 @@ import androidx.compose.runtime.Stable
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
-import pro.respawn.flowmvi.compose.api.SubscriberLifecycle
-import pro.respawn.flowmvi.compose.api.SubscriptionMode
+import pro.respawn.flowmvi.api.SubscriberLifecycle
+import pro.respawn.flowmvi.api.SubscriptionMode
+import pro.respawn.flowmvi.dsl.SubscriberLifecycle
 import androidx.lifecycle.Lifecycle.State as ALifecycleState
 
 /**
@@ -39,7 +40,9 @@ public val ALifecycleState.asEssentyLifecycle: Lifecycle.State
  */
 @Stable
 public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
-    get() = SubscriberLifecycle { mode, block -> repeatOnLifecycle(mode.asEssentyLifecycle, block = block) }
+    get() = SubscriberLifecycle(this) { mode, block ->
+        repeatOnLifecycle(mode.asEssentyLifecycle, block = block)
+    }
 
 /**
  * Convert this [SubscriptionMode] to an Essenty [Lifecycle.State]

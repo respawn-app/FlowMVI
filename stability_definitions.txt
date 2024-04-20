@@ -5,3 +5,5 @@ pro.respawn.flowmvi.api.Store
 pro.respawn.flowmvi.api.Container
 pro.respawn.flowmvi.api.ImmutableStore
 pro.respawn.flowmvi.dsl.LambdaIntent
+pro.respawn.flowmvi.api.SubscriberLifecycle
+pro.respawn.flowmvi.api.IntentReceiver

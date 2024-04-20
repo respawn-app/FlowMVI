@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.sample.ui.screens
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -28,6 +29,7 @@ internal class XmlActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(binding.root)
         subscribe(vm.store, ::consume, ::render)
         with(binding) {

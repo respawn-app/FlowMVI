@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -79,7 +81,7 @@ internal class DiConfigContainer(
 fun DiConfigScreen(
     navigator: Navigator,
 ) = with(container<DiConfigContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
     RScaffold(
         onBack = navigator.backNavigator,
         title = stringResource(Res.string.di_feature_title),
@@ -103,4 +105,5 @@ private fun DiConfigScreenContent(state: PersistedCounterState) = Column(
     Text("Persisted counter state: ${state.counter}")
     Spacer(Modifier.height(12.dp))
     CodeText(Code, PhraseLocation(start = 198, end = 357))
+    Spacer(Modifier.navigationBarsPadding())
 }

@@ -1,27 +1,23 @@
-@file:OptIn(DelicateStoreApi::class)
-
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.SubscriberLifecycle
 import pro.respawn.flowmvi.api.SubscriptionMode
 import pro.respawn.flowmvi.dsl.subscribe
-import pro.respawn.flowmvi.util.immediateOrDefault
+
+private const val Message = """
+An overload without an explicit Lifecycle parameter is deprecated as it is error prone in environments where
+custom lifecycle is provided by the system or a navigation library. Please pass one of: 
+- requireLifecycle() if you provide a lifecycle via a composition local
+- DefaultLifecycle if you wish to use a platform lifecycle if no composition local is provided
+- A custom component that implements Lifecycle owner if you are using an integration library
+"""
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -38,29 +34,14 @@ import pro.respawn.flowmvi.util.immediateOrDefault
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
+@Deprecated(Message, ReplaceWith("this.subscribe(DefaultLifecycle, mode, consume)"))
 @Suppress("ComposableParametersOrdering")
 @Composable
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
     consume: suspend CoroutineScope.(action: A) -> Unit,
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
-        withContext(Dispatchers.Main.immediateOrDefault) {
-            lifecycle.repeatOnLifecycle(mode) {
-                subscribe(
-                    store = this@subscribe,
-                    consume = { block(it) },
-                    render = { state.value = it }
-                ).join()
-            }
-        }
-    }
-    return state
-}
+): State<S> = subscribe(DefaultLifecycle, mode, consume)
 
 /**
  * A function to subscribe to the store that follows the system lifecycle.
@@ -75,22 +56,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.
  * @see ImmutableStore.subscribe
  * @see subscribe
  */
+@Deprecated(Message, ReplaceWith("this.subscribe(DefaultLifecycle, mode)"))
 @Composable
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
-        withContext(Dispatchers.Main.immediateOrDefault) {
-            lifecycle.repeatOnLifecycle(mode) {
-                subscribe(
-                    store = this@subscribe,
-                    render = { state.value = it }
-                ).join()
-            }
-        }
-    }
-    return state
-}
+): State<S> = subscribe(DefaultLifecycle, mode)

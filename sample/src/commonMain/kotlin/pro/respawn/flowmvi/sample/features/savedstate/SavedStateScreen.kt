@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import dev.snipme.highlights.model.PhraseLocation
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.arch.di.container
@@ -73,7 +76,7 @@ internal class SavedStateContainer(
 fun SavedStateScreen(
     navigator: Navigator,
 ) = with(container<SavedStateContainer, _, _, _>()) {
-    val state by subscribe()
+    val state by subscribe(DefaultLifecycle)
 
     RScaffold(
         title = stringResource(Res.string.savedstate_feature_title),
@@ -89,7 +92,11 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
 ) = TypeCrossfade(state) {
     when (this) {
         is DisplayingInput -> Column(
-            modifier = Modifier.fillMaxHeight().verticalScroll(rememberScrollState()).adaptiveWidth(),
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 12.dp)
+                .verticalScroll(rememberScrollState())
+                .adaptiveWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
@@ -104,6 +111,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             Spacer(Modifier.height(24.dp))
             @Suppress("MagicNumber")
             CodeText(Code, PhraseLocation(167, 297))
+            Spacer(Modifier.navigationBarsPadding())
         }
     }
 }

@@ -11,19 +11,22 @@ import pro.respawn.flowmvi.sample.features.simple.SimpleScreen
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoScreen
 import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
+import pro.respawn.flowmvi.sample.navigation.util.ProvideDestinationLocals
 
 @Composable
 fun Destinations(
     destination: Destination,
     navigator: RootComponent,
     component: DestinationComponent,
-) = when (destination) {
-    is Destination.Home -> HomeScreen(navigator)
-    is Destination.SimpleFeature -> SimpleScreen(navigator)
-    is Destination.LCEFeature -> LCEScreen(navigator)
-    is Destination.SavedState -> SavedStateScreen(navigator)
-    is Destination.DiConfig -> DiConfigScreen(navigator)
-    is Destination.Logging -> LoggingScreen(navigator)
-    is Destination.UndoRedo -> UndoRedoScreen(navigator)
-    is Destination.Decompose -> DecomposeScreen(component, navigator)
+) = ProvideDestinationLocals(component) {
+    when (destination) {
+        Destination.Home -> HomeScreen(navigator)
+        Destination.SimpleFeature -> SimpleScreen(navigator)
+        Destination.LCEFeature -> LCEScreen(navigator)
+        Destination.SavedState -> SavedStateScreen(navigator)
+        Destination.DiConfig -> DiConfigScreen(navigator)
+        Destination.Logging -> LoggingScreen(navigator)
+        Destination.UndoRedo -> UndoRedoScreen(navigator)
+        Destination.Decompose -> DecomposeScreen(component, navigator)
+    }
 }
