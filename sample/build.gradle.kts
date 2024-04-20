@@ -205,7 +205,7 @@ compose {
 
     desktop {
         application {
-            mainClass = "${Config.Sample.namespace}.app.MainKt"
+            mainClass = "${Config.Sample.namespace}.MainKt"
             nativeDistributions {
                 targetFormats(TargetFormat.Dmg, TargetFormat.Deb, TargetFormat.Exe)
                 packageName = Config.namespace

@@ -9,6 +9,7 @@ import androidx.compose.ui.window.rememberWindowState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.KoinContext
+import org.koin.core.context.startKoin
 import pro.respawn.flowmvi.debugger.app.di.koin
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineScreen
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
