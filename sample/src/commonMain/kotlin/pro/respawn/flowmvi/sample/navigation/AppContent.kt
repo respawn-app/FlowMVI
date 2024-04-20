@@ -14,14 +14,12 @@ import pro.respawn.flowmvi.sample.ui.theme.RespawnTheme
 @Composable
 fun AppContent(
     root: RootComponent
-) = ProvideDestinationLocals(root) {
-    RespawnTheme(useDynamicColors = true) {
+) = RespawnTheme(useDynamicColors = true) {
         Children(
             stack = root.stack,
             modifier = Modifier.background(MaterialTheme.colorScheme.background),
             animation = defaultNavAnimation(root),
         ) { child ->
-            ProvideDestinationLocals(child.instance) {
                 Destinations(
                     component = child.instance,
                     destination = child.configuration,
@@ -29,5 +27,3 @@ fun AppContent(
                 )
             }
         }
-    }
-}

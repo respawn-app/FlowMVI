@@ -4,6 +4,7 @@ package pro.respawn.flowmvi.sample
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.router.stack.webhistory.DefaultWebHistoryController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.essenty.lifecycle.resume
 import com.arkivanov.essenty.lifecycle.stop
@@ -16,7 +17,6 @@ import org.w3c.dom.Document
 import pro.respawn.flowmvi.sample.di.startKoin
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
-import pro.respawn.flowmvi.sample.platform.NoOpPlatformFeatureLauncher
 import pro.respawn.flowmvi.sample.util.Json
 
 private const val KEY_SAVED_STATE = "saved_state"
@@ -38,7 +38,7 @@ fun main() {
         savedState = localStorage.getItem(KEY_SAVED_STATE)?.decodeSerializableContainer()
     )
     val root = RootComponent(
-        androidFeatures = NoOpPlatformFeatureLauncher,
+        controller = DefaultWebHistoryController(),
         context = DefaultComponentContext(
             lifecycle = registry,
             stateKeeper = stateKeeper,

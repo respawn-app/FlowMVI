@@ -7,42 +7,31 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.sample.navigation.util.toSnakeCase
 import pro.respawn.flowmvi.sample.util.UUIDSerializer
+import pro.respawn.kmmutils.common.fastLazy
 
 @Serializable
 @Immutable
-sealed interface Destination {
+enum class Destination(
+    vararg val routes: String,
+    val topLevel: Boolean = false,
+    val singleTop: Boolean = topLevel,
+) {
 
-    val topLevel: Boolean get() = false
-    val singleTop: Boolean get() = topLevel
-    val route get() = requireNotNull(this::class.simpleName).toSnakeCase()
+    Home("", "home", topLevel = true),
+    SimpleFeature("simple"),
+    LCEFeature("lce"),
+    SavedState("savedstate"),
+    DiConfig("di"),
+    Logging("logging"),
+    UndoRedo("undoredo", "undo"),
+    Decompose("decompose");
 
-    override fun equals(other: Any?): Boolean
-    override fun hashCode(): Int
+    companion object {
 
-    @Serializable
-    data object Home : Destination {
-
-        override val topLevel: Boolean get() = true
+        val byRoute by fastLazy {
+            entries.flatMap { destination ->
+                destination.routes.map { route -> route to destination }
+            }.toMap()
+        }
     }
-
-    @Serializable
-    data object SimpleFeature : Destination
-
-    @Serializable
-    data object LCEFeature : Destination
-
-    @Serializable
-    data object SavedState : Destination
-
-    @Serializable
-    data object DiConfig : Destination
-
-    @Serializable
-    data object Logging : Destination
-
-    @Serializable
-    data object UndoRedo : Destination
-
-    @Serializable
-    data object Decompose : Destination
 }
