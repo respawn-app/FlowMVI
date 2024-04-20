@@ -24,6 +24,7 @@ import kotlin.jvm.JvmName
  */
 @Composable
 @FlowMVIDSL
+@JvmName("subscribeWithLifecycle")
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,
 ): State<S> where T : LifecycleOwner, T : ImmutableContainer<S, I, A> = store.subscribe(
@@ -39,7 +40,7 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
  */
 @Composable
 @FlowMVIDSL
-@JvmName("subscribeConsume")
+@JvmName("subscribeWithLifecycle")
 @Suppress("ComposableParametersOrdering")
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,

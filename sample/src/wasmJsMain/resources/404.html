@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>FlowMVI</title>
+    <script>
+        sessionStorage.redirect = location.href;
+    </script>
+    <meta http-equiv="refresh" content="0;URL='/FlowMVI/sample/'">
     <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0" name="viewport">
     <meta content="FlowMVI is a KMP MVI library with a powerful plugin system" name="description">
     <!--  Social media  -->
@@ -17,20 +21,6 @@
     <meta property="twitter:image" content="https://opensource.respawn.pro/FlowMVI/images/banner.png">
     <meta property="twitter:site" content="@respawn_app">
     <meta name="twitter:description" content="FlowMVI is a KMP MVI library with a powerful plugin system">
-    <!--    Hack to obtain a redirect instance from github-pages's 404 and rewrite the browser history  -->
-    <script type="application/javascript">
-        (function(){
-          var redirect = sessionStorage.redirect;
-          delete sessionStorage.redirect;
-          if (redirect && redirect != location.href) {
-            history.replaceState(null, null, redirect);
-          }
-        })();
-    </script>
-    <script type="application/javascript" src="skiko.js"></script>
-    <script type="application/javascript" src="app.js"></script>
 </head>
-<body>
-<canvas id="ComposeTarget"></canvas>
-</body>
+<body></body>
 </html>

@@ -36,19 +36,13 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "app"
+        binaries.executable()
         browser {
             commonWebpackConfig {
                 outputFileName = "app.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(project.projectDir.path)
-                    }
-                }
             }
             testTask { enabled = false }
         }
-        binaries.executable()
         applyBinaryen()
     }
     jvm("desktop")
