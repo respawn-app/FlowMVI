@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -55,8 +56,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
             subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
             else -> job.getAndSet(null)?.cancelAndJoin()
         }
-        onUnsubscribe { current ->
-            if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
-        }
+    }
+    onUnsubscribe { current ->
+        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
+    }
+    onStop {
+        job.getAndSet(null)?.cancel(CancellationException(null, it))
     }
 }

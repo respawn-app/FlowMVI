@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.store
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -92,6 +93,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         launch { awaitUnsubscription() }
         block(this@StoreImpl)
         if (config.debuggable) throw NonSuspendingSubscriberException()
+        cancel()
     }
 
     override fun close() {

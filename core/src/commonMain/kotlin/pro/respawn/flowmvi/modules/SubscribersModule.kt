@@ -25,7 +25,6 @@ private class SubscribersModuleImpl : SubscribersModule {
     override val subscribers = marker
         .subscriptionCount
         .withPrevious(0)
-        .drop(1)
 
     override suspend fun awaitUnsubscription() = marker.collect { }
 }
@@ -36,6 +35,6 @@ internal suspend inline fun SubscribersModule.observeSubscribers(
 ) = subscribers.collect { (previous, new) ->
     when {
         new > previous -> onSubscribe(new)
-        else -> onUnsubscribe(new)
+        new < previous -> onUnsubscribe(new)
     }
 }

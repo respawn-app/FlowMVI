@@ -18,7 +18,6 @@ import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
 // TODO:
-//   parent store plugin
 //   while subscribed plugin: job cancelled, multiple subs, single sub
 //   subscriber manager
 //   subscriber count is correct
