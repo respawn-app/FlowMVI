@@ -7,7 +7,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmInline
 
-internal suspend fun <T> Mutex.withReentrantLock(block: suspend () -> T): T {
+internal suspend inline fun <T> Mutex.withReentrantLock(crossinline block: suspend () -> T): T {
     val key = ReentrantMutexContextKey(this)
     // call block directly when this mutex is already locked in the context
     if (coroutineContext[key] != null) return block()
