@@ -1,37 +1,41 @@
 package pro.respawn.flowmvi.modules
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.drop
+import pro.respawn.flowmvi.util.withPrevious
 
 internal fun subscribersModule(): SubscribersModule = SubscribersModuleImpl()
 
+/**
+ * This class is used to mark the collectors as subscribed, it's needed because
+ * we can't really tell what the subscriber is collecting - states or actions, hence using
+ * those flows is not sufficient.
+ **/
 internal interface SubscribersModule {
 
-    val subscribers: StateFlow<Pair<Int, Int>>
-    fun newSubscriber()
-    fun removeSubscriber()
+    val subscribers: Flow<Pair<Int, Int>>
+
+    suspend fun awaitUnsubscription(): Nothing
 }
 
 private class SubscribersModuleImpl : SubscribersModule {
 
-    private val _subscribers = MutableStateFlow(0 to 0) // previous, current
-    override val subscribers = _subscribers.asStateFlow()
+    private val marker = MutableSharedFlow<Unit>()
+    override val subscribers = marker
+        .subscriptionCount
+        .withPrevious(0)
+        .drop(1)
 
-    override fun newSubscriber() = _subscribers.update { (_, current) -> current to (current + 1).coerceAtLeast(0) }
-
-    override fun removeSubscriber() = _subscribers.update { (_, current) -> current to (current - 1).coerceAtLeast(0) }
+    override suspend fun awaitUnsubscription() = marker.collect { }
 }
 
 internal suspend inline fun SubscribersModule.observeSubscribers(
     crossinline onSubscribe: suspend (count: Int) -> Unit,
     crossinline onUnsubscribe: suspend (count: Int) -> Unit,
-) {
-    subscribers.collect { (previous, new) ->
-        when {
-            new > previous -> onSubscribe(new)
-            new < previous -> onUnsubscribe(new)
-        }
+) = subscribers.collect { (previous, new) ->
+    when {
+        new > previous -> onSubscribe(new)
+        else -> onUnsubscribe(new)
     }
 }

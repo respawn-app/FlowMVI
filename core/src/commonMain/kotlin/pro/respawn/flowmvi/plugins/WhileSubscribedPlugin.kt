@@ -49,13 +49,14 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     this.name = name
     val job = atomic<Job?>(null)
     onSubscribe { previous ->
-        val newSubscribers = previous + 1
+        val subs = previous + 1
         when {
-            job.value?.isActive == true -> return@onSubscribe // condition was already satisfied
-            newSubscribers >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
+            job.value?.isActive == true -> Unit // condition was already satisfied
+            subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
+            else -> job.getAndSet(null)?.cancelAndJoin()
         }
-    }
-    onUnsubscribe { current ->
-        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
+        onUnsubscribe { current ->
+            if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
+        }
     }
 }

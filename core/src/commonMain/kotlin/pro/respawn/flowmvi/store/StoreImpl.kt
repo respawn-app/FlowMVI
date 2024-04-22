@@ -54,7 +54,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             this@StoreImpl.updateState { onState(this, transform()) ?: this }
         },
         onStop = {
-            checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
+            checkNotNull(launchJob.getAndSet(null)) { "Store is stopped but was not started before" }
             onStop(it)
         },
         onStart = {
@@ -89,11 +89,9 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job = launch {
-        newSubscriber()
+        launch { awaitUnsubscription() }
         block(this@StoreImpl)
         if (config.debuggable) throw NonSuspendingSubscriberException()
-    }.apply {
-        invokeOnCompletion { removeSubscriber() }
     }
 
     override fun close() {
