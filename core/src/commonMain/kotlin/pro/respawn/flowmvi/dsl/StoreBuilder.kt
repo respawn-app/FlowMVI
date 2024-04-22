@@ -1,4 +1,4 @@
-@file:Suppress("MemberVisibilityCanBePrivate", "NOTHING_TO_INLINE")
+@file:Suppress("MemberVisibilityCanBePrivate")
 
 package pro.respawn.flowmvi.dsl
 
@@ -132,33 +132,28 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public var atomicStateUpdates: Boolean = true
 
     /**
-     * Install an existing [StorePlugin]. See the other overload to build the plugin on the fly.
-     * This installs a prebuilt plugin.
+     * Install [StorePlugin]s. See the other overload to build the plugin on the fly.
+     * This installs prebuilt plugins.
      * Plugins will **preserve** the order of installation and will proceed according to this order.
      * See [StorePlugin] for comprehensive information on the behavior of plugins.
      * Installation of the same plugin multiple times is **not allowed**.
      * See [StorePlugin.name] for more info and solutions.
      */
     @FlowMVIDSL
-    public fun install(plugin: StorePlugin<S, I, A>): Unit = require(plugins.add(plugin)) {
-        duplicatePluginMessage(plugin.toString())
+    public inline fun install(
+        plugin: StorePlugin<S, I, A>,
+        vararg other: StorePlugin<S, I, A>,
+    ): Unit = install(other.asSequence().plus(plugin).asIterable())
+
+    /**
+     * Install all [plugins].
+     * Please see documentation for the other overload for more details.
+     * @see install
+     */
+    @FlowMVIDSL
+    public fun install(plugins: Iterable<StorePlugin<S, I, A>>): Unit = plugins.forEach {
+        require(this.plugins.add(it)) { duplicatePluginMessage(it.toString()) }
     }
-
-    /**
-     * Install all [plugins].
-     * Please see documentation for the other overload for more details.
-     * @see install
-     */
-    @FlowMVIDSL
-    public inline fun install(vararg plugins: StorePlugin<S, I, A>): Unit = install(plugins.asIterable())
-
-    /**
-     * Install all [plugins].
-     * Please see documentation for the other overload for more details.
-     * @see install
-     */
-    @FlowMVIDSL
-    public inline fun install(plugins: Iterable<StorePlugin<S, I, A>>): Unit = plugins.forEach { install(it) }
 
     /**
      * Create and install a new [StorePlugin].
