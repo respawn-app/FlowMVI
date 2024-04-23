@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.test.plugin
 
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -8,7 +7,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.TimeTravel
-import kotlin.coroutines.coroutineContext
 
 /**
  * A function that runs a test on a [StorePlugin].

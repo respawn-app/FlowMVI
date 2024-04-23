@@ -2,7 +2,6 @@ package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.drop
 import pro.respawn.flowmvi.util.withPrevious
 
 internal fun subscribersModule(): SubscribersModule = SubscribersModuleImpl()
@@ -21,7 +20,7 @@ internal interface SubscribersModule {
 
 private class SubscribersModuleImpl : SubscribersModule {
 
-    private val marker = MutableSharedFlow<Unit>()
+    private val marker = MutableSharedFlow<Nothing>()
     override val subscribers = marker
         .subscriptionCount
         .withPrevious(0)
