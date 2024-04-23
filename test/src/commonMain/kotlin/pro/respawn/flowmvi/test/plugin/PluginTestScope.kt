@@ -5,8 +5,10 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
+import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import kotlin.coroutines.CoroutineContext
 
@@ -35,7 +37,14 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
         ctx = TestPipelineContext(
             initial = initial,
             coroutineContext = coroutineContext,
-            plugin = compositePlugin(setOf(timeTravelPlugin(timeTravel), plugin), plugin.name),
+            plugin = compositePlugin(
+                setOf(
+                    loggingPlugin(PlatformStoreLogger, plugin.name),
+                    timeTravelPlugin(timeTravel),
+                    plugin,
+                ),
+                name = plugin.name,
+            ),
         ),
     )
 
