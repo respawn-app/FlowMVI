@@ -52,9 +52,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     onSubscribe { previous ->
         val subs = previous + 1
         when {
+            subs < minSubscriptions -> job.getAndSet(null)?.cancelAndJoin()
             job.value?.isActive == true -> Unit // condition was already satisfied
             subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
-            else -> job.getAndSet(null)?.cancelAndJoin()
         }
     }
     onUnsubscribe { current ->
