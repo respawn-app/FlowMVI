@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.test.plugin
 
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -23,4 +25,8 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlug
     initial: S,
     timeTravel: TimeTravel<S, I, A> = TimeTravel(),
     crossinline block: suspend PluginTestScope<S, I, A>.() -> Unit,
-): Unit = PluginTestScope(initial, coroutineContext, this@test, timeTravel).block()
+): Unit = coroutineScope {
+    PluginTestScope(initial, coroutineContext, this@test, timeTravel).run {
+        block()
+    }
+}
