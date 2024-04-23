@@ -175,11 +175,10 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         intentCapacity = intentCapacity,
         onOverflow = onOverflow,
         debuggable = debuggable,
-        plugins = plugins,
         coroutineContext = coroutineContext,
         logger = logger,
         atomicStateUpdates = atomicStateUpdates,
-    ).let(::StoreImpl)
+    ).let { StoreImpl(it, plugins) }
 }
 
 private fun duplicatePluginMessage(name: String) = """

@@ -8,11 +8,22 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.RecursiveRecoverException
+import pro.respawn.flowmvi.exceptions.UnhandledStoreException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
+
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverModule(
+    delegate: StorePlugin<S, I, A>,
+) = RecoverModule { e ->
+    with(delegate) {
+        if (e is UnrecoverableException) throw e
+        onException(e)?.let { throw UnhandledStoreException(it) }
+    }
+}
 
 /**
  * An entity that can [recover] from exceptions happening during its lifecycle. Most often, a [Store]
@@ -22,10 +33,7 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
 
     override val key: CoroutineContext.Key<*> get() = RecoverModule
 
-    /**
-     * Recover from an exception in the given context.
-     */
-    suspend fun PipelineContext<S, I, A>.recover(e: Exception)
+    suspend fun PipelineContext<S, I, A>.handle(e: Exception)
 
     /**
      * Run [block] catching any exceptions and invoking [recover]. This will add this [RecoverModule] key to the coroutine
@@ -39,6 +47,10 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
             alreadyRecovered() -> throw RecursiveRecoverException(expected)
             else -> recover(expected)
         }
+    }
+
+    suspend fun PipelineContext<S, I, A>.recover(e: Exception) = withContext(this@RecoverModule) {
+        handle(e)
     }
 
     @Suppress("FunctionName")
@@ -67,6 +79,6 @@ private tailrec fun UnrecoverableException.unwrapRecursion(): Exception = when (
     else -> cause
 }
 
-internal suspend fun alreadyRecovered() = coroutineContext.alreadyRecovered
+private suspend fun alreadyRecovered() = coroutineContext.alreadyRecovered
 
 private val CoroutineContext.alreadyRecovered get() = this[RecoverModule] != null
