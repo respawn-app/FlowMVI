@@ -132,15 +132,16 @@ class CounterContainer(
 ) {
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
 
-        actionShareBehavior = ActionShareBehavior.Distribute()
+        configure {
+            actionShareBehavior = ActionShareBehavior.Distribute()
+            debuggable = true
 
-        // makes the store fully async, parallel and thread-safe
-        parallelIntents = true
-        coroutineContext = Dispatchers.Default
-        atomicStateUpdates = true
+            // makes the store fully async, parallel and thread-safe
+            parallelIntents = true
+            coroutineContext = Dispatchers.Default
+            atomicStateUpdates = true
+        }
 
-        // enables debugging features such as logging and remote connection
-        debuggable = true
         enableLogging()
         enableRemoteDebugging()
 
@@ -212,22 +213,25 @@ store.subscribe(
 Powerful DSL allows to hook into store events and amend any store's logic with reusable plugins.
 
 ```kotlin
-val counterPlugin = plugin<CounterState, CounterIntent, CounterAction> {
-    
+val counterPlugin = lazyPlugin<CounterState, CounterIntent, CounterAction> {
+
+    // access the store configuration
+    if (config.debuggable) config.logger(Debug) { "Store is debuggable" }
+
     onStart { }
-    
+
     onStop { }
-    
+
     onIntent { intent -> }
-    
+
     onState { old, new -> }
-    
+
     onAction { action -> }
-    
+
     onSubscribe { subs -> }
-    
+
     onUnsubscribe { subs -> }
-    
+
     onException { e -> }
 }
 ```
@@ -242,7 +246,7 @@ fun CounterScreen() {
     val store = inject<CounterContainer>().store
 
     // subscribe to store based on system lifecycle - on any platform
-    val state by store.subscribe { action ->
+    val state by store.subscribe(DefaultLifecycle) { action ->
         when (action) {
             is ShowMessage -> /* ... */
         }
