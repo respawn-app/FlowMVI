@@ -146,7 +146,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
  * because the plugin depends on a lot of things you may not need for your application.
  */
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableRemoteDebugging(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableRemoteDebugging(
     client: HttpClient,
     historySize: Int = DefaultHistorySize,
     host: String = DebuggerDefaults.ClientHost,
