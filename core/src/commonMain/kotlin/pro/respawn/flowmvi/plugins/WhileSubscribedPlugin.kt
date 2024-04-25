@@ -30,7 +30,8 @@ internal class SubscriptionHolder {
 
     suspend fun cancelAndJoin() = job.getAndSet(null)?.cancelAndJoin()
 
-    val isActive get() = job.value?.isActive == true
+    // when a job has finished execution, we still want to consider it present to not relaunch on each new subscription
+    val isActive get() = job.value != null
 }
 
 /**
@@ -69,15 +70,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     this.name = name
     val job = SubscriptionHolder()
     onSubscribe { previous ->
-        val subs = previous + 1
+        val current = previous + 1
         when {
-            subs < minSubscriptions -> job.cancelAndJoin().also {
-                log(StoreLogLevel.Debug) { "Canceled WhileSubscribed '$name' job" }
-            }
+            current < minSubscriptions -> job.cancelAndJoin()
             job.isActive -> Unit // condition was already satisfied
-            subs >= minSubscriptions -> job.start(this) { block() }.also {
-                log(StoreLogLevel.Debug) { "Started WhileSubscribed '$name' job" }
-            }
+            current >= minSubscriptions -> job.start(this) { block() }
         }
     }
     onUnsubscribe { current ->
