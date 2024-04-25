@@ -46,6 +46,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     this.name = currentTag.let { "${it.orEmpty()}Logging" }
     val logger = config.logger
     onState { old, new ->
+        if (old == new) return@onState new
         new.also { logger(level ?: Trace, currentTag) { "State:\n--->\n$old\n<---\n$new" } }
     }
     onIntent {
