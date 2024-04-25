@@ -35,7 +35,7 @@ You can override the scope by passing your own scope to the function:
 val store = retainedStore(
     initial = Loading,
     scope = retainedScope(),
-    key = "Store name by default",
+    key = "Type of the State class by default",
 ) {
     // build or inject here
 }

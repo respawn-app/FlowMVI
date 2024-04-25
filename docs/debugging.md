@@ -54,14 +54,14 @@ expect fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 
 // androidDebug -> InstallDebugger.kt
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger(
-) = install(debuggerPlugin(name ?: "Store"))
+) = install(debuggerPlugin())
 
 // androidRelease -> InstallDebugger.kt
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() = Unit
 
 // conditional installation for other platforms: 
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() {
-    if (debuggable) enableRemoteDebugging()
+    enableRemoteDebugging()
 }
 ```
 
@@ -83,7 +83,7 @@ interface StoreConfiguration {
 
 inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.configure(
     configuration: StoreConfiguration,
-    name: String = requireNotNull(nameByType<S>()), // automatically provide store name with reflection if needed
+    name: String,
 ) = with(configuration) {
     invoke(name = name)
 }
@@ -102,17 +102,18 @@ internal class DefaultStoreConfiguration(
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,
     ) {
-        this.name = name
-        debuggable = BuildFlags.debuggable // set up using an expect-actual and BuildConfig.DEBUG
-        actionShareBehavior = ActionShareBehavior.Distribute()
-        onOverflow = SUSPEND
-        parallelIntents = true
-        if (debuggable) {
-            enableLogging()
-            remoteDebugger()
+        configure {
+            this.name = name
+            debuggable = BuildFlags.debuggable // set up using an expect-actual and BuildConfig.DEBUG
+            actionShareBehavior = ActionShareBehavior.Distribute()
+            onOverflow = SUSPEND
+            parallelIntents = true
+            logger = CustomLogger
         }
+        enableLogging()
+        remoteDebugger()
 
-        install(analyticsPlugin(analytics, name)) // custom plugins
+        install(analyticsPlugin(analytics)) // custom plugins
     }
 }
 ```
@@ -124,13 +125,13 @@ val commonArchModule = module {
     singleOf(::DefaultStoreConfiguration) bind StoreConfiguration::class
 }
 
-// feature-counter module
+// feature module
 internal class CounterContainer(
     configuration: StoreConfiguration,
 ) : Container<State, Intent, Action> {
 
     override val store = store(Loading) {
-        configure(configuration)
+        configure(configuration, "Counter")
     }
 }
 ```
@@ -210,6 +211,6 @@ Right now the debugging setup includes only the essentials.
 
 Feel free to create an issue for a feature you want to be added.
 
-You can also check out the debugger
-app [implementation](https://github.com/respawn-app/FlowMVI/tree/34236773e21e7138a330d7d0fb6c5d0eba21b61e/debugger/server/src/commonMain/kotlin/pro/respawn/flowmvi/debugger/server)
+You can also check out the sample app
+app [implementation](https://github.com/respawn-app/FlowMVI/tree/master/sample)
 to see how flowMVI can be used to build multiplatform apps.

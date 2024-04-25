@@ -41,7 +41,7 @@ val saver = TypedSaver<DisplayingCounter, CounterState>(
     JsonSaver(
         json = Json,
         serializer = DisplayingCounter.serializer(),
-        delegate = CompressedFileSaver(dir, "counter_state.json"),
+        delegate = CompressedFileSaver(path),
     )
 )
 ```
@@ -93,22 +93,19 @@ provides sensible defaults for you, called `serializeState`:
 
 ```kotlin
 serializeState(
-    dir = cacheDir, // (1)
-    json = json, // (2)
-    serializer = DisplayingCounter.serializer(), // (3)
-    recover = NullRecover // (4)
+    path = path, // (1)
+    serializer = DisplayingCounter.serializer(), // (2)
+    recover = NullRecover // (3)
 )
 ```
 
-1. Provide a directory where the state will be saved.
-    * The filename will be derived from the store / class name, but watch out for conflicts and provide your own name in
-      this case.
+1. Provide a path where the state will be saved.
     * It's best to use a subdirectory of your cache dir to prevent it from being fiddled with by other code.
-2. For performance and safety, inject and reuse a single json instance with relaxed restrictions on parsing data.
-3. Mark your state class as `@Serializable` to generate the serializer for it.
+   * On web platforms, the state will be saved to local storage.k
+2. Mark your state class as `@Serializable` to generate the serializer for it.
     * It's best to store only a particular subset of states of the store because you don't want to restore the user
       to an error / loading state, do you?
-4. Provide a way for the plugin to recover from errors when parsing, saving or reading the state. The bare minimum
+3. Provide a way for the plugin to recover from errors when parsing, saving or reading the state. The bare minimum
    is to ignore all errors and not restore or save anything, but a better solution like logging the errors can be used
    instead. By default, the plugin will just throw and let the store (`recoverPlugin`) handle the exception.
 
