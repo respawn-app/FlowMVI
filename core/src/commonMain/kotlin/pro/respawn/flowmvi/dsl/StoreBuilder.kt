@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.store.StoreImpl
+import pro.respawn.flowmvi.util.concurrentLinkedSet
 import kotlin.coroutines.CoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
@@ -51,7 +52,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         private set
 
     @PublishedApi
-    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
+    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = concurrentLinkedSet()
 
     // region Deprecated props
 
@@ -152,14 +153,6 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      */
     @FlowMVIDSL
     public inline fun configure(block: StoreConfigurationBuilder.() -> Unit): Unit = config.run(block)
-
-    /**
-     * Replace the current [StoreConfiguration] of this store by the value from [StoreConfigurationBuilder].
-     */
-    @FlowMVIDSL
-    public fun configureWith(configuration: StoreConfigurationBuilder) {
-        config = configuration
-    }
 
     /**
      * Alias for [install]

@@ -9,13 +9,6 @@ internal class SynchronizedHashMap<K, V>(initialCapacity: Int = 32) : MutableMap
 
     private val inner = LinkedHashMap<K, V>(initialCapacity)
 
-    fun computeIfAbsent(key: K, block: (K) -> V): V = synchronized(this) {
-        if (inner.containsKey(key)) return inner[key]!!
-        val value = block(key)
-        inner[key] = value
-        return value
-    }
-
     override val size: Int
         get() = inner.size
 
