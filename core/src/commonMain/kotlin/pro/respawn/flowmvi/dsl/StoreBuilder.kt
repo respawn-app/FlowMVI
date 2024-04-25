@@ -13,8 +13,8 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.store.StoreImpl
-import pro.respawn.flowmvi.util.concurrentLinkedSet
 import kotlin.coroutines.CoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
@@ -52,7 +52,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         private set
 
     @PublishedApi
-    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = concurrentLinkedSet()
+    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
 
     // region Deprecated props
 
@@ -162,6 +162,8 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        StoreImpl(config, plugins.map { it(config) })
+        // it's important to first convert the collection to an immutable before iterating, or the
+        // iterator will throw
+        StoreImpl(config, compositePlugin(plugins.toSet().map { it(config) }))
     }
 }

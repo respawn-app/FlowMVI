@@ -48,12 +48,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     IntentModule<I> by intents,
     ActionModule<A> by actions {
 
-    constructor(
-        configuration: StoreConfiguration<S>,
-        plugins: Iterable<StorePlugin<S, I, A>>,
-    ) : this(config = configuration, compositePlugin(plugins))
-
-    private var launchJob = atomic<Job?>(null)
+    private val launchJob = atomic<Job?>(null)
     override val name by config::name
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(

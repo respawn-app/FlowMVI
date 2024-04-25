@@ -46,9 +46,11 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState as 
 internal fun timelineStore(scope: CoroutineScope) = store<State, Intent, Action>(ConfiguringServer(), scope) {
     val timezone = TimeZone.currentSystemDefault()
     val filters = MutableStateFlow(TimelineFilters())
-    name = "TimelineStore"
-    parallelIntents = true
-    debuggable = true
+    configure {
+        name = "TimelineStore"
+        parallelIntents = true
+        debuggable = true
+    }
     recover {
         updateState { State.Error(it) }
         null

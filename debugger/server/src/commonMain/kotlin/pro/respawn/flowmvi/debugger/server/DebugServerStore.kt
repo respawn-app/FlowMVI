@@ -27,12 +27,14 @@ import pro.respawn.flowmvi.debugger.server.ServerState as State
 private typealias Ctx = PipelineContext<State, Intent, Action>
 
 internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
-    name = "DebugServer"
-    parallelIntents = true
-    coroutineContext = Dispatchers.Default
-    actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
-    debuggable = true
-    onOverflow = BufferOverflow.DROP_OLDEST
+    configure {
+        name = "DebugServer"
+        parallelIntents = true
+        coroutineContext = Dispatchers.Default
+        actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
+        debuggable = true
+        onOverflow = BufferOverflow.DROP_OLDEST
+    }
     enableLogging()
     recover { e ->
         updateState { State.Error(e, this) }

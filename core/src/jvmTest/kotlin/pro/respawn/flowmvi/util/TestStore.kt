@@ -22,13 +22,15 @@ internal fun testStore(
     behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     configure: BuildStore<TestState, LambdaIntent<TestState, TestAction>, TestAction> = {},
 ) = store(initial) {
-    debuggable = false
-    name = "TestStore"
-    actionShareBehavior = behavior
-    atomicStateUpdates = true
-    logger = PlatformStoreLogger
-    timeTravel(timeTravel)
+    configure {
+        debuggable = false
+        name = "TestStore"
+        actionShareBehavior = behavior
+        atomicStateUpdates = true
+        logger = PlatformStoreLogger
+    }
     enableLogging()
+    timeTravel(timeTravel)
     configure()
     reduceLambdas()
 }
