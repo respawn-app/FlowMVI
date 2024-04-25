@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
@@ -30,10 +31,9 @@ import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscriptionModule
 import pro.respawn.flowmvi.plugins.compositePlugin
 
-internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
+internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S>,
-    plugins: Set<StorePlugin<S, I, A>>,
-    plugin: StorePlugin<S, I, A> = compositePlugin(plugins),
+    plugin: StorePlugin<S, I, A>,
     recover: RecoverModule<S, I, A> = recoverModule(plugin),
     subs: SubscriptionModule = subscriptionModule(),
     states: StateModule<S> = stateModule(config.initial, config.atomicStateUpdates),
@@ -50,8 +50,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction> private con
 
     constructor(
         configuration: StoreConfiguration<S>,
-        plugins: Set<StorePlugin<S, I, A>>,
-    ) : this(config = configuration, plugins)
+        plugins: Iterable<StorePlugin<S, I, A>>,
+    ) : this(config = configuration, compositePlugin(plugins))
 
     private var launchJob = atomic<Job?>(null)
     override val name by config::name
@@ -91,9 +91,11 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction> private con
 
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
-    ): Job = subscribe {
+    ): Job = launch {
+        launch { awaitUnsubscription() }
         block(this@StoreImpl)
         if (config.debuggable) throw NonSuspendingSubscriberException()
+        cancel()
     }
 
     override fun close() {
