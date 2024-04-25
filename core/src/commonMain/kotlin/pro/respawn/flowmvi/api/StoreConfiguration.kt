@@ -14,6 +14,7 @@ import kotlin.coroutines.CoroutineContext
 @Suppress("UndocumentedPublicProperty")
 public data class StoreConfiguration<S : MVIState>(
     val initial: S,
+    val allowIdleSubscriptions: Boolean,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
     val intentCapacity: Int,

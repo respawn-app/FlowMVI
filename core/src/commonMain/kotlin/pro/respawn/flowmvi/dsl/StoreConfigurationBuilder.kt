@@ -72,6 +72,13 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     public var debuggable: Boolean = false
 
     /**
+     * A flag to indicate that clients may subscribe to this store even while it is not started.
+     * If you intend to stop and restart your store while the subscribers are present, set this to `true`.
+     */
+    @FlowMVIDSL
+    public var allowIdleSubscriptions: Boolean? = null
+
+    /**
      *  A coroutine context overrides for the [Store].
      *  This context will be merged with the one the store was launched with (e.g. `viewModelScope`).
      *
@@ -128,7 +135,8 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
         coroutineContext = coroutineContext,
         logger = logger ?: if (debuggable) PlatformStoreLogger else NoOpStoreLogger,
         atomicStateUpdates = atomicStateUpdates,
-        name = name
+        name = name,
+        allowIdleSubscriptions = allowIdleSubscriptions ?: !debuggable,
     )
 }
 

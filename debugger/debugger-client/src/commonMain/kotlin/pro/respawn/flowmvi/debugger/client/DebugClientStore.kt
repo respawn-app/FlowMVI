@@ -55,6 +55,7 @@ internal fun debugClientStore(
         debuggable = true
         parallelIntents = false // ensure the order of events matches server's expectations
         actionShareBehavior = Disabled
+        allowIdleSubscriptions = true
         onOverflow = BufferOverflow.DROP_OLDEST // drop old events in the queue
     }
     if (logEvents) enableLogging()

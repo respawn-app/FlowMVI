@@ -7,7 +7,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -16,6 +15,7 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
+import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
@@ -92,6 +92,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job = launch {
+        if (launchJob.value?.isActive != true && !config.allowIdleSubscriptions) throw SubscribeBeforeStartException()
         launch { awaitUnsubscription() }
         block(this@StoreImpl)
         if (config.debuggable) throw NonSuspendingSubscriberException()
