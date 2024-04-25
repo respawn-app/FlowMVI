@@ -1,16 +1,19 @@
-package pro.respawn.flowmvi.store
+package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.channels.BufferOverflow
-import pro.respawn.flowmvi.api.ActionShareBehavior
-import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.dsl.StoreConfigurationBuilder
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
 
-@FlowMVIDSL
-internal data class StoreConfiguration<S : MVIState>(
+/**
+ * A configuration of the [Store].
+ * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
+ *
+ * @param initial The initial state the [Store] will have.
+ */
+@Suppress("UndocumentedPublicProperty")
+public data class StoreConfiguration<S : MVIState>(
     val initial: S,
-    val name: String?,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
     val intentCapacity: Int,
@@ -19,4 +22,5 @@ internal data class StoreConfiguration<S : MVIState>(
     val coroutineContext: CoroutineContext,
     val logger: StoreLogger,
     val atomicStateUpdates: Boolean,
+    val name: String?,
 )
