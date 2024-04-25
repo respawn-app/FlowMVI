@@ -54,9 +54,4 @@ internal class DefaultStoreConfiguration(
             )
         )
     }
-
-    private companion object {
-
-        const val StoreCacheDirName = "state"
-    }
 }

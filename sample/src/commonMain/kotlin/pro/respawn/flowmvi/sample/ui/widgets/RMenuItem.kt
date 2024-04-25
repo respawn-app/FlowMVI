@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.sample.ui.theme.Opacity
-import pro.respawn.flowmvi.sample.ui.theme.Size.icon
 import pro.respawn.flowmvi.sample.ui.theme.rememberRandomColor
 import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.noIndicationClickable

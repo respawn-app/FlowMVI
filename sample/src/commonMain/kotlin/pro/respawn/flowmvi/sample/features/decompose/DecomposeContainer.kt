@@ -11,7 +11,6 @@ import com.arkivanov.decompose.router.pages.childPages
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.api.Container
-import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.essenty.dsl.retainedStore
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.reduce

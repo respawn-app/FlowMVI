@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancelAndJoin
