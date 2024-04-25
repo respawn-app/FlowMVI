@@ -14,7 +14,7 @@ import pro.respawn.flowmvi.dsl.plugin
  * It can be useful in testing and custom store implementations.
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
-    plugins: Set<StorePlugin<S, I, A>>,
+    plugins: Iterable<StorePlugin<S, I, A>>,
     name: String? = null,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
