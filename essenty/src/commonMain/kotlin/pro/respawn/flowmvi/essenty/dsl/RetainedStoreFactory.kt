@@ -13,21 +13,7 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.essenty.internal.retained
 import kotlin.reflect.typeOf
 
-// keeper
-
-/**
- * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
- *
- * * Uses the State class name as a key for the instance keeper by default.
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- */
-@FlowMVIDSL
-public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
-    scope: CoroutineScope? = retainedScope(),
-    key: Any = typeOf<S>(),
-    @BuilderInference factory: () -> Store<S, I, A>,
-): Store<S, I, A> = getOrCreate(key) { retained(factory(), scope) }
+// region keeper
 
 /**
  * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
@@ -39,15 +25,30 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
-    factory: () -> Store<S, I, A>,
+    @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = getOrCreate(key) { retained(factory(), scope) }
-
-// keeper owner
 
 /**
  * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
  *
- * * Uses the State class name as a key for the instance keeper by default.
+ * * Uses the type of [S] as the key for the instance keeper
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
+@FlowMVIDSL
+public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference factory: () -> Store<S, I, A>,
+): Store<S, I, A> = retainedStore(typeOf<S>(), scope, factory)
+
+// endregion
+
+// region keeper owner
+
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * Uses the type of [S] as the key for the instance keeper
  * * By default, uses a [retainedScope] instance to launch the store automatically.
  *   Provide `null` to not launch the store after creation.
  */
@@ -67,6 +68,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     scope: CoroutineScope? = retainedScope(),
-    key: Any = typeOf<S>(),
     @BuilderInference factory: () -> Store<S, I, A>,
-): Store<S, I, A> = instanceKeeper.retainedStore(key, scope, factory)
+): Store<S, I, A> = retainedStore(typeOf<S>(), scope, factory)
+
+// endregion

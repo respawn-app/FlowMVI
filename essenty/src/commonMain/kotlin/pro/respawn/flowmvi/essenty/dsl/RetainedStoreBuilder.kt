@@ -14,13 +14,30 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.essenty.internal.retain
 import kotlin.reflect.typeOf
 
-// keeper
+// region keeper
 
 /**
  * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
  *
- * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
- *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
+    initial: S,
+    key: Any,
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> = getOrCreate(key) {
+    store(initial, builder).retain(scope)
+}
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses the type of [S] as the key for the instance keeper
  * * By default, uses a [retainedScope] instance to launch the store automatically.
  *   Provide `null` to not launch the store after creation.
  *
@@ -29,46 +46,42 @@ import kotlin.reflect.typeOf
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
-    key: Any = typeOf<S>(),
     scope: CoroutineScope? = retainedScope(),
     @BuilderInference builder: BuildStore<S, I, A>,
-): Store<S, I, A> = getOrCreate(key) {
-    store(initial, builder).retain(scope)
-}
+): Store<S, I, A> = retainedStore(initial, typeOf<S>(), scope, builder)
 
-// owner
+// endregion
+
+// region owner
 
 /**
  * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
  *
- * * Uses [name] as both the store name and the instance keeper's key parameter.
  * * By default, uses a [retainedScope] instance to launch the store automatically.
  *   Provide `null` to not launch the store after creation.
  *
  * See [store] for more details.
  */
 @FlowMVIDSL
-public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
-    name: String,
+    key: Any,
     scope: CoroutineScope? = retainedScope(),
-    @BuilderInference builder: BuildStore<S, I, A>,
-): Store<S, I, A> = instanceKeeper.retainedStore(initial, name, scope, builder)
-
-/**
- * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
- *
- * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
- *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- *
- * See [store] for more details.
- */
-@FlowMVIDSL
-public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
-    initial: S,
-    scope: CoroutineScope? = retainedScope(),
-    key: Any = typeOf<S>(),
     @BuilderInference builder: BuildStore<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(initial, key, scope, builder)
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses the type of [S] as the key for the instance keeper
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
+    initial: S,
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> = retainedStore(initial, typeOf<S>(), scope, builder)

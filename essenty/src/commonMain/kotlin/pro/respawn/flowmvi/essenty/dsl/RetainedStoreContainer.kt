@@ -11,7 +11,26 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
-import kotlin.reflect.typeOf
+
+// region explicit key
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    initial: S,
+    key: Any,
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
+    initial, key, scope, builder
+)
 
 /**
  * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeperOwner].
@@ -28,56 +47,35 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStor
     key, scope, factory
 )
 
+// endregion
+
+/**
+ * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
+ *
+ * * Uses the type of [S] as the key for the instance keeper
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ *
+ * See [store] for more details.
+ */
+@FlowMVIDSL
+public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    initial: S,
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference builder: BuildStore<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
+    initial, scope, builder
+)
+
 /**
  * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
  *
+ * * Uses the type of [S] as the key for the instance keeper
  * * By default, uses a [retainedScope] instance to launch the store automatically.
  *   Provide `null` to not launch the store after creation.
  */
 @FlowMVIDSL
 public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     scope: CoroutineScope? = retainedScope(),
-    key: Any = typeOf<S>(),
     @BuilderInference factory: () -> Store<S, I, A>,
-): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
-    key, scope, factory
-)
-
-/**
- * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
- *
- * * Uses [name] as both the store name and the instance keeper's key parameter.
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- *
- * See [store] for more details.
- */
-@FlowMVIDSL
-public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
-    initial: S,
-    name: String,
-    scope: CoroutineScope? = retainedScope(),
-    @BuilderInference builder: BuildStore<S, I, A>,
-): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
-    initial, name, scope, builder
-)
-
-/**
- * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
- *
- * * Uses [name] as both the store name and the instance keeper's key parameter. By default, the store's name will be
- *   derived from the [S] parameter's class name, such as 'CounterState' -> 'CounterStore'.
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- *
- * See [store] for more details.
- */
-@FlowMVIDSL
-public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
-    initial: S,
-    scope: CoroutineScope? = retainedScope(),
-    key: Any = typeOf<S>(),
-    @BuilderInference builder: BuildStore<S, I, A>,
-): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
-    initial, key, scope, builder
-)
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(scope, factory)
