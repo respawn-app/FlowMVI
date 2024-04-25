@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.dsl.plugin
  * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
 @Suppress("ComplexInterface")
-public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
+public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyPlugin<S, I, A> {
 
     /**
      * The name of this plugin. The name can be used for logging purposes, but most importantly, to
@@ -160,4 +160,6 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
+    override fun toString(): String
+    override fun invoke(config: StoreConfiguration<S>): StorePlugin<S, I, A> = this
 }
