@@ -51,5 +51,6 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
     // compiler bug which crashes compilation because both context and plugin declare equals
     override fun equals(other: Any?): Boolean = ctx.plugin == other
     override fun hashCode(): Int = ctx.plugin.hashCode()
+    override fun toString(): String = "PluginTestScope(plugin=${ctx.plugin.name})"
     public val state: S by ctx::state
 }
