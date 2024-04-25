@@ -3,11 +3,9 @@
 Plugin is a unit that can extend the business logic of the Store.
 All stores are mostly based on plugins, and their behavior is entirely determined by them.
 
-Plugins can influence subscription, stopping, and all other forms of store behavior.
-Access the store's context and other functions through the `PipelineContext` receiver.
-It is not recommended to implement the `StorePlugin` interface,
-If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
-described below.
+* Plugins can influence subscription, stopping, and all other forms of store behavior.
+* Plugins are executed in the order they were installed and follow the Chain of Responsibility pattern.
+* Access the store's context & configuration and launch jobs through the `PipelineContext` receiver.
 
 Plugins are simply built:
 
@@ -17,6 +15,30 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
     // dsl for intercepting is available
 }
 
+```
+
+### Lazy Plugins
+
+Lazy plugins are created **after** the store builder has been run ( they are still installed in the order they were
+declared). This gives you access to the `StoreConfiguration`, which contains various options, of which the most useful
+are:
+
+* `StoreLogger` instance,
+* Store `name`,
+* `debuggable` flag,
+* `initial` state.
+
+To create a lazy plugin, use `lazyPlugin` builder function. It contains a `config` property:
+
+```kotlin
+val resetStatePlugin = lazyPlugin<MVIState, MVIIntent, MVIAction> {
+    if (config.debuggable) config.logger(Warn) { "Plugin for store '${config.name}' is installed on a debug build" }
+
+    onException {
+        updateState { config.initial }  // reset the state
+        null
+    }
+}
 ```
 
 ## Plugin DSL
@@ -59,7 +81,7 @@ install(plugin) // -> will throw
 ```
 
 So name your plugin based on whether you want it to be repeatable, i.e. installed multiple times.
-For example, the library's `reduce` plugin **cannot** be installed multiple times.
+For example, the library's `reduce` plugin **cannot** be installed multiple times by default.
 
 ### onState
 

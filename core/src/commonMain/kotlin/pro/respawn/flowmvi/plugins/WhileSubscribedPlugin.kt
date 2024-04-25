@@ -14,8 +14,6 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.logging.StoreLogLevel
-import pro.respawn.flowmvi.logging.log
 
 @PublishedApi
 internal class SubscriptionHolder {
