@@ -13,7 +13,7 @@ private fun error(message: String): Unit = js("""console.error(message)""")
  * A [StoreLogger] instance for each supported platform
  */
 public actual val PlatformStoreLogger: StoreLogger = StoreLogger { level, tag, message ->
-    val template = "${if (tag == null) "" else "$tag: "}${message()}"
+    val template = "${if (tag.isNullOrBlank()) "" else "$tag: "}${message()}"
     when (level) {
         StoreLogLevel.Trace, StoreLogLevel.Debug -> log(template)
         StoreLogLevel.Info -> info(template)

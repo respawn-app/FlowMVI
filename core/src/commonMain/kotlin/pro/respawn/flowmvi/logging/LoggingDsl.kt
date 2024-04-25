@@ -5,19 +5,16 @@ import pro.respawn.flowmvi.api.PipelineContext
 /**
  * Alias for [StoreLogger.log] with optional parameters
  */
-public operator fun StoreLogger?.invoke(
+public operator fun StoreLogger.invoke(
     level: StoreLogLevel,
     tag: String? = null,
     message: () -> String,
-) {
-    if (this == null) return
-    log(level, tag, message)
-}
+): Unit = log(level, tag, message)
 
 /**
  * Alias for [StoreLogger.log] that can log exceptions
  */
-public operator fun StoreLogger?.invoke(
+public operator fun StoreLogger.invoke(
     e: Exception,
     level: StoreLogLevel = StoreLogLevel.Error,
     tag: String? = null,
@@ -36,15 +33,25 @@ public val StoreLogLevel.asSymbol: String
     }
 
 /**
- * Write a message to [StoreLogger]. Tag is the [Store.name]
+ * Write a message to [StoreLogger]. Tag is the [Store.name] by default.
  */
-public fun PipelineContext<*, *, *>.log(level: StoreLogLevel, message: () -> String) {
-    config.logger(level, config.name, message)
-}
+public fun PipelineContext<*, *, *>.log(
+    level: StoreLogLevel = StoreLogLevel.Debug,
+    tag: String? = config.name,
+    message: () -> String
+): Unit = config.logger(level, tag, message)
 
 /**
- * Write a message to [StoreLogger]. Tag is the [Store.name]
+ * Write a message to [StoreLogger]. Tag is the [Store.name] by default.
  */
-public fun PipelineContext<*, *, *>.log(e: Exception, level: StoreLogLevel = StoreLogLevel.Error) {
-    config.logger(e, level, config.name)
-}
+public fun PipelineContext<*, *, *>.log(
+    e: Exception,
+    level: StoreLogLevel = StoreLogLevel.Error,
+    tag: String? = config.name
+): Unit = config.logger(e, level, tag)
+
+internal inline fun template(
+    level: StoreLogLevel,
+    tag: String?,
+    message: () -> String
+) = "${level.asSymbol} ${if (tag.isNullOrBlank()) "" else "$tag: "}${message()}"

@@ -5,7 +5,7 @@ package pro.respawn.flowmvi.logging
  */
 public actual val PlatformStoreLogger: StoreLogger by lazy {
     StoreLogger { level, tag, message ->
-        val template = "${if (tag != null) "$tag: " else ""}${message()}"
+        val template = "${if (tag.isNullOrBlank()) "" else "$tag: "}${message()}"
         with(console) {
             when (level) {
                 StoreLogLevel.Trace, StoreLogLevel.Debug -> log(template)

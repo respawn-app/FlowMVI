@@ -33,7 +33,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.en
 /**
  * Create a new [StorePlugin] that prints messages using [log].
  * [tag] is used as a name for the plugin.
- * Tag can be null, in which case, [name] will be used, will remain null.
+ * Tag can be null, in which case, store's name will be used. Provide an empty string to remove the tag.
  * [level] level override to print all messages. If null, a default level will be used (null by default)
  */
 @Suppress("CyclomaticComplexMethod") // false-positive based on ternary ops
@@ -46,24 +46,26 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     this.name = currentTag.let { "${it.orEmpty()}Logging" }
     val logger = config.logger
     onState { old, new ->
-        logger(level ?: Trace, currentTag) { "State:\n--->\n$old\n<---\n$new" }
-        new
+        new.also { logger(level ?: Trace, currentTag) { "State:\n--->\n$old\n<---\n$new" } }
     }
     onIntent {
-        logger(level ?: Debug, currentTag) { "Intent -> $it" }
-        it
+        it.also { logger(level ?: Debug, currentTag) { "Intent -> $it" } }
     }
     onAction {
-        logger(level ?: Debug, currentTag) { "Action -> $it" }
-        it
+        it.also { logger(level ?: Debug, currentTag) { "Action -> $it" } }
     }
     onException {
-        logger(it, level ?: Error, currentTag)
-        it
+        it.also { logger(it, level ?: Error, currentTag) }
     }
-    onStart { logger(level ?: Info, currentTag) { "Started ${config.name ?: "Store"}" } }
-    onSubscribe { logger(level ?: Info, currentTag) { "New subscriber #${it + 1}" } }
-    onUnsubscribe { logger(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" } }
+    onStart {
+        logger(level ?: Info, currentTag) { "Started ${config.name ?: "Store"}" }
+    }
+    onSubscribe {
+        logger(level ?: Info, currentTag) { "New subscriber #${it + 1}" }
+    }
+    onUnsubscribe {
+        logger(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" }
+    }
     onStop {
         if (it == null) {
             logger(level ?: Info, currentTag) { "Stopped ${config.name ?: "Store"}" }
