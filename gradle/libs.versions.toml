@@ -1,8 +1,9 @@
 [versions]
 activity = "1.9.0"
-compose = "1.6.10-beta01"
+androidx-lifecycle = "2.8.0-beta01"
+compose = "1.6.10-beta02"
 compose-compiler = "1.5.12"
-compose-plugin = "1.6.10-beta01"
+compose-lifecycle = "2.8.0-beta01"
 composeDetektPlugin = "1.3.0"
 core-ktx = "1.13.0"
 coroutines = "1.8.1-Beta"
@@ -11,7 +12,7 @@ dependencyAnalysisPlugin = "1.31.0"
 detekt = "1.23.6"
 detektFormattingPlugin = "1.23.6"
 dokka = "1.9.20"
-essenty = "2.0.0-beta02"
+essenty = "2.0.0"
 fragment = "1.7.0-rc02"
 gradleAndroid = "8.4.0-rc02"
 gradleDoctorPlugin = "0.9.2"
@@ -22,31 +23,29 @@ kotest-plugin = "5.8.1"
 # @pin
 kotlin = "1.9.23"
 kotlin-collections = "0.3.7"
-kotlin-io = "0.3.2"
+kotlin-io = "0.3.3"
 kotlinx-atomicfu = "0.24.0"
 ktor = "3.0.0-beta-1"
 serialization = "1.6.3"
 turbine = "1.1.0"
 uuid = "0.8.4"
 versionCatalogUpdatePlugin = "0.8.4"
-compose-lifecycle = "2.8.0-alpha01"
-androidx-lifecycle = "2.8.0-beta01"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
-androidx-lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+androidx-lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
 dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
 essenty-instancekeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
-essenty-statekeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 essenty-lifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
 essenty-lifecycle-coroutines = { module = "com.arkivanov.essenty:lifecycle-coroutines", version.ref = "essenty" }
+essenty-statekeeper = { module = "com.arkivanov.essenty:state-keeper", version.ref = "essenty" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
@@ -136,7 +135,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest-plugin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
