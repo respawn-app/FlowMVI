@@ -15,7 +15,6 @@ import pro.respawn.flowmvi.logging.StoreLogLevel.Debug
 import pro.respawn.flowmvi.logging.StoreLogLevel.Error
 import pro.respawn.flowmvi.logging.StoreLogLevel.Info
 import pro.respawn.flowmvi.logging.StoreLogLevel.Trace
-import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.logging.invoke
 import kotlin.math.log
 

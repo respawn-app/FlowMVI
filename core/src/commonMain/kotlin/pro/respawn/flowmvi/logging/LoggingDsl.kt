@@ -35,10 +35,16 @@ public val StoreLogLevel.asSymbol: String
         StoreLogLevel.Error -> "🔴"
     }
 
+/**
+ * Write a message to [StoreLogger]. Tag is the [Store.name]
+ */
 public fun PipelineContext<*, *, *>.log(level: StoreLogLevel, message: () -> String) {
     config.logger(level, config.name, message)
 }
 
+/**
+ * Write a message to [StoreLogger]. Tag is the [Store.name]
+ */
 public fun PipelineContext<*, *, *>.log(e: Exception, level: StoreLogLevel = StoreLogLevel.Error) {
     config.logger(e, level, config.name)
 }

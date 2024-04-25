@@ -29,7 +29,6 @@ import pro.respawn.flowmvi.modules.observeSubscribers
 import pro.respawn.flowmvi.modules.recoverModule
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscriptionModule
-import pro.respawn.flowmvi.plugins.compositePlugin
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val config: StoreConfiguration<S>,

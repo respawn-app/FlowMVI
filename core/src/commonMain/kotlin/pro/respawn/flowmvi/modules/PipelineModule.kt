@@ -59,11 +59,11 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     private val handler = PipelineExceptionHandler()
     private val pipelineName = CoroutineName(toString())
     override val coroutineContext: CoroutineContext = parent.coroutineContext +
-            config.coroutineContext +
-            pipelineName +
-            job +
-            handler +
-            this
+        config.coroutineContext +
+        pipelineName +
+        job +
+        handler +
+        this
 
     override fun toString(): String = "${config.name.orEmpty()}PipelineContext"
 

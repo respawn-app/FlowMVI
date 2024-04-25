@@ -7,14 +7,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.log

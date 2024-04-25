@@ -5,7 +5,6 @@ internal class CappedMutableList<T>(
     private val backing: MutableList<T> = mutableListOf(),
 ) : MutableList<T> by backing {
 
-
     init {
         require(maxSize > 0) { "The max size of the collection must be >0, got $maxSize" }
     }
