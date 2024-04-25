@@ -173,9 +173,7 @@ public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugi
     name: String? = JobManager.Name, // by default, do not allow duplicates
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    onStop {
-        manager.cancelAll()
-    }
+    onStop { manager.cancelAll() }
 }
 
 /**

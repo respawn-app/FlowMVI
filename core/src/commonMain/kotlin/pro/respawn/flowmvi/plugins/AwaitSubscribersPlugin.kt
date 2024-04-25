@@ -75,12 +75,12 @@ public class SubscriberManager {
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.awaitSubscribers(
-    manager: SubscriberManager,
+    manager: SubscriberManager = SubscriberManager(),
     minSubs: Int = 1,
     suspendStore: Boolean = true,
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
-): Unit = install(awaitSubscribersPlugin(manager, minSubs, suspendStore, timeout, name))
+): SubscriberManager = manager.also { install(awaitSubscribersPlugin(it, minSubs, suspendStore, timeout, name)) }
 
 /**
  * Installs a new plugin using [manager] that will start waiting for new subscribers when the store launches.
