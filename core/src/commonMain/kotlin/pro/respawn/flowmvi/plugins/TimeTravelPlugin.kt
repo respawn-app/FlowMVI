@@ -3,6 +3,8 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.atomicfu.locks.reentrantLock
+import kotlinx.atomicfu.locks.withLock
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -25,32 +27,34 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
     maxExceptions: Int = DefaultHistorySize,
 ) {
 
+    private val lock = reentrantLock()
+
     public constructor(maxHistorySize: Int = DefaultHistorySize) : this(
         maxHistorySize, maxHistorySize, maxHistorySize, maxHistorySize
     )
 
-    private val _states by atomic(CappedMutableList<S>(maxStates))
+    private val _states = CappedMutableList<S>(maxStates)
 
     /**
      * States emitted by the store, capped at max value provided at creation time
      * The last value is the most recent.
      */
-    public val states: Collection<S> get() = _states
-    private val _intents by atomic(CappedMutableList<I>(maxIntents))
+    public val states: List<S> get() = _states
+    private val _intents = CappedMutableList<I>(maxIntents)
 
     /**
      * Intents processed by the store, capped at the value provided at creation time.
      * The last value is the most recent.
      */
-    public val intents: Collection<I> get() = _intents
-    private val _actions by atomic(CappedMutableList<A>(maxActions))
+    public val intents: List<I> get() = _intents
+    private val _actions = CappedMutableList<A>(maxActions)
 
     /**
      *  Actions sent by the store, capped at the value provided at creation time.
      * The last value is the most recent.
      */
-    public val actions: Collection<A> get() = _actions
-    private val _exceptions by atomic(CappedMutableList<Exception>(maxExceptions))
+    public val actions: List<A> get() = _actions
+    private val _exceptions = CappedMutableList<Exception>(maxExceptions)
 
     /**
      * Last exceptions caught by store, capped at the value provided at creation time.
@@ -58,55 +62,59 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
      */
     public val exceptions: Collection<Exception> get() = _exceptions
 
+    private var _subscriptions: Int by atomic(0)
+
     /**
      * Number of subscription events of the store. Never decreases.
      * The last value is the most recent.
      */
-    public var subscriptions: Int by atomic(0)
-        private set
+    public val subscriptions: Int get() = _subscriptions
+
+    private var _starts: Int by atomic(0)
 
     /**
      * Number of times the store was launched. Never decreases.
      */
-    public var starts: Int by atomic(0)
-        private set
+    public val starts: Int get() = _starts
+
+    private var _stops: Int by atomic(0)
 
     /**
      * Number of the times the store was stopped. Never decreases.
      */
-    public var stops: Int by atomic(0)
-        private set
+    public val stops: Int get() = _stops
+
+    private var _unsubscriptions: Int by atomic(0)
 
     /**
      * Number of times the store has been unsubscribed from. Never decreases.
      */
-    public var unsubscriptions: Int by atomic(0)
-        private set
+    public val unsubscriptions: Int get() = _unsubscriptions
 
     /**
      * Reset all values of this plugin and start from scratch.
      */
-    public fun reset() {
+    public fun reset(): Unit = lock.withLock {
         _states.clear()
         _intents.clear()
         _actions.clear()
         _exceptions.clear()
-        subscriptions = 0
-        unsubscriptions = 0
-        starts = 0
-        stops = 0
+        _subscriptions = 0
+        _unsubscriptions = 0
+        _starts = 0
+        _stops = 0
     }
 
     internal fun asPlugin(name: String) = plugin {
         this.name = name
-        onState { _: S, new: S -> new.also { _states.add(new) } }
-        onIntent { intent: I -> intent.also { _intents.add(it) } }
-        onAction { action: A -> action.also { _actions.add(it) } }
-        onException { e: Exception -> e.also { _exceptions.add(it) } }
-        onStart { starts += 1 }
-        onSubscribe { subscriptions += 1 }
-        onUnsubscribe { unsubscriptions += 1 }
-        onStop { stops += 1 }
+        onState { _: S, new: S -> new.also { lock.withLock { _states.add(new) } } }
+        onIntent { intent: I -> intent.also { lock.withLock { _intents.add(it) } } }
+        onAction { action: A -> action.also { lock.withLock { _actions.add(it) } } }
+        onException { e: Exception -> e.also { lock.withLock { _exceptions.add(it) } } }
+        onStart { _starts += 1 }
+        onSubscribe { _subscriptions += 1 }
+        onUnsubscribe { _unsubscriptions += 1 }
+        onStop { _stops += 1 }
     }
 
     public companion object {

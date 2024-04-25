@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -17,6 +18,22 @@ import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.log
+
+@PublishedApi
+internal class SubscriptionHolder {
+
+    private val job = atomic<Job?>(null)
+    suspend fun start(
+        scope: CoroutineScope,
+        block: suspend () -> Unit
+    ) = job.getAndSet(scope.launch { block() })?.cancelAndJoin()
+
+    fun cancel(e: CancellationException?) = job.getAndSet(null)?.cancel(e)
+
+    suspend fun cancelAndJoin() = job.getAndSet(null)?.cancelAndJoin()
+
+    val isActive get() = job.value?.isActive == true
+}
 
 /**
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
@@ -52,23 +69,21 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
 ): StorePlugin<S, I, A> = plugin {
     require(minSubscriptions > 0) { "Minimum number of subscribers must be greater than 0" }
     this.name = name
-    val job = atomic<Job?>(null)
+    val job = SubscriptionHolder()
     onSubscribe { previous ->
         val subs = previous + 1
         when {
-            subs < minSubscriptions -> job.getAndSet(null)?.cancelAndJoin()?.also {
+            subs < minSubscriptions -> job.cancelAndJoin().also {
                 log(StoreLogLevel.Debug) { "Canceled WhileSubscribed '$name' job" }
             }
-            job.value?.isActive == true -> Unit // condition was already satisfied
-            subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()?.also {
+            job.isActive -> Unit // condition was already satisfied
+            subs >= minSubscriptions -> job.start(this) { block() }.also {
                 log(StoreLogLevel.Debug) { "Started WhileSubscribed '$name' job" }
             }
         }
     }
     onUnsubscribe { current ->
-        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
+        if (current < minSubscriptions) job.cancelAndJoin()
     }
-    onStop {
-        job.getAndSet(null)?.cancel(CancellationException(null, it))
-    }
+    onStop { job.cancel(CancellationException(null, it)) }
 }
