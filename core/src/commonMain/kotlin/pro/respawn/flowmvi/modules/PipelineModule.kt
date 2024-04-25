@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.api.StoreConfiguration
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -32,8 +33,8 @@ import kotlin.coroutines.CoroutineContext
 @OptIn(DelicateStoreApi::class)
 @Suppress("Indentation")
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipeline(
-    name: String?,
     parent: CoroutineScope,
+    config: StoreConfiguration<S>,
     crossinline onStop: (e: Exception?) -> Unit,
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
@@ -44,7 +45,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     PipelineContext<S, I, A>,
     ActionReceiver<A> {
 
-    override fun toString(): String = "${name.orEmpty()}PipelineContext"
+    override val config get() = config
     override val key = PipelineContext // recoverable should be separate.
     private val job = SupervisorJob(parent.coroutineContext[Job]).apply {
         invokeOnCompletion {
@@ -57,7 +58,15 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     }
     private val handler = PipelineExceptionHandler()
     private val pipelineName = CoroutineName(toString())
-    override val coroutineContext: CoroutineContext = parent.coroutineContext + pipelineName + job + handler + this
+    override val coroutineContext: CoroutineContext = parent.coroutineContext +
+            config.coroutineContext +
+            pipelineName +
+            job +
+            handler +
+            this
+
+    override fun toString(): String = "${config.name.orEmpty()}PipelineContext"
+
     override suspend fun updateState(transform: suspend S.() -> S) = catch { onTransformState(transform) }
     override suspend fun action(action: A) = catch { onAction(action) }
     override fun send(action: A) {

@@ -57,8 +57,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override val name by config::name
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(
-        name = name,
-        parent = scope + config.coroutineContext,
+        parent = scope,
+        config = config,
         onAction = { action -> onAction(action)?.let { this@StoreImpl.action(it) } },
         onTransformState = { transform ->
             this@StoreImpl.updateState { onState(this, transform()) ?: this }
