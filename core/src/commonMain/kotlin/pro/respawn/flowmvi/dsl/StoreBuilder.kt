@@ -3,24 +3,38 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
-import pro.respawn.flowmvi.logging.defaultLogger
-import pro.respawn.flowmvi.store.StoreConfiguration
 import pro.respawn.flowmvi.store.StoreImpl
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
+
+private const val ConfigDeprecation = """
+Please use a `configure { }` block instead to set up store configuration properties and place all the setup logic there.
+This is needed to prevent store body internals from accessing the builder above, especially when using lazy plugins.
+Accessing these properties outside of `configure` block can lead to scoping and mutability issues.
+Removal cycle: 2 releases.
+"""
+
+private fun duplicatePluginMessage(name: String) = """
+    You have attempted to install plugin $name which was already installed.
+    Plugins can be repeatable if they have different names or are different instances of the target class.
+    You either have installed the same plugin instance twice or have installed two plugins with the same name.
+    To fix, please either create a new plugin instance for each installation (when not using names) 
+    or override the plugin name to be unique among all plugins for this store.
+    Consult the StorePlugin docs to learn more.
+""".trimIndent()
 
 /**
  * A builder DSL for creating a [Store].
@@ -34,126 +48,96 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public val initial: S,
 ) {
 
-    private var _logger: StoreLogger? = null
-    private var plugins: MutableSet<StorePlugin<S, I, A>> = mutableSetOf()
+    @PublishedApi
+    internal var config: StoreConfigurationBuilder = StoreConfigurationBuilder()
+        private set
 
-    /**
-     * [StoreLogger] used for this store.
-     * If [debuggable] is `true` and logger has not been set,
-     * then [PlatformStoreLogger] will be used, else [NoOpStoreLogger] will be used.
-     * If the logger was set explicitly, then it will be used regardless of the [debuggable] flag.
-     */
+    @PublishedApi
+    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
+
+    // region Deprecated props
+
+    @FlowMVIDSL
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
     public var logger: StoreLogger
-        get() = _logger ?: defaultLogger(debuggable)
+        get() = config.logger ?: if (config.debuggable) PlatformStoreLogger else NoOpStoreLogger
         set(value) {
-            _logger = value
+            config.logger = value
         }
 
-    /**
-     *  A coroutine context overrides for the store.
-     *  This context will be merged with the one the store was launched with (e.g. viewModelScope).
-     *  All store operations will be launched in that context by default
-     */
     @FlowMVIDSL
-    public var coroutineContext: CoroutineContext = EmptyCoroutineContext
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var coroutineContext: CoroutineContext by config::coroutineContext
 
-    /**
-     * Settings this to true enables additional store validations and debug logging.
-     */
     @FlowMVIDSL
-    public var debuggable: Boolean = false
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var debuggable: Boolean by config::debuggable
 
-    /**
-     * Set the future name of the store.
-     * See [Store.name] for more info.
-     *
-     * null by default
-     */
     @FlowMVIDSL
-    public var name: String? = null
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var name: String? by config::name
 
-    /**
-     * Declare that intents must be processed in parallel.
-     * All guarantees on the order of [MVIIntent]s will be lost.
-     * Intents may still be dropped according to [onOverflow].
-     * Intents are not **obtained** in parallel, just processed.
-     *
-     * false by default.
-     */
     @FlowMVIDSL
-    public var parallelIntents: Boolean = false
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var parallelIntents: Boolean by config::parallelIntents
 
-    /**
-     * Provide the [ActionShareBehavior] for the store.
-     * For stores where actions are of type [Nothing] this must be set to [ActionShareBehavior.Disabled].
-     * Will be set automatically when using the two-argument store builder.
-     *
-     * [ActionShareBehavior.Distribute] by default.
-     */
     @FlowMVIDSL
-    public var actionShareBehavior: ActionShareBehavior = ActionShareBehavior.Distribute()
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var actionShareBehavior: ActionShareBehavior by config::actionShareBehavior
 
-    /**
-     * Designate behavior for when [pro.respawn.flowmvi.api.IntentReceiver]'s [MVIIntent] pool overflows.
-     *
-     * [BufferOverflow.DROP_OLDEST] by default
-     */
     @FlowMVIDSL
-    public var onOverflow: BufferOverflow = BufferOverflow.DROP_OLDEST
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var onOverflow: BufferOverflow by config::onOverflow
 
-    /**
-     * Designate the maximum capacity of [MVIIntent]s waiting for processing
-     * in the [pro.respawn.flowmvi.api.IntentReceiver]'s queue.
-     * Intents that overflow this capacity will be processed according to [onOverflow].
-     * This should be either a positive value, or one of:
-     *  * [Channel.UNLIMITED]
-     *  * [Channel.CONFLATED]
-     *  * [Channel.RENDEZVOUS]
-     *  * [Channel.BUFFERED]
-     *
-     *  [Channel.UNLIMITED] by default.
-     */
     @FlowMVIDSL
-    public var intentCapacity: Int = Channel.UNLIMITED
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var intentCapacity: Int by config::intentCapacity
 
-    /**
-     * Enables transaction serialization for state updates, making state updates atomic and suspendable.
-     *
-     * * Serializes both state reads and writes using a mutex.
-     * * Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
-     *   All other clients attempt to get the state will wait on a FIFO queue and suspend the parent coroutine.
-     * * This property disables state transactions for the whole store.
-     *   For one-time usage of non-atomic updates, see [useState].
-     * * Has a small performance impact because of coroutine context switching and mutex usage.
-     *
-     * `true` by default
-     */
     @FlowMVIDSL
-    public var atomicStateUpdates: Boolean = true
+    @Deprecated(ConfigDeprecation)
+    @Suppress("UndocumentedPublicProperty")
+    public var atomicStateUpdates: Boolean by config::atomicStateUpdates
+
+    // endregion
 
     /**
      * Install [StorePlugin]s. See the other overload to build the plugin on the fly.
      * This installs prebuilt plugins.
+     *
      * Plugins will **preserve** the order of installation and will proceed according to this order.
      * See [StorePlugin] for comprehensive information on the behavior of plugins.
+     *
      * Installation of the same plugin multiple times is **not allowed**.
      * See [StorePlugin.name] for more info and solutions.
      */
     @FlowMVIDSL
-    public inline fun install(
-        plugin: StorePlugin<S, I, A>,
-        vararg other: StorePlugin<S, I, A>,
-    ): Unit = install(other.asSequence().plus(plugin).asIterable())
-
-    /**
-     * Install all [plugins].
-     * Please see documentation for the other overload for more details.
-     * @see install
-     */
-    @FlowMVIDSL
-    public fun install(plugins: Iterable<StorePlugin<S, I, A>>): Unit = plugins.forEach {
+    public fun install(plugins: Iterable<LazyPlugin<S, I, A>>): Unit = plugins.forEach {
         require(this.plugins.add(it)) { duplicatePluginMessage(it.toString()) }
     }
+
+    /**
+     * Install [StorePlugin]s. See the other overload to build the plugin on the fly.
+     * This installs prebuilt plugins.
+     *
+     * Plugins will **preserve** the order of installation and will proceed according to this order.
+     * See [StorePlugin] for comprehensive information on the behavior of plugins.
+     *
+     * Installation of the same plugin multiple times is **not allowed**.
+     * See [StorePlugin.name] for more info and solutions.
+     */
+    @FlowMVIDSL
+    public fun install(
+        plugin: LazyPlugin<S, I, A>,
+        vararg other: LazyPlugin<S, I, A>,
+    ): Unit = install(other.asSequence().plus(plugin).asIterable())
 
     /**
      * Create and install a new [StorePlugin].
@@ -162,30 +146,26 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      */
     @FlowMVIDSL
     public inline fun install(
-        block: StorePluginBuilder<S, I, A>.() -> Unit
-    ): Unit = install(plugin(block))
+        crossinline block: LazyPluginBuilder<S, I, A>.() -> Unit
+    ): Unit = install(lazyPlugin(block))
+
+    /**
+     * Adjust the current [StoreConfiguration] of this [Store].
+     */
+    @FlowMVIDSL
+    public inline fun configure(block: StoreConfigurationBuilder.() -> Unit): Unit = config.run(block)
+
+    /**
+     * Replace the current [StoreConfiguration] of this store by the value from [StoreConfigurationBuilder].
+     */
+    @FlowMVIDSL
+    public fun configureWith(configuration: StoreConfigurationBuilder) {
+        config = configuration
+    }
 
     @PublishedApi
     @FlowMVIDSL
-    internal fun build(): Store<S, I, A> = StoreConfiguration(
-        initial = initial,
-        name = name,
-        parallelIntents = parallelIntents,
-        actionShareBehavior = actionShareBehavior,
-        intentCapacity = intentCapacity,
-        onOverflow = onOverflow,
-        debuggable = debuggable,
-        coroutineContext = coroutineContext,
-        logger = logger,
-        atomicStateUpdates = atomicStateUpdates,
-    ).let { StoreImpl(it, plugins) }
+    internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
+        StoreImpl(config, plugins.map { it(config) })
+    }
 }
-
-private fun duplicatePluginMessage(name: String) = """
-    You have attempted to install plugin $name which was already installed.
-    Plugins can be repeatable if they have different names or are different instances of the target class.
-    You either have installed the same plugin instance twice or have installed two plugins with the same name.
-    To fix, please either create a new plugin instance for each installation (when not using names) 
-    or override the plugin name to be unique among all plugins for this store.
-    Consult the StorePlugin docs to learn more.
-""".trimIndent()
