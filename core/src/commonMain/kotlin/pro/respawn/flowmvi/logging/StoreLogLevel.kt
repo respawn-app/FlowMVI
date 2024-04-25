@@ -1,8 +1,9 @@
 package pro.respawn.flowmvi.logging
 
 /**
- * Log level of this store. Override using [logging] or leave as a default for sensible log levels.
- * Not used when the logger does not support levels, such as with [consoleLoggingPlugin].
+ * Log level of this store. Override when installing the plugin or leave as a default for sensible log levels.
+ * Log level may be represented using a system log level, such as on JS, Wasm, Android and iOS.
+ * On other platforms, log level will be represented as an emoji ([StoreLogLevel.asSymbol]).
  */
 public enum class StoreLogLevel {
 

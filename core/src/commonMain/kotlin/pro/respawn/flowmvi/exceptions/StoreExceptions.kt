@@ -46,3 +46,11 @@ internal fun ActionsDisabledException() = UnrecoverableException(
         This is most likely a developer error. Either enable actions or do not attempt to send them.
     """.trimIndent()
 )
+
+internal fun SubscribeBeforeStartException() = UnrecoverableException(
+    message = """
+        You have attempted to subscribe to the store before starting it.
+        If this is intended, set allowIdleSubscriptions = true for the store. 
+        If not, please always call Store.start() before you try using it.
+    """.trimIndent()
+)

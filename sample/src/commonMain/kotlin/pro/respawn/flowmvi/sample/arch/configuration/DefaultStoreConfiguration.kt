@@ -17,7 +17,6 @@ import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
-import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 internal class DefaultStoreConfiguration(
@@ -37,26 +36,23 @@ internal class DefaultStoreConfiguration(
         name: String,
         saver: Saver<S>?,
     ) {
-        this.name = name
-        debuggable = BuildFlags.debuggable
-        actionShareBehavior = ActionShareBehavior.Distribute()
-        onOverflow = SUSPEND
-        parallelIntents = true
-        if (debuggable) {
+        configure {
+            this.name = name
+            debuggable = BuildFlags.debuggable
+            actionShareBehavior = ActionShareBehavior.Distribute()
+            onOverflow = SUSPEND
+            parallelIntents = true
+        }
+        if (BuildFlags.debuggable) {
             enableLogging()
             remoteDebugger()
         }
         if (saver != null) install(
             saveStatePlugin(
-                saver = LoggingSaver(saver, tag = name, logger = logger),
+                saver = saver,
                 name = "${name}SavedStatePlugin",
                 context = Dispatchers.Default,
             )
         )
-    }
-
-    private companion object {
-
-        const val StoreCacheDirName = "state"
     }
 }

@@ -7,16 +7,17 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
-import kotlin.coroutines.CoroutineContext
 
 internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
-    initial: S,
-    override val coroutineContext: CoroutineContext,
+    override val config: StoreConfiguration<S>,
     val plugin: StorePlugin<S, I, A>,
 ) : PipelineContext<S, I, A> {
 
-    var state: S by atomic(initial)
+    override val coroutineContext by config::coroutineContext
+
+    var state: S by atomic(config.initial)
         private set
 
     @DelicateStoreApi

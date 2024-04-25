@@ -1,204 +1,476 @@
-# Creating custom plugins
+# An overview of prebuilt plugins
 
-Plugin is a unit that can extend the business logic of the Store.
-All stores are mostly based on plugins, and their behavior is entirely determined by them.
+FlowMVI comes with a whole suite of prebuilt plugins to cover the most common development needs.
 
-Plugins can influence subscription, stopping, and all other forms of store behavior.
-Access the store's context and other functions through the `PipelineContext` receiver.
-It is not recommended to implement the `StorePlugin` interface,
-If you do override that interface, you **must** comply with the hashcode/equals contract of the plugin system,
-described below.
+Here's a full list:
 
-Plugins are simply built:
+* **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
+* **Init Plugin** - do something when the store is launched. Install with `init { }`.
+* **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
+* **While Subscribed Plugin** - run jobs when the `N`th subscriber of a store appears. Install
+  with `whileSubscribed { }`.
+* **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
+* **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
+  lifecycle. Install with `val value by cache { }`
+* **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
+* **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
+  work. Install with `awaitSubscribers()`.
+* **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
+* **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
+  Install with `disallowRestart()`.
+* **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for  
+  testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
+* **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order.
+* **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
+  See [saved state](./savedstate.md) for details.
+* **Remote Debugging Plugin** - connect to a remote debugger application shipped with FlowMVI. See
+  the [documentation](debugging.md) to learn how to set up the environment.
+* **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
+
+All plugins are based on the essential callbacks that FlowMVI allows them to intercept, so most of them contain minimal
+amounts of code. They are explained on the [custom plugins page](custom_plugins.md).
+
+Here's an explanation of how each default plugin works:
+
+### Reduce Plugin
+
+This is probably the most essential plugin in the library. Here's the full code of the plugin:
 
 ```kotlin
+fun reducePlugin(
+    consume: Boolean = true,
+    name: String = ReducePluginName,
+    reduce: PipelineContext.(intent: I) -> Unit,
+) = plugin {
+    this.name = name
 
-val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
-    // dsl for intercepting is available
+    onIntent {
+        reduce(it)
+        it.takeUnless { consume }
+    }
 }
-
 ```
 
-## Plugin DSL
+This plugin simply executes `reduce` when it receives an intent.
+If you set `consume = true`, the plugin will **not** let other plugins installed after this one receive the intent.
+Set `consume = false` to install more than one reduce plugin.
 
-### Name
+Install this plugin in your stores by using
 
 ```kotlin
-val name: String? = null
+val store = store(Loading) {
+
+    reduce { intent ->
+
+    }
+}
 ```
 
-The name can be used for logging purposes, but most importantly, to distinguish between different plugins.
-Name is optional, when it is missing, the plugins will be compared **by reference**.
-If you need to have the same plugin installed multiple times, consider giving plugins different names.
-Plugins that have no name can be installed multiple times, assuming they are different instances of a plugin.
+### Init plugin
 
-?> If you attempt to install the same plugin multiple times, or different plugins
-with the same name, **an exception will be thrown**.
+This plugin invokes a given (suspending) action **before** the Store starts, each time it starts.
 
-Consider the following examples:
-
-``` kotlin
-loggingPlugin("foo")
-analyticsPlugin("foo") // -> will throw
-
-loggingPlugin(null)
-analyticsPlugin(null) // -> OK
-
-loggingPlugin("plugin1")
-loggingPlugin("plugin1") // -> will throw
-
-loggingPlugin("plugin1")
-loggingPlugin("plugin2") // -> OK, but same logs will be printed twice
-
-loggingPlugin(null)
-loggingPlugin(null) // -> OK, but same logs will be printed twice
-
-val plugin = loggingPlugin(null)
-install(plugin)
-install(plugin) // -> will throw
-```
-
-So name your plugin based on whether you want it to be repeatable, i.e. installed multiple times.
-For example, the library's `reduce` plugin **cannot** be installed multiple times.
-
-### onState
+Here's the full code (simplified a bit):
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = new
+fun initPlugin(
+    block: suspend PipelineContext.() -> Unit,
+) = plugin {
+
+    onStart(block)
+}
 ```
 
-A callback to be invoked each time `updateState` is called.
-This callback is invoked **before** the state changes, but **after** the function's `block` is invoked.
-Any plugin can veto (forbid) or modify the state change.
+Here are some interesting properties that apply to all plugins that use `onStart`:
 
-This callback is **not** invoked at all when state is changed through `useState`, used in `withState`
-or when `state` is obtained directly.
+* They are executed **each time** the store starts.
+* They can suspend, and until **all** of them return, the store will **not handle any subscriptions, intents or any
+  other actions**
+* They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
 
-* Return null to cancel the state change. All plugins registered later when building the store will not receive
-  this event.
-* Return `new` to continue the chain of modification, or allow the state to change,
-  if no other plugins change it.
-* Return `old` to veto the state change, but allow next plugins in the queue to process the state.
-* Execute other operations using `PipelineContext`, including jobs.
+!> Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
+but also operates in the context of the store, which is still active even if the store is not visible. It does not
+respect system lifecycle and is not aware of subscriptions. Consider using `whileSubscribed` if you need lifecycle
+awareness.
 
-### onIntent
+This plugin can be useful when you want to do something **before** the store is fully started.
+
+Install the init plugin by calling
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent
+val store = store(Loading) {
+
+    init { // this: PipelineContext
+
+    }
+}
 ```
 
-A callback that is invoked each time an intent is received **and then begun** to be processed.
+### Recover plugin
 
-This callback is invoked **after** the intent is sent and **before** it is received,
-sometimes the time difference can be significant if the store was stopped for some time
-or even **never** if the store's buffer overflows or store is not ever used again.
-
-* Return null to veto the processing and prevent other plugins from using the intent.
-* Return another intent to replace `intent` with another one and continue with the chain.
-* Return `intent` to continue processing, leaving it unmodified.
-* Execute other operations using `PipelineContext`.
-
-### onAction
+Here's the full code of the plugin:
 
 ```kotlin
- suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action
+fun recoverPlugin(
+    name: String? = null,
+    recover: PipelineContext.(e: Exception) -> Exception?
+) = plugin {
+    this.name = name
+
+    onException(recover)
+}
 ```
 
-A callback that is invoked each time an `MVIAction` has been sent.
+This plugins executes `recover` lambda each time an exception happens in any of the store's callbacks, plugins or jobs
+This callback is invoked asynchronously **after** the exception has been thrown and the job that threw it was cancelled.
+With this plugin, you cannot continue the execution of the job because it has already ended.
+If you return `null` from this plugin, this means that the exception was handled and it will be swallowed in this case.
 
-This is invoked **after** the action has been sent, but **before** the store handles it.
-This function will always be invoked, even after the action is later dropped because of `ActionShareBehavior`,
-and it will be invoked before the `action(action: A)` returns, if it has been suspended, so this handler may suspend the
-parent coroutine that wanted to send the action.
+This plugin can be useful to display an error message to the user or to report an error to analytics.
 
-* Return null to veto the processing and prevent other plugins from using the action.
-* Return another action to replace `action` with another one and continue with the chain.
-* Return `action` to continue processing, leaving it unmodified.
-* Execute other operations using `PipelineContext`
-
-### onException
+Install this plugin by using:
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = e
+val store = store(Loading) {
+
+    recover { e: Exception ->
+
+    }
+}
 ```
 
-A callback that is invoked when Store catches an exception. It is invoked when either a coroutine launched inside the  
-store throws, or when an exception occurs in any other plugin.
+### While Subscribed Plugin
 
-* If none of the plugins handles the exception (returns `null`), **the exception is rethrown and the store fails**.
-* If you throw an exception in this block, **the store will fail**. Do not throw exceptions in this function.
-* This is invoked **before** the exception is rethrown or otherwise processed.
-* This is invoked **asynchronously in a background job** and after the job that has thrown was cancelled, meaning
-  that some time may pass after the job is cancelled and the exception is handled.
-* Handled exceptions do not result in the store being closed.
-* You cannot prevent the job that threw an exception and all its nested jobs from failing. The job has already been
-  canceled and can no longer continue. This does not apply to the store's context however.
-
------
-
-* Return `null` to signal that the exception has been handled and recovered from, continuing the flow's processing.
-* Return `e` if the exception was **not** handled and should be passed to other plugins or rethrown.
-* Execute other operations using `PipelineContext`
-
-### onStart
+This plugin launches a background job whenever the number of store subscribers reaches a minimum value (1 by default)
+and automatically cancels it when that number drops below the minimum.
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onStart(): Unit = Unit
+fun whileSubscribedPlugin(
+    minSubscriptions: Int = 1,
+    block: suspend PipelineContext.() -> Unit,
+) = plugin {
+
+    val job = SubscriptionHolder()
+    onSubscribe { previous ->
+        val current = previous + 1
+        when {
+            current < minSubscriptions -> job.cancelAndJoin()
+            job.isActive -> Unit // condition was already satisfied
+            current >= minSubscriptions -> job.start(this) { block() }
+        }
+    }
+    onUnsubscribe { current ->
+        if (current < minSubscriptions) job.cancelAndJoin()
+    }
+    onStop { job.cancel() }
+}
 ```
 
-A callback that is invoked **each time** `Store.start` is called.
+This plugin is designed to suspend inside its `block` because it already launches a background job.
+You can safely collect flows and suspend forever in the `block`.
 
-* Suspending in this callback will **prevent** the store from starting until the plugin is finished.
-* Plugins that use `onSubscribe` will also not get their events until this is run.
-* Execute any operations using `PipelineContext`.
+After the store is started, this plugin will begin receiving subscription events from the store.
 
-### onSubscribe
+* The **first time** the number of plugins reaches the minimum, the block that you provided will be run.
+* The job will stay active until it either ends by itself or the number of subscriptions drops below the minimum.
+* If the job has ended by itself, it will only be launched **after** the count of subscriptions has dropped below the
+  minimum. I.e. it will not be relaunched each time a new subscriber appears, and only when the condition is satisfied
+  the first time.
+
+This plugin is useful for starting and stopping observation of some external data sources when the user can interact
+with the app. For example, you may want to collect some flows and call `updateState` on each emission to update
+the state you display to the user.
+
+Install the plugin with:
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int): Unit = Unit
+val store = store(Loading) {
+
+    whileSubscribed { // optionally provide the number of subs
+
+    }
+}
 ```
 
-A callback to be executed **each time** `Store.subscribe` is called.
+### Logging plugin
 
-* This callback is executed **before** the `subscriberCount` is incremented.
-  This means, for the first subscription, `subscriberCount` will be zero.
-* There is no guarantee that the subscribers will not be able to subscribe when the store has not been started yet.
-  But this function will be invoked as soon as the store is started, with the most recent subscriber count.
-* This function is invoked in the store's scope, not the subscriber's scope.
-* There is no guarantee that this will be invoked exactly before a subscriber reappears.
-  It may be so that a second subscriber, for example,
-  appears before the first one disappears (due to the parallel nature of
-  coroutines). In that case, `onSubscribe` will be invoked first as if it was a second subscriber, and then
-  `onUnsubscribe` will be invoked, as if there were more subscribers for a moment.
-* Suspending in this function will prevent other plugins from receiving the subscription event (i.e. next plugins
-  that use `onSubscribe` will wait for this one to complete.
+This plugin prints the events that happen in the store to the `logger` that you specified when you were creating the
+store.
 
-### onUnsubscribe
+It will print to:
+
+* Logcat on Android
+* NSLog on Apple platforms
+* Console on Wasm and JS
+* Stdout / Stderr on JVM
+* Stdout on other platforms
+
+---
+
+* Tags are only used on Android, so on other platforms they will be appended as a part of the message.
+* On platforms that do not support levels, an emoji will be printed instead
+
+Install this plugin with
 
 ```kotlin
-suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
+val store = store(Loading) {
+
+    enableLogging()
+}
 ```
 
-A callback to be executed when the subscriber cancels its subscription job (unsubscribes).
+### Cache Plugin
 
-* This callback is executed **after** the subscriber has been removed and **after** `subscriberCount` is
-  decremented. This means, for the last subscriber, the count will be 0.
-* There is no guarantee that this will be invoked exactly before a subscriber reappears.
-  It may be so that a second subscriber appears before the first one disappears (due to the parallel nature of
-  coroutines). In that case, `onSubscribe` will be invoked first as if it was a second subscriber, and then
-  `onUnsubscribe` will be invoked, as if there were more subscribers for a moment.
-* Suspending in this function will prevent other plugins from receiving the unsubscription event (i.e. next plugins
-  that use `onUnsubscribe` will wait for this one to complete.
-
-### onStop
+Here's a simplified version of the code:
 
 ```kotlin
-fun onStop(e: Exception?): Unit = Unit
+fun <T> cachePlugin(
+    init: suspend PipelineContext.() -> T,
+) = plugin {
+
+    val value = CachedValue<T>(init)
+
+    onStart { value.create() }
+
+    onStop { value.clear() }
+}
 ```
 
-Invoked when the store is closed.
+This plugin provides a delegate that is very similar to `lazy`, but the reference that the plugin holds is tied to the
+lifecycle of the store, which means when the store starts, the value is initialized using the provided `init` parameter,
+and when the store stops, it clears the reference to the value. If you use the `PipelineContext` inside, it will be
+cancelled by the store itself.
 
-* This is called **after** the store is already closed, and you cannot influence the outcome.
-* This is invoked for both exceptional stops and normal stops.
-* Will not be invoked when an `Error` is thrown. You should not handle `Error`s.
-* `e` is the exception the store is closed with. Will be `null` for normal completions.
+You can create a `CachedValue` outside of the store if you need to, but you **must** install the plugin using the value,
+and you must not try to access the value outside of the store's lifecycle.
+
+This plugin is most useful:
+
+* When you want to either suspend in the initializer (like a suspending `lazy`), in which case it will function
+  similarly to `init` plugin
+* When you want to use the `PipelineContext` (and its `CoroutineScope`) when initializing a value, for example with
+  pagination or shared flows.
+
+Install this plugin using:
+
+```kotlin
+suspend fun produceTimer(): Flow<Int>
+
+val store = store(Loading) {
+
+    val timer by cache {
+        produceTimer().stateIn(scope = this, initial = 0)
+    }
+}
+```
+
+or provide the value externally:
+
+```kotlin
+// do not access outside the store lifecycle
+val value = CachedValue<Int, State, Intent, Action> { produceTimer() }
+
+val store = store(Loading) {
+
+    install(cachePlugin(value))
+}
+```
+
+### Job Manager Plugin
+
+FlowMVI provides a `JobManager` class that can store references to long-running `Job`s by an arbitrary key and manage
+them. Job manager can then hook up to the store lifecycle events to cancel the jobs as appropriate:
+
+```kotlin
+fun <K : Any> jobManagerPlugin(
+    manager: JobManager<K>,
+    name: String? = JobManager.Name,
+) = plugin {
+    this.name = name
+
+    onStop { manager.cancelAll() }
+}
+```
+
+Examine the methods of the `JobManager` class to learn what it can do.
+
+Create a job manager and immediately install it using:
+
+```kotlin
+enum class Jobs { Connection }
+
+val store = store(Loading) {
+
+    val jobs: JobManager<Jobs> = manageJobs()
+}
+```
+
+Or provide the job manager externally:
+
+```kotlin
+val manager = JobManager<Jobs>()
+
+val store = store(Loading) {
+
+    install(jobManagerPlugin(manager))
+}
+```
+
+Then register a job once you launch it:
+
+```kotlin
+val store = store(Loading) {
+
+    val jobs = manageJobs()
+
+    init {
+        launch {
+            server.connect()
+        }.register(Jobs.Connection, jobs)
+    }
+
+    recover { e ->
+        jobs.cancel(Connection)
+        e
+    }
+}
+```
+
+### Await Subscribers Plugin
+
+This plugin allows you to suspend until the store has reached a specified number of subscribers present.
+To use it, you can create an instance of `SubscriberManager` and call `await` to suspend until the condition is met.
+
+```kotlin
+fun awaitSubscribersPlugin(
+    manager: SubscriberManager,
+    minSubs: Int = 1,
+    suspendStore: Boolean = true,
+    timeout: Duration = Duration.INFINITE,
+    name: String = SubscriberManager.Name,
+) = plugin {
+    this.name = name
+    onStart {
+        with(manager) { launch(timeout) }
+    }
+    onState { _, new ->
+        if (suspendStore) manager.await()
+        new
+    }
+    onAction {
+        if (suspendStore) manager.await()
+        it
+    }
+    onIntent {
+        if (suspendStore) manager.await()
+        it
+    }
+    onStop {
+        manager.complete()
+    }
+    onSubscribe { subscriberCount ->
+        val currentSubs = subscriberCount + 1
+        if (minSubs >= currentSubs) manager.completeAndWait()
+    }
+}
+```
+
+* Specify `minSubs` to determine the minimum number of subscribers to reach.
+* Choose `suspendStore` to block all store operations until the condition is met. If you pass `false`, only the code
+  that explicitly calls `await()` will suspend.
+* You can only await or complete the job once per start of the store.
+* Specify a `timeout` duration or `complete()` the job manually if you want to finish early.
+
+### Undo/Redo Plugin
+
+Undo/Redo plugin allows you to create and manage a queue of operations that can be undone and repeated.
+
+```kotlin
+fun undoRedoPlugin(
+    undoRedo: UndoRedo,
+    name: String? = null,
+    resetOnException: Boolean = true,
+) = plugin {
+    this.name = name
+
+    onStop { undoRedo.reset() }
+
+    if (resetOnException) onException {
+        it.also { undoRedo.reset() }
+    }
+}
+```
+
+The events will be reset when store is stopped and (optionally) when an exception occurs.
+
+You can observe the queue of events for example in `whileSubscribed`:
+
+```kotlin
+val store = store(Loading) {
+
+    val undoRedo = undoRedo(queueSize = 10)
+
+    whileSubscribed {
+        undoRedo.queue.onEach { (i, canUndo, canRedo) ->
+            updateState {
+                copy(index = i, canUndo = canUndo, canRedo = canRedo)
+            }
+        }.collect()
+    }
+
+    reduce { intent ->
+        when (intent) {
+            is ClickedRedo -> undoRedo.redo()
+            is ClickedUndo -> undoRedo.undo()
+            is ChangedInput -> undoRedo(
+                redo = { useState { copy(input = intent.current) } },
+                undo = { useState { copy(input = intent.previous) } },
+            )
+        }
+    }
+}
+```
+
+This plugin can be useful whenever you are implementing an "editor" type functionality.
+
+### Time Travel plugin
+
+Time travel records all Intents, Actions, State Changes, subscription events, starts and stops of the store.
+
+It's mostly useful for debugging, logging and other technical tasks.
+For example, FlowMVI's testing DSL embeds a time travel plugin when testing the store.
+
+```kotlin
+fun timeTravelPlugin(
+    timeTravel: TimeTravel,
+    name: String = TimeTravel.Name,
+) = plugin {
+    this.name = name
+    onState { _: S, new: S -> new.also { timeTravel.states.add(new) } }
+    onIntent { intent: I -> intent.also { timeTravel.intents.add(it) } }
+    onAction { action: A -> action.also { timeTravel.actions.add(it) } }
+    onException { e: Exception -> e.also { timeTravel.exceptions.add(it) } }
+    onStart { timeTravel.starts += 1 }
+    onSubscribe { timeTravel.subscriptions += 1 }
+    onUnsubscribe { timeTravel.unsubscriptions += 1 }
+    onStop { stops += 1 }
+}
+```
+
+Install the plugin using:
+
+```kotlin
+val store = store(Loading) {
+    val timeTravel = timeTravel()
+
+    init {
+        assert(timeTravel.starts == 1)
+    }
+}
+```
+
+### Or Create Your Own
+
+In case you are missing a feature or a plugin, you can create your own in just a few lines of code.
+
+Learn how to do in the [next guide](custom_plugins.md)

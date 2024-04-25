@@ -16,10 +16,13 @@ object TestStoreConfiguration : StoreConfiguration {
         name: String,
         saver: Saver<S>?,
     ) {
-        this.name = name
-        debuggable = true
-        parallelIntents = false
-        onOverflow = SUSPEND
+        configure {
+            this.name = name
+            debuggable = true
+            parallelIntents = false
+            atomicStateUpdates = false
+            onOverflow = SUSPEND
+        }
         enableLogging()
     }
 

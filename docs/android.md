@@ -25,8 +25,10 @@ class CounterViewModel(
         initial = Loading,
         scope = viewModelScope,
     ) {
-        debuggable = BuildConfig.DEBUG
-        install(androidLoggingPlugin())
+        configure {
+            debuggable = BuildConfig.DEBUG
+        }
+        enableLogging()
         parcelizeState(handle)
 
         /* ... everything else ... */
@@ -120,7 +122,7 @@ fun CounterScreen() {
     // using Koin DSL from above
     val store = storeViewModel<CounterContainer, _, _, _>()
 
-    val state by store.subscribe { action ->
+    val state by store.subscribe(DefaultLifecycle) { action ->
         when (action) {
             is ShowMessage -> {
                 /* ... */

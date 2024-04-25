@@ -21,8 +21,8 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      * Intents are processed as long as the parent scope is active.
      * **Starting store processing when it is already started will result in an exception.**
      * Although not always needed, store can be launched multiple times,
-     * assuming you cancel the job used before or call [close].
-     * @return a [Job] that the store is running on that can be cancelled later. [close] will cancel that job.
+     * assuming you cancel the job used before or call [Store.close].
+     * @return a [Job] that the store is running on that can be cancelled later. [Store.close] will cancel that job.
      */
     public fun start(scope: CoroutineScope): Job
 

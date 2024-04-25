@@ -11,15 +11,18 @@ import io.kotest.core.spec.style.scopes.FreeSpecTerminalScope
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.testCoroutineScheduler
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.coroutineContext
 
 @OptIn(ExperimentalKotest::class)
 fun Spec.asUnconfined() {
+    dispatcherAffinity = true
+    coroutineTestScope = true
+    coroutineDebugProbes = false
     coroutineDispatcherFactory = object : CoroutineDispatcherFactory {
         override suspend fun <T> withDispatcher(testCase: TestCase, f: suspend () -> T): T =
-            withContext(coroutineContext + UnconfinedTestDispatcher()) { f() }
+            withContext(currentCoroutineContext() + UnconfinedTestDispatcher()) { f() }
     }
 }
 

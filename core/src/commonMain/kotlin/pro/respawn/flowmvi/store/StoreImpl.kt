@@ -3,58 +3,62 @@ package pro.respawn.flowmvi.store
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
+import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
-import pro.respawn.flowmvi.exceptions.UnhandledStoreException
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.StateModule
-import pro.respawn.flowmvi.modules.SubscribersModule
+import pro.respawn.flowmvi.modules.SubscriptionModule
 import pro.respawn.flowmvi.modules.actionModule
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
+import pro.respawn.flowmvi.modules.recoverModule
 import pro.respawn.flowmvi.modules.stateModule
-import pro.respawn.flowmvi.modules.subscribersModule
-import pro.respawn.flowmvi.plugins.compositePlugin
+import pro.respawn.flowmvi.modules.subscriptionModule
 
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
-    private val config: StoreConfiguration<S, I, A>,
+    private val config: StoreConfiguration<S>,
+    plugin: StorePlugin<S, I, A>,
+    recover: RecoverModule<S, I, A> = recoverModule(plugin),
+    subs: SubscriptionModule = subscriptionModule(),
+    states: StateModule<S> = stateModule(config.initial, config.atomicStateUpdates),
+    intents: IntentModule<I> = intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
+    actions: ActionModule<A> = actionModule(config.actionShareBehavior),
 ) : Store<S, I, A>,
     Provider<S, I, A>,
-    RecoverModule<S, I, A>,
-    StorePlugin<S, I, A> by compositePlugin(config.plugins),
-    SubscribersModule by subscribersModule(),
-    StateModule<S> by stateModule(config.initial, config.atomicStateUpdates),
-    IntentModule<I> by intentModule(config.parallelIntents, config.intentCapacity, config.onOverflow),
-    ActionModule<A> by actionModule(config.actionShareBehavior) {
+    StorePlugin<S, I, A> by plugin,
+    RecoverModule<S, I, A> by recover,
+    SubscriptionModule by subs,
+    StateModule<S> by states,
+    IntentModule<I> by intents,
+    ActionModule<A> by actions {
 
-    private var launchJob = atomic<Job?>(null)
+    private val launchJob = atomic<Job?>(null)
     override val name by config::name
 
     override fun start(scope: CoroutineScope): Job = launchPipeline(
-        name = name,
-        parent = scope + config.coroutineContext,
+        parent = scope,
+        config = config,
         onAction = { action -> onAction(action)?.let { this@StoreImpl.action(it) } },
         onTransformState = { transform ->
             this@StoreImpl.updateState { onState(this, transform()) ?: this }
         },
         onStop = {
-            checkNotNull(launchJob.getAndSet(null)) { "Store is closed but was not started" }
+            checkNotNull(launchJob.getAndSet(null)) { "Store is stopped but was not started before" }
             onStop(it)
         },
         onStart = {
@@ -79,21 +83,14 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
     )
 
-    override suspend fun PipelineContext<S, I, A>.recover(e: Exception) {
-        withContext(this@StoreImpl) {
-            if (e is UnrecoverableException) throw e
-            onException(e)?.let { throw UnhandledStoreException(it) }
-        }
-    }
-
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job = launch {
-        newSubscriber()
+        if (launchJob.value?.isActive != true && !config.allowIdleSubscriptions) throw SubscribeBeforeStartException()
+        launch { awaitUnsubscription() }
         block(this@StoreImpl)
         if (config.debuggable) throw NonSuspendingSubscriberException()
-    }.apply {
-        invokeOnCompletion { removeSubscriber() }
+        cancel()
     }
 
     override fun close() {

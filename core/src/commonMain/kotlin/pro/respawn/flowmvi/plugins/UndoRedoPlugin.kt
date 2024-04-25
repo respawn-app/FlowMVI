@@ -85,7 +85,7 @@ public class UndoRedo(
         with(_queue) {
             if (doImmediately) redo()
             val range = _index.value.coerceAtLeast(0) + 1..lastIndex
-            if (!range.isEmpty()) removeAll(slice(range))
+            if (!range.isEmpty()) removeAll(slice(range).toSet())
             add(Event(redo, undo))
             lastIndex.also { _index.value = it }
         }

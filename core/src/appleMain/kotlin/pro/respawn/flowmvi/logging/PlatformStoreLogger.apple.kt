@@ -6,5 +6,5 @@ import platform.Foundation.NSLog
  * Alias for [ConsoleStoreLogger]
  */
 public actual val PlatformStoreLogger: StoreLogger by lazy {
-    StoreLogger { level, tag, message -> NSLog("%s %s: %s", level.asSymbol, tag.orEmpty(), message()) }
+    StoreLogger { level, tag, message -> NSLog(template(level, tag, message)) }
 }

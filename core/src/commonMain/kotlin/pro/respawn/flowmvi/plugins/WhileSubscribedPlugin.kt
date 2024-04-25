@@ -1,6 +1,8 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -12,6 +14,23 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+
+@PublishedApi
+internal class SubscriptionHolder {
+
+    private val job = atomic<Job?>(null)
+    suspend fun start(
+        scope: CoroutineScope,
+        block: suspend () -> Unit
+    ) = job.getAndSet(scope.launch { block() })?.cancelAndJoin()
+
+    fun cancel(e: CancellationException?) = job.getAndSet(null)?.cancel(e)
+
+    suspend fun cancelAndJoin() = job.getAndSet(null)?.cancelAndJoin()
+
+    // when a job has finished execution, we still want to consider it present to not relaunch on each new subscription
+    val isActive get() = job.value != null
+}
 
 /**
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
@@ -47,15 +66,17 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
 ): StorePlugin<S, I, A> = plugin {
     require(minSubscriptions > 0) { "Minimum number of subscribers must be greater than 0" }
     this.name = name
-    val job = atomic<Job?>(null)
+    val job = SubscriptionHolder()
     onSubscribe { previous ->
-        val newSubscribers = previous + 1
+        val current = previous + 1
         when {
-            job.value?.isActive == true -> return@onSubscribe // condition was already satisfied
-            newSubscribers >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
+            current < minSubscriptions -> job.cancelAndJoin()
+            job.isActive -> Unit // condition was already satisfied
+            current >= minSubscriptions -> job.start(this) { block() }
         }
     }
     onUnsubscribe { current ->
-        if (current < minSubscriptions) job.getAndSet(null)?.cancelAndJoin()
+        if (current < minSubscriptions) job.cancelAndJoin()
     }
+    onStop { job.cancel(CancellationException(null, it)) }
 }

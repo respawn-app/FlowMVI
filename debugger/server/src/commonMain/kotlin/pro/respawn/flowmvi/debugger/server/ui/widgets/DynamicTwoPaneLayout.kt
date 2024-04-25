@@ -1,7 +1,9 @@
 package pro.respawn.flowmvi.debugger.server.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.EaseOutCubic
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.gestures.Orientation
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,13 +38,17 @@ internal fun DynamicTwoPaneLayout(
 ) {
     var contentWidth by remember { mutableStateOf(0f) }
     var paneWidth by remember { mutableStateOf(widthRange.midpoint) }
+    val animatedPaneWidth by animateFloatAsState(
+        targetValue = paneWidth.takeIf { secondPaneVisible } ?: 0f,
+        animationSpec = tween(easing = EaseOutCubic, durationMillis = 400)
+    )
     val draggableState = rememberDraggableState {
         paneWidth = (paneWidth + it / (contentWidth.takeIfNotZero() ?: 1f)).coerceIn(widthRange)
     }
     Row(modifier = modifier.onSizeChanged { contentWidth = it.width.toFloat() }) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.weight(1f).fillMaxHeight().animateContentSize()
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         ) {
             firstPaneContent()
         }
@@ -52,8 +59,8 @@ internal fun DynamicTwoPaneLayout(
             VerticalDivider(Modifier.padding(horizontal = 12.dp))
         }
         AnimatedVisibility(
-            visible = secondPaneVisible,
-            modifier = Modifier.fillMaxWidth(paneWidth).fillMaxHeight().animateContentSize(),
+            visible = animatedPaneWidth > 0,
+            modifier = Modifier.fillMaxWidth(animatedPaneWidth),
             enter = slideInHorizontally { it },
             exit = slideOutHorizontally { it }
         ) {

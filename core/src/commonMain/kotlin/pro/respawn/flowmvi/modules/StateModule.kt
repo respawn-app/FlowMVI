@@ -1,3 +1,5 @@
+@file:Suppress("OVERRIDE_BY_INLINE")
+
 package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,24 +29,24 @@ private abstract class AbstractStateModule<S : MVIState>(initial: S) : StateModu
     @DelicateStoreApi
     final override val state by _states::value
 
-    final override fun useState(block: S.() -> S) = _states.update(block)
+    final override inline fun useState(block: S.() -> S) = _states.update(block)
 }
 
 private class AtomicStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
 
     private val stateMutex = Mutex()
 
-    override suspend fun withState(
-        block: suspend S.() -> Unit
+    override suspend inline fun withState(
+        crossinline block: suspend S.() -> Unit
     ) = stateMutex.withReentrantLock { block(states.value) }
 
-    override suspend fun updateState(
-        transform: suspend S.() -> S
+    override suspend inline fun updateState(
+        crossinline transform: suspend S.() -> S
     ) = stateMutex.withReentrantLock { _states.update { transform(it) } }
 }
 
 private class DefaultStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
 
-    override suspend fun updateState(transform: suspend S.() -> S) = _states.update { transform(it) }
-    override suspend fun withState(block: suspend S.() -> Unit) = _states.value.block()
+    override suspend inline fun updateState(crossinline transform: suspend S.() -> S) = _states.update { transform(it) }
+    override suspend inline fun withState(crossinline block: suspend S.() -> Unit) = _states.value.block()
 }

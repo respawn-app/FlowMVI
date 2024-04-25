@@ -1,6 +1,7 @@
 * [Home](/)
 * [Quickstart](quickstart.md)
-* [Plugins](plugins.md)
+* [Prebuilt Plugins](plugins.md)
+* [Custom Plugins](custom_plugins.md)
 * [Android](android.md)
 * [Saving State](savedstate.md)
 * [Remote Debugging](debugging.md)
@@ -8,4 +9,3 @@
 * [FAQ](faq.md)
 * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * [Contributing](CONTRIBUTING.md)
-* [Migrating from v1](migration.md)

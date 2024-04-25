@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.dsl.plugin
  * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
 @Suppress("ComplexInterface")
-public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
+public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyPlugin<S, I, A> {
 
     /**
      * The name of this plugin. The name can be used for logging purposes, but most importantly, to
@@ -108,7 +108,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
     /**
      * A callback that is invoked **each time** the [Store.start] is called.
      * * Execute any operations using [PipelineContext].
-     * * You can **prevent the launching of the store** by calling [PipelineContext.cancel], but this will not throw an
+     * * You can **prevent the launching of the store** by calling [PipelineContext.close], but this will not throw an
      *   exception, the store will just not work.
      * * Plugins that use `onSubscribe` will also not get their events until this is run.
      */
@@ -160,4 +160,6 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
+    override fun toString(): String
+    override fun invoke(config: StoreConfiguration<S>): StorePlugin<S, I, A> = this
 }

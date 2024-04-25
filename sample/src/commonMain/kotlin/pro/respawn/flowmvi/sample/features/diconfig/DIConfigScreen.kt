@@ -64,7 +64,7 @@ internal class DiConfigContainer(
         onOverflow = SUSPEND
         parallelIntents = true
         saveStatePlugin(
-            saver = <injected saver>,
+            saver = JsonSaver(),
             name = "{name}SavedStatePlugin",
             context = Dispatchers.IO,
         )

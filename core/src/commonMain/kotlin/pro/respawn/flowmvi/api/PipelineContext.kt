@@ -33,6 +33,11 @@ public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     CoroutineContext.Element {
 
     /**
+     * The [StoreConfiguration] of this store
+     */
+    public val config: StoreConfiguration<S>
+
+    /**
      * Same as [cancel], but for resolving the ambiguity between context.cancel() and scope.cancel()
      */
     public fun close(): Unit = coroutineContext.job.cancel()

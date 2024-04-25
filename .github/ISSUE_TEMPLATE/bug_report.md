@@ -38,6 +38,7 @@ Steps to reproduce the behavior:
 ```
 
 </details>
+
 ---
 
 - [ ] This issue hasn't been reported already

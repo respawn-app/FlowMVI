@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.cancelAndJoin
@@ -164,9 +163,9 @@ public suspend fun <K : Any> Job.registerOrReplace(
 
 /**
  * Create a new plugin that uses [manager] to manage jobs.
- * Will cancel and remove all jobs if the parent [pro.respawn.flowmvi.api.Store] is closed
+ * This will cancel and remove all jobs when the parent [pro.respawn.flowmvi.api.Store] is closed.
  *
- * By default, job managers can't be reused without overriding [name]
+ * By default, job managers can't be reused without overriding [name].
  */
 @FlowMVIDSL
 public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugin(
@@ -174,9 +173,7 @@ public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugi
     name: String? = JobManager.Name, // by default, do not allow duplicates
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    onStop {
-        manager.cancelAll()
-    }
+    onStop { manager.cancelAll() }
 }
 
 /**
@@ -191,8 +188,7 @@ public fun <K : Any, S : MVIState, I : MVIIntent, A : MVIAction> jobManagerPlugi
  * @return the [JobManager] instance that was created for this plugin.
  */
 @FlowMVIDSL
-public fun <A : MVIAction, I : MVIIntent, S : MVIState> StoreBuilder<S, I, A>.manageJobs(
+public fun <K : Any, A : MVIAction, I : MVIIntent, S : MVIState> StoreBuilder<S, I, A>.manageJobs(
+    jobs: JobManager<K> = JobManager(),
     name: String = JobManager.Name
-): JobManager<String> = JobManager<String>().also {
-    install(jobManagerPlugin(it, name))
-}
+): JobManager<K> = jobs.also { install(jobManagerPlugin(it, name)) }

@@ -21,7 +21,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
     @BuilderInference configure: BuildStore<S, I, A>,
 ): Store<S, I, A> = StoreBuilder<S, I, A>(initial).run {
     configure()
-    build()
+    invoke()
 }
 
 /**
@@ -55,7 +55,9 @@ public inline fun <S : MVIState, I : MVIIntent> store(
     @BuilderInference configure: BuildStore<S, I, Nothing>,
 ): Store<S, I, Nothing> = store(initial) {
     configure()
-    actionShareBehavior = ActionShareBehavior.Disabled
+    configure {
+        actionShareBehavior = ActionShareBehavior.Disabled
+    }
 }
 
 /**

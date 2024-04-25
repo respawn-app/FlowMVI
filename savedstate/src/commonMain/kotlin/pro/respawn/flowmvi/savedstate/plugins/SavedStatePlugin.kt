@@ -7,12 +7,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnChange
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnUnsubscribe
@@ -22,6 +23,7 @@ import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.DefaultFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.FileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.dsl.MapSaver
 import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
@@ -30,6 +32,7 @@ import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
 import pro.respawn.flowmvi.savedstate.util.restoreCatching
 import pro.respawn.flowmvi.savedstate.util.saveCatching
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Creates a plugin for persisting and restoring [MVIState] of the current store.
@@ -60,22 +63,23 @@ import kotlin.coroutines.CoroutineContext
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     saver: Saver<S>,
-    context: CoroutineContext,
+    context: CoroutineContext = EmptyCoroutineContext,
     name: String? = PluginNameSuffix,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     resetOnException: Boolean = true,
-): StorePlugin<S, I, A> = plugin {
+): LazyPlugin<S, I, A> = lazyPlugin {
     require(behaviors.isNotEmpty()) { EmptyBehaviorsMessage }
     this.name = name
     var job: Job? by atomic(null)
+    val loggingSaver = LoggingSaver(saver, config.logger, tag = config.name)
 
     onStart {
         withContext(this + context) {
-            updateState { saver.restoreCatching() ?: this }
+            updateState { loggingSaver.restoreCatching() ?: this }
         }
     }
     if (resetOnException) onException {
-        withContext(this + context) { saver.saveCatching(null) }
+        withContext(this + context) { loggingSaver.saveCatching(null) }
         it
     }
 
@@ -87,7 +91,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     if (maxSubscribers != null) onUnsubscribe { remainingSubs ->
         if (remainingSubs > maxSubscribers) return@onUnsubscribe
         job?.cancelAndJoin()
-        job = launch(context) { withState { saver.saveCatching(this) } }
+        job = launch(context) { withState { loggingSaver.saveCatching(this) } }
     }
 
     val saveTimeout = behaviors
@@ -100,7 +104,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
         job = launch(context) {
             delay(saveTimeout)
             // defer state read until delay has passed
-            withState { saver.saveCatching(this) }
+            withState { loggingSaver.saveCatching(this) }
         }
         new
     }
@@ -116,8 +120,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     saver: Saver<S>,
-    context: CoroutineContext,
+    context: CoroutineContext = EmptyCoroutineContext,
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
-    name: String? = "${this.name.orEmpty()}$PluginNameSuffix",
+    name: String? = PluginNameSuffix,
     resetOnException: Boolean = true,
 ): Unit = install(saveStatePlugin(saver, context, name, behaviors, resetOnException))

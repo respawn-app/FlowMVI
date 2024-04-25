@@ -7,7 +7,7 @@ import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
-import pro.respawn.flowmvi.util.nameByType
+import pro.respawn.flowmvi.savedstate.platform.key
 
 /**
  * A [Saver] implementation that saves the specified value of [T] to a [handle].
@@ -33,6 +33,6 @@ public fun <T> SavedStateHandleSaver(
  */
 public inline fun <reified T> ParcelableSaver(
     handle: SavedStateHandle,
-    key: String = "${requireNotNull(nameByType<T>())}State",
+    key: String = key<T>(),
     noinline recover: suspend (e: Exception) -> T? = ThrowRecover,
 ): Saver<T> where T : Parcelable, T : MVIState = SavedStateHandleSaver(handle, key, recover)

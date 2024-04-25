@@ -5,18 +5,15 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.logging.PlatformStoreLogger
-import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
-import pro.respawn.flowmvi.savedstate.dsl.LoggingSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.DefaultJson
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
@@ -45,18 +42,15 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     name: String? = serializer.descriptor.serialName.plus(PluginNameSuffix),
     context: CoroutineContext = Dispatchers.Default,
-    logger: StoreLogger = PlatformStoreLogger,
     resetOnException: Boolean = true,
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
-): StorePlugin<S, I, A> = saveStatePlugin(
+): LazyPlugin<S, I, A> = saveStatePlugin(
     saver = JsonSaver(
         json = json,
         serializer = serializer,
         delegate = CompressedFileSaver(path, ThrowRecover),
         recover = recover
-    )
-        .let { TypedSaver<T, S>(it) }
-        .let { LoggingSaver(it, logger) },
+    ).let { TypedSaver<T, S>(it) },
     behaviors = behaviors,
     context = context,
     name = name,
@@ -82,7 +76,7 @@ public inline fun <
     path: String,
     serializer: KSerializer<T>,
     json: Json = DefaultJson,
-    name: String? = "${this.name ?: serializer.descriptor.serialName}$PluginNameSuffix",
+    name: String? = "${serializer.descriptor.serialName}$PluginNameSuffix",
     behaviors: Set<SaveBehavior> = SaveBehavior.Default,
     context: CoroutineContext = Dispatchers.Default,
     resetOnException: Boolean = true,
@@ -93,7 +87,6 @@ public inline fun <
     name = name,
     context = context,
     behaviors = behaviors,
-    logger = this.logger,
     resetOnException = resetOnException,
     recover = recover,
     serializer = serializer,

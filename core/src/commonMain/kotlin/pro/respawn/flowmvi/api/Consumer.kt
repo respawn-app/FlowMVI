@@ -1,9 +1,9 @@
 package pro.respawn.flowmvi.api
 
 /**
- * A [consume]r of [Store]'s events that has certain state [S].
- * Each [Consumer] needs a container, a way to [send] intents to it,
- * a way to [render] the new state, and a way to [consume] side-effects.
+ * A consumer of [Store]'s events that has certain state [S].
+ * Each [Consumer] needs a container, a way to [emit] intents to it,
+ * a way to [render] the new state.
  */
 public interface Consumer<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I>, StateConsumer<S> {
 

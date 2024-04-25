@@ -63,7 +63,7 @@ public class CachedValue<out T, S : MVIState, I : MVIIntent, A : MVIAction> inte
         override fun toString() = "Uninitialized cache value"
     }
 
-    private var _value = atomic<Any?>(UNINITIALIZED)
+    private val _value = atomic<Any?>(UNINITIALIZED)
 
     /**
      * Returns true if the cached value is present

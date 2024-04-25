@@ -12,7 +12,7 @@ import pro.respawn.flowmvi.api.StorePlugin
  * For more documentation, see [StorePlugin]
  */
 
-public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
+public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
     private var state: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S? = { _, new -> new }
@@ -128,13 +128,3 @@ public class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Pub
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> plugin(
     @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,
 ): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>().apply(builder).build()
-
-/**
- * Build a new [StorePlugin] using [StorePluginBuilder] lazily.
- * Plugin will be created upon first usage (i.e. installation).
- * @see [StorePlugin]
- */
-@FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyPlugin(
-    @BuilderInference crossinline builder: StorePluginBuilder<S, I, A>.() -> Unit,
-): Lazy<StorePlugin<S, I, A>> = lazy { plugin(builder) }

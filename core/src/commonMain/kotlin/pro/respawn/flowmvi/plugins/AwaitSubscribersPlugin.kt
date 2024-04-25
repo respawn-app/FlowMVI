@@ -6,7 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -56,11 +56,10 @@ public class SubscriberManager {
      * Usually not called manually but rather launched by the [awaitSubscribersPlugin].
      */
     public fun CoroutineScope.launch(timeout: Duration) {
+        val previous = subscriber
         subscriber = launch {
-            subscriber?.cancelAndJoin()
-            withTimeout(timeout) {
-                awaitCancellation()
-            }
+            previous?.cancelAndJoin()
+            withTimeoutOrNull<Nothing>(timeout) { awaitCancellation() }
         }.apply {
             invokeOnCompletion {
                 subscriber = null
@@ -75,12 +74,12 @@ public class SubscriberManager {
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.awaitSubscribers(
-    manager: SubscriberManager,
+    manager: SubscriberManager = SubscriberManager(),
     minSubs: Int = 1,
     suspendStore: Boolean = true,
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
-): Unit = install(awaitSubscribersPlugin(manager, minSubs, suspendStore, timeout, name))
+): SubscriberManager = manager.also { install(awaitSubscribersPlugin(it, minSubs, suspendStore, timeout, name)) }
 
 /**
  * Installs a new plugin using [manager] that will start waiting for new subscribers when the store launches.
@@ -100,9 +99,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onStart {
-        with(manager) {
-            launch(timeout)
-        }
+        with(manager) { launch(timeout) }
     }
     onState { _, new ->
         if (suspendStore) manager.await()

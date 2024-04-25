@@ -52,6 +52,18 @@ Did you call `Store.subscribe()`?
 3. If one of the subscribers doesn't need to handle Actions, you can use another overload of `subscribe` that does not
    subscribe to actions.
 
+### Why does `updateState` and `withState` not return the resulting state? Why is there no `state` property I can access?
+
+FlowMVI is a framework that enables you to build highly parallel, multi-threaded systems. In such systems, multiple
+threads may modify the state of the `Store` in parallel, leading to data races, thread races, live locks and other
+nasty problems. To prevent that, FlowMVI implements a strategy called "transaction serialization" which only allows
+**one** client at a time to read or modify the state. Because of that, you can be sure that your state won't change
+unexpectedly while you're working with it. However, any state that you pass outside of the scope of `withState` or
+`updateState` should be **considered invalid** immediately. You can read more about serializable state transactions in
+the [article](https://proandroiddev.com/how-to-safely-update-state-in-your-kotlin-apps-bf51ccebe2ef).
+Difficulties that you are facing because of this likely have an easy solution that requires a bit more thinking.
+As you continue working with FlowMVI, updating states safely will come naturally to you.
+
 ### In what order are intents, plugins and actions processed?
 
 * Intents: FIFO or undefined based on the configuration parameter `parallelIntents`.

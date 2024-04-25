@@ -1,12 +1,15 @@
 package pro.respawn.flowmvi.test.plugin
 
+import kotlinx.coroutines.coroutineScope
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.dsl.StoreConfigurationBuilder
+import pro.respawn.flowmvi.dsl.configuration
 import pro.respawn.flowmvi.plugins.TimeTravel
-import kotlin.coroutines.coroutineContext
 
 /**
  * A function that runs a test on a [StorePlugin].
@@ -19,8 +22,12 @@ import kotlin.coroutines.coroutineContext
  * environment for the test.
  */
 @FlowMVIDSL
-public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.test(
+public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LazyPlugin<S, I, A>.test(
     initial: S,
     timeTravel: TimeTravel<S, I, A> = TimeTravel(),
+    crossinline configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
     crossinline block: suspend PluginTestScope<S, I, A>.() -> Unit,
-): Unit = PluginTestScope(initial, coroutineContext, this@test, timeTravel).block()
+): Unit = coroutineScope {
+    val config = configuration(initial, configuration)
+    PluginTestScope(config, this@test, timeTravel).run { block() }
+}
