@@ -71,7 +71,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     require(behaviors.isNotEmpty()) { EmptyBehaviorsMessage }
     this.name = name
     var job: Job? by atomic(null)
-    val loggingSaver = LoggingSaver(saver, config.logger, tag = name)
+    val loggingSaver = LoggingSaver(saver, config.logger, tag = config.name)
 
     onStart {
         withContext(this + context) {
