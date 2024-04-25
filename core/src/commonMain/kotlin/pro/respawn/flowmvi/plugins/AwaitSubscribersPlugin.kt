@@ -7,6 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -56,11 +57,10 @@ public class SubscriberManager {
      * Usually not called manually but rather launched by the [awaitSubscribersPlugin].
      */
     public fun CoroutineScope.launch(timeout: Duration) {
+        val previous = subscriber
         subscriber = launch {
-            subscriber?.cancelAndJoin()
-            withTimeout(timeout) {
-                awaitCancellation()
-            }
+            previous?.cancelAndJoin()
+            withTimeoutOrNull<Nothing>(timeout) { awaitCancellation() }
         }.apply {
             invokeOnCompletion {
                 subscriber = null
@@ -100,9 +100,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
     onStart {
-        with(manager) {
-            launch(timeout)
-        }
+        with(manager) { launch(timeout) }
     }
     onState { _, new ->
         if (suspendStore) manager.await()
