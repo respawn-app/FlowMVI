@@ -114,6 +114,9 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     @FlowMVIDSL
     public var name: String? = null
 
+    /**
+     * Create the [StoreConfiguration]
+     */
     @PublishedApi
     internal operator fun <S : MVIState> invoke(initial: S): StoreConfiguration<S> = StoreConfiguration(
         initial = initial,
@@ -130,9 +133,10 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
 }
 
 /**
- * Create a new [StoreConfigurationBuilder]
+ * Create a new [StoreConfiguration]
  */
 @FlowMVIDSL
-public inline fun configuration(
+public inline fun <S : MVIState> configuration(
+    initial: S,
     block: StoreConfigurationBuilder.() -> Unit,
-): StoreConfigurationBuilder = StoreConfigurationBuilder().apply(block)
+): StoreConfiguration<S> = StoreConfigurationBuilder().apply(block).invoke(initial)

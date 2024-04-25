@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.util.nameByType
+import kotlin.reflect.typeOf
 
 /**
  * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeperOwner].
@@ -37,7 +37,7 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStor
 @FlowMVIDSL
 public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     scope: CoroutineScope? = retainedScope(),
-    key: Any = "${requireNotNull(nameByType<S>())}Store",
+    key: Any = typeOf<S>(),
     @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
     key, scope, factory
@@ -76,8 +76,8 @@ public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.reta
 public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),
-    name: String = "${requireNotNull(nameByType<S>())}Store",
+    key: Any = typeOf<S>(),
     @BuilderInference builder: BuildStore<S, I, A>,
 ): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
-    initial, name, scope, builder
+    initial, key, scope, builder
 )

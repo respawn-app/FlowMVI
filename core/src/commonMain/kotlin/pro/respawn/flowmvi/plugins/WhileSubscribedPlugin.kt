@@ -6,13 +6,17 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.logging.StoreLogLevel
+import pro.respawn.flowmvi.logging.log
 
 /**
  * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
@@ -52,9 +56,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     onSubscribe { previous ->
         val subs = previous + 1
         when {
-            subs < minSubscriptions -> job.getAndSet(null)?.cancelAndJoin()
+            subs < minSubscriptions -> job.getAndSet(null)?.cancelAndJoin()?.also {
+                log(StoreLogLevel.Debug) { "Canceled WhileSubscribed '$name' job" }
+            }
             job.value?.isActive == true -> Unit // condition was already satisfied
-            subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()
+            subs >= minSubscriptions -> job.getAndSet(launch { block() })?.cancelAndJoin()?.also {
+                log(StoreLogLevel.Debug) { "Started WhileSubscribed '$name' job" }
+            }
         }
     }
     onUnsubscribe { current ->

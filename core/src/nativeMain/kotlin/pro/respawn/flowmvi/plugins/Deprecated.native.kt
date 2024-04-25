@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -18,4 +19,4 @@ import pro.respawn.flowmvi.logging.PlatformStoreLogger
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> nativeLoggingPlugin(
     name: String? = null
-): StorePlugin<S, I, A> = loggingPlugin(PlatformStoreLogger, name)
+): LazyPlugin<S, I, A> = loggingPlugin(name)

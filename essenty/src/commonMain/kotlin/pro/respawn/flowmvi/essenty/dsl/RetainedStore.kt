@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.essenty.internal.retained
-import pro.respawn.flowmvi.util.nameByType
+import kotlin.reflect.typeOf
 
 // keeper
 
@@ -25,7 +25,7 @@ import pro.respawn.flowmvi.util.nameByType
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     scope: CoroutineScope? = retainedScope(),
-    key: Any = "${requireNotNull(nameByType<S>())}Store",
+    key: Any = typeOf<S>(),
     @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = getOrCreate(key) { retained(factory(), scope) }
 
@@ -67,6 +67,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     scope: CoroutineScope? = retainedScope(),
-    key: Any = "${requireNotNull(nameByType<S>())}Store",
+    key: Any = typeOf<S>(),
     @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(key, scope, factory)

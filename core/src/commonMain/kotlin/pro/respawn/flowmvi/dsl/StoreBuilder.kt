@@ -161,6 +161,11 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         config = configuration
     }
 
+    /**
+     * Alias for [install]
+     */
+    public fun LazyPlugin<S, I, A>.install(): Unit = install(this)
+
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->

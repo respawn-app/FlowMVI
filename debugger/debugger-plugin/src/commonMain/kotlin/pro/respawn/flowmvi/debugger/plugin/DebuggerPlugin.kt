@@ -1,10 +1,10 @@
 package pro.respawn.flowmvi.debugger.plugin
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.client.debuggerPlugin
 import pro.respawn.flowmvi.debugger.client.enableRemoteDebugging
@@ -24,13 +24,11 @@ import kotlin.time.Duration
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
-    storeName: String,
     historySize: Int = DebuggerDefaults.DefaultHistorySize,
     host: String = DebuggerDefaults.ClientHost,
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
-): StorePlugin<S, I, A> = debuggerPlugin(
-    storeName = storeName,
+): LazyPlugin<S, I, A> = debuggerPlugin(
     client = DebugHttpClient,
     historySize = historySize,
     host = host,

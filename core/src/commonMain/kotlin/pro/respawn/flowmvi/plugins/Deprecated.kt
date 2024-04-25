@@ -6,6 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -32,9 +33,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 )
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> consoleLoggingPlugin(
     tag: String? = null,
-    name: String = "${tag.orEmpty()}Logging",
     level: StoreLogLevel? = null,
-): StorePlugin<S, I, A> = loggingPlugin(ConsoleStoreLogger, tag, name, level)
+): LazyPlugin<S, I, A> = loggingPlugin(tag, level)
 
 /**
  * Creates a [loggingPlugin] that is suitable for each targeted platform.
@@ -52,9 +52,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> consoleLoggingPlugin(
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> platformLoggingPlugin(
     tag: String? = null,
-    name: String = "${tag.orEmpty()}Logging",
     level: StoreLogLevel? = null
-): StorePlugin<S, I, A> = loggingPlugin(PlatformStoreLogger, tag, name, level)
+): LazyPlugin<S, I, A> = loggingPlugin(tag, level)
 
 /**
  * A base class for creating custom [StorePlugin]s.

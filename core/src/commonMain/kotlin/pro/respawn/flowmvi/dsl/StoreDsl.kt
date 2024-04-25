@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.api.StorePlugin
 import kotlin.jvm.JvmName
 
 /**

@@ -30,7 +30,7 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.StoreLogLevel
-import pro.respawn.flowmvi.logging.invoke
+import pro.respawn.flowmvi.logging.log
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
@@ -49,16 +49,17 @@ internal fun debugClientStore(
 ) = store<EmptyState, ClientEvent, Nothing>(EmptyState) {
     val id = uuid4()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-    name = "${clientName}Debugger"
-    coroutineContext = Dispatchers.Default
-    debuggable = true
-    parallelIntents = false // ensure the order of events matches server's expectations
-    actionShareBehavior = Disabled
-    onOverflow = BufferOverflow.DROP_OLDEST // drop old events in the queue
+    configure {
+        name = "${clientName}Debugger"
+        coroutineContext = Dispatchers.Default
+        debuggable = true
+        parallelIntents = false // ensure the order of events matches server's expectations
+        actionShareBehavior = Disabled
+        onOverflow = BufferOverflow.DROP_OLDEST // drop old events in the queue
+    }
     if (logEvents) enableLogging()
-    val log = this@store.logger
     recover {
-        log(StoreLogLevel.Error, this@store.name, it)
+        log(it)
         null
     }
 
@@ -84,9 +85,9 @@ internal fun debugClientStore(
                     this
                 }
                 sendSerialized<ClientEvent>(StoreConnected(clientName, id))
-                log(StoreLogLevel.Debug, this@store.name) { "Established connection to ${call.request.url}" }
+                log(StoreLogLevel.Debug) { "Established connection to ${call.request.url}" }
                 awaitEvents {
-                    log(StoreLogLevel.Debug, this@store.name) { "Received event: $it" }
+                    log(StoreLogLevel.Debug) { "Received event: $it" }
                     when (it) {
                         is ServerEvent.Stop -> close()
                     }

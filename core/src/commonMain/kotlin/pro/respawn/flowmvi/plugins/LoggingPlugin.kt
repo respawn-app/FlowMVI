@@ -3,13 +3,13 @@
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.logging.PlatformStoreLogger
+import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.StoreLogLevel.Debug
 import pro.respawn.flowmvi.logging.StoreLogLevel.Error
@@ -21,18 +21,15 @@ import kotlin.math.log
 
 /**
  * Install a new [loggingPlugin].
- * @param logger a [StoreLogger] that prints the message using provided [StoreLogLevel] and tag if needed.
+ * @param level [StoreLogLevel] to override the defaults
+ * @param tag tag to use, or the default tag will be used
  * [pro.respawn.flowmvi.api.Store.name] is used as a tag by default.
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableLogging(
-    logger: StoreLogger = this.logger,
-    tag: String? = this.name,
-    name: String = "${tag}Logging",
+    tag: String? = null,
     level: StoreLogLevel? = null,
-) {
-    install(loggingPlugin(logger, tag, name, level))
-}
+): Unit = loggingPlugin<S, I, A>(tag, level).let(::install)
 
 /**
  * Create a new [StorePlugin] that prints messages using [log].
@@ -43,37 +40,37 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.en
 @Suppress("CyclomaticComplexMethod") // false-positive based on ternary ops
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
-    logger: StoreLogger = PlatformStoreLogger,
     tag: String? = null,
-    name: String = "${tag.orEmpty()}Logging",
     level: StoreLogLevel? = null,
-): StorePlugin<S, I, A> = plugin {
-    this.name = name
+): LazyPlugin<S, I, A> = lazyPlugin {
+    val currentTag = tag ?: config.name
+    this.name = currentTag.let { "${it.orEmpty()}Logging" }
+    val logger = config.logger
     onState { old, new ->
-        logger(level ?: Trace, tag) { "State:\n--->\n$old\n<---\n$new" }
+        logger(level ?: Trace, currentTag) { "State:\n--->\n$old\n<---\n$new" }
         new
     }
     onIntent {
-        logger(level ?: Debug, tag) { "Intent -> $it" }
+        logger(level ?: Debug, currentTag) { "Intent -> $it" }
         it
     }
     onAction {
-        logger(level ?: Debug, tag) { "Action -> $it" }
+        logger(level ?: Debug, currentTag) { "Action -> $it" }
         it
     }
     onException {
-        logger(level ?: Error, tag, it)
+        logger(it, level ?: Error, currentTag)
         it
     }
-    onStart { logger(level ?: Info, tag) { "Started ${tag ?: "Store"}" } }
-    onSubscribe { subs -> logger(level ?: Info, tag) { "New subscriber #$subs" } }
-    onUnsubscribe { logger(level ?: Info, tag) { "Subscriber #${it + 1} removed" } }
+    onStart { logger(level ?: Info, currentTag) { "Started ${config.name ?: "Store"}" } }
+    onSubscribe { logger(level ?: Info, currentTag) { "New subscriber #${it + 1}" } }
+    onUnsubscribe { logger(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" } }
     onStop {
         if (it == null) {
-            logger(level ?: Info, tag) { "Stopped $tag" }
+            logger(level ?: Info, currentTag) { "Stopped ${config.name ?: "Store"}" }
             return@onStop
         }
-        logger(level ?: Error, tag) { "Stopped with exception: " }
-        logger(level ?: Error, tag, it)
+        logger(level ?: Error, currentTag) { "Stopped with exception: " }
+        logger(it, level ?: Error, currentTag)
     }
 }

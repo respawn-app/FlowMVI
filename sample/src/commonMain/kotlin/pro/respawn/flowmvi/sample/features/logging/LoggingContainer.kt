@@ -33,8 +33,10 @@ object InMemoryLogger : StoreLogger {
 internal class LoggingContainer : Container<LoggingState, LoggingIntent, LoggingAction> {
 
     override val store = store(LoggingState.Loading) {
-        name = "LoggingStore"
-        logger = InMemoryLogger
+        configure {
+            name = "LoggingStore"
+            logger = InMemoryLogger
+        }
         enableLogging()
 
         recover {

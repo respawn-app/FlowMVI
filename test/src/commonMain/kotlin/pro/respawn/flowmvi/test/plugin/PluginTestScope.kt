@@ -1,16 +1,16 @@
 package pro.respawn.flowmvi.test.plugin
 
+import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
-import kotlin.coroutines.CoroutineContext
 
 /**
  * A class which provides DSL for testing a [StorePlugin].
@@ -28,24 +28,21 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
 ) : PipelineContext<S, I, A> by ctx, StorePlugin<S, I, A> by ctx.plugin {
 
     public constructor(
-        initial: S,
-        coroutineContext: CoroutineContext,
-        plugin: StorePlugin<S, I, A>,
+        configuration: StoreConfiguration<S>,
+        plugin: LazyPlugin<S, I, A>,
         timeTravel: TimeTravel<S, I, A>,
     ) : this(
         timeTravel = timeTravel,
         ctx = TestPipelineContext(
-            initial = initial,
-            coroutineContext = coroutineContext,
+            config = configuration,
             plugin = compositePlugin(
                 setOf(
-                    loggingPlugin(PlatformStoreLogger, plugin.name),
+                    loggingPlugin(),
                     timeTravelPlugin(timeTravel),
                     plugin,
-                ),
-                name = plugin.name,
-            ),
-        ),
+                ).map { it.invoke(configuration) },
+            )
+        )
     )
 
     // compiler bug which crashes compilation because both context and plugin declare equals
