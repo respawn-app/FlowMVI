@@ -16,6 +16,12 @@ Store was disallowed to restart but was restarted. Please remove disallowRestart
 
 private const val DisallowRestartPluginName = "DisallowRestartPlugin"
 
+private class RestartHolder {
+
+    private val started = atomic(false)
+    fun update(value: Boolean) = started.getAndUpdate { value }
+}
+
 /**
  * Disallow restart plugin will allow the store to be [pro.respawn.flowmvi.api.Store.start]ed only once.
  * It will throw on any subsequent invocations of [StorePlugin.onStart].
@@ -27,9 +33,9 @@ private const val DisallowRestartPluginName = "DisallowRestartPlugin"
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> disallowRestartPlugin(): StorePlugin<S, I, A> = plugin {
     name = DisallowRestartPluginName
-    val started = atomic(false)
+    val holder = RestartHolder()
     onStart {
-        check(!started.getAndUpdate { true }) { DisallowRestartMessage }
+        check(!holder.update(true)) { DisallowRestartMessage }
     }
 }
 
