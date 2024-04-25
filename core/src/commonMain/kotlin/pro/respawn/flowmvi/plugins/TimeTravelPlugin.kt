@@ -156,5 +156,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.ti
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
+    historySize: Int = TimeTravel.DefaultHistorySize,
     name: String = TimeTravel.Name,
-): TimeTravel<S, I, A> = TimeTravel<S, I, A>().also { install(timeTravelPlugin(it, name = name)) }
+): TimeTravel<S, I, A> = TimeTravel<S, I, A>(historySize).also { install(timeTravelPlugin(it, name = name)) }
