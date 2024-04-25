@@ -1,5 +1,6 @@
 * [Home](/)
 * [Quickstart](quickstart.md)
+* [Prebuilt Plugins](plugins.md)
 * [Custom Plugins](custom_plugins.md)
 * [Android](android.md)
 * [Saving State](savedstate.md)

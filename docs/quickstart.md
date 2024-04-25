@@ -325,27 +325,8 @@ FlowMVI is built entirely based on plugins!
 Call the `install` function using a prebuilt plugin, or use a lambda to create and install a plugin on the fly.
 
 For every store, you'll likely want to install a few plugins.
-Prebuilt plugins come with a nice dsl when building a store. Here's the list of prebuilt plugins:
-
-* **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
-* **Init Plugin** - do something when the store is launched. Install with `init { }`.
-* **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
-* **While Subscribed Plugin** - run jobs when the Nth subscriber of a store appears. Install
-  with `whileSubscribed { }`.
-* **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
-* **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
-  See [saved state](./savedstate.md) for details.
-* **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
-* **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
-  work. Install with `awaitSubscribers()`.
-* **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
-* **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
-  Install with `disallowRestart`.
-* **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
-  lifecycle. Install with `val value by cache { }`
-* **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
-* **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for  
-  testing, debugging and when building other plugins.
+Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins.md) page to learn how
+to use them.
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume or otherwise change anything in the store.
