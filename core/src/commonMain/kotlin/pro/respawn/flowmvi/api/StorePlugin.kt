@@ -108,7 +108,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
     /**
      * A callback that is invoked **each time** the [Store.start] is called.
      * * Execute any operations using [PipelineContext].
-     * * You can **prevent the launching of the store** by calling [PipelineContext.cancel], but this will not throw an
+     * * You can **prevent the launching of the store** by calling [PipelineContext.close], but this will not throw an
      *   exception, the store will just not work.
      * * Plugins that use `onSubscribe` will also not get their events until this is run.
      */

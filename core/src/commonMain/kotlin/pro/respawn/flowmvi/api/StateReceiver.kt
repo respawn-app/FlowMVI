@@ -21,7 +21,7 @@ public interface StateReceiver<S : MVIState> {
     public suspend fun updateState(transform: suspend S.() -> S)
 
     /**
-     * Obtain the current state and operate on it, returning [R].
+     * Obtain the current state and operate on it, returning [S].
      *
      * This function does NOT update the state, for that, use [updateState].
      * Store allows only one state update at a time, and because of that,
@@ -41,7 +41,7 @@ public interface StateReceiver<S : MVIState> {
      * This function has lower performance than [useState] and allows plugins to intercept the state change.
      * If you really need the additional performance or wish to avoid plugins, use [useState].
      *
-     * @returns the value of [R], i.e. the result of the block.
+     * @returns the value of [S], i.e. the result of the block.
      */
     @FlowMVIDSL
     public suspend fun withState(block: suspend S.() -> Unit)

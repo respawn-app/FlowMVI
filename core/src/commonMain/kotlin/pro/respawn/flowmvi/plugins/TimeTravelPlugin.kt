@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
@@ -30,28 +32,28 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val _states by atomic(CappedMutableList<S>(maxStates))
 
     /**
-     * States emitted by the store, capped at [maxStates]
+     * States emitted by the store, capped at max value provided at creation time
      * The last value is the most recent.
      */
     public val states: Collection<S> get() = _states
     private val _intents by atomic(CappedMutableList<I>(maxIntents))
 
     /**
-     * Intents processed by the store, capped at [maxIntents].
+     * Intents processed by the store, capped at the value provided at creation time.
      * The last value is the most recent.
      */
     public val intents: Collection<I> get() = _intents
     private val _actions by atomic(CappedMutableList<A>(maxActions))
 
     /**
-     *  Actions sent by the store, capped at [maxActions].
+     *  Actions sent by the store, capped at the value provided at creation time.
      * The last value is the most recent.
      */
     public val actions: Collection<A> get() = _actions
     private val _exceptions by atomic(CappedMutableList<Exception>(maxExceptions))
 
     /**
-     * Last exceptions caught by store, capped at [maxExceptions].
+     * Last exceptions caught by store, capped at the value provided at creation time.
      * The last value is the most recent.
      */
     public val exceptions: Collection<Exception> get() = _exceptions

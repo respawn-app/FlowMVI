@@ -3,18 +3,19 @@ package pro.respawn.flowmvi.dsl
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.flowmvi.util.withType
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 /**
- * Run [block] if current [MVIStore.state] is of type [T], otherwise do nothing.
+ * Run [block] if current [StateProvider.states] value is of type [T], otherwise do nothing.
  *
- * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * @see MVIStore.withState
- * @see MVIStore.useState
- * @see MVIStore.updateState
+ * **This function will suspend until all previous [StateReceiver.withState] invocations are finished.**
+ * @see StateReceiver.withState
+ * @see StateReceiver.useState
+ * @see StateReceiver.updateState
  */
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withState(
@@ -27,13 +28,13 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withSta
 }
 
 /**
- * Obtain the current [MVIStore.state] and update it with
+ * Obtain the current [StateProvider.states] value and update it with
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
- * **This function will suspend until all previous [MVIStore.withState] invocations are finished.**
- * @see MVIStore.withState
- * @see MVIStore.useState
- * @see MVIStore.updateState
+ * **This function will suspend until all previous [StateReceiver.withState] invocations are finished.**
+ * @see StateReceiver.withState
+ * @see StateReceiver.useState
+ * @see StateReceiver.updateState
  */
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateState(
@@ -46,16 +47,16 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateS
 }
 
 /**
- * Obtain the current [MVIStore.state] and update it with
+ * Obtain the current [StateProvider.states] value and update it with
  * the result of [transform] if it is of type [T], otherwise do nothing.
  *
  * * **This function may be executed multiple times**
  * * **This function will not trigger any plugins. It is intended for performance-critical operations only**
  * * **This function does lock the state. Watch out for races**
  *
- * @see MVIStore.withState
- * @see MVIStore.useState
- * @see MVIStore.updateState
+ * @see StateReceiver.withState
+ * @see StateReceiver.useState
+ * @see StateReceiver.updateState
  */
 @FlowMVIDSL
 public inline fun <reified T : S, S : MVIState> StateReceiver<S>.useState(

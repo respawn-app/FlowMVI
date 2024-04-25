@@ -1,4 +1,4 @@
-@file:Suppress("UnusedParameter")
+@file:Suppress("UnusedParameter", "UNUSED_PARAMETER")
 package pro.respawn.flowmvi.logging
 
 private fun log(message: String): Unit = js("""console.log(message)""")

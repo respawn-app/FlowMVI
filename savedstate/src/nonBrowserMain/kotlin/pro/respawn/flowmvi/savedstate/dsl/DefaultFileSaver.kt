@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.savedstate.platform.FileAccess
  * * You still need to provide your own [write] and [read] functions for this overload.
  * Use [FileSaver] and [CompressedFileSaver] if you want to save already serialized state.
  *
- * * This saver creates the necessary [dir] and file if not present and writes to file in an atomic way using a [Mutex].
+ * * This saver creates the necessary [dir] and file if not present and writes to file in an atomic way using a mutex.
  * * If `null` is passed to [Saver.save], it will delete the file, but not the directory.
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
