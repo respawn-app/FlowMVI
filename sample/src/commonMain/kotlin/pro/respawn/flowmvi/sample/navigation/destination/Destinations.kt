@@ -9,14 +9,14 @@ import pro.respawn.flowmvi.sample.features.logging.LoggingScreen
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateScreen
 import pro.respawn.flowmvi.sample.features.simple.SimpleScreen
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoScreen
+import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
-import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 import pro.respawn.flowmvi.sample.navigation.util.ProvideDestinationLocals
 
 @Composable
 fun Destinations(
     destination: Destination,
-    navigator: RootComponent,
+    navigator: AppNavigator,
     component: DestinationComponent,
 ) = ProvideDestinationLocals(component) {
     when (destination) {

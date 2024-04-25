@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.sample.navigation.util
 
+import androidx.compose.ui.unit.DpSize
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.instancekeeper.getOrCreateSimple
 import pro.respawn.flowmvi.sample.navigation.destination.Destination
@@ -16,3 +17,5 @@ internal inline fun <reified T> InstanceKeeperOwner.retained(
 private val humps by fastLazy { "(?<=.)(?=\\p{Upper})".toRegex() }
 
 internal fun String.toSnakeCase() = replace(humps, "_").lowercase()
+
+expect val LocalWindowSize: DpSize

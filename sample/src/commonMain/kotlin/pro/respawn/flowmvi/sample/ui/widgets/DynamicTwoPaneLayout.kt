@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.server.ui.widgets
+package pro.respawn.flowmvi.sample.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
+import pro.respawn.flowmvi.sample.navigation.util.NavigationDefaults
 import pro.respawn.kmmutils.common.midpoint
 import pro.respawn.kmmutils.common.takeIfNotZero
 
@@ -41,7 +42,7 @@ internal fun DynamicTwoPaneLayout(
     var paneWidth by remember { mutableStateOf(widthRange.midpoint) }
     val animatedPaneWidth by animateFloatAsState(
         targetValue = paneWidth.takeIf { secondPaneVisible } ?: 0f,
-        animationSpec = tween(easing = EaseOutCubic, durationMillis = 400)
+        animationSpec = tween(easing = EaseOutCubic, durationMillis = NavigationDefaults.NavAnimDuration)
     )
     val draggableState = rememberDraggableState {
         paneWidth = (paneWidth + it / (contentWidth.takeIfNotZero() ?: 1f)).coerceIn(widthRange)

@@ -10,7 +10,6 @@ import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.KoinContext
@@ -18,14 +17,14 @@ import pro.respawn.flowmvi.sample.di.startKoin
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalDecomposeApi::class)
+@OptIn(ExperimentalDecomposeApi::class)
 fun main() = application {
     startKoin()
     val lifecycle = LifecycleRegistry()
 
     val state = rememberWindowState(
-        width = 1200.dp,
-        height = 800.dp,
+        width = 1600.dp,
+        height = 1000.dp,
         position = WindowPosition.Aligned(Alignment.Center),
     )
     LifecycleController(lifecycle, state)
