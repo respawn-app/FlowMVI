@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.util.immediateOrDefault
 
 /**
  * This is an experimental wrapper for the store to support native platforms which do not have the coroutines api,
@@ -20,7 +21,7 @@ import pro.respawn.flowmvi.dsl.subscribe
 public class NativeStore<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val store: Store<S, I, A>,
     autoStart: Boolean = false,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main),
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediateOrDefault),
 ) : Store<S, I, A> by store, CoroutineScope by scope {
 
     init {

@@ -27,5 +27,5 @@ public inline fun <reified T> Any?.typed(): T? = this as? T
 /**
  * Get the name of the class, removing the "State" suffix, if present.
  */
-// @Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
-// public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
+@Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
+public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")

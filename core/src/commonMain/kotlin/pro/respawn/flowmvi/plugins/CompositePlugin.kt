@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.plugins
 
+import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -13,6 +14,7 @@ import pro.respawn.flowmvi.dsl.plugin
  * This plugin is mostly not intended for usage in general code as there are no real use cases for it so far.
  * It can be useful in testing and custom store implementations.
  */
+@FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     plugins: Iterable<StorePlugin<S, I, A>>,
     name: String? = null,
