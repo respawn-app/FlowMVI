@@ -10,7 +10,6 @@ Here's how the library works at a glance:
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
-
 <details>
 <summary>Version catalogs</summary>
 
@@ -103,51 +102,6 @@ If you support Android API <26, you will also need to
 enable [desugaring](https://developer.android.com/studio/write/java8-support).
 
 </details>
-
-### 1.3 Configure Compose
-
-If you are using compose, set up stability definitions for your project.
-
-<details>
-<summary>stability_definitions.txt</summary>
-
-```text
-pro.respawn.flowmvi.api.MVIIntent
-pro.respawn.flowmvi.api.MVIState
-pro.respawn.flowmvi.api.MVIAction
-pro.respawn.flowmvi.api.Store
-pro.respawn.flowmvi.api.Container
-pro.respawn.flowmvi.api.ImmutableStore
-pro.respawn.flowmvi.dsl.LambdaIntent
-pro.respawn.flowmvi.api.SubscriberLifecycle
-pro.respawn.flowmvi.api.IntentReceiver
-```
-
-</details>
-
-Then configure compose compiler to account for the definitions in your root `build.gradle.kts`:
-
-<details>
-<summary>/build.gradle.kts</summary>
-
-```kotlin
-allprojects {
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            freeCompilerArgs.addAll(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                        "${rootProject.rootDir.absolutePath}/stability_definitions.txt"
-            )
-        }
-    }
-}
-```
-
-</details>
-
-Now the states/intents you create will be stable in compose. Immutability of these classes is already required by the
-library, so this will ensure you get the best performance.
 
 ## Step 2: Choose your style
 
@@ -245,7 +199,7 @@ sealed interface CounterAction : MVIAction {
 * If your store does not have a `State`, you can use an `EmptyState` object.
 * If your store does not have side-effects, use `Nothing` in place of the side-effect type.
 
-## Step 4: Define your store
+## Step 4: Configure your store
 
 Here's a full list of things that can be done when configuring the store:
 
@@ -328,67 +282,6 @@ For every store, you'll likely want to install a few plugins.
 Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins.md) page to learn how
 to use them.
 
-!> The order of plugins matters! Changing the order of plugins may completely change how your store works.
-Plugins can replace, veto, consume or otherwise change anything in the store.
-They can close the store or swallow exceptions!
-
-Consider the following:
-
-```kotlin
-val broken = store(Loading) {
-    reduce {
-
-    }
-    // ❌ - logging plugin will not log any intents
-    // because they have been consumed by the reduce plugin
-    install(consoleLoggingPlugin())
-}
-
-val working = store(Loading) {
-    install(consoleLoggingPlugin())
-
-    reduce {
-        // ✅ - logging plugin will get the intent before reduce() is run, and it does not consume the intent
-    }
-}
-```
-
-That example was simple, but this rule can manifest in other, not so obvious ways. Consider the following:
-
-```kotlin
-val broken = store(Loading) {
-
-    serializeState() // ‼️ restores state on start
-
-    init {
-        updateState {
-            Loading // 🤦‍ and the state is immediately overwritten
-        }
-    }
-
-    // this happened because serializeState() uses onStart() under the hood, and init does too.
-    // Init is run after serializeState because it was installed later.
-}
-// or
-val broken = store(Loading) {
-
-    install(customUndocumentedPlugin()) // ‼️ you don't know what this plugin does
-
-    reduce {
-        // ❌ intents are not reduced because the plugin consumed them
-    }
-    init {
-        updateState {
-            // ❌ states are not changed because the plugin veto'd the change
-        }
-        action(MyAction) // ❌ actions are replaced with something else
-    }
-}
-```
-So make sure to consider how your plugins affect the store's logic when using and writing them.
-
-The discussion above warrants another note.
-
 ### Step 6: Create, inject and provide dependencies
 
 You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
@@ -459,15 +352,10 @@ To subscribe to the store, regardless of your platform see [this guide](android.
 
 ### Next steps:
 
-* Learn how to create custom [plugins](plugins.md)
-* Learn how to use DI and [Android-specific features](android.md)
-* Learn how to [persist and restore state](savedstate.md)
-* Get answers to common [questions](faq.md)
-* Set up [remote debugging](debugging.md)
-* [Read an article](https://medium.com/@Nek.12/success-story-how-flowmvi-has-changed-the-fate-of-our-project-3c1226890d67)
-  about how our team has used the library to improve performance and stability of our app, with practical examples.
-* Explore
-  the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/src/commonMain/kotlin/pro/respawn/flowmvi/sample)
-    * Want more samples? Explore how we created
-      a [multiplatform debugger app](https://github.com/respawn-app/FlowMVI/tree/34236773e21e7138a330d7d0fb6c5d0eba21b61e/debugger/server/src/commonMain/kotlin/pro/respawn/flowmvi/debugger/server)
-      for FlowMVI using... FlowMVI itself.
+1. Learn how to [install](plugins.md) and [create](custom_plugins.md) plugins.
+2. Learn how to use FlowMVI with [compose](compose.md)
+3. Learn how to [persist and restore state](savedstate.md)
+4. Get answers to common [questions](faq.md)
+5. Set up [remote debugging](debugging.md)
+6. *Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/)
+7. *Learn how to use FlowMVI on [Android](android.md)

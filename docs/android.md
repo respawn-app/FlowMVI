@@ -101,91 +101,10 @@ DI framework will fail, likely in runtime.
 This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
 to subclass ViewModels. This example is also demonstrated in the sample app.
 
-## UI Layer
+## View Integration
 
-It doesn't matter which UI framework you use. Neither your Contract nor your `Container` will change in any way.
-
-### Compose
-
-!> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
-It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
-also degrade performance.
-
-?> Compose stability configuration has been added in 1.6.0, and the library specifies stability rules with itself.
-`MVIState`, `MVIIntent`, `MVIAction`, `LambdaIntent` and `Store` are marked as `@Stable`. It's still best to
-annotate your contract with `@Immutable` explicitly however to ensure that the compiler pics up the mapping.
-See [quickstart](quickstart.md) to learn how to configure stability yourself.
-
-```kotlin
-@Composable
-fun CounterScreen() {
-    // using Koin DSL from above
-    val store = storeViewModel<CounterContainer, _, _, _>()
-
-    val state by store.subscribe(DefaultLifecycle) { action ->
-        when (action) {
-            is ShowMessage -> {
-                /* ... */
-            }
-        }
-    }
-    CounterScreenContent(store, state)
-}
-
-@Composable
-private fun IntentReceiver<CounterIntent>.CounterScreenContent(state: CounterState) {
-    when (state) {
-        is DisplayingCounter -> {
-            Button(onClick = { intent(ClickedCounter) }) { // intent() available from the receiver parameter
-                Text("Counter: ${state.counter}")
-            }
-        }
-        /* ... */
-    }
-}
-```
-
-Under the hood, the `subscribe` function will efficiently subscribe to the store (it is lifecycle-aware) and
-use the composition scope to process your events. Event processing will stop in `onPause()` of the parent activity.
-In `onResume()`, the composable will resubscribe. Your composable will recompose when state changes, but not
-resubscribe to events. The lifecycle state is customizable.
-
-?> Compose plays well with MVI style because state changes will trigger recompositions. Just mutate your state,
-and the UI will update to reflect changes.
-
-* Use the lambda parameter of `subscribe` to subscribe to `MVIActions`.
-  Those will be processed as they arrive and the `consume` lambda
-  will **suspend** until an action is processed. Use a receiver coroutine scope to
-  launch new coroutines that will parallelize your flow (e.g. for snackbars).
-* A best practice is to make your state handling (UI redraw composable) a pure function and extract it to a separate
-  Composable such as `ScreenContent(state: ScreenState)` to keep your `*Screen` function clean, as shown above.
-* If you want to send `MVIIntent`s from a nested composable, just use `IntentReceiver` as a context or pass a function
-  reference.
-
-If you have defined your `*Content` function, you will get a composable that can be easily used in previews.
-That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
-But there's a catch: It has an `IntentReceiver<I>` as a parameter. To deal with this, there is an `EmptyReceiver`
-composable. EmptyReceiver does nothing when an intent is sent, which
-is exactly what we want for previews. We can now define our `PreviewParameterProvider` and the Preview composable.
-
-```kotlin
-private class PreviewProvider : StateProvider<CounterState>(
-    DisplayingCounter(1, 2, "param"),
-    Loading,
-)
-
-@Composable
-@Preview
-private fun CounterScreenPreview(
-    @PreviewParameter(PreviewProvider::class) state: CounterState,
-) = EmptyReceiver {
-    ComposeScreenContent(state)
-}
-```
-
-## View
-
-For a View-based project, the logic is essentially the same.
+For a View-based project, subscribe in an appropriate lifecycle callback and create two functions to render states
+and consume actions.
 
 * Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle the lifecycle for you.
 * Make sure your `render` function is pure, and `consume` function does not loop itself with intents.

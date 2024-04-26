@@ -1,4 +1,68 @@
-# An overview of prebuilt plugins
+# Getting started with plugins
+
+## Plugin Ordering
+
+!> The order of plugins matters! Changing the order of plugins may completely change how your store works.
+Plugins can replace, veto, consume or otherwise change anything in the store.
+They can close the store or swallow exceptions!
+
+Consider the following:
+
+```kotlin
+val broken = store(Loading) {
+    reduce {
+
+    }
+    // ❌ - logging plugin will not log any intents
+    // because they have been consumed by the reduce plugin
+    install(consoleLoggingPlugin())
+}
+
+val working = store(Loading) {
+    install(consoleLoggingPlugin())
+
+    reduce {
+        // ✅ - logging plugin will get the intent before reduce() is run, and it does not consume the intent
+    }
+}
+```
+
+That example was simple, but this rule can manifest in other, not so obvious ways. Consider the following:
+
+```kotlin
+val broken = store(Loading) {
+
+    serializeState() // ‼️ restores state on start
+
+    init {
+        updateState {
+            Loading // 🤦‍ and the state is immediately overwritten
+        }
+    }
+
+    // this happened because serializeState() uses onStart() under the hood, and init does too.
+    // Init is run after serializeState because it was installed later.
+}
+// or
+val broken = store(Loading) {
+
+    install(customUndocumentedPlugin()) // ‼️ you don't know what this plugin does
+
+    reduce {
+        // ❌ intents are not reduced because the plugin consumed them
+    }
+    init {
+        updateState {
+            // ❌ states are not changed because the plugin veto'd the change
+        }
+        action(MyAction) // ❌ actions are replaced with something else
+    }
+}
+```
+
+So make sure to consider how your plugins affect the store's logic when using and writing them.
+
+## Prebuilt Plugins
 
 FlowMVI comes with a whole suite of prebuilt plugins to cover the most common development needs.
 
@@ -28,7 +92,7 @@ Here's a full list:
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 All plugins are based on the essential callbacks that FlowMVI allows them to intercept, so most of them contain minimal
-amounts of code. They are explained on the [custom plugins page](custom_plugins.md).
+amounts of code. The callbacks are explained on the [custom plugins page](custom_plugins.md).
 
 Here's an explanation of how each default plugin works:
 
