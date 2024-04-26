@@ -59,14 +59,14 @@ jobs:
           configurationJson: |
             {
               "template": "#{{CHANGELOG}}",
-              "pr_template": "- #{{TITLE}}\n",
+              "pr_template": "- #{{TITLE}}",
               "categories": [
                 {
-                    "title": "## Feature",
+                    "title": "## New Features",
                     "labels": ["feat", "feature"]
                 },
                 {
-                    "title": "## Fix",
+                    "title": "## Bug Fixes",
                     "labels": ["fix", "bug"]
                 },
                 {
