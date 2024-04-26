@@ -41,7 +41,7 @@ jobs:
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Assemble android sample
-        run: ./gradlew :sample:androidApp:assembleRelease
+        run: ./gradlew :sample:assembleRelease
 
       - name: Publish to sonatype
         env:

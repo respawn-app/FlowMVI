@@ -1,4 +1,4 @@
-name: Autorelease
+name: Auto-tag
 on:
   pull_request:
     types:
@@ -21,7 +21,7 @@ jobs:
       - name: Bump version and push tag
         uses: anothrNick/github-tag-action@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OPENSOURCE_PAT }} # Use PAT to trigger workflows
           CUSTOM_TAG: ${{ github.event.pull_request.title }}
           WITH_V: false
           PRERELEASE: false

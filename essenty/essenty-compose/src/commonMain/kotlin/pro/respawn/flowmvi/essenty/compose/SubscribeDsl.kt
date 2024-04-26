@@ -22,7 +22,7 @@ import kotlin.jvm.JvmName
  * @see subscribe
  */
 @Suppress("ComposableParametersOrdering")
-@JvmName("subscribeTo")
+@JvmName("subscribe3")
 @Composable
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
@@ -43,7 +43,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.
  */
 @Composable
 @FlowMVIDSL
-@JvmName("subscribeTo")
+@JvmName("subscribe4")
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycleOwner: LifecycleOwner,
     lifecycleState: Lifecycle.State = Lifecycle.State.CREATED,

@@ -37,10 +37,21 @@ jobs:
       - name: Create platform debugger distributable
         run: ./gradlew debugger:app:packageDistributionForCurrentOS
 
-      - name: Upload a Build Artifact
+      - name: Create platform sample distributable
+        run: ./gradlew sample:packageDistributionForCurrentOS
+
+      - name: Upload debugger
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: Debugger_Macos
+          name: Debugger_MacOS
           path: ./debugger/app/build/compose/binaries/main/dmg/*
+          if-no-files-found: error
+          overwrite: false
+
+      - name: Upload sample
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: Sample_MacOS
+          path: ./sample/build/compose/binaries/main/dmg/*
           if-no-files-found: error
           overwrite: false
