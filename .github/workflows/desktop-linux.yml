@@ -1,16 +1,16 @@
-name: debugger-windows
+name: debugger-linux
 
 on:
   push:
     branches: [ master ]
 
 concurrency:
-  group: "publish-win"
+  group: "publish-linux"
   cancel-in-progress: true
 
 jobs:
   publish-windows:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     environment: publishing
     steps:
       - uses: actions/checkout@v3
@@ -32,16 +32,26 @@ jobs:
       - name: Create local properties
         env:
           LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        shell: bash
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Create platform debugger distributable
         run: ./gradlew debugger:app:packageDistributionForCurrentOS
 
-      - name: Upload a Build Artifact
+      - name: Create platform sample distributable
+        run: ./gradlew sample:packageDistributionForCurrentOS
+
+      - name: Upload debugger
         uses: actions/upload-artifact@v4.3.1
         with:
-          name: Debugger_Windows
-          path: ./debugger/app/build/compose/binaries/main/exe/*
+          name: Debugger_Linux
+          path: ./debugger/app/build/compose/binaries/main/deb/*
+          if-no-files-found: error
+          overwrite: false
+
+      - name: Upload sample
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: Sample_Linux
+          path: ./sample/build/compose/binaries/main/deb/*
           if-no-files-found: error
           overwrite: false
