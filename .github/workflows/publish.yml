@@ -94,7 +94,7 @@ jobs:
           artifactErrorsFailBuild: true
           prerelease: false
           tag: ${{ github.ref }}
-          artifacts: sample/androidApp/build/outputs/apk/release/pro.respawn.flowmvi.sample.apk
+          artifacts: sample/build/outputs/apk/release/pro.respawn.flowmvi.sample.apk
           body: ${{steps.build_changelog.outputs.changelog}}
         env:
           GITHUB_TOKEN: ${{ github.token }}
