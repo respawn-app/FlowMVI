@@ -224,7 +224,7 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 }
 ```
 
-* `debuggable` - Settings this to true enables additional store validations and debug logging. The store will check your
+* `debuggable` - Setting this to `true` enables additional store validations and debug logging. The store will check your
   subscription events, launches/stops, and plugins for validity, as well as print logs to the system console.
 * `name` - Set the future name of the store. Needed for debug, logging, comparing and injecting stores
 * `parallelIntents` - Declare that intents must be processed in parallel. Intents may still be dropped according to the
@@ -282,7 +282,7 @@ For every store, you'll likely want to install a few plugins.
 Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins.md) page to learn how
 to use them.
 
-### Step 6: Create, inject and provide dependencies
+## Step 6: Create, inject and provide dependencies
 
 You'll likely want to provide some dependencies for the store to use and to create additional functions instead of just
 putting all code into the store's builder.
@@ -310,7 +310,7 @@ class CounterContainer(
 }
 ```
 
-### Step 7: Start and subscribe to your store
+## Step 7: Start and subscribe to your store
 
 !> Don't forget to start your store! Store will do nothing unless it is started using the `start(scope: CoroutineScope)`
 function. Provide a coroutine scope with a lifecycle that matches the duration your store should be accepting intents
@@ -348,9 +348,10 @@ scope.cancel()
 store.stop()
 ```
 
-To subscribe to the store, regardless of your platform see [this guide](android.md)
+To subscribe to the store in compose, see the [compose](compose.md)
+To subscribe using Android Views, see [android](android.md)
 
-### Next steps:
+## Next steps:
 
 1. Learn how to [install](plugins.md) and [create](custom_plugins.md) plugins.
 2. Learn how to use FlowMVI with [compose](compose.md)

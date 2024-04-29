@@ -40,7 +40,9 @@ sealed interface SimpleIntent : MVIIntent {
     data object ClickedButton : SimpleIntent
 }
 
+// two type arguments mean that actions are disabled
 val simpleStore = store<_, _>(SimpleState()) {
+
     reduce { intent: SimpleIntent ->
         when (intent) {
             ClickedButton -> updateState {
