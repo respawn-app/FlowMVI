@@ -5,6 +5,7 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.InstanceKeeperOwner
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -72,3 +73,33 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 ): Store<S, I, A> = retainedStore(typeOf<S>(), scope, factory)
 
 // endregion
+
+// region container
+
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeperOwner].
+ *
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
+@FlowMVIDSL
+public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    key: Any,
+    scope: CoroutineScope? = retainedScope(),
+    factory: () -> Store<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
+    key, scope, factory
+)
+
+/**
+ * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
+ *
+ * * Uses the type of [S] as the key for the instance keeper
+ * * By default, uses a [retainedScope] instance to launch the store automatically.
+ *   Provide `null` to not launch the store after creation.
+ */
+@FlowMVIDSL
+public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
+    scope: CoroutineScope? = retainedScope(),
+    @BuilderInference factory: () -> Store<S, I, A>,
+): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(scope, factory)

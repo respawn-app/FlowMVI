@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalDecomposeApi::class, ExperimentalDecomposeApi::class)
+@file:OptIn(ExperimentalDecomposeApi::class, ExperimentalDecomposeApi::class, DelicateRetainedApi::class)
 
 package pro.respawn.flowmvi.sample.features.decompose
 
@@ -11,6 +11,7 @@ import com.arkivanov.decompose.router.pages.childPages
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.api.Container
+import pro.respawn.flowmvi.essenty.api.DelicateRetainedApi
 import pro.respawn.flowmvi.essenty.dsl.retainedStore
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.reduce
