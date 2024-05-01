@@ -136,7 +136,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public fun install(
         plugin: LazyPlugin<S, I, A>,
         vararg other: LazyPlugin<S, I, A>,
-    ): Unit = install(other.asSequence().plus(plugin).asIterable())
+    ): Unit = install(sequenceOf(plugin).plus(other).asIterable())
 
     /**
      * Create and install a new [StorePlugin].
@@ -159,11 +159,11 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      */
     public fun LazyPlugin<S, I, A>.install(): Unit = install(this)
 
+    // it's important to first convert the collection to an immutable before iterating, or the
+    // iterator will throw
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        // it's important to first convert the collection to an immutable before iterating, or the
-        // iterator will throw
         StoreImpl(config, compositePlugin(plugins.toSet().map { it(config) }))
     }
 }
