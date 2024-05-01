@@ -116,8 +116,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
     onStop {
         manager.complete()
     }
-    onSubscribe { subscriberCount ->
-        val currentSubs = subscriberCount + 1
-        if (minSubs >= currentSubs) manager.completeAndWait()
+    onSubscribe { previous ->
+        val currentSubs = previous + 1
+        if (currentSubs >= minSubs) manager.completeAndWait()
     }
 }
