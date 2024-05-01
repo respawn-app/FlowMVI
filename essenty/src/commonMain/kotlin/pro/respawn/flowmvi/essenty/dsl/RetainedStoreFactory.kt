@@ -57,7 +57,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
-    factory: () -> Store<S, I, A>,
+    @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> = instanceKeeper.retainedStore(key, scope, factory)
 
 /**
@@ -86,7 +86,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
 public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
-    factory: () -> Store<S, I, A>,
+    @BuilderInference factory: () -> Store<S, I, A>,
 ): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
     key, scope, factory
 )
