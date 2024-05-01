@@ -22,6 +22,6 @@ public interface StateProvider<out S : MVIState> {
      *
      * Accessing and modifying the state this way will **circumvent ALL plugins** and will not make state updates atomic.
      */
-    @DelicateStoreApi
+    @InternalFlowMVIAPI
     public val state: S get() = states.value
 }

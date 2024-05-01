@@ -34,7 +34,7 @@ public inline fun <reified T : S, S : MVIState, I : MVIIntent, A : MVIAction> ke
         onStart {
             ensureNotRegistered(key)
             updateState { consume(key, serializer) ?: this }
-            register(key, serializer) { states.value.typed<T>() }
+            register(key, serializer) { state.typed<T>() }
         }
         onStop { unregister(key) }
     }

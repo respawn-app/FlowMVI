@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.api.Provider
 import pro.respawn.flowmvi.api.SubscriptionMode
 import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.essenty.lifecycle.asEssentyLifecycle
+import kotlin.jvm.JvmName
 
 /**
  * Subscribe to the [store] in the scope of this [LifecycleOwner]'s lifecycle.
@@ -47,6 +48,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LifecycleOwner.su
  *
  * The subscription will follow the [mode] specified.
  */
+@JvmName("subscribeContainer")
 public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     scope: CoroutineScope = coroutineScope(),
     mode: SubscriptionMode = SubscriptionMode.Started,
@@ -58,6 +60,7 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
  *
  * The subscription will follow the [mode] specified.
  */
+@JvmName("subscribeStore")
 public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.subscribe(
     scope: CoroutineScope = coroutineScope(),
     mode: SubscriptionMode = SubscriptionMode.Started,

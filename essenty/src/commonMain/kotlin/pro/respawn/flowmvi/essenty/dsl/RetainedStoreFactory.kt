@@ -11,8 +11,8 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
-import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.essenty.internal.retained
+import kotlin.jvm.JvmName
 import kotlin.reflect.typeOf
 
 // region keeper
@@ -24,6 +24,7 @@ import kotlin.reflect.typeOf
  *   Provide `null` to not launch the store after creation.
  */
 @FlowMVIDSL
+@JvmName("retainedInstanceKeeperStoreFactory")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
@@ -55,6 +56,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
  *   Provide `null` to not launch the store after creation.
  */
 @FlowMVIDSL
+@JvmName("retainedInstanceKeeperOwnerStoreFactory")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
@@ -84,6 +86,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
  *   Provide `null` to not launch the store after creation.
  */
 @FlowMVIDSL
+@JvmName("retainedContainerFactory")
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     key: Any,
     scope: CoroutineScope? = retainedScope(),
@@ -100,6 +103,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
  *   Provide `null` to not launch the store after creation.
  */
 @FlowMVIDSL
+@JvmName("subscribeContainerFactory")
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     scope: CoroutineScope? = retainedScope(),
     @BuilderInference factory: () -> Container<S, I, A>,

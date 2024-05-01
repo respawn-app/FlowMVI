@@ -58,10 +58,18 @@ public interface StateReceiver<S : MVIState> {
     public fun useState(block: S.() -> S)
 
     /**
-     * Obtain the current value of state in an unsafe manner.
+     * Obtain the mutable flow of states in an unsafe manner.
      * It is recommended to always use [withState] or [updateState] always as obtaining this value can lead
      * to data races when the state transaction changes the value of the state previously obtained.
      */
     @InternalFlowMVIAPI
     public val states: MutableStateFlow<S>
+
+    /**
+     * Obtain the current value of state in an unsafe manner.
+     * It is recommended to always use [withState] or [updateState] always as obtaining this value can lead
+     * to data races when the state transaction changes the value of the state previously obtained.
+     */
+    @InternalFlowMVIAPI
+    public val state: S
 }
