@@ -19,10 +19,7 @@ import kotlin.jvm.JvmName
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> store(
     initial: S,
     @BuilderInference configure: BuildStore<S, I, A>,
-): Store<S, I, A> = StoreBuilder<S, I, A>(initial).run {
-    configure()
-    invoke()
-}
+): Store<S, I, A> = StoreBuilder<S, I, A>(initial).apply(configure).invoke()
 
 /**
  * Build a new [Store] using [StoreBuilder].
@@ -68,8 +65,9 @@ public inline fun <S : MVIState, I : MVIIntent> store(
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     initial: S,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
-): Lazy<Store<S, I, A>> = lazy { store(initial, configure) }
+): Lazy<Store<S, I, A>> = lazy(mode) { store(initial, configure) }
 
 /**
  * Build a new [Store] using [StoreBuilder].
@@ -79,5 +77,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     initial: S,
     scope: CoroutineScope,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
-): Lazy<Store<S, I, A>> = lazy { store(initial, configure).apply { start(scope) } }
+): Lazy<Store<S, I, A>> = lazy(mode) { store(initial, configure).apply { start(scope) } }

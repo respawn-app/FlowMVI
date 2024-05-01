@@ -37,7 +37,7 @@ public inline fun <reified T> Any?.typed(): T? = this as? T
 @Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
 public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
 
-internal inline fun <T> setOnce(property: KMutableProperty0<T?>, value: T) {
+internal fun <T> setOnce(property: KMutableProperty0<T?>, value: T) {
     require(property.get() == null) { duplicatePropMessage(property.name) }
     property.set(value)
 }
