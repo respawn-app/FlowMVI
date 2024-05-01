@@ -46,7 +46,7 @@ and the plugin that caches the value was installed before first access.
  *
  * ```kotlin
  * // in store's scope
- * val pagedItems: Flow<PagingData<Item>> by cache { // this: PipelineContext ->
+ * val pagedItems by cache { // this: PipelineContext ->
  *     repo.pagedItems().cachedIn(this)
  * }
  * ```
@@ -126,4 +126,4 @@ public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> cachePlugin(
 public fun <T, S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.cache(
     name: String? = null,
     @BuilderInference init: suspend PipelineContext<S, I, A>.() -> T,
-): CachedValue<T, S, I, A> = CachedValue(init).also { install(it.asPlugin(name)) }
+): CachedValue<T, S, I, A> = CachedValue(init).apply { install(asPlugin(name)) }

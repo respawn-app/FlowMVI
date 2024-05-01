@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.store
+package pro.respawn.flowmvi
 
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope

@@ -25,9 +25,13 @@ android {
 
 dependencies {
     commonMainApi(projects.core)
+    commonMainApi(projects.savedstate)
 
+    commonMainApi(libs.lifecycle.runtime)
     commonMainApi(libs.essenty.lifecycle)
     commonMainApi(libs.essenty.instancekeeper)
+    commonMainApi(libs.essenty.statekeeper)
+    commonMainApi(libs.essenty.lifecycle.coroutines)
 }
 
 publishMultiplatform()

@@ -9,7 +9,7 @@ import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 
 inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.configure(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
     name: String,
     saver: Saver<S>? = null,
 ) = with(configuration) {
@@ -20,7 +20,7 @@ inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, 
 }
 
 inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.configure(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
     serializer: KSerializer<T>,
     name: String,
 ) = with(configuration) {

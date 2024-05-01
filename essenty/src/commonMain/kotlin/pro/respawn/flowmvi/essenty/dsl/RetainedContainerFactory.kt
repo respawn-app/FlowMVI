@@ -11,8 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
-
-// region explicit key
+import pro.respawn.flowmvi.essenty.api.DelicateRetainedApi
 
 /**
  * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
@@ -23,6 +22,7 @@ import pro.respawn.flowmvi.dsl.store
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     initial: S,
     key: Any,
@@ -33,23 +33,6 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStor
 )
 
 /**
- * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeperOwner].
- *
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- */
-@FlowMVIDSL
-public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
-    key: Any,
-    scope: CoroutineScope? = retainedScope(),
-    factory: () -> Store<S, I, A>,
-): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
-    key, scope, factory
-)
-
-// endregion
-
-/**
  * Creates and retains a new [Store] instance built using [builder] using this [InstanceKeeper].
  *
  * * Uses the type of [S] as the key for the instance keeper
@@ -59,6 +42,7 @@ public inline fun <T, S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStor
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),
@@ -66,16 +50,3 @@ public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.reta
 ): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(
     initial, scope, builder
 )
-
-/**
- * Creates and retains a new [Store] instance provided using [factory] using this [InstanceKeeper].
- *
- * * Uses the type of [S] as the key for the instance keeper
- * * By default, uses a [retainedScope] instance to launch the store automatically.
- *   Provide `null` to not launch the store after creation.
- */
-@FlowMVIDSL
-public inline fun <T, reified S : MVIState, I : MVIIntent, A : MVIAction> T.retainedStore(
-    scope: CoroutineScope? = retainedScope(),
-    @BuilderInference factory: () -> Store<S, I, A>,
-): Store<S, I, A> where T : Container<S, I, A>, T : InstanceKeeperOwner = instanceKeeper.retainedStore(scope, factory)

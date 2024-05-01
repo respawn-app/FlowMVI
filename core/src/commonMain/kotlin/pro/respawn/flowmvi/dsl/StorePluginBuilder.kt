@@ -6,22 +6,26 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.util.setOnce
 
 /**
  * A class that builds a new [StorePlugin]
  * For more documentation, see [StorePlugin]
+ *
+ * Builder methods will throw [IllegalArgumentException] if they are assigned multiple times. Each plugin can only
+ * have **one** block per each type of [StorePlugin] callback.
  */
-
+@FlowMVIDSL
 public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
-    private var intent: suspend PipelineContext<S, I, A>.(I) -> I? = { it }
-    private var state: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S? = { _, new -> new }
-    private var action: suspend PipelineContext<S, I, A>.(A) -> A? = { it }
-    private var exception: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception? = { it }
-    private var start: suspend PipelineContext<S, I, A>.() -> Unit = { }
-    private var subscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
-    private var unsubscribe: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit = {}
-    private var stop: (e: Exception?) -> Unit = { }
+    private var intent: (suspend PipelineContext<S, I, A>.(I) -> I?)? = null
+    private var state: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)? = null
+    private var action: (suspend PipelineContext<S, I, A>.(A) -> A?)? = null
+    private var exception: (suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?)? = null
+    private var start: (suspend PipelineContext<S, I, A>.() -> Unit)? = null
+    private var subscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
+    private var unsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
+    private var stop: ((e: Exception?) -> Unit)? = null
 
     /**
      * @see [StorePlugin.name]
@@ -33,49 +37,39 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
      * @see [StorePlugin.onIntent]
      */
     @FlowMVIDSL
-    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?) {
-        intent = block
-    }
+    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = setOnce(::intent, block)
 
     /**
      * @see [StorePlugin.onState]
      */
     @FlowMVIDSL
-    public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?) {
-        state = block
-    }
+    public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?): Unit = setOnce(::state, block)
 
     /**
      * @see [StorePlugin.onStart]
      */
     @FlowMVIDSL
-    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit) {
-        start = block
-    }
+    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = setOnce(::start, block)
 
     /**
      * @see [StorePlugin.onStop]
      */
     @FlowMVIDSL
-    public fun onStop(block: (e: Exception?) -> Unit) {
-        stop = block
-    }
+    public fun onStop(block: (e: Exception?) -> Unit): Unit = setOnce(::stop, block)
 
     /**
      * @see [StorePlugin.onException]
      */
     @FlowMVIDSL
-    public fun onException(block: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?) {
-        exception = block
-    }
+    public fun onException(
+        block: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?
+    ): Unit = setOnce(::exception, block)
 
     /**
      * @see [StorePlugin.onAction]
      */
     @FlowMVIDSL
-    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?) {
-        action = block
-    }
+    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = setOnce(::action, block)
 
     /**
      * @see [StorePlugin.onSubscribe]
@@ -83,9 +77,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onSubscribe(
         block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
-    ) {
-        subscribe = block
-    }
+    ): Unit = setOnce(::subscribe, block)
 
     /**
      * @see StorePlugin.onUnsubscribe
@@ -93,24 +85,52 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onUnsubscribe(
         block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
-    ) {
-        unsubscribe = block
-    }
+    ): Unit = setOnce(::unsubscribe, block)
 
     @FlowMVIDSL
     @PublishedApi
     internal fun build(): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
         override val name = this@StorePluginBuilder.name
-        override suspend fun PipelineContext<S, I, A>.onStart() = start()
-        override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = state(old, new)
-        override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? = intent(this, intent)
-        override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action(this, action)
-        override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = exception(e)
-        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) = subscribe(subscriberCount)
-        override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) = unsubscribe(subscriberCount)
-        override fun onStop(e: Exception?): Unit = stop(e)
-        override fun toString(): String = "StorePlugin \"${name ?: super.toString()}\""
+        override suspend fun PipelineContext<S, I, A>.onStart() {
+            this@StorePluginBuilder.start?.invoke(this)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? {
+            val block = this@StorePluginBuilder.state ?: return new
+            return block(old, new)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? {
+            val block = this@StorePluginBuilder.intent ?: return intent
+            return block(intent)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? {
+            val block = this@StorePluginBuilder.action ?: return action
+            return block(action)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? {
+            val block = this@StorePluginBuilder.exception ?: return e
+            return block(e)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
+            this@StorePluginBuilder.subscribe?.invoke(this, subscriberCount)
+        }
+
+        override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
+            this@StorePluginBuilder.unsubscribe?.invoke(this, subscriberCount)
+        }
+
+        override fun onStop(e: Exception?) {
+            stop?.invoke(e)
+        }
+
+        override fun toString(): String = name?.let { "StorePlugin \"$it\"" } ?: super.toString()
+
         override fun hashCode(): Int = name?.hashCode() ?: super.hashCode()
+
         override fun equals(other: Any?): Boolean = when {
             other !is StorePlugin<*, *, *> -> false
             other.name == null && name == null -> this === other

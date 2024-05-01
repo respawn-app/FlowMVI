@@ -6,7 +6,7 @@ package pro.respawn.flowmvi.api
  * or an exception while trying to recover from another exception (which is prohibited).
  * You may also use this to bypass store plugins handling this particular exception.
  */
-public class UnrecoverableException(
+public open class UnrecoverableException(
     override val cause: Exception? = null,
     override val message: String? = null,
 ) : IllegalStateException(message, cause)

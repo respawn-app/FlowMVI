@@ -1,3 +1,5 @@
+@file:OptIn(DelicateStoreApi::class)
+
 package pro.respawn.flowmvi.test.plugin
 
 import kotlinx.atomicfu.atomic
@@ -17,7 +19,7 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override val coroutineContext by config::coroutineContext
 
-    var state: S by atomic(config.initial)
+    override var state: S by atomic(config.initial)
         private set
 
     @DelicateStoreApi

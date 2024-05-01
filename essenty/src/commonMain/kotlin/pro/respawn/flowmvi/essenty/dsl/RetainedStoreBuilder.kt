@@ -11,6 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.BuildStore
 import pro.respawn.flowmvi.dsl.store
+import pro.respawn.flowmvi.essenty.api.DelicateRetainedApi
 import pro.respawn.flowmvi.essenty.internal.retain
 import kotlin.reflect.typeOf
 
@@ -25,6 +26,7 @@ import kotlin.reflect.typeOf
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
     key: Any,
@@ -44,6 +46,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.re
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeper.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),
@@ -63,6 +66,7 @@ public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceK
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
     key: Any,
@@ -80,6 +84,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwn
  * See [store] for more details.
  */
 @FlowMVIDSL
+@DelicateRetainedApi
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> InstanceKeeperOwner.retainedStore(
     initial: S,
     scope: CoroutineScope? = retainedScope(),

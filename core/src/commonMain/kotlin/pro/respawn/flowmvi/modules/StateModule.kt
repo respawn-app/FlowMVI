@@ -16,37 +16,29 @@ import pro.respawn.flowmvi.util.withReentrantLock
 internal fun <S : MVIState> stateModule(
     initial: S,
     atomic: Boolean,
-): StateModule<S> = if (atomic) AtomicStateModule(initial) else DefaultStateModule(initial)
+): StateModule<S> = StateModuleImpl(initial, if (atomic) Mutex() else null)
 
 internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
 
-private abstract class AbstractStateModule<S : MVIState>(initial: S) : StateModule<S> {
+private class StateModuleImpl<S : MVIState>(
+    initial: S,
+    private val mutex: Mutex?,
+) : StateModule<S> {
 
-    @Suppress("PropertyName", "VariableNaming")
-    protected val _states = MutableStateFlow(initial)
-    final override val states: StateFlow<S> = _states.asStateFlow()
+    @Suppress("VariableNaming")
+    private val _states = MutableStateFlow(initial)
+    override val states: StateFlow<S> = _states.asStateFlow()
 
     @DelicateStoreApi
-    final override val state by _states::value
+    override val state: S by states::value
 
-    final override inline fun useState(block: S.() -> S) = _states.update(block)
-}
-
-private class AtomicStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
-
-    private val stateMutex = Mutex()
+    override inline fun useState(block: S.() -> S) = _states.update(block)
 
     override suspend inline fun withState(
         crossinline block: suspend S.() -> Unit
-    ) = stateMutex.withReentrantLock { block(states.value) }
+    ) = mutex.withReentrantLock { block(states.value) }
 
     override suspend inline fun updateState(
         crossinline transform: suspend S.() -> S
-    ) = stateMutex.withReentrantLock { _states.update { transform(it) } }
-}
-
-private class DefaultStateModule<S : MVIState>(initial: S) : AbstractStateModule<S>(initial) {
-
-    override suspend inline fun updateState(crossinline transform: suspend S.() -> S) = _states.update { transform(it) }
-    override suspend inline fun withState(crossinline block: suspend S.() -> Unit) = _states.value.block()
+    ) = mutex.withReentrantLock { _states.update { transform(it) } }
 }

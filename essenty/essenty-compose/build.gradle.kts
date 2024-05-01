@@ -31,11 +31,11 @@ kotlin {
         commonMain.dependencies {
             api(projects.core)
             api(projects.compose)
+            api(projects.essenty)
 
             api(libs.essenty.lifecycle)
             api(libs.essenty.lifecycle.coroutines)
             api(libs.essenty.instancekeeper)
-            api(libs.lifecycle.runtime)
 
             implementation(compose.runtime)
             implementation(compose.foundation)

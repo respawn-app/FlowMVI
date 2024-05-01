@@ -10,7 +10,7 @@ import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 
-object TestStoreConfiguration : StoreConfiguration {
+object TestConfigurationFactory : ConfigurationFactory {
 
     override fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,

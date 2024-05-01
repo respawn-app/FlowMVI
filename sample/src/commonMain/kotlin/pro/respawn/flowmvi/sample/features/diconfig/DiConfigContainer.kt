@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.sample.arch.configuration.StoreConfiguration
+import pro.respawn.flowmvi.sample.arch.configuration.ConfigurationFactory
 import pro.respawn.flowmvi.sample.arch.configuration.configure
 import kotlin.random.Random
 
@@ -12,7 +12,7 @@ import kotlin.random.Random
 data class PersistedCounterState(val counter: Int = Random.nextInt(1000)) : MVIState
 
 internal class DiConfigContainer(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
 ) : Container<PersistedCounterState, Nothing, Nothing> {
 
     override val store = store(PersistedCounterState()) {

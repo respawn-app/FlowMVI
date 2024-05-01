@@ -3,7 +3,10 @@ package pro.respawn.flowmvi.savedstate.dsl
 import kotlinx.io.files.Path
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
-import pro.respawn.flowmvi.savedstate.platform.FileAccess
+import pro.respawn.flowmvi.savedstate.platform.read
+import pro.respawn.flowmvi.savedstate.platform.readCompressed
+import pro.respawn.flowmvi.savedstate.platform.write
+import pro.respawn.flowmvi.savedstate.platform.writeCompressed
 
 /**
  * A [Saver] implementation that saves the given state to a file in a specified [dir] and [fileName].
@@ -46,8 +49,8 @@ public fun FileSaver(
     dir = dir,
     fileName = fileName,
     recover = recover,
-    write = { data, path -> FileAccess.write(data, path.name) },
-    read = { path -> FileAccess.read(path.name) },
+    write = { data, path -> write(data, path.name) },
+    read = { path -> read(path.name) },
 )
 
 /**
@@ -71,6 +74,6 @@ public fun CompressedFileSaver(
     dir = dir,
     fileName = fileName,
     recover = recover,
-    write = { data, path -> FileAccess.writeCompressed(data, path.name) },
-    read = { path -> FileAccess.readCompressed(path.name) },
+    write = { data, path -> writeCompressed(data, path.name) },
+    read = { path -> readCompressed(path.name) },
 )

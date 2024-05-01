@@ -6,7 +6,10 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
-import pro.respawn.flowmvi.savedstate.platform.FileAccess
+import pro.respawn.flowmvi.savedstate.platform.read
+import pro.respawn.flowmvi.savedstate.platform.readCompressed
+import pro.respawn.flowmvi.savedstate.platform.write
+import pro.respawn.flowmvi.savedstate.platform.writeCompressed
 
 /**
  * A [Saver] implementation that saves the given state to a file in a specified [path]
@@ -56,8 +59,8 @@ public fun FileSaver(
 ): Saver<String> = DefaultFileSaver(
     path = path,
     recover = recover,
-    write = FileAccess::write,
-    read = FileAccess::read,
+    write = ::write,
+    read = ::read,
 )
 
 /**
@@ -79,6 +82,6 @@ public fun CompressedFileSaver(
 ): Saver<String> = DefaultFileSaver(
     path = path,
     recover = recover,
-    write = FileAccess::writeCompressed,
-    read = FileAccess::readCompressed,
+    write = ::writeCompressed,
+    read = ::readCompressed,
 )

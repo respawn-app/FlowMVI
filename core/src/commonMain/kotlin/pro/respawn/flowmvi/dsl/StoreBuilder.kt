@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.channels.BufferOverflow
+import pro.respawn.flowmvi.StoreImpl
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.LazyPlugin
@@ -14,7 +15,6 @@ import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.plugins.compositePlugin
-import pro.respawn.flowmvi.store.StoreImpl
 import kotlin.coroutines.CoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
@@ -136,7 +136,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public fun install(
         plugin: LazyPlugin<S, I, A>,
         vararg other: LazyPlugin<S, I, A>,
-    ): Unit = install(other.asSequence().plus(plugin).asIterable())
+    ): Unit = install(sequenceOf(plugin).plus(other).asIterable())
 
     /**
      * Create and install a new [StorePlugin].
@@ -157,13 +157,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     /**
      * Alias for [install]
      */
+    @FlowMVIDSL
     public fun LazyPlugin<S, I, A>.install(): Unit = install(this)
 
+    // it's important to first convert the collection to an immutable before iterating, or the
+    // iterator will throw
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        // it's important to first convert the collection to an immutable before iterating, or the
-        // iterator will throw
         StoreImpl(config, compositePlugin(plugins.toSet().map { it(config) }))
     }
 }

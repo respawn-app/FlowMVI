@@ -27,18 +27,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.childContext
 import com.arkivanov.decompose.extensions.compose.pages.Pages
 import com.arkivanov.decompose.extensions.compose.pages.PagesScrollAnimation
-import com.arkivanov.decompose.router.pages.select
-import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.arkivanov.essenty.instancekeeper.getOrCreateSimple
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.LocalKoinScope
 import pro.respawn.flowmvi.essenty.compose.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.decompose_feature_title
-import pro.respawn.flowmvi.sample.features.decompose.PageIntent.ClickedIncrementCounter
-import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.DisplayingPages
-import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.Error
-import pro.respawn.flowmvi.sample.features.decompose.PagesComponentState.Loading
+import pro.respawn.flowmvi.sample.features.decompose.page.PageComponent
+import pro.respawn.flowmvi.sample.features.decompose.page.PageIntent.ClickedIncrementCounter
+import pro.respawn.flowmvi.sample.features.decompose.pages.PagesComponent
+import pro.respawn.flowmvi.sample.features.decompose.pages.PagesComponentState
+import pro.respawn.flowmvi.sample.features.decompose.pages.PagesComponentState.DisplayingPages
+import pro.respawn.flowmvi.sample.features.decompose.pages.PagesIntent.SelectedPage
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
@@ -59,43 +62,47 @@ private const val Description = """
 
 //language=kotlin
 private const val Code = """
-internal class PagesComponent(
+class PagesComponent(
     context: ComponentContext,
-) : Container<PagesComponentState, Nothing, Nothing>, ComponentContext by context {
+    container: () -> PagesContainer, // inject using DI or create
+) : ComponentContext by context,
+    PagesStore by context.retainedStore(factory = container) {
 
-    val navigator = PagesNavigation<PageConfig>()
+    private val navigator = PagesNavigation<PageConfig>()
 
     val pages = childPages(
         source = navigator,
-        initialPages = {
-            Pages(
-                items = List(5) { PageConfig(it) },
-                selectedIndex = 0,
-            )
-        },
         serializer = PageConfig.serializer(),
+        initialPages = { Pages(items = List(5) { PageConfig(it) }, selectedIndex = 0) },
         childFactory = ::PageComponent,
     )
 
-    override val store = retainedStore(initial = Loading) {
-        init {
-            updateState {
-                delay(1000)
-                DisplayingPages
+    init {
+        // subscribe to the store following the component's lifecycle
+        subscribe {
+            actions.collect { action ->
+                when (action) {
+                    is SelectPage -> navigator.select(action.index)
+                }
             }
         }
     }
 }
 
-internal class PageComponent(
+class PageComponent(
     page: PageConfig,
     context: ComponentContext,
-) : Container<PageState, PageIntent, Nothing>, ComponentContext by context {
+) : ComponentContext by context,
+    Container<PageState, PageIntent, Nothing> {
 
-    override val store = retainedStore(initial = PageState(page.page)) {
+    override val store = store(PageState(page.page), coroutineScope()) {
+
+        // state keeper will preserve the store's state
+        keepState(context.stateKeeper, PageState.serializer())
+
         reduce { intent ->
             when (intent) {
-                ClickedIncrementCounter -> updateState {
+                is ClickedIncrementCounter -> updateState {
                     copy(counter = counter + 1)
                 }
             }
@@ -109,13 +116,17 @@ fun DecomposeScreen(
     parent: ComponentContext,
     navigator: Navigator,
 ) {
-    // due to interop between decompose navigation we built and the need to showcase a decompose feature,
+    // due to interop between decompose navigation we built (using retained components)
+    // and the need to showcase a decompose feature,
     // this is a little bit of a hack to force the component hierarchy to behave as if it's the root hierarchy
+    val koin = LocalKoinScope.current
     val component = remember(parent) {
-        parent.instanceKeeper.getOrCreate { PagesComponent(parent) }
+        parent.instanceKeeper.getOrCreateSimple {
+            PagesComponent(parent.childContext("Pages"), koin::get)
+        }
     }
 
-    val state by component.subscribe()
+    val state by component.subscribe(component)
 
     RScaffold(
         onBack = navigator.backNavigator,
@@ -131,8 +142,8 @@ private fun DecomposeScreenContent(
     pagesComponent: PagesComponent,
 ) = TypeCrossfade(state) {
     when (this) {
-        is Error -> RErrorView(e)
-        is Loading -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        is PagesComponentState.Error -> RErrorView(e)
+        is PagesComponentState.Loading -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
             Text("Simulating loading of pages")
         }
@@ -149,7 +160,7 @@ private fun DecomposeScreenContent(
             )
             Pages(
                 pages = pagesComponent.pages,
-                onPageSelected = { pagesComponent.navigator.select(it) },
+                onPageSelected = { pagesComponent.intent(SelectedPage(it)) },
                 modifier = Modifier.fillMaxSize(),
                 scrollAnimation = PagesScrollAnimation.Default,
                 pageContent = { _, page -> PageContent(page) },

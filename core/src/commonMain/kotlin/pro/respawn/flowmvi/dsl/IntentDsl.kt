@@ -1,4 +1,4 @@
-@file:Suppress("NOTHING_TO_INLINE")
+@file:Suppress("NOTHING_TO_INLINE", "KotlinRedundantDiagnosticSuppress")
 
 package pro.respawn.flowmvi.dsl
 
@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 
 // ----- intents -----
+
 /**
  * Alias for [IntentReceiver.intent] for multiple intents
  *
@@ -42,6 +43,7 @@ public suspend inline fun <I : MVIIntent> IntentReceiver<I>.emit(
 ): Unit = intents.forEach { emit(it) }
 
 // ----- actions  -----
+
 /**
  * Alias for [ActionReceiver.action] for multiple actions
  *

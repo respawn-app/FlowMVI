@@ -60,14 +60,12 @@ class StoreExceptionsTest : FreeSpec({
         }
         "given store that throws on subscribe" - {
             val store = testStore {
+                recover {
+                    println("recover from $it")
+                    null
+                }
                 install {
-                    recover {
-                        println("recover from $it")
-                        null
-                    }
-                    onSubscribe { _ ->
-                        throw e
-                    }
+                    onSubscribe { _ -> throw e }
                 }
             }
             "then exceptions in subscriber scope do not cancel the pipeline" {

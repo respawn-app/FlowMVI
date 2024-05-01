@@ -19,8 +19,9 @@ import pro.respawn.flowmvi.api.Store
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
     initial: S,
     scope: CoroutineScope,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference crossinline configure: BuildStore<S, I, A>
-): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, scope, configure)
+): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, scope, mode, configure)
 
 /**
  * Alias for [pro.respawn.flowmvi.dsl.lazyStore]
@@ -28,8 +29,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
     initial: S,
+    mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference crossinline configure: BuildStore<S, I, A>
-): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, configure)
+): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial = initial, mode = mode, configure = configure)
 
 /**
  * Alias for [pro.respawn.flowmvi.dsl.store]

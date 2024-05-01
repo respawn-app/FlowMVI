@@ -415,7 +415,7 @@ fun awaitSubscribersPlugin(
 ) = plugin {
     this.name = name
     onStart {
-        with(manager) { launch(timeout) }
+        startWaiting(timeout)
     }
     onState { _, new ->
         if (suspendStore) manager.await()
@@ -432,9 +432,9 @@ fun awaitSubscribersPlugin(
     onStop {
         manager.complete()
     }
-    onSubscribe { subscriberCount ->
-        val currentSubs = subscriberCount + 1
-        if (minSubs >= currentSubs) manager.completeAndWait()
+    onSubscribe { previous ->
+        val currentSubs = previous + 1
+        if (currentSubs >= minSubs) manager.completeAndWait()
     }
 }
 ```
