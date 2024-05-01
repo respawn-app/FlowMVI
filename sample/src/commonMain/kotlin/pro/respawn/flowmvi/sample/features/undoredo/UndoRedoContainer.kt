@@ -12,7 +12,7 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.undoRedo
 import pro.respawn.flowmvi.plugins.whileSubscribed
-import pro.respawn.flowmvi.sample.arch.configuration.StoreConfiguration
+import pro.respawn.flowmvi.sample.arch.configuration.ConfigurationFactory
 import pro.respawn.flowmvi.sample.arch.configuration.configure
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ChangedInput
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedRedo
@@ -20,7 +20,7 @@ import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedUndo
 import pro.respawn.kmmutils.inputforms.dsl.input
 
 internal class UndoRedoContainer(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
 ) : Container<UndoRedoState, UndoRedoIntent, Nothing> {
 
     private val lastInput = MutableStateFlow("")

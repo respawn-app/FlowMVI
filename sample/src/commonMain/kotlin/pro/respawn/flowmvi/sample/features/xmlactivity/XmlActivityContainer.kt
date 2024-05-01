@@ -7,14 +7,14 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
-import pro.respawn.flowmvi.sample.arch.configuration.StoreConfiguration
+import pro.respawn.flowmvi.sample.arch.configuration.ConfigurationFactory
 import pro.respawn.flowmvi.sample.arch.configuration.configure
 import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityAction.ShowIncrementedSnackbar
 import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityIntent.ClickedIncrementCounter
 import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityState.DisplayingCounter
 
 internal class XmlActivityContainer(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
 ) : Container<XmlActivityState, XmlActivityIntent, XmlActivityAction> {
 
     override val store = store(DisplayingCounter(0)) {

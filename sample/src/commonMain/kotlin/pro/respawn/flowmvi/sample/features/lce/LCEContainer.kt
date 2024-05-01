@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
-import pro.respawn.flowmvi.sample.arch.configuration.StoreConfiguration
+import pro.respawn.flowmvi.sample.arch.configuration.ConfigurationFactory
 import pro.respawn.flowmvi.sample.arch.configuration.configure
 import pro.respawn.flowmvi.sample.features.lce.LCEIntent.ClickedRefresh
 
@@ -15,7 +15,7 @@ private typealias Ctx = PipelineContext<LCEState, LCEIntent, Nothing>
 
 internal class LCEContainer(
     private val repo: LCERepository,
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
 ) : Container<LCEState, LCEIntent, Nothing> {
 
     override val store = store(LCEState.Loading) {

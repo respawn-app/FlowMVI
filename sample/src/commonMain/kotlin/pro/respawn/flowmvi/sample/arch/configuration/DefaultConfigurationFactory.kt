@@ -19,10 +19,10 @@ import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
-internal class DefaultStoreConfiguration(
+internal class DefaultConfigurationFactory(
     private val files: FileManager,
     private val json: Json,
-) : StoreConfiguration {
+) : ConfigurationFactory {
 
     override fun <S : MVIState> saver(
         serializer: KSerializer<S>,
