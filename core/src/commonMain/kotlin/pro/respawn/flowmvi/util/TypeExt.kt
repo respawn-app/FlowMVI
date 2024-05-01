@@ -7,7 +7,7 @@ import kotlin.contracts.contract
 import kotlin.reflect.KMutableProperty0
 
 private fun duplicatePropMessage(name: String) = """
-    Property $name has already been set. Setting the value of this property multiple times will override any previous
+    Value of $name has already been set. Setting the value of this property multiple times will override any previous
     invocations, which is likely not what you meant to do. 
     Please merge the logic from the second invocation with the first one.
 """.trimIndent()
