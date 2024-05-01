@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.util.setOnce
  * Builder methods will throw [IllegalArgumentException] if they are assigned multiple times. Each plugin can only
  * have **one** block per each type of [StorePlugin] callback.
  */
+@FlowMVIDSL
 public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: (suspend PipelineContext<S, I, A>.(I) -> I?)? = null
@@ -91,11 +92,11 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     internal fun build(): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
         override val name = this@StorePluginBuilder.name
         override suspend fun PipelineContext<S, I, A>.onStart() {
-            start?.invoke(this)
+            this@StorePluginBuilder.start?.invoke(this)
         }
 
         override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? {
-            val block = state ?: return new
+            val block = this@StorePluginBuilder.state ?: return new
             return block(old, new)
         }
 
@@ -110,16 +111,16 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
         }
 
         override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? {
-            val block = exception ?: return e
+            val block = this@StorePluginBuilder.exception ?: return e
             return block(e)
         }
 
         override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
-            subscribe?.invoke(this, subscriberCount)
+            this@StorePluginBuilder.subscribe?.invoke(this, subscriberCount)
         }
 
         override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
-            unsubscribe?.invoke(this, subscriberCount)
+            this@StorePluginBuilder.unsubscribe?.invoke(this, subscriberCount)
         }
 
         override fun onStop(e: Exception?) {

@@ -157,6 +157,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     /**
      * Alias for [install]
      */
+    @FlowMVIDSL
     public fun LazyPlugin<S, I, A>.install(): Unit = install(this)
 
     // it's important to first convert the collection to an immutable before iterating, or the
