@@ -49,5 +49,4 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
     override fun equals(other: Any?): Boolean = ctx.plugin == other
     override fun hashCode(): Int = ctx.plugin.hashCode()
     override fun toString(): String = "PluginTestScope(plugin=${ctx.plugin.name})"
-    public val state: S by ctx::state
 }
