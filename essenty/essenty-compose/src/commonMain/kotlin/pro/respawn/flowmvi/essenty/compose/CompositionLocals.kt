@@ -6,6 +6,7 @@ import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import pro.respawn.flowmvi.compose.dsl.DefaultLifecycle
 import pro.respawn.flowmvi.compose.dsl.LocalSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
+import pro.respawn.flowmvi.essenty.lifecycle.asSubscriberLifecycle
 
 /**
  * Provides a local Essenty lifecycle [owner] through a [LocalSubscriberLifecycle].

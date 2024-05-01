@@ -1,6 +1,5 @@
-package pro.respawn.flowmvi.essenty.compose
+package pro.respawn.flowmvi.essenty.lifecycle
 
-import androidx.compose.runtime.Stable
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.lifecycle.coroutines.repeatOnLifecycle
@@ -12,7 +11,6 @@ import androidx.lifecycle.Lifecycle.State as ALifecycleState
 /**
  * Convert this [LifecycleOwner] to a [SubscriberLifecycle].
  */
-@Stable
 public val Lifecycle.State.asAndroidxLifecycle: ALifecycleState
     get() = when (this) {
         Lifecycle.State.DESTROYED -> ALifecycleState.DESTROYED
@@ -25,7 +23,6 @@ public val Lifecycle.State.asAndroidxLifecycle: ALifecycleState
 /**
  * Convert this [SubscriptionMode] to an Essenty [Lifecycle.State]
  */
-@Stable
 public val ALifecycleState.asEssentyLifecycle: Lifecycle.State
     get() = when (this) {
         ALifecycleState.DESTROYED -> Lifecycle.State.DESTROYED
@@ -38,7 +35,6 @@ public val ALifecycleState.asEssentyLifecycle: Lifecycle.State
 /**
  * Convert this Essenty [Lifecycle] to the [Subscriber
  */
-@Stable
 public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
     get() = SubscriberLifecycle(this) { mode, block ->
         repeatOnLifecycle(mode.asEssentyLifecycle, block = block)
@@ -47,7 +43,6 @@ public val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
 /**
  * Convert this [SubscriptionMode] to an Essenty [Lifecycle.State]
  */
-@Stable
 public val SubscriptionMode.asEssentyLifecycle: Lifecycle.State
     get() = when (this) {
         SubscriptionMode.Immediate -> Lifecycle.State.CREATED

@@ -14,6 +14,8 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.dsl.subscribe
+import pro.respawn.flowmvi.essenty.lifecycle.asSubscriberLifecycle
+import pro.respawn.flowmvi.essenty.lifecycle.asSubscriptionMode
 import kotlin.jvm.JvmName
 
 /**
