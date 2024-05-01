@@ -28,7 +28,6 @@ internal class PagesContainer(
             when (intent) {
                 is SelectedPage -> action(SelectPage(intent.index))
             }
-
         }
     }
 }
