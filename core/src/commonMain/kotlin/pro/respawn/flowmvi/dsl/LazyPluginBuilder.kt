@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.api.StorePlugin
  * when the store is created.
  */
 public class LazyPluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
-    public val config: StoreConfiguration<S>
+    public val config: StoreConfiguration<S>,
 ) : StorePluginBuilder<S, I, A>()
 
 /**

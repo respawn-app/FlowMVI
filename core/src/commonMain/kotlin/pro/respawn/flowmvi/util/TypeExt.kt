@@ -4,6 +4,13 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
+import kotlin.reflect.KMutableProperty0
+
+private fun duplicatePropMessage(name: String) = """
+    Property $name has already been set. Setting the value of this property multiple times will override any previous
+    invocations, which is likely not what you meant to do. 
+    Please merge the logic from the second invocation with the first one.
+""".trimIndent()
 
 /**
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
@@ -29,3 +36,8 @@ public inline fun <reified T> Any?.typed(): T? = this as? T
  */
 @Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
 public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
+
+internal inline fun <T> setOnce(property: KMutableProperty0<T?>, value: T) {
+    require(property.get() == null) { duplicatePropMessage(property.name) }
+    property.set(value)
+}
