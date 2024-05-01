@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.api
 
+import kotlinx.coroutines.flow.MutableStateFlow
+
 /**
  * An entity that handles [MVIState] updates. This entity modifies the state of the [StateProvider].
  * This is most often implemented by a [Store] and exposed through [PipelineContext].
@@ -54,4 +56,12 @@ public interface StateReceiver<S : MVIState> {
      */
     @FlowMVIDSL
     public fun useState(block: S.() -> S)
+
+    /**
+     * Obtain the current value of state in an unsafe manner.
+     * It is recommended to always use [withState] or [updateState] always as obtaining this value can lead
+     * to data races when the state transaction changes the value of the state previously obtained.
+     */
+    @InternalFlowMVIAPI
+    public val states: MutableStateFlow<S>
 }
