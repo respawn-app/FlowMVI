@@ -29,6 +29,12 @@ public class JobManager<K : Any> {
 
     private val jobs = concurrentMutableMap<K, Job>()
 
+    /** Returns true if this manager has any active jobs, false otherwise. */
+    public val hasJobs: Boolean get() = jobs.isNotEmpty()
+
+    /** Returns a read-only view of the currently active jobs. */
+    public val activeJobs: Collection<Job> get() = jobs.values
+
     /**
      * Cancels all jobs without suspending
      */
