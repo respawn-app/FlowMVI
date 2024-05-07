@@ -29,7 +29,7 @@ flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowm
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
 # Remote debugging client
-flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
+flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
 # Essenty (Decompose) integration
 flowmvi-essenty = { module = "pro.respawn.flowmvi:essenty", version.ref = "flowmvi" }
 flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" } 
@@ -56,8 +56,8 @@ dependencies {
     commonTestImplementation("pro.respawn.flowmvi:test:$flowmvi")
     // android integration
     androidMainImplementation("pro.respawn.flowmvi:android:$flowmvi")
-    // remote debugging client
-    androidDebugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
+    // remote debugging client (use on debug only)
+    debugImplementation("pro.respawn.flowmvi:debugger-plugin:$flowmvi")
 }
 ```
 
@@ -207,16 +207,16 @@ Here's a full list of things that can be done when configuring the store:
 val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
 
     configure {
-        var debuggable = false
-        var name: String? = null
-        var parallelIntents = false
-        var coroutineContext: CoroutineContext = EmptyCoroutineContext
-        var actionShareBehavior = ActionShareBehavior.Distribute()
-        var onOverflow = BufferOverflow.DROP_OLDEST
-        var intentCapacity = Channel.UNLIMITED
-        var atomicStateUpdates = true
-        var allowIdleSubscriptions: Boolean? = null
-        var logger: StoreLogger? = null
+        debuggable = false
+        name = null
+        parallelIntents = false
+        coroutineContext = EmptyCoroutineContext
+        actionShareBehavior = ActionShareBehavior.Distribute()
+        onOverflow = BufferOverflow.DROP_OLDEST
+        intentCapacity = Channel.UNLIMITED
+        atomicStateUpdates = true
+        allowIdleSubscriptions = null
+        logger = null
     }
 
     fun install(vararg plugins: LazyPlugin<S, I, A>)
@@ -257,11 +257,13 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
   mutex usage when enabled.
 * `allowIdleSubscriptions` - A flag to indicate that clients may subscribe to this store even while it is not started.
   If you intend to stop and restart your store while the subscribers are present, set this to `true`. By default, will
-  choose a value based on `debuggable` parameter.
+  use the opposite value of the `debuggable` parameter (`false` on production).
 * `logger` - An instance of `StoreLogger` to use for logging events. By default, the value is chosen based on
   the `debuggable` parameter:
-    * `PlatformStoreLogging` that logs to the primary log stream of the system (e.g. Logcat on Android).
-    * `NoOpStoreLogging` - if `debuggable` is false, logs will not be printed.
+    * `PlatformStoreLogger` that logs to the primary log stream of the system (e.g. Logcat on Android).
+    * `NoOpStoreLogger` - if `debuggable` is false, logs will not be printed.
+
+You may want to eventually setup [injection](debugging.md) of the configuration and plugins.
 
 Some interesting properties of the store:
 
@@ -314,8 +316,8 @@ class CounterContainer(
 
 !> Don't forget to start your store! Store will do nothing unless it is started using the `start(scope: CoroutineScope)`
 function. Provide a coroutine scope with a lifecycle that matches the duration your store should be accepting intents
-and running background jobs. For  [android](android.md) this will be `viewModelScope` for example.
-On desktop, you can use `rememberCoroutineScope()`. On iOS, provide an application lifecycle scope.
+and running background jobs. For  [android](android.md), this will be `viewModelScope`, for example.
+On desktop, you can use `rememberCoroutineScope()`. On iOS, provide a lifecycle scope manually or through a library.
 
 #### Automatically:
 
@@ -345,7 +347,7 @@ store.start(scope)
 // stop
 scope.cancel()
 // or to keep the scope alive
-store.stop()
+store.close()
 ```
 
 To subscribe to the store in compose, see the [compose](compose.md)
