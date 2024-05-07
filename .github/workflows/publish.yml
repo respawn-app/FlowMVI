@@ -60,6 +60,7 @@ jobs:
             {
               "template": "#{{CHANGELOG}}",
               "pr_template": "- #{{TITLE}}",
+              "trim_values": false,
               "categories": [
                 {
                     "title": "## New Features",
