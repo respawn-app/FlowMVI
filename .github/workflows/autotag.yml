@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true || contains(github.event.pull_request.labels.*.name, 'autorelease')
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'autorelease')
     runs-on: ubuntu-latest
     permissions:
       contents: write
