@@ -182,8 +182,7 @@ suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int): Unit = U
 
 A callback to be executed **each time** `Store.subscribe` is called.
 
-* This callback is executed **before** the `subscriberCount` is incremented.
-  This means, for the first subscription, `subscriberCount` will be zero.
+* This callback is executed **after** the `subscriberCount` is incremented i.e. with the **new** count of subscribers.
 * There is no guarantee that the subscribers will not be able to subscribe when the store has not been started yet.
   But this function will be invoked as soon as the store is started, with the most recent subscriber count.
 * This function is invoked in the store's scope, not the subscriber's scope.

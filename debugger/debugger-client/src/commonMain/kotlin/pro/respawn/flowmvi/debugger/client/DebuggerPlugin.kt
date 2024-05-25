@@ -27,7 +27,6 @@ internal const val NonDebuggableStoreMessage: String = """
 Store must be debuggable in order to use the debugger.
 Please set `debuggable = true` before installing the plugin.
 Don't include debug code in production builds.
-Suppress this error by using install(debuggerPlugin) directly.
 """
 
 @Suppress("UNUSED_PARAMETER")

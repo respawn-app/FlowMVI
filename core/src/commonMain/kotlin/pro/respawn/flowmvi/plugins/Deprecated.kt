@@ -138,7 +138,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction, S2 : MVIState, I2
         "pro.respawn.flowmvi.dsl.collect"
     )
 )
-@Suppress("Indentation") // conflicts with IDE formatting
+@Suppress("Indentation", "Deprecation") // conflicts with IDE formatting
 @FlowMVIDSL
 public inline fun <
         S : MVIState,

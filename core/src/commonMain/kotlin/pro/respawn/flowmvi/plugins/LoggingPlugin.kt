@@ -67,7 +67,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
         log(level ?: Info, currentTag) { "Started ${config.name ?: "Store"}" }
     }
     onSubscribe {
-        log(level ?: Info, currentTag) { "New subscriber #${it + 1}" }
+        log(level ?: Info, currentTag) { "New subscriber #$it" }
     }
     onUnsubscribe {
         log(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" }

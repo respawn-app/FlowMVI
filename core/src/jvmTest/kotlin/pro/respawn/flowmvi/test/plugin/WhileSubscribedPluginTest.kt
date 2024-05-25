@@ -49,7 +49,7 @@ class WhileSubscribedPluginTest : FreeSpec({
                 running.test {
                     plugin().test(TestState.Some) {
                         idle()
-                        onSubscribe(minSubs) // previous value
+                        onSubscribe(minSubs + 1) // previous value
                         idle()
                         awaitItem().shouldBeTrue()
                         onStop(null)

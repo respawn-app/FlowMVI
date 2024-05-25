@@ -76,7 +76,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
      */
     @FlowMVIDSL
     public fun onSubscribe(
-        block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
+        block: suspend PipelineContext<S, I, A>.(newSubscriberCount: Int) -> Unit
     ): Unit = setOnce(::subscribe, block)
 
     /**
@@ -115,12 +115,12 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
             return block(e)
         }
 
-        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
-            this@StorePluginBuilder.subscribe?.invoke(this, subscriberCount)
+        override suspend fun PipelineContext<S, I, A>.onSubscribe(newSubscriberCount: Int) {
+            this@StorePluginBuilder.subscribe?.invoke(this, newSubscriberCount)
         }
 
-        override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
-            this@StorePluginBuilder.unsubscribe?.invoke(this, subscriberCount)
+        override suspend fun PipelineContext<S, I, A>.onUnsubscribe(newSubscriberCount: Int) {
+            this@StorePluginBuilder.unsubscribe?.invoke(this, newSubscriberCount)
         }
 
         override fun onStop(e: Exception?) {

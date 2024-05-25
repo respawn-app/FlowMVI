@@ -214,10 +214,7 @@ Powerful DSL allows to hook into store events and amend any store's logic with r
 
 ```kotlin
 val counterPlugin = lazyPlugin<CounterState, CounterIntent, CounterAction> {
-
-    // access the store configuration
-    if (config.debuggable) config.logger(Debug) { "Store is debuggable" }
-
+    
     onStart { }
 
     onStop { }
@@ -233,6 +230,9 @@ val counterPlugin = lazyPlugin<CounterState, CounterIntent, CounterAction> {
     onUnsubscribe { subs -> }
 
     onException { e -> }
+
+    // access the store configuration
+    if (config.debuggable) config.logger(Debug) { "Store is debuggable" }
 }
 ```
 

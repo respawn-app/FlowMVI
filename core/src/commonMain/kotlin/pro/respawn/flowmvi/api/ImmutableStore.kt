@@ -30,9 +30,8 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      * Subscribe to the store, obtaining a [Provider] to consume [MVIState]s and [MVIAction]s.
      * The store itself does not expose actions or states to prevent subscribers from affecting the store and to keep
      * track of each subscription.
-     * When [subscribe] is invoked, a new [StorePlugin.onSubscribe] event is sent to all plugins **and then** the
-     * subscription count is incremented.
-     * For more, see [StorePlugin]
+     * When [subscribe] is invoked, a new [StorePlugin.onSubscribe] event is sent to all plugins with the
+     * new subscriber count. For more, see [StorePlugin].
      */
     public fun CoroutineScope.subscribe(block: suspend Provider<S, I, A>.() -> Unit): Job
 

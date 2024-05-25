@@ -19,7 +19,7 @@ class StoreSubscriptionsTest : FreeSpec({
         var subs = 0
         val store = testStore(tt) {
             install {
-                onSubscribe { previous -> subs = previous + 1 }
+                onSubscribe { new -> subs = new }
                 onUnsubscribe { subs = it }
                 onStop { subs = 0 }
             }
