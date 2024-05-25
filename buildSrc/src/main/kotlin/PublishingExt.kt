@@ -35,7 +35,7 @@ internal fun MavenPublication.configurePom() = pom {
             id.set(Config.vendorId)
             name.set(Config.vendorName)
             email.set(Config.supportEmail)
-            url.set("https://opensource.respawn.pro")
+            url.set(Config.developerUrl)
             organization.set(Config.vendorName)
             organizationUrl.set(url)
         }

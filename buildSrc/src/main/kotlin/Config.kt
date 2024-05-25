@@ -23,6 +23,7 @@ object Config {
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
+    const val developerUrl = "https://respawn.pro"
     const val licenseFile = "LICENSE.txt"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
