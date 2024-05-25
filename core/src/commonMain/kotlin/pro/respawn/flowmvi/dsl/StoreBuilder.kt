@@ -165,6 +165,6 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        StoreImpl(config, compositePlugin(plugins.toSet().map { it(config) }))
+        StoreImpl(config, compositePlugin(plugins.map { it(config) }))
     }
 }

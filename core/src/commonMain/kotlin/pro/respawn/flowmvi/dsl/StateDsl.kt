@@ -1,10 +1,7 @@
-@file:Suppress("DEPRECATION")
-
 package pro.respawn.flowmvi.dsl
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.flowmvi.util.withType
@@ -47,7 +44,12 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateS
 @FlowMVIDSL
 public inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateStateImmediate(
     @BuilderInference crossinline transform: T.() -> S
-): Unit = updateStateImmediate { withType<T, _> { transform() } }
+) {
+    contract {
+        callsInPlace(transform)
+    }
+    updateStateImmediate { withType<T, _> { transform() } }
+}
 
 // region deprecated
 

@@ -117,7 +117,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     val tt = TimeTravel<S, I, A>(maxHistorySize = historySize)
     compositePlugin(
         name = "${config.name}DebuggerPlugin",
-        plugins = setOf(
+        plugins = listOf(
             timeTravelPlugin(timeTravel = tt, name = "${config.name}DebuggerTimeTravel"),
             debuggerPlugin(
                 client = client,
