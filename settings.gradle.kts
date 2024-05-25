@@ -1,7 +1,6 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
         google()
         gradlePluginPortal()
         mavenCentral()
@@ -22,21 +21,17 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     // REQUIRED for IDE module configuration to resolve IDE platform
-    repositoriesMode = RepositoriesMode.PREFER_PROJECT
+    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
     repositories {
         mavenLocal()
         google()
         mavenCentral()
-        ivyNative()
-        node()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
-    dependencyResolutionManagement {
-        versionCatalogs {
-            create("applibs") {
-                from(files("sample/libs.versions.toml"))
-            }
+    versionCatalogs {
+        create("applibs") {
+            from(files("sample/libs.versions.toml"))
         }
     }
 }
@@ -59,58 +54,3 @@ include(":debugger:debugger-plugin")
 include(":debugger:server")
 include(":debugger:debugger-common")
 // include(":debugger:ideplugin")
-
-fun RepositoryHandler.node() {
-    exclusiveContent {
-        forRepository {
-            ivy("https://nodejs.org/dist/") {
-                name = "Node Distributions at $url"
-                patternLayout { artifact("v[revision]/[artifact](-v[revision]-[classifier]).[ext]") }
-                metadataSources { artifact() }
-                content { includeModule("org.nodejs", "node") }
-            }
-        }
-        filter { includeGroup("org.nodejs") }
-    }
-
-    exclusiveContent {
-        forRepository {
-            ivy("https://github.com/yarnpkg/yarn/releases/download") {
-                name = "Yarn Distributions at $url"
-                patternLayout { artifact("v[revision]/[artifact](-v[revision]).[ext]") }
-                metadataSources { artifact() }
-                content { includeModule("com.yarnpkg", "yarn") }
-            }
-        }
-        filter { includeGroup("com.yarnpkg") }
-    }
-}
-
-fun RepositoryHandler.ivyNative() {
-    ivy { url = uri("https://download.jetbrains.com") }
-
-    // TODO: Maybe this is not needed anymore
-    exclusiveContent {
-        forRepository {
-            this@ivyNative.ivy("https://download.jetbrains.com/kotlin/native/builds") {
-                name = "Kotlin Native"
-                patternLayout {
-                    listOf(
-                        "macos-x86_64",
-                        "macos-aarch64",
-                        "osx-x86_64",
-                        "osx-aarch64",
-                        "linux-x86_64",
-                        "windows-x86_64",
-                    ).forEach { os ->
-                        listOf("dev", "releases").forEach { stage ->
-                            artifact("$stage/[revision]/$os/[artifact]-[revision].[ext]")
-                        }
-                    }
-                }
-                metadataSources { artifact() }
-            }
-        }
-        filter { includeModuleByRegex(".*", ".*kotlin-native-prebuilt.*") }
-    }
-}
