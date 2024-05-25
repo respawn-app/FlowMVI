@@ -14,7 +14,7 @@ public val StoreLogLevel.asLogPriority: Int
         StoreLogLevel.Error -> Log.ERROR
     }
 
-internal  val Int.asStoreLogLevel
+internal val Int.asStoreLogLevel
     get() = when (this) {
         Log.VERBOSE -> StoreLogLevel.Trace
         Log.DEBUG -> StoreLogLevel.Debug

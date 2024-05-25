@@ -7,8 +7,6 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
-
 plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gradleDoctor)

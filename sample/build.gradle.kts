@@ -190,9 +190,7 @@ compose {
     }
 
     web {
-
     }
-
 
     desktop {
         application {
