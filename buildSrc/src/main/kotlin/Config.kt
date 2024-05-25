@@ -60,8 +60,6 @@ object Config {
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
-        "-P",
-        "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)
