@@ -2,6 +2,7 @@
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.stack.webhistory.DefaultWebHistoryController
@@ -49,7 +50,7 @@ fun main() {
         localStorage.setItem(KEY_SAVED_STATE, stateKeeper.save().encodeToString())
         null
     }
-    CanvasBasedWindow { AppContent(root) }
+    ComposeViewport(document.body!!) { AppContent(root) }
 }
 
 private fun LifecycleRegistry.attachToDocument() {
