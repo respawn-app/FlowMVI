@@ -6,6 +6,7 @@ plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(applibs.plugins.android.application.id)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
 }
 
@@ -42,7 +43,6 @@ kotlin {
             }
             testTask { enabled = false }
         }
-        applyBinaryen()
     }
     jvm("desktop")
 
@@ -126,7 +126,7 @@ kotlin {
 }
 android {
     namespace = Config.Sample.namespace
-    configureAndroid(this)
+    configureAndroid()
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -190,9 +190,10 @@ compose {
         publicResClass = false
     }
 
-    experimental {
-        web.application { }
+    web {
+
     }
+
 
     desktop {
         application {

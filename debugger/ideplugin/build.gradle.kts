@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.intellij.ide)
     kotlin("jvm")
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 val props by localProperties
 

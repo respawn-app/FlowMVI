@@ -4,6 +4,7 @@ plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
     id("maven-publish")
     signing
 }

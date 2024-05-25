@@ -18,7 +18,7 @@ kotlin {
                 withAndroidTarget()
             }
             group("browser") {
-                withWasm()
+                withWasmJs()
                 withJs()
             }
         }
