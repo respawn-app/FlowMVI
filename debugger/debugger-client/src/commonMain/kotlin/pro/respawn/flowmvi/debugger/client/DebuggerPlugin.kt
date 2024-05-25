@@ -124,8 +124,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
                 host = host,
                 port = port,
                 reconnectionDelay = reconnectionDelay
-            ).invoke(config)
-        ),
+            )
+        ).map { it.invoke(config) },
     )
 }
 

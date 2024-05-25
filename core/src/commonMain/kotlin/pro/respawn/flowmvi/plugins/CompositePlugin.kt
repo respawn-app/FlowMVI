@@ -24,21 +24,21 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     name: String? = null,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
-    onState { old: S, new: S -> plugins.fold(new) { onState(old, it) } }
-    onIntent { intent: I -> plugins.fold(intent) { onIntent(it) } }
-    onAction { action: A -> plugins.fold(action) { onAction(it) } }
-    onException { e: Exception -> plugins.fold(e) { onException(it) } }
-    onUnsubscribe { subs: Int -> plugins.fold { onUnsubscribe(subs) } }
-    onSubscribe { subs: Int -> plugins.fold { onSubscribe(subs) } }
-    onStart { plugins.fold { onStart() } }
-    onStop { plugins.fold { onStop(it) } }
+    onState { old: S, new: S -> plugins.iterate(new) { onState(old, it) } }
+    onIntent { intent: I -> plugins.iterate(intent) { onIntent(it) } }
+    onAction { action: A -> plugins.iterate(action) { onAction(it) } }
+    onException { e: Exception -> plugins.iterate(e) { onException(it) } }
+    onSubscribe { subs: Int -> plugins.iterate { onSubscribe(subs) } }
+    onUnsubscribe { subs: Int -> plugins.iterate { onUnsubscribe(subs) } }
+    onStart { plugins.iterate { onStart() } }
+    onStop { plugins.iterate { onStop(it) } }
 }
 
-private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.fold(
+private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.iterate(
     block: StorePlugin<S, I, A>.() -> Unit,
 ) = fastForEach(block)
 
-private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.fold(
+private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.iterate(
     initial: R,
     block: StorePlugin<S, I, A>.(R) -> R?
-) = fastFold<_, R?>(initial) inner@{ acc, it -> it.block(acc ?: return@fold acc) }
+) = fastFold<_, R?>(initial) inner@{ acc, it -> block(it, acc ?: return@iterate acc) }
