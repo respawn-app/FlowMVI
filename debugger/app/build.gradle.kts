@@ -2,7 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
 }

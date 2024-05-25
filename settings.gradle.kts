@@ -21,7 +21,7 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     // REQUIRED for IDE module configuration to resolve IDE platform
-    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
         mavenLocal()
         google()

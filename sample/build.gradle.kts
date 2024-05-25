@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(applibs.plugins.android.application.id)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
 }
