@@ -8,7 +8,7 @@ activity = "1.9.0"
 okio = "3.9.0"
 splashscreen = "1.1.0-rc01"
 xml-constraintlayout = "2.2.0-alpha13"
-#codehighlights = "0.8.0"
+codehighlights = "0.9.0"
 
 [libraries]
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
@@ -31,8 +31,7 @@ androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 view-material = { module = "com.google.android.material:material", version.ref = "material" }
 view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "xml-constraintlayout" }
-
-#compose-codehighlighting = { module = "dev.snipme:highlights", version.ref = "codehighlights" }
+compose-codehighlighting = { module = "dev.snipme:highlights", version.ref = "codehighlights" }
 
 [bundles]
 koin = [
