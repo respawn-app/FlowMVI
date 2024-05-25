@@ -30,6 +30,11 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
 }
 
+// https://youtrack.jetbrains.com/issue/KT-68088
+tasks.matching { it.name.contains("compileProductionExecutableKotlinWasmJsOptimize") }.configureEach {
+    enabled = false
+}
+
 kotlin {
     applyDefaultHierarchyTemplate()
 
@@ -182,14 +187,11 @@ dependencies {
     debugImplementation(projects.debugger.debuggerPlugin)
 }
 compose {
-    android {
-    }
+    android { }
+    web { }
     resources {
         packageOfResClass = Config.Sample.namespace
         publicResClass = false
-    }
-
-    web {
     }
 
     desktop {
