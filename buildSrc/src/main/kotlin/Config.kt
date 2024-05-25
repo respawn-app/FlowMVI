@@ -74,7 +74,6 @@ object Config {
     val jvmTarget = JvmTarget.JVM_11
     val idePluginJvmTarget = JvmTarget.JVM_17
     val javaVersion = JavaVersion.VERSION_11
-    val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
     const val compileSdk = 34
     const val targetSdk = compileSdk
     const val minSdk = 21

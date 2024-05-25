@@ -43,7 +43,6 @@ allprojects {
         compilerOptions {
             optIn.addAll(Config.optIns)
             jvmTarget = Config.jvmTarget
-            languageVersion = Config.kotlinVersion
             freeCompilerArgs.apply { addAll(Config.jvmCompilerArgs) }
         }
     }

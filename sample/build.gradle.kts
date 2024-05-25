@@ -63,7 +63,6 @@ kotlin {
         all {
             languageSettings {
                 progressiveMode = true
-                languageVersion = Config.kotlinVersion.version
                 Config.optIns.forEach { optIn(it) }
             }
         }

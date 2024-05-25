@@ -15,6 +15,5 @@ android {
 
     kotlinOptions {
         jvmTarget = Config.jvmTarget.target
-        languageVersion = Config.kotlinVersion.version
     }
 }
