@@ -44,6 +44,10 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.common)
         }
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(compose.uiTooling)
+        }
     }
 }
 
