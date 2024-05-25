@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.savedstate.util
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.savedstate.api.Saver
 
 @PublishedApi
@@ -42,3 +43,9 @@ internal val DefaultJson: Json = Json {
     allowTrailingComma = true
     useAlternativeNames = true
 }
+
+/**
+ * Get the name of the class, removing the "State" suffix, if present.
+ */
+@Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
+public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
