@@ -2,15 +2,13 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
 }
 
 kotlin {
     jvm("desktop") {
-        compilations.all {
-            compilerOptions.configure { jvmToolchain(21) }
-        }
     }
 
     sourceSets {

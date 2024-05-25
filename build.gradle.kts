@@ -1,11 +1,11 @@
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import nl.littlerobots.vcu.plugin.versionSelector
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradleSubplugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-private val PluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination"
 
 plugins {
     alias(libs.plugins.detekt)
@@ -15,44 +15,42 @@ plugins {
     alias(libs.plugins.atomicfu)
     alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.serialization) apply false
-    alias(libs.plugins.jetbrainsCompose) apply false
+    alias(libs.plugins.compose) apply false
     // plugins already on a classpath (conventions)
     // alias(libs.plugins.androidApplication) apply false
     // alias(libs.plugins.androidLibrary) apply false
     // alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 allprojects {
     group = Config.artifactId
     version = Config.versionName
+    plugins.withType<ComposeCompilerGradleSubplugin>().configureEach {
+        the<ComposeCompilerGradlePluginExtension>().apply {
+            enableIntrinsicRemember = true
+            enableNonSkippingGroupOptimization = true
+            enableStrongSkippingMode = true
+            stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_definitions.txt")
+            if (properties["enableComposeCompilerReports"] == "true") {
+                val metricsDir = layout.buildDirectory.dir("compose_metrics")
+                metricsDestination = metricsDir
+                reportsDestination = metricsDir
+            }
+        }
+    }
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             optIn.addAll(Config.optIns)
             jvmTarget = Config.jvmTarget
-            languageVersion = Config.kotlinVersion
-            freeCompilerArgs.apply {
-                addAll(Config.jvmCompilerArgs)
-                addAll(
-                    "-P",
-                    "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=" +
-                        "${rootProject.rootDir.absolutePath}/stability_definitions.txt",
-                )
-                if (project.findProperty("enableComposeCompilerReports") == "true") {
-                    addAll(
-                        "-P",
-                        "$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics",
-                        "-P",
-                        "$PluginPrefix=${layout.buildDirectory.get()}/compose_metrics",
-                    )
-                }
-            }
+            freeCompilerArgs.apply { addAll(Config.jvmCompilerArgs) }
         }
     }
 }
 
 subprojects {
     // TODO: Migrate to applying dokka plugin per-project in conventions
-    if (name in setOf("app", "debugger", "server")) return@subprojects
+    if (name in setOf("sample", "debugger", "server")) return@subprojects
     apply(plugin = rootProject.libs.plugins.dokka.id)
 
     dependencies {

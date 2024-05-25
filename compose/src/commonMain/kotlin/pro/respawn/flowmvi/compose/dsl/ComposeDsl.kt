@@ -44,7 +44,7 @@ import kotlin.jvm.JvmName
 @FlowMVIDSL
 @JvmName("subscribeConsume")
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
+    lifecycle: SubscriberLifecycle = DefaultLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
     consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
@@ -80,7 +80,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.
 @Composable
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
-    lifecycle: SubscriberLifecycle,
+    lifecycle: SubscriberLifecycle = DefaultLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
 ): State<S> {
     val state = remember(this) { mutableStateOf(state) }

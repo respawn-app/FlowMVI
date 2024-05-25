@@ -13,3 +13,13 @@ public val StoreLogLevel.asLogPriority: Int
         StoreLogLevel.Warn -> Log.WARN
         StoreLogLevel.Error -> Log.ERROR
     }
+
+internal val Int.asStoreLogLevel
+    get() = when (this) {
+        Log.VERBOSE -> StoreLogLevel.Trace
+        Log.DEBUG -> StoreLogLevel.Debug
+        Log.WARN -> StoreLogLevel.Warn
+        Log.INFO -> StoreLogLevel.Info
+        Log.ASSERT, Log.ERROR -> StoreLogLevel.Error
+        else -> error("Not an android Log level")
+    }

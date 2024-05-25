@@ -67,8 +67,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     require(minSubscriptions > 0) { "Minimum number of subscribers must be greater than 0" }
     this.name = name
     val job = SubscriptionHolder()
-    onSubscribe { previous ->
-        val current = previous + 1
+    onSubscribe { current ->
         when {
             current < minSubscriptions -> job.cancelAndJoin()
             job.isActive -> Unit // condition was already satisfied

@@ -4,11 +4,8 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Project
 
-fun Project.configureAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
-) = commonExtension.apply {
+fun CommonExtension<*, *, *, *, *, *>.configureAndroid() = apply {
     compileSdk = Config.compileSdk
-    val libs by versionCatalog
 
     defaultConfig {
         minSdk = Config.minSdk
@@ -66,15 +63,10 @@ fun Project.configureAndroid(
             }
         }
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.requireVersion("compose-compiler")
-        useLiveLiterals = true
-    }
 }
 
 fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
-    configureAndroid(this)
+    configureAndroid()
 
     testFixtures {
         enable = true

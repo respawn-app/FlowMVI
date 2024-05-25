@@ -34,10 +34,10 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     public var name: String? = null
 
     /**
-     * @see [StorePlugin.onIntent]
+     * @see [StorePlugin.onStart]
      */
     @FlowMVIDSL
-    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = setOnce(::intent, block)
+    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = setOnce(::start, block)
 
     /**
      * @see [StorePlugin.onState]
@@ -46,16 +46,16 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?): Unit = setOnce(::state, block)
 
     /**
-     * @see [StorePlugin.onStart]
+     * @see [StorePlugin.onIntent]
      */
     @FlowMVIDSL
-    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = setOnce(::start, block)
+    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = setOnce(::intent, block)
 
     /**
-     * @see [StorePlugin.onStop]
+     * @see [StorePlugin.onAction]
      */
     @FlowMVIDSL
-    public fun onStop(block: (e: Exception?) -> Unit): Unit = setOnce(::stop, block)
+    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = setOnce(::action, block)
 
     /**
      * @see [StorePlugin.onException]
@@ -66,17 +66,11 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::exception, block)
 
     /**
-     * @see [StorePlugin.onAction]
-     */
-    @FlowMVIDSL
-    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = setOnce(::action, block)
-
-    /**
      * @see [StorePlugin.onSubscribe]
      */
     @FlowMVIDSL
     public fun onSubscribe(
-        block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
+        block: suspend PipelineContext<S, I, A>.(newSubscriberCount: Int) -> Unit
     ): Unit = setOnce(::subscribe, block)
 
     /**
@@ -87,55 +81,26 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
         block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
     ): Unit = setOnce(::unsubscribe, block)
 
+    /**
+     * @see [StorePlugin.onStop]
+     */
     @FlowMVIDSL
+    public fun onStop(block: (e: Exception?) -> Unit): Unit = setOnce(::stop, block)
+
     @PublishedApi
-    internal fun build(): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
-        override val name = this@StorePluginBuilder.name
-        override suspend fun PipelineContext<S, I, A>.onStart() {
-            this@StorePluginBuilder.start?.invoke(this)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? {
-            val block = this@StorePluginBuilder.state ?: return new
-            return block(old, new)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? {
-            val block = this@StorePluginBuilder.intent ?: return intent
-            return block(intent)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? {
-            val block = this@StorePluginBuilder.action ?: return action
-            return block(action)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? {
-            val block = this@StorePluginBuilder.exception ?: return e
-            return block(e)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onSubscribe(subscriberCount: Int) {
-            this@StorePluginBuilder.subscribe?.invoke(this, subscriberCount)
-        }
-
-        override suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int) {
-            this@StorePluginBuilder.unsubscribe?.invoke(this, subscriberCount)
-        }
-
-        override fun onStop(e: Exception?) {
-            stop?.invoke(e)
-        }
-
-        override fun toString(): String = name?.let { "StorePlugin \"$it\"" } ?: super.toString()
-
-        override fun hashCode(): Int = name?.hashCode() ?: super.hashCode()
-
-        override fun equals(other: Any?): Boolean = when {
-            other !is StorePlugin<*, *, *> -> false
-            other.name == null && name == null -> this === other
-            else -> name == other.name
-        }
+    internal fun build(): StorePlugin<S, I, A> {
+        val builder = this@StorePluginBuilder
+        return StorePlugin(
+            name = name,
+            onStart = { builder.start?.invoke(this) },
+            onState = call@{ old, new -> builder.state?.let { return@call it(old, new) } ?: new },
+            onIntent = call@{ intent -> builder.intent?.let { return@call it(intent) } ?: intent },
+            onAction = call@{ action -> builder.action?.let { return@call it(action) } ?: action },
+            onException = call@{ e -> builder.exception?.let { return@call it(e) } ?: e },
+            onSubscribe = { builder.subscribe?.invoke(this, it) },
+            onUnsubscribe = { builder.unsubscribe?.invoke(this, it) },
+            onStop = { builder.stop?.invoke(it) },
+        )
     }
 }
 

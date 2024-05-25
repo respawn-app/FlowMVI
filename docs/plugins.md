@@ -215,8 +215,7 @@ fun whileSubscribedPlugin(
 ) = plugin {
 
     val job = SubscriptionHolder()
-    onSubscribe { previous ->
-        val current = previous + 1
+    onSubscribe { current ->
         when {
             current < minSubscriptions -> job.cancelAndJoin()
             job.isActive -> Unit // condition was already satisfied
@@ -432,8 +431,7 @@ fun awaitSubscribersPlugin(
     onStop {
         manager.complete()
     }
-    onSubscribe { previous ->
-        val currentSubs = previous + 1
+    onSubscribe { currentSubs ->
         if (currentSubs >= minSubs) manager.completeAndWait()
     }
 }
@@ -487,8 +485,8 @@ val store = store(Loading) {
             is ClickedRedo -> undoRedo.redo()
             is ClickedUndo -> undoRedo.undo()
             is ChangedInput -> undoRedo(
-                redo = { useState { copy(input = intent.current) } },
-                undo = { useState { copy(input = intent.previous) } },
+                redo = { updateState { copy(input = intent.current) } },
+                undo = { updateState { copy(input = intent.previous) } },
             )
         }
     }

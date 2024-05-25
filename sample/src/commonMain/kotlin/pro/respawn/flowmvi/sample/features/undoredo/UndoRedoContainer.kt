@@ -39,8 +39,8 @@ internal class UndoRedoContainer(
                         if (new.value == old) return@withState
                         undoRedo(
                             doImmediately = false,
-                            redo = { useState { copy(input = new) } },
-                            undo = { useState { copy(input = old.input()) } },
+                            redo = { updateStateImmediate { copy(input = new) } },
+                            undo = { updateStateImmediate { copy(input = old.input()) } },
                         )
                     }
                 }.launchIn(this)
@@ -62,7 +62,7 @@ internal class UndoRedoContainer(
             when (intent) {
                 is ClickedRedo -> undoRedo.redo()
                 is ClickedUndo -> undoRedo.undo()
-                is ChangedInput -> useState {
+                is ChangedInput -> updateStateImmediate {
                     lastInput.value = intent.value
                     copy(input = input(intent.value))
                 }

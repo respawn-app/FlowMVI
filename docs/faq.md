@@ -7,7 +7,8 @@
 * Use nested class imports and import aliases to clean up your code, as contract class names can be long sometimes.
 * Use value classes to reduce object allocations if your Intents are being sent frequently, such as for text field
   value changes or scroll events.
-    * You can use the `useState` function to optimize the performance of the store by bypassing all checks and plugins.
+    * You can use the `updateStateImmediate` function to optimize the
+      performance of the store by bypassing all checks and plugins.
     * Overall, there are cases when changes are so frequent that you'll want to just leave some logic on the UI layer to
       avoid polluting the heap with garbage collected objects and keep the UI performant.
 * Avoid subscribing to a bunch of flows in your Store. The best way to implement a reactive UI pattern is to

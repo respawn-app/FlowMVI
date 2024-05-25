@@ -5,7 +5,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.dsl.StorePlugin
+import pro.respawn.flowmvi.util.fastFold
+import pro.respawn.flowmvi.util.fastForEach
 
 /**
  * A plugin that delegates to [plugins] in the iteration order.
@@ -13,28 +15,30 @@ import pro.respawn.flowmvi.dsl.plugin
  *
  * This plugin is mostly not intended for usage in general code as there are no real use cases for it so far.
  * It can be useful in testing and custom store implementations.
+ *
+ * The [plugins] list must support random element access in order to be performant
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
-    plugins: Iterable<StorePlugin<S, I, A>>,
+    plugins: List<StorePlugin<S, I, A>>,
     name: String? = null,
-): StorePlugin<S, I, A> = plugin {
-    this.name = name
-    onState { old: S, new: S -> plugins.fold(new) { onState(old, it) } }
-    onIntent { intent: I -> plugins.fold(intent) { onIntent(it) } }
-    onAction { action: A -> plugins.fold(action) { onAction(it) } }
-    onException { e: Exception -> plugins.fold(e) { onException(it) } }
-    onUnsubscribe { subs: Int -> plugins.fold { onUnsubscribe(subs) } }
-    onSubscribe { subs: Int -> plugins.fold { onSubscribe(subs) } }
-    onStart { plugins.fold { onStart() } }
-    onStop { plugins.fold { onStop(it) } }
-}
+): StorePlugin<S, I, A> = StorePlugin(
+    name = name,
+    onState = { old: S, new: S -> plugins.fold(new) { next -> onState(old, next) } },
+    onIntent = { intent: I -> plugins.fold(intent) { onIntent(it) } },
+    onAction = { action: A -> plugins.fold(action) { onAction(it) } },
+    onException = { e: Exception -> plugins.fold(e) { onException(it) } },
+    onSubscribe = { subs: Int -> plugins.fold { onSubscribe(subs) } },
+    onUnsubscribe = { subs: Int -> plugins.fold { onUnsubscribe(subs) } },
+    onStart = { plugins.fold { onStart() } },
+    onStop = { plugins.fold { onStop(it) } }
+)
 
-private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Iterable<StorePlugin<S, I, A>>.fold(
+private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.fold(
     block: StorePlugin<S, I, A>.() -> Unit,
-) = forEach(block)
+) = fastForEach(block)
 
-private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> Iterable<StorePlugin<S, I, A>>.fold(
+private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.fold(
     initial: R,
     block: StorePlugin<S, I, A>.(R) -> R?
-) = fold<_, R?>(initial) inner@{ acc, it -> it.block(acc ?: return@fold acc) }
+) = fastFold<_, R?>(initial) inner@{ acc, it -> block(it, acc ?: return@fold acc) }

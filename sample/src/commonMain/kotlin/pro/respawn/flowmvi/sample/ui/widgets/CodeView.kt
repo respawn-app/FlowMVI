@@ -8,9 +8,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -23,35 +28,9 @@ import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.PhraseLocation
 import dev.snipme.highlights.model.SyntaxLanguage
-import dev.snipme.highlights.model.SyntaxTheme
-
-private const val ONE_KEY = "one"
-
-val OneDarkTheme = SyntaxTheme(
-    key = ONE_KEY,
-    code = 0xBBBBBB,
-    keyword = 0xD55FDE,
-    string = 0x89CA78,
-    literal = 0xD19A66,
-    comment = 0x5C6370,
-    metadata = 0xE5C07B,
-    multilineComment = 0x5C6370,
-    punctuation = 0xEF596F,
-    mark = 0x2BBAC5
-)
-
-val OneLightTheme = SyntaxTheme(
-    key = ONE_KEY,
-    code = 0x383A42,
-    keyword = 0xA626A4,
-    string = 0x50A14F,
-    literal = 0x986801,
-    comment = 0xA1A1A1,
-    metadata = 0xC18401,
-    multilineComment = 0xA1A1A1,
-    punctuation = 0xE45649,
-    mark = 0x526FFF,
-)
+import dev.snipme.highlights.model.SyntaxThemes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 val Highlights.annotatedString
     get() = buildAnnotatedString {
@@ -81,14 +60,18 @@ fun CodeText(
     darkMode: Boolean = isSystemInDarkTheme(),
     language: SyntaxLanguage = SyntaxLanguage.KOTLIN,
 ) {
-    val string = remember(code, darkMode, language, emphasis) {
-        Highlights.Builder().run {
-            theme(if (darkMode) OneDarkTheme else OneLightTheme)
-            code(code)
-            emphasis(locations = emphasis)
-            language(language)
-            build()
-        }.annotatedString
+    var string by remember { mutableStateOf(AnnotatedString(code)) }
+
+    LaunchedEffect(code, darkMode, language, emphasis) {
+        withContext(Dispatchers.Default) {
+            string = Highlights.Builder().run {
+                theme(SyntaxThemes.atom(darkMode))
+                code(code)
+                emphasis(locations = emphasis)
+                language(language)
+                build()
+            }.annotatedString
+        }
     }
     Box(modifier = modifier.horizontalScroll(rememberScrollState())) {
         SelectionContainer {

@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(libs.plugins.androidLibrary.id)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     id("maven-publish")
     signing
 }
@@ -42,6 +43,10 @@ kotlin {
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
+        }
+        androidMain.dependencies {
+            implementation(compose.preview)
+            implementation(compose.uiTooling)
         }
     }
 }

@@ -36,11 +36,13 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
         ctx = TestPipelineContext(
             config = configuration,
             plugin = compositePlugin(
-                setOf(
+                sequenceOf(
                     loggingPlugin(),
                     timeTravelPlugin(timeTravel),
                     plugin,
-                ).map { it.invoke(configuration) },
+                )
+                    .map { it.invoke(configuration) }
+                    .toList(),
             )
         )
     )

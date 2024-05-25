@@ -33,9 +33,7 @@ internal suspend inline fun SubscriptionModule.observeSubscribers(
     crossinline onUnsubscribe: suspend (count: Int) -> Unit,
 ) = subscribers.collect { (previous, new) ->
     when {
-        // although the implementation has changed, maintain previous behavior by passing previous sub value
-        // to the plugins
-        new > previous -> onSubscribe(new - 1)
+        new > previous -> onSubscribe(new)
         new < previous -> onUnsubscribe(new)
     }
 }

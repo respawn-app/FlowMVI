@@ -28,7 +28,6 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> recoverModule(
 /**
  * An entity that can [recover] from exceptions happening during its lifecycle. Most often, a [Store]
  */
-@Suppress("FUN_INTERFACE_WITH_SUSPEND_FUNCTION") // https://youtrack.jetbrains.com/issue/KTIJ-7642
 internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction> : CoroutineContext.Element {
 
     override val key: CoroutineContext.Key<*> get() = RecoverModule

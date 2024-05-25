@@ -5,7 +5,8 @@ import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     id(applibs.plugins.android.application.id)
-    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
 }
 
@@ -29,6 +30,11 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
 }
 
+// https://youtrack.jetbrains.com/issue/KT-68088
+tasks.matching { it.name.contains("compileProductionExecutableKotlinWasmJsOptimize") }.configureEach {
+    enabled = false
+}
+
 kotlin {
     applyDefaultHierarchyTemplate()
 
@@ -42,7 +48,6 @@ kotlin {
             }
             testTask { enabled = false }
         }
-        applyBinaryen()
     }
     jvm("desktop")
 
@@ -63,7 +68,6 @@ kotlin {
         all {
             languageSettings {
                 progressiveMode = true
-                languageVersion = Config.kotlinVersion.version
                 Config.optIns.forEach { optIn(it) }
             }
         }
@@ -88,7 +92,7 @@ kotlin {
                 implementation(applibs.bundles.koin)
                 implementation(applibs.apiresult)
                 implementation(applibs.decompose.compose)
-                // implementation(applibs.compose.codehighlighting)
+                implementation(applibs.compose.codehighlighting)
                 implementation(applibs.decompose)
 
                 implementation(projects.core)
@@ -126,7 +130,7 @@ kotlin {
 }
 android {
     namespace = Config.Sample.namespace
-    configureAndroid(this)
+    configureAndroid()
     buildFeatures {
         viewBinding = true
         buildConfig = true
@@ -183,15 +187,11 @@ dependencies {
     debugImplementation(projects.debugger.debuggerPlugin)
 }
 compose {
-    android {
-    }
+    android { }
+    web { }
     resources {
         packageOfResClass = Config.Sample.namespace
         publicResClass = false
-    }
-
-    experimental {
-        web.application { }
     }
 
     desktop {

@@ -2,7 +2,7 @@ package pro.respawn.flowmvi.sample.features.savedstate
 
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.dsl.useState
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.sample.arch.configuration.ConfigurationFactory
 import pro.respawn.flowmvi.sample.arch.configuration.configure
@@ -33,7 +33,7 @@ internal class SavedStateContainer(
 
         reduce { intent ->
             when (intent) {
-                is ChangedInput -> useState<DisplayingInput, _> {
+                is ChangedInput -> updateStateImmediate<DisplayingInput, _> {
                     copy(input = input(intent.value))
                 }
             }

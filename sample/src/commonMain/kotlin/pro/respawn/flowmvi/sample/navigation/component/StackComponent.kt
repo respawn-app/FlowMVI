@@ -16,7 +16,6 @@ import com.arkivanov.decompose.router.stack.active
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.webhistory.WebHistoryController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,6 @@ import pro.respawn.flowmvi.sample.navigation.util.retained
 @Stable
 open class StackComponent(
     context: ComponentContext,
-    controller: WebHistoryController?,
 ) : Navigator {
 
     val results by context.retained { MutableStateFlow<Set<NavResult<*>>>(emptySet()) }
@@ -41,16 +39,6 @@ open class StackComponent(
         handleBackButton = true,
         childFactory = ::destinationComponent,
     )
-
-    init {
-        controller?.attach(
-            navigator = stackNav,
-            stack = stack,
-            getPath = { it.routes.first() },
-            getConfiguration = { Destination.byRoute[it.removePrefix("/")] ?: Destination.Home },
-            serializer = Destination.serializer(),
-        )
-    }
 
     fun navigate(
         destination: Destination,

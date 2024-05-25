@@ -61,13 +61,13 @@ class StoreStatesTest : FreeSpec({
                     }
                 }
             }
-            "then useState overrides the state locks" {
+            "then updateStateImmediate overrides the state locks" {
                 val newState = TestState.SomeData(1)
                 store.subscribeAndTest {
                     states.test {
                         awaitItem() shouldBe TestState.Some
                         intent(blockingIntent)
-                        intent { useState { newState } }
+                        intent { updateStateImmediate { newState } }
                         awaitItem() shouldBe newState
                         state shouldBe newState
                     }

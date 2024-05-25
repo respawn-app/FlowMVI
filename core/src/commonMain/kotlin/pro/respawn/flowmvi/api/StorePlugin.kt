@@ -55,7 +55,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * or modify the state change.
      *
      * This callback is invoked **after** a [StateReceiver.updateState] call is finished.
-     * This callback is **not** invoked at all when state is changed through [StateReceiver.useState]
+     * This callback is **not** invoked at all when state is changed through [StateReceiver.updateStateImmediate]
      * or when [StateProvider.state] is obtained.
      *
      *  * Return null to cancel the state change. All plugins registered later when building the store will not receive
@@ -117,8 +117,8 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
     /**
      * A callback to be executed each time [Store.subscribe] is called.
      *
-     * * This callback is executed **before** the [subscriberCount] is incremented.
-     *   This means, for the first subscription, [subscriberCount] will be zero.
+     * * This callback is executed **after** the subscriber count is incremented, i.e. the value represents
+     *   the **new** number of subscribers.
      * * There is no guarantee that the subscribers will not be able to subscribe when the store has not been started yet.
      *   But this function will be invoked as soon as the store is started, with the most recent subscriber count.
      * * This function is invoked in the store's scope, not the subscriber's scope.
@@ -130,15 +130,13 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * * Suspending in this function will prevent other plugins from receiving the subscription event (i.e. next plugins
      *   that use [onSubscribe] will wait for this one to complete.
      */
-    public suspend fun PipelineContext<S, I, A>.onSubscribe(
-        subscriberCount: Int
-    ): Unit = Unit
+    public suspend fun PipelineContext<S, I, A>.onSubscribe(newSubscriberCount: Int): Unit = Unit
 
     /**
      * A callback to be executed when the subscriber cancels its subscription job (unsubscribes).
      *
      * * This callback is executed **after** the subscriber has been removed and **after** [subscriberCount] is
-     *   decremented. This means, for the last subscriber, the count will be 0.
+     *   decremented, i.e. the value represents the **new** number of subscribers.
      * * There is no guarantee that this will be invoked exactly before a subscriber reappears.
      *   It may be so that a second subscriber appears before the first one disappears (due to the parallel nature of
      *   coroutines). In that case, [onSubscribe] will be invoked first as if it was a second subscriber, and then
@@ -146,7 +144,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * * Suspending in this function will prevent other plugins from receiving the subscription event (i.e. next plugins
      *   that use [onUnsubscribe] will wait for this one to complete.
      */
-    public suspend fun PipelineContext<S, I, A>.onUnsubscribe(subscriberCount: Int): Unit = Unit
+    public suspend fun PipelineContext<S, I, A>.onUnsubscribe(newSubscriberCount: Int): Unit = Unit
 
     /**
      * Invoked when [Store.close] is invoked. This is called **after** the store is already closed, and you cannot

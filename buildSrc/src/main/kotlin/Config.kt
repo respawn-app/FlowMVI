@@ -15,14 +15,15 @@ object Config {
 
     const val artifactId = "$group.$artifact"
 
-    const val versionCode = 5
-    const val majorRelease = 2
-    const val minorRelease = 5
+    const val versionCode = 7
+    const val majorRelease = 3
+    const val minorRelease = 0
     const val patch = 0
-    const val postfix = "-alpha12" // include dash (-)
+    const val postfix = "" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
+    const val developerUrl = "https://respawn.pro"
     const val licenseFile = "LICENSE.txt"
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
@@ -60,8 +61,6 @@ object Config {
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
-        "-P",
-        "plugin:androidx.compose.compiler.plugins.kotlin:experimentalStrongSkipping=true"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)
@@ -74,7 +73,6 @@ object Config {
     val jvmTarget = JvmTarget.JVM_11
     val idePluginJvmTarget = JvmTarget.JVM_17
     val javaVersion = JavaVersion.VERSION_11
-    val kotlinVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
     const val compileSdk = 34
     const val targetSdk = compileSdk
     const val minSdk = 21

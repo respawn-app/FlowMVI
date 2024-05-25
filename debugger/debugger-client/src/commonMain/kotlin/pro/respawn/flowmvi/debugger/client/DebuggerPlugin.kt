@@ -27,7 +27,6 @@ internal const val NonDebuggableStoreMessage: String = """
 Store must be debuggable in order to use the debugger.
 Please set `debuggable = true` before installing the plugin.
 Don't include debug code in production builds.
-Suppress this error by using install(debuggerPlugin) directly.
 """
 
 @Suppress("UNUSED_PARAMETER")
@@ -117,7 +116,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     val tt = TimeTravel<S, I, A>(maxHistorySize = historySize)
     compositePlugin(
         name = "${config.name}DebuggerPlugin",
-        plugins = setOf(
+        plugins = listOf(
             timeTravelPlugin(timeTravel = tt, name = "${config.name}DebuggerTimeTravel"),
             debuggerPlugin(
                 client = client,
@@ -125,8 +124,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
                 host = host,
                 port = port,
                 reconnectionDelay = reconnectionDelay
-            ).invoke(config)
-        ),
+            )
+        ).map { it.invoke(config) },
     )
 }
 
