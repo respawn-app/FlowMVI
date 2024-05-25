@@ -43,8 +43,8 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
     reduce { intent ->
         when (intent) {
             is RestoreRequested -> updateState<State.Error, _> { previous }
-            is StopRequested -> useState { Idle } // needs to be fast
-            is ServerStarted -> useState { Running() }
+            is StopRequested -> updateStateImmediate { Idle } // needs to be fast
+            is ServerStarted -> updateStateImmediate { Running() }
             is EventReceived -> state {
                 when (val event = intent.event) {
                     is StoreDisconnected -> {

@@ -93,7 +93,7 @@ A callback to be invoked each time `updateState` is called.
 This callback is invoked **before** the state changes, but **after** the function's `block` is invoked.
 Any plugin can veto (forbid) or modify the state change.
 
-This callback is **not** invoked at all when state is changed through `useState`, used in `withState`
+This callback is **not** invoked at all when state is changed through `updateStateImmediate`, used in `withState`
 or when `state` is obtained directly.
 
 * Return null to cancel the state change. All plugins registered later when building the store will not receive

@@ -487,8 +487,8 @@ val store = store(Loading) {
             is ClickedRedo -> undoRedo.redo()
             is ClickedUndo -> undoRedo.undo()
             is ChangedInput -> undoRedo(
-                redo = { useState { copy(input = intent.current) } },
-                undo = { useState { copy(input = intent.previous) } },
+                redo = { updateState { copy(input = intent.current) } },
+                undo = { updateState { copy(input = intent.previous) } },
             )
         }
     }

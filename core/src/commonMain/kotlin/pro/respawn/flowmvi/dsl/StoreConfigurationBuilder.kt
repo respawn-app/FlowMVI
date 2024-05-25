@@ -104,7 +104,7 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
      * * Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
      *   All other clients attempt to get the state will wait on a FIFO queue and suspend the parent coroutine.
      * * This property disables state transactions for the whole store.
-     *   For one-time usage of non-atomic updates, see [useState].
+     *   For one-time usage of non-atomic updates, see [updateStateImmediate].
      * * Has a small performance impact because of coroutine context switching and mutex usage.
      *
      * `true` by default

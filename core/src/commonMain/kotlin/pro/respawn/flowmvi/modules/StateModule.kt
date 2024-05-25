@@ -32,7 +32,7 @@ private class StateModuleImpl<S : MVIState>(
     @DelicateStoreApi
     override val state: S by states::value
 
-    override inline fun useState(block: S.() -> S) = _states.update(block)
+    override inline fun updateStateImmediate(block: S.() -> S) = _states.update(block)
 
     override suspend inline fun withState(
         crossinline block: suspend S.() -> Unit

@@ -253,8 +253,8 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 * `atomicStateUpdates` - Enables transaction serialization for state updates, making state updates atomic and
   suspendable. Synchronizes state updates, allowing only **one** client to read and/or update the state at a time. All
   other clients that attempt to get the state will wait in a FIFO queue and suspend the parent coroutine. For one-time
-  usage of non-atomic updates, see `useState`. Has a small performance impact because of coroutine context switching and
-  mutex usage when enabled.
+  usage of non-atomic updates, see `updateStateImediate`.
+  Has a small performance impact because of coroutine context switching and mutex usage when enabled.
 * `allowIdleSubscriptions` - A flag to indicate that clients may subscribe to this store even while it is not started.
   If you intend to stop and restart your store while the subscribers are present, set this to `true`. By default, will
   use the opposite value of the `debuggable` parameter (`false` on production).

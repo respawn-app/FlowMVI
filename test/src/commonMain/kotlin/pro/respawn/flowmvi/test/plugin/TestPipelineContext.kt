@@ -44,7 +44,7 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override suspend fun withState(block: suspend S.() -> Unit): Unit = block(state)
 
-    override fun useState(block: S.() -> S) {
+    override fun updateStateImmediate(block: S.() -> S) {
         state = block(state)
     }
 }

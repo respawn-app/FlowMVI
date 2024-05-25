@@ -55,7 +55,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * or modify the state change.
      *
      * This callback is invoked **after** a [StateReceiver.updateState] call is finished.
-     * This callback is **not** invoked at all when state is changed through [StateReceiver.useState]
+     * This callback is **not** invoked at all when state is changed through [StateReceiver.updateStateImmediate]
      * or when [StateProvider.state] is obtained.
      *
      *  * Return null to cancel the state change. All plugins registered later when building the store will not receive
