@@ -52,3 +52,9 @@ kotlin {
 }
 
 publishMultiplatform()
+
+compose {
+    resources {
+        generateResClass = never
+    }
+}

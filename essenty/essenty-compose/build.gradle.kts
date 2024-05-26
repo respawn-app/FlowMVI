@@ -51,3 +51,9 @@ publishMultiplatform()
 
 dependencies {
 }
+
+compose {
+    resources {
+        generateResClass = never
+    }
+}
