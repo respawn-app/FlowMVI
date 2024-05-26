@@ -5,6 +5,10 @@ on:
     tags:
       - '3.*'
   workflow_dispatch:
+    inputs:
+      required: true
+      type: string
+      description: 'Tag to use for the release and changelog'
 
 concurrency:
   group: "publish"
