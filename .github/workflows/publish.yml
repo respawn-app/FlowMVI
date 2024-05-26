@@ -3,7 +3,8 @@ name: publish
 on:
   push:
     tags:
-      - '2.*'
+      - '3.*'
+  workflow_dispatch:
 
 concurrency:
   group: "publish"
@@ -94,7 +95,6 @@ jobs:
           draft: true
           artifactErrorsFailBuild: true
           prerelease: false
-          tag: ${{ github.ref }}
           artifacts: sample/build/outputs/apk/release/pro.respawn.flowmvi.sample.apk
           body: ${{steps.build_changelog.outputs.changelog}}
         env:
