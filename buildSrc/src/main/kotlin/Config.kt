@@ -61,6 +61,7 @@ object Config {
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
+        "-Xwasm-use-new-exception-proposal"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)

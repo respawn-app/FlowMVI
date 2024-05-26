@@ -45,6 +45,7 @@ kotlin {
         browser {
             commonWebpackConfig {
                 outputFileName = "app.js"
+                export = true
             }
             testTask { enabled = false }
         }
@@ -187,13 +188,12 @@ dependencies {
     debugImplementation(projects.debugger.debuggerPlugin)
 }
 compose {
-    android { }
-    web { }
     resources {
         packageOfResClass = Config.Sample.namespace
         publicResClass = false
     }
-
+    android { }
+    web { }
     desktop {
         application {
             mainClass = "${Config.Sample.namespace}.MainKt"

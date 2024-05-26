@@ -80,23 +80,26 @@ dependencies {
 
 ## Why FlowMVI?
 
-* Fully async and parallel business logic - with no manual thread synchronization required!
-* Automatically recover from any errors and avoid runtime crashes with one line of code
-* Automatic platform-independent system lifecycle handling
-* Build fully-multiplatform business logic with pluggable UI
-* Out of the box debugging, logging, testing and long-running task management support
-* Restartable, reusable stores with no external dependencies or dedicated lifecycles.
-* Compress, persist, and restore state automatically with a single line of code - on any platform
-* Create compile-time safe state machines with a readable DSL. Forget about `state as? ...` casts
-* Decompose stores into plugins, split responsibilities, and modularize the project easily
-* No base classes, complicated interfaces or factories of factories - store is built using a simple DSL
+* Powerful Plug-In system to automate processes and **reuse any business logic** you desire.
+    * Create automatic analytics handlers, websocket connections, error handling mechanisms, or anything else once and
+      reuse them throughout your whole project automatically.
+* Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
+* Create multiplatform business logic components with pluggable UI using **0 platform code**.
+* Automatically **recover from any errors** and prevent crashes
+* Automatic multiplatform system **lifecycle handling**
+* Out of the box **debugging, logging, testing, undo/redo, caching and long-running tasks** support
+* **Compress, persist, and restore state** automatically on any platform
+* No base classes, complicated interfaces or factories of factories - logic is **declarative and built with a DSL**
+* Restartable, reusable business logic components with no external dependencies or dedicated lifecycles.
+* Create compile-time safe state machines with a readable DSL. Forget about casts and `null`s
+* First class Compose Multiplatform support optimized for performance and ease of use
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
-* Dedicated remote debugger app for Windows, Linux, MacOS.
-* Built for Compose: The library lets you achieve the best performance with Compose out of the box.
+* Dedicated remote debugger app for Windows, Linux, MacOS
 * The core library depends on kotlin coroutines. Nothing else.
 * Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
-* 60+% unit test coverage of core library code
+* Core library is fully covered by tests
+* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser.
 
 ## How does it look?
 
@@ -246,7 +249,7 @@ fun CounterScreen() {
     val store = inject<CounterContainer>().store
 
     // subscribe to store based on system lifecycle - on any platform
-    val state by store.subscribe(DefaultLifecycle) { action ->
+    val state by store.subscribe { action ->
         when (action) {
             is ShowMessage -> /* ... */
         }
