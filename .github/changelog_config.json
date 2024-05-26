@@ -1,0 +1,57 @@
+{
+  "template" : "#{{CHANGELOG}}",
+  "pr_template" : "- #{{TITLE_ONLY}}",
+  "trim_values" : true,
+  "categories" : [
+    {
+      "title" : "## 🚀 New Features",
+      "labels" : [
+        "feat",
+        "feature"
+      ]
+    },
+    {
+      "title" : "## 🧨 Api Changes",
+      "labels" : [
+        "feat!",
+        "breaking",
+        "api"
+      ]
+    },
+    {
+      "title" : "## 🐞 Bug Fixes",
+      "labels" : [
+        "fix",
+        "bug"
+      ]
+    },
+    {
+      "title" : "## ❔ Other",
+      "labels" : []
+    },
+    {
+      "title" : "## 📚 Docs",
+      "labels" : [
+        "doc",
+        "docs"
+      ]
+    }
+  ],
+  "custom_placeholders" : [
+    {
+      "name" : "TITLE_ONLY",
+      "source" : "TITLE",
+      "transformer" : {
+        "method" : "regexr",
+        "pattern" : "(\\w+(\\(.+\\))?: ?)?(.+)",
+        "target" : "$2"
+      }
+    }
+  ],
+  "label_extractor" : [
+    {
+      "pattern" : "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
+      "target" : "$1"
+    }
+  ]
+}

@@ -62,36 +62,7 @@ jobs:
         id: build_changelog
         with:
           commitMode: true
-          configurationJson: |
-            {
-              "template": "#{{CHANGELOG}}",
-              "pr_template": "- #{{TITLE}}",
-              "trim_values": false,
-              "categories": [
-                {
-                    "title": "## New Features",
-                    "labels": ["feat", "feature"]
-                },
-                {
-                    "title": "## Bug Fixes",
-                    "labels": ["fix", "bug"]
-                },
-                {
-                    "title": "## Other",
-                    "labels": []
-                },
-                {
-                    "title": "## Docs",
-                    "labels": ["doc", "docs"]
-                }
-              ],
-              "label_extractor": [
-                {
-                  "pattern": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\\([\\w\\-\\.]+\\))?(!)?: ([\\w ])+([\\s\\S]*)",
-                  "target": "$1"
-                }
-              ]
-            }
+          configuration: ./github/changelog_config.json
 
       - name: Create GH release
         uses: ncipollo/release-action@v1.14.0
