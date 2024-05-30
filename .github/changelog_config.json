@@ -44,7 +44,7 @@
       "transformer" : {
         "method" : "regexr",
         "pattern" : "(\\w+(\\(.+\\))?: ?)?(.+)",
-        "target" : "$2"
+        "target" : "$3"
       }
     }
   ],
