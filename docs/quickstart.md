@@ -128,7 +128,7 @@ So please consider the following comparison:
 | Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become useless, such as logging/time travel/analytics    |
 | Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated and organized into families          |
 
-If you decide to use the MVVM+ style, consider using `ImmutableStore` interface that won't let external code send 
+If you decide to use the MVVM+ style, consider using the `ImmutableStore` interface that won't let external code send
 intents. This will prevent leaking the context of the store to subscribers.
 
 ## Step 3: Describe your Contract
@@ -197,7 +197,7 @@ sealed interface CounterAction : MVIAction {
 ```
 
 * If your store does not have a `State`, you can use an `EmptyState` object.
-* If your store does not have side-effects, use `Nothing` in place of the side-effect type.
+* If your store does not have side effects, use `Nothing` in place of the side-effect type.
 
 ## Step 4: Configure your store
 
@@ -253,7 +253,7 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
 * `atomicStateUpdates` - Enables transaction serialization for state updates, making state updates atomic and
   suspendable. Synchronizes state updates, allowing only **one** client to read and/or update the state at a time. All
   other clients that attempt to get the state will wait in a FIFO queue and suspend the parent coroutine. For one-time
-  usage of non-atomic updates, see `updateStateImediate`.
+  usage of non-atomic updates, see `updateStateImmediate`.
   Has a small performance impact because of coroutine context switching and mutex usage when enabled.
 * `allowIdleSubscriptions` - A flag to indicate that clients may subscribe to this store even while it is not started.
   If you intend to stop and restart your store while the subscribers are present, set this to `true`. By default, will
@@ -269,9 +269,9 @@ Some interesting properties of the store:
 
 * Store can be launched, stopped, and relaunched again as many times as you want.
   Use `close()`, or cancel the job returned from `start()` to stop the store.
-* Store's subscribers will **not** wait until the store is launched when they subscribe to the store.
+* The store's subscribers will **not** wait until the store is launched when they subscribe to the store.
   Such subscribers will not receive state updates or actions. Don't forget to start the store.
-* Stores are created eagerly usually, but the store *can* be lazy. There is `lazyStore()` for that.
+* Stores are usually created eagerly, but the store *can* be lazy. There is `lazyStore()` for that.
 
 ## Step 5: Install plugins
 
@@ -360,5 +360,5 @@ To subscribe using Android Views, see [android](android.md)
 3. Learn how to [persist and restore state](savedstate.md)
 4. Get answers to common [questions](faq.md)
 5. Set up [remote debugging](debugging.md)
-6. *Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/)
-7. *Learn how to use FlowMVI on [Android](android.md)
+6. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/)
+7. Learn how to use FlowMVI on [Android](android.md)
