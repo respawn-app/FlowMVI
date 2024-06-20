@@ -43,7 +43,7 @@ fun Project.publishMultiplatform() {
  */
 fun Project.publishAndroid(ext: LibraryExtension) = with(ext) {
     val properties = localProperties()
-    val isReleaseBuild = requireNotNull(properties["release"]).toString().toBooleanStrict()
+    val isReleaseBuild = properties["release"].toString().toBoolean()
     publishing {
         singleVariant(Config.publishingVariant) {
             withSourcesJar()

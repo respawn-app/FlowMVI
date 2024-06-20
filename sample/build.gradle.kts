@@ -1,6 +1,5 @@
 import org.intellij.lang.annotations.Language
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -29,11 +28,6 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     }
     // the target directory
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
-}
-
-// // https://youtrack.jetbrains.com/issue/KT-68088
-tasks.withType<BinaryenExec>().configureEach {
-    enabled = false
 }
 
 kotlin {
