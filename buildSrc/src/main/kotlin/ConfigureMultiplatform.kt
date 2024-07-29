@@ -1,6 +1,7 @@
 @file:Suppress("MissingPackageDeclaration", "unused", "UndocumentedPublicFunction", "LongMethod")
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -53,9 +54,23 @@ fun Project.configureMultiplatform(
 
     if (android) androidTarget {
         publishLibraryVariants("release")
+    }.compilations.all {
+        compileTaskProvider.configure {
+            compilerOptions {
+                jvmTarget = Config.jvmTarget
+                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
+            }
+        }
     }
 
-    if (jvm) jvm()
+    if (jvm) jvm().compilations.all {
+        compileTaskProvider.configure {
+            compilerOptions {
+                jvmTarget = Config.jvmTarget
+                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
+            }
+        }
+    }
 
     sequence {
         if (iOs) {
@@ -92,6 +107,18 @@ fun Project.configureMultiplatform(
             languageSettings {
                 progressiveMode = true
                 Config.optIns.forEach { optIn(it) }
+            }
+        }
+    }
+
+    targets.all {
+        compilations.all {
+            compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.addAll(Config.compilerArgs)
+                    optIn.addAll(Config.optIns)
+                    progressiveMode = true
+                }
             }
         }
     }

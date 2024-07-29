@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradleSubplug
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.detekt)
@@ -72,13 +71,6 @@ allprojects {
                     url = Config.scmUrl
                 }
             }
-        }
-    }
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            optIn.addAll(Config.optIns)
-            jvmTarget = Config.jvmTarget
-            freeCompilerArgs.apply { addAll(Config.jvmCompilerArgs) }
         }
     }
 }
