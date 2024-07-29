@@ -17,7 +17,7 @@ intellij-ide-plugin = "2.0.0-beta1"
 junit = "4.13.2"
 kotest = "5.9.1"
 # @pin
-kotlin = "2.0.0"
+kotlin = "2.0.20-Beta2"
 kotlin-collections = "0.3.7"
 kotlin-io = "0.5.1"
 kotlinx-atomicfu = "0.25.0"
