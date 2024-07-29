@@ -125,7 +125,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
                 items(items, { it.index }) {
                     RMenuItem(
                         title = "Item #${it.index}",
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItem(),
                     )
                 }
             }

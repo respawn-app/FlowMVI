@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -57,7 +58,7 @@ fun RIcon(
                 onClick = onClick,
                 enabled = enabled,
                 interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(radius = size / 2),
+                indication = ripple(radius = size / 2),
             )
             .minimumInteractiveComponentSize(),
         contentAlignment = Alignment.Center,
