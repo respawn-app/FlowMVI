@@ -29,16 +29,11 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 21
+          java-version: 22
           cache: 'gradle'
 
       - name: Validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
-
-      - name: Create local properties
-        env:
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Update docs/README.md
         run: cp ./README.md ./docs/README.md

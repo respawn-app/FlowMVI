@@ -31,34 +31,30 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 21
+          java-version: 22
           cache: 'gradle'
 
       - name: Validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v3
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest
-
-      - name: Create local properties
-        env:
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Assemble android sample
         run: ./gradlew :sample:assembleRelease
 
       - name: Publish to sonatype
         env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-        # It's important to not upload in parallel or duplicate repos will be created
-        # repository creds are broken with gradle 8.6 https://github.com/gradle/gradle/issues/24040
-        run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
+        run: ./gradlew publishToMavenCentral --no-configuration-cache
 
       - name: Generate Changelog
-        uses: mikepenz/release-changelog-builder-action@v4
+        uses: mikepenz/release-changelog-builder-action@v5
         id: build_changelog
         with:
           commitMode: true
