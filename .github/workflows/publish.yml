@@ -58,7 +58,7 @@ jobs:
         run: ./gradlew publishAllPublicationsToSonatypeRepository -Dorg.gradle.parallel=false --stacktrace --no-configuration-cache
 
       - name: Generate Changelog
-        uses: mikepenz/release-changelog-builder-action@v4
+        uses: mikepenz/release-changelog-builder-action@v5
         id: build_changelog
         with:
           commitMode: true
