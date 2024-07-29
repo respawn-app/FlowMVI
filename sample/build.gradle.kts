@@ -1,5 +1,6 @@
 import org.intellij.lang.annotations.Language
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -10,6 +11,7 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
+// region buildconfig
 @Language("Kotlin")
 // language=kotlin
 val BuildConfig = """
@@ -29,6 +31,7 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     // the target directory
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
 }
+// endregion
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -47,7 +50,14 @@ kotlin {
     }
     jvm("desktop")
 
-    androidTarget()
+    androidTarget().compilations.all {
+        compileTaskProvider.configure {
+            compilerOptions {
+                jvmTarget = Config.jvmTarget
+                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
+            }
+        }
+    }
 
     // sequence {
     //     yield(iosX64())
@@ -224,4 +234,9 @@ compose {
             }
         }
     }
+}
+
+// TODO: https://youtrack.jetbrains.com/issue/KT-68509
+tasks.named<BinaryenExec>("compileProductionExecutableKotlinWasmJsOptimize") {
+    enabled = false
 }
