@@ -32,6 +32,7 @@ object Config {
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
     const val vendorId = "respawn-app"
+    const val name = "FlowMVI"
 
     object Debugger {
 

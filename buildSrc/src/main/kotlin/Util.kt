@@ -62,3 +62,7 @@ fun stabilityLevel(version: String): Int {
     }
     return Config.stabilityLevels.size
 }
+fun Config.version(isRelease: Boolean) = buildString {
+    append(versionName)
+    if (!isRelease) append("-SNAPSHOT")
+}
