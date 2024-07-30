@@ -1,5 +1,4 @@
 import org.gradle.kotlin.dsl.kotlin
-import org.gradle.kotlin.dsl.signing
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
