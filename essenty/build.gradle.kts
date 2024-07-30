@@ -3,8 +3,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("maven-publish")
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 kotlin {
@@ -33,5 +32,3 @@ dependencies {
     commonMainApi(libs.essenty.statekeeper)
     commonMainApi(libs.essenty.lifecycle.coroutines)
 }
-
-publishMultiplatform()

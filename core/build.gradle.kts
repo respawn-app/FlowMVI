@@ -2,6 +2,7 @@
 plugins {
     id("pro.respawn.shared-library")
     alias(libs.plugins.atomicfu)
+    alias(libs.plugins.maven.publish)
 
     // TODO: https://github.com/kotest/kotest/issues/3598
     // alias(libs.plugins.kotest)

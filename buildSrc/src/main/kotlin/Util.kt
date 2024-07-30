@@ -51,7 +51,7 @@ fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
 
 fun Project.localProperties() = Properties().apply {
     val file = File(rootProject.rootDir.absolutePath, "local.properties")
-    require(file.exists()) { "Please create root local.properties file" }
+    if (!file.exists()) println("w: Local.properties file does not exist. You may be missing some publishing keys")
     load(FileInputStream(file))
 }
 

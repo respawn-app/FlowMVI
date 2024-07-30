@@ -3,13 +3,12 @@ plugins {
     id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    id("maven-publish")
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 android {
-    configureAndroidLibrary(this)
     namespace = "${Config.namespace}.essenty.compose"
+    configureAndroidLibrary(this)
 
     buildFeatures {
         compose = true
@@ -44,16 +43,5 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.common)
         }
-    }
-}
-
-publishMultiplatform()
-
-dependencies {
-}
-
-compose {
-    resources {
-        generateResClass = never
     }
 }
