@@ -35,6 +35,11 @@ jobs:
       - name: Validate gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
 
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
+
       - name: Update docs/README.md
         run: cp ./README.md ./docs/README.md
 

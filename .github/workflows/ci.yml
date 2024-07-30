@@ -35,6 +35,11 @@ jobs:
         with:
           xcode-version: latest
 
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
+
       - name: Run detekt
         run: ./gradlew detektAll
 
