@@ -41,7 +41,7 @@ jobs:
         run: ./gradlew sample:packageDistributionForCurrentOS
 
       - name: Upload debugger
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.3.5
         with:
           name: Debugger_Linux
           path: ./debugger/app/build/compose/binaries/main/deb/*
@@ -49,7 +49,7 @@ jobs:
           overwrite: false
 
       - name: Upload sample
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.3.5
         with:
           name: Sample_Linux
           path: ./sample/build/compose/binaries/main/deb/*
