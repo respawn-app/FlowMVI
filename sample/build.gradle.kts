@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.serialization)
 }
 
+// region buildconfig
 @Language("Kotlin")
 // language=kotlin
 val BuildConfig = """
@@ -29,6 +30,7 @@ val generateBuildConfig by tasks.registering(Sync::class) {
     // the target directory
     into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
 }
+// endregion
 
 kotlin {
     applyDefaultHierarchyTemplate()
@@ -47,7 +49,14 @@ kotlin {
     }
     jvm("desktop")
 
-    androidTarget()
+    androidTarget().compilations.all {
+        compileTaskProvider.configure {
+            compilerOptions {
+                jvmTarget = Config.jvmTarget
+                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
+            }
+        }
+    }
 
     // sequence {
     //     yield(iosX64())

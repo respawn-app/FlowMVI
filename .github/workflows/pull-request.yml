@@ -1,11 +1,8 @@
-name: Assign self to PR
+name: PR automation
 
 on:
   pull_request:
     types: [ opened ]
-    branches:
-      - master
-      - main
 
 jobs:
   assign_author:

@@ -1,8 +1,8 @@
 [versions]
 decompose = "3.1.0"
-apiresult = "2.0.0-alpha01"
-koin = "3.6.0-wasm-alpha2"
-kmputils = "1.4.1"
+apiresult = "2.0.0-beta02"
+koin = "4.0.0-RC1"
+kmputils = "1.4.2"
 material = "1.12.0"
 activity = "1.9.0"
 okio = "3.9.0"
@@ -15,6 +15,7 @@ decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decom
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 
 kmputils-common = { module = "pro.respawn.kmmutils:common", version.ref = "kmputils" }
+kmputils-compose = { module = "pro.respawn.kmmutils:compose", version.ref = "kmputils" }
 kmputils-coroutines = { module = "pro.respawn.kmmutils:coroutines", version.ref = "kmputils" }
 kmputils-datetime = { module = "pro.respawn.kmmutils:datetime", version.ref = "kmputils" }
 kmputils-inputforms = { module = "pro.respawn.kmmutils:inputforms", version.ref = "kmputils" }
@@ -42,6 +43,7 @@ kmputils = [
     "kmputils-coroutines",
     "kmputils-datetime",
     "kmputils-inputforms",
+    "kmputils-compose",
 ]
 
 [plugins]

@@ -15,11 +15,11 @@ object Config {
 
     const val artifactId = "$group.$artifact"
 
-    const val versionCode = 7
+    const val versionCode = 8
     const val majorRelease = 3
     const val minorRelease = 0
-    const val patch = 0
-    const val postfix = "" // include dash (-)
+    const val patch = 1
+    const val postfix = "-beta01" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
@@ -32,6 +32,7 @@ object Config {
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
     const val vendorId = "respawn-app"
+    const val name = "FlowMVI"
 
     object Debugger {
 
@@ -61,7 +62,8 @@ object Config {
     val compilerArgs = listOf(
         "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
-        "-Xwasm-use-new-exception-proposal"
+        "-Xwasm-use-new-exception-proposal",
+        "-Xconsistent-data-class-copy-visibility"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)

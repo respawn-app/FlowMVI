@@ -4,8 +4,7 @@ plugins {
     kotlin("multiplatform")
     alias(libs.plugins.serialization)
     id("com.android.library")
-    id("maven-publish")
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 kotlin {
@@ -47,5 +46,3 @@ android {
     configureAndroidLibrary(this)
     namespace = "${Config.namespace}.savedstate"
 }
-
-publishMultiplatform()

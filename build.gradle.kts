@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.SonatypeHost
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import nl.littlerobots.vcu.plugin.versionSelector
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
@@ -5,7 +7,6 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradleSubplug
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     alias(libs.plugins.detekt)
@@ -16,6 +17,7 @@ plugins {
     alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.serialization) apply false
     alias(libs.plugins.compose) apply false
+    alias(libs.plugins.maven.publish) apply false
     // plugins already on a classpath (conventions)
     // alias(libs.plugins.androidApplication) apply false
     // alias(libs.plugins.androidLibrary) apply false
@@ -39,11 +41,36 @@ allprojects {
             }
         }
     }
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            optIn.addAll(Config.optIns)
-            jvmTarget = Config.jvmTarget
-            freeCompilerArgs.apply { addAll(Config.jvmCompilerArgs) }
+    afterEvaluate {
+        extensions.findByType<MavenPublishBaseExtension>()?.run {
+            val isReleaseBuild = properties["release"]?.toString().toBoolean()
+            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, false)
+            if (isReleaseBuild) signAllPublications()
+            coordinates(Config.artifactId, name, Config.version(isReleaseBuild))
+            pom {
+                name = Config.name
+                description = Config.description
+                url = Config.url
+                licenses {
+                    license {
+                        name = Config.licenseName
+                        url = Config.licenseUrl
+                        distribution = Config.licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id = Config.vendorId
+                        name = Config.vendorName
+                        url = Config.developerUrl
+                        email = Config.supportEmail
+                        organizationUrl = Config.developerUrl
+                    }
+                }
+                scm {
+                    url = Config.scmUrl
+                }
+            }
         }
     }
 }
@@ -75,6 +102,9 @@ subprojects {
 }
 
 doctor {
+    warnWhenJetifierEnabled = true
+    warnWhenNotUsingParallelGC = true
+    disallowMultipleDaemons = false
     javaHome {
         ensureJavaHomeMatches.set(false)
     }

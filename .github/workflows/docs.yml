@@ -29,11 +29,11 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 21
+          java-version: 22
           cache: 'gradle'
 
       - name: Validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v3
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Create local properties
         env:

@@ -1,9 +1,8 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("maven-publish")
     alias(libs.plugins.serialization)
-    signing
+    alias(libs.plugins.maven.publish)
 }
 
 kotlin {
@@ -19,13 +18,8 @@ kotlin {
 }
 
 android {
-    configureAndroidLibrary(this)
-}
-
-publishMultiplatform()
-
-android {
     namespace = "${Config.namespace}.debugger.plugin"
+    configureAndroidLibrary(this)
 }
 
 dependencies {

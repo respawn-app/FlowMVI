@@ -27,7 +27,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     onState = { old: S, new: S -> plugins.fold(new) { next -> onState(old, next) } },
     onIntent = { intent: I -> plugins.fold(intent) { onIntent(it) } },
     onAction = { action: A -> plugins.fold(action) { onAction(it) } },
-    onException = { e: Exception -> plugins.fold(e) { onException(it) } },
+    onException = { e: Exception -> plugins.foldException(e) { onException(it) } },
     onSubscribe = { subs: Int -> plugins.fold { onSubscribe(subs) } },
     onUnsubscribe = { subs: Int -> plugins.fold { onUnsubscribe(subs) } },
     onStart = { plugins.fold { onStart() } },
@@ -42,3 +42,9 @@ private inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlu
     initial: R,
     block: StorePlugin<S, I, A>.(R) -> R?
 ) = fastFold<_, R?>(initial) inner@{ acc, it -> block(it, acc ?: return@fold acc) }
+
+// TODO: https://youtrack.jetbrains.com/issue/KT-68509
+private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.foldException(
+    initial: Exception,
+    block: StorePlugin<S, I, A>.(Exception) -> Exception?
+) = fastFold<_, Exception?>(initial) inner@{ acc, it -> block(it, acc ?: return@foldException acc) }

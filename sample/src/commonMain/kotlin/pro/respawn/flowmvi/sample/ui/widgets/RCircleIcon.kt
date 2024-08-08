@@ -7,10 +7,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -71,7 +71,7 @@ fun RCircleIcon(
     modifier = modifier
         .clickable(
             interactionSource = interactionSource,
-            indication = rememberRipple(bounded = false, radius = size / 2),
+            indication = ripple(bounded = false, radius = size / 2),
             role = Role.Button,
             enabled = enabled,
             onClick = onClick,
