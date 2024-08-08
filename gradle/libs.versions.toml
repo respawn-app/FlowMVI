@@ -11,23 +11,23 @@ detektFormattingPlugin = "1.23.6"
 dokka = "1.9.20"
 essenty = "2.1.0"
 fragment = "1.8.2"
-gradleAndroid = "8.6.0-beta02"
+gradleAndroid = "8.6.0-rc01"
 gradleDoctorPlugin = "0.10.0"
 intellij-ide-plugin = "2.0.0-beta1"
 junit = "4.13.2"
 kotest = "5.9.1"
 # @pin
-kotlin = "2.0.10-RC2"
+kotlin = "2.0.10"
 kotlin-collections = "0.3.7"
 kotlin-io = "0.5.1"
 kotlinx-atomicfu = "0.25.0"
 ktor = "3.0.0-beta-2"
 lifecycle = "2.8.0"
+maven-publish-plugin = "0.29.0"
 serialization = "1.7.1"
 turbine = "1.1.0"
 uuid = "0.8.4"
 versionCatalogUpdatePlugin = "0.8.4"
-maven-publish-plugin = "0.29.0"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -137,6 +137,6 @@ gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
