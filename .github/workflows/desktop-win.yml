@@ -35,6 +35,14 @@ jobs:
         shell: bash
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
+      - name: Cache konan directory
+        uses: actions/cache@v3
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('*.gradle.kts', 'buildSrc/*') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
       - name: Create platform debugger distributable
         run: ./gradlew debugger:app:packageDistributionForCurrentOS
 
