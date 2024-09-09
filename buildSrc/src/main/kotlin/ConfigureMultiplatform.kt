@@ -57,7 +57,7 @@ fun Project.configureMultiplatform(
     }.compilations.all {
         compileTaskProvider.configure {
             compilerOptions {
-                jvmTarget = Config.jvmTarget
+                jvmTarget.set(Config.jvmTarget)
                 freeCompilerArgs.addAll(Config.jvmCompilerArgs)
             }
         }
@@ -66,7 +66,7 @@ fun Project.configureMultiplatform(
     if (jvm) jvm().compilations.all {
         compileTaskProvider.configure {
             compilerOptions {
-                jvmTarget = Config.jvmTarget
+                jvmTarget.set(Config.jvmTarget)
                 freeCompilerArgs.addAll(Config.jvmCompilerArgs)
             }
         }

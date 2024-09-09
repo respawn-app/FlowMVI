@@ -1,30 +1,29 @@
 [versions]
-activity = "1.9.1"
-compose = "1.7.0-alpha02"
-composeDetektPlugin = "1.3.0"
+activity = "1.9.2"
+compose = "1.7.0-beta01"
+composeDetektPlugin = "1.4.0"
 core-ktx = "1.13.1"
-coroutines = "1.9.0-RC"
-datetime = "0.6.0"
-dependencyAnalysisPlugin = "1.32.0"
-detekt = "1.23.6"
-detektFormattingPlugin = "1.23.6"
+coroutines = "1.9.0-RC.2"
+datetime = "0.6.1"
+dependencyAnalysisPlugin = "2.0.1"
+detekt = "1.23.7"
 dokka = "1.9.20"
-essenty = "2.1.0"
-fragment = "1.8.2"
-gradleAndroid = "8.6.0-rc01"
+essenty = "2.2.0-beta01"
+fragment = "1.8.3"
+gradleAndroid = "8.6.0"
 gradleDoctorPlugin = "0.10.0"
-intellij-ide-plugin = "2.0.0-beta1"
+intellij-ide-plugin = "2.0.1"
 junit = "4.13.2"
 kotest = "5.9.1"
 # @pin
-kotlin = "2.0.10"
-kotlin-collections = "0.3.7"
-kotlin-io = "0.5.1"
+kotlin = "2.0.20"
+kotlin-collections = "0.3.8"
+kotlin-io = "0.5.3"
 kotlinx-atomicfu = "0.25.0"
 ktor = "3.0.0-beta-2"
-lifecycle = "2.8.0"
+lifecycle = "2.8.1"
 maven-publish-plugin = "0.29.0"
-serialization = "1.7.1"
+serialization = "1.7.2"
 turbine = "1.1.0"
 uuid = "0.8.4"
 versionCatalogUpdatePlugin = "0.8.4"
@@ -32,10 +31,10 @@ versionCatalogUpdatePlugin = "0.8.4"
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
-androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
-detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detektFormattingPlugin" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 detekt-libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
 dokka-android = { module = "org.jetbrains.dokka:android-documentation-plugin", version.ref = "dokka" }
@@ -81,9 +80,10 @@ ktor-server-engine = { module = "io.ktor:ktor-server-netty", version.ref = "ktor
 ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
 ktor-server-partialcontent = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+lifecycle-savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.5"
 lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
-lifecycle-savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.4"
 lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 

@@ -47,12 +47,12 @@ val TopBarTextStyle
 fun RTopBar(
     modifier: Modifier = Modifier,
     onNavigationIconClick: (() -> Unit)? = null,
-    actions: @Composable (RowScope.() -> Unit) = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     title: AnnotatedString? = stringResource(Res.string.app_name).branded(),
     navigationIcon: ImageVector = Icons.AutoMirrored.Outlined.ArrowBack,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     style: TextStyle = TopBarTextStyle,
+    actions: @Composable (RowScope.() -> Unit) = {},
 ) = RTopBar(
     modifier = modifier,
     title = { RTopBarTitle(title, style = style) },
@@ -63,15 +63,16 @@ fun RTopBar(
     scrollBehavior = scrollBehavior,
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RTopBar(
-    title: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     onNavigationIconClick: (() -> Unit)? = null,
     navigationIcon: ImageVector = Icons.AutoMirrored.Outlined.ArrowBack,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     actions: @Composable (RowScope.() -> Unit) = {},
+    title: @Composable () -> Unit,
 ) = CenterAlignedTopAppBar(
     windowInsets = windowInsets,
     modifier = modifier,

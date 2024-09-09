@@ -21,8 +21,8 @@ import androidx.compose.ui.util.fastForEach
  */
 @Composable
 fun <T> Transition<T>.Crossfade(
-    modifier: Modifier = Modifier,
     contentAlignment: Alignment,
+    modifier: Modifier = Modifier,
     animationSpec: FiniteAnimationSpec<Float> = tween(),
     contentKey: (targetState: T) -> Any? = { it },
     content: @Composable BoxScope.(targetState: T) -> Unit

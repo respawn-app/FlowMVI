@@ -35,6 +35,7 @@ public sealed interface SaveBehavior {
      */
     public data class OnUnsubscribe(val remainingSubscribers: Int = 0) : SaveBehavior
 
+    @Suppress("UndocumentedPublicClass") // document a companion?
     public companion object {
 
         private const val DefaultDelayMs: Int = 2000
