@@ -1,13 +1,12 @@
 [versions]
-decompose = "3.1.0"
-apiresult = "2.0.0-beta02"
-koin = "4.0.0-RC1"
-kmputils = "1.4.2"
+decompose = "3.2.0-beta01"
+apiresult = "2.0.0"
+koin = "4.0.0-RC2"
+kmputils = "1.4.4"
 material = "1.12.0"
-activity = "1.9.0"
 okio = "3.9.0"
 splashscreen = "1.1.0-rc01"
-xml-constraintlayout = "2.2.0-alpha13"
+xml-constraintlayout = "2.2.0-beta01"
 codehighlights = "0.9.0"
 
 [libraries]
@@ -26,8 +25,6 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
-androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
 view-material = { module = "com.google.android.material:material", version.ref = "material" }
 view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "xml-constraintlayout" }

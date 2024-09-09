@@ -123,7 +123,7 @@ kotlin {
 
             implementation(applibs.androidx.splashscreen)
 
-            implementation(applibs.compose.activity)
+            implementation(libs.compose.activity)
             implementation(applibs.koin.android)
             implementation(applibs.koin.android.compose)
             implementation(applibs.view.material)
