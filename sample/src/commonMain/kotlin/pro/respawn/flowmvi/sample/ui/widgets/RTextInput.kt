@@ -71,9 +71,9 @@ fun RTextInput(
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
     keyboardActions: KeyboardActions = KeyboardActions.default(),
     focusRequester: FocusRequester = remember { FocusRequester() },
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = { ClearFieldIcon(input, { onTextChange("") }) },
-    colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
 ) {
     LaunchedEffect(autoFocus) {
         if (!autoFocus) return@LaunchedEffect

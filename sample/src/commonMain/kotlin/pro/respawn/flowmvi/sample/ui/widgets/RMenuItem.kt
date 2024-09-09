@@ -36,6 +36,7 @@ fun takeIf(condition: Boolean, block: @Composable () -> Unit): (@Composable () -
     return if (condition) block else null
 }
 
+@Suppress("ComposableParametersOrdering") // as intended
 @Composable
 fun RMenuItem(
     title: (@Composable () -> Unit),
@@ -81,6 +82,7 @@ fun RMenuItem(
     }
 }
 
+@Suppress("ComposableParametersOrdering") // as intended
 @Composable
 fun RMenuItem(
     icon: ImageVector?,

@@ -66,6 +66,7 @@ public sealed interface ActionShareBehavior {
      */
     public data object Disabled : ActionShareBehavior
 
+    @Suppress("UndocumentedPublicClass")
     public companion object {
 
         /**

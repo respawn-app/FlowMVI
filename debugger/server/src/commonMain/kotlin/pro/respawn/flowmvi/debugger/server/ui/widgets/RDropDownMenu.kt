@@ -44,9 +44,9 @@ internal data class DropDownActions(
 internal fun RDropDownMenu(
     expanded: Boolean,
     onExpand: () -> Unit,
-    button: @Composable () -> Unit,
     actions: DropDownActions,
     modifier: Modifier = Modifier,
+    button: @Composable () -> Unit,
 ) {
     // box needed for popup anchoring
     Box(modifier = modifier) {

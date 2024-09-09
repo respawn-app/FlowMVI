@@ -79,9 +79,9 @@ internal fun RTextInput(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
     keyboardActions: KeyboardActions = KeyboardActions.default(),
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = { ClearFieldIcon(input, { onTextChange("") }) },
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
+    trailingIcon: @Composable (() -> Unit)? = { ClearFieldIcon(input, { onTextChange("") }) },
+    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier,

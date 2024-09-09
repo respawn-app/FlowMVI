@@ -117,6 +117,7 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
         onStop { _stops += 1 }
     }
 
+    @Suppress("UndocumentedPublicClass")
     public companion object {
 
         /**

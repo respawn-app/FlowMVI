@@ -55,15 +55,15 @@ fun RScaffold(
     title: String? = null,
     onBack: (() -> Unit)? = null,
     topBarScrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-    actions: @Composable RowScope.() -> Unit = {},
-    bottomBar: @Composable () -> Unit = {},
-    fab: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState? = null,
     containerColor: Color = RScaffoldDefaults.containerColor,
     contentColor: Color = RScaffoldDefaults.contentColor,
     fabPosition: FabPosition = RScaffoldDefaults.FabPosition,
     contentWindowInsets: WindowInsets? = RScaffoldDefaults.partialWindowInsets,
     fadeContent: Boolean = true,
+    actions: @Composable RowScope.() -> Unit = {},
+    bottomBar: @Composable () -> Unit = {},
+    fab: @Composable () -> Unit = {},
     content: @Composable (BoxScope.() -> Unit),
 ) = RScaffold(
     modifier = modifier,
@@ -91,9 +91,6 @@ fun RScaffold(
 @Composable
 fun RScaffold(
     modifier: Modifier = Modifier,
-    topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit = {},
-    fab: @Composable () -> Unit = {},
     snackbarHostState: SnackbarHostState? = null,
     containerColor: Color = RScaffoldDefaults.containerColor,
     contentColor: Color = RScaffoldDefaults.contentColor,
@@ -101,6 +98,9 @@ fun RScaffold(
     contentWindowInsets: WindowInsets? = RScaffoldDefaults.partialWindowInsets,
     nestedScrollConnection: NestedScrollConnection? = null,
     fadeContent: Boolean = true,
+    bottomBar: @Composable () -> Unit = {},
+    fab: @Composable () -> Unit = {},
+    topBar: @Composable () -> Unit,
     content: @Composable BoxScope.() -> Unit,
 ) {
     Scaffold(
