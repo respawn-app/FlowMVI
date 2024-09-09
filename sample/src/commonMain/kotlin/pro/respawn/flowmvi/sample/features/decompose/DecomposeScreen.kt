@@ -1,8 +1,7 @@
-@file:OptIn(ExperimentalFoundationApi::class, ExperimentalDecomposeApi::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package pro.respawn.flowmvi.sample.features.decompose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,9 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.childContext
-import com.arkivanov.decompose.extensions.compose.pages.Pages
+import com.arkivanov.decompose.extensions.compose.pages.ChildPages
 import com.arkivanov.decompose.extensions.compose.pages.PagesScrollAnimation
 import com.arkivanov.essenty.instancekeeper.getOrCreateSimple
 import org.jetbrains.compose.resources.stringResource
@@ -158,7 +156,7 @@ private fun DecomposeScreenContent(
                 text = Description.formatAsMultiline(),
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
-            Pages(
+            ChildPages(
                 pages = pagesComponent.pages,
                 onPageSelected = { pagesComponent.intent(SelectedPage(it)) },
                 modifier = Modifier.fillMaxSize(),

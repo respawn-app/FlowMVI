@@ -4,6 +4,7 @@ import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import nl.littlerobots.vcu.plugin.versionSelector
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradleSubplugin
+import org.jetbrains.kotlin.compose.compiler.gradle.ComposeFeatureFlag
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnLockMismatchReport
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin
 import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
@@ -28,11 +29,12 @@ plugins {
 allprojects {
     group = Config.artifactId
     version = Config.versionName
+}
+
+subprojects {
     plugins.withType<ComposeCompilerGradleSubplugin>().configureEach {
         the<ComposeCompilerGradlePluginExtension>().apply {
-            enableIntrinsicRemember = true
-            enableNonSkippingGroupOptimization = true
-            enableStrongSkippingMode = true
+            featureFlags.addAll(ComposeFeatureFlag.OptimizeNonSkippingGroups)
             stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_definitions.txt")
             if (properties["enableComposeCompilerReports"] == "true") {
                 val metricsDir = layout.buildDirectory.dir("compose_metrics")
@@ -73,22 +75,18 @@ allprojects {
             }
         }
     }
-}
-
-subprojects {
+    tasks {
+        withType<Test>().configureEach {
+            useJUnitPlatform()
+            filter { isFailOnNoMatchingTests = true }
+        }
+    }
     // TODO: Migrate to applying dokka plugin per-project in conventions
     if (name in setOf("sample", "debugger", "server")) return@subprojects
     apply(plugin = rootProject.libs.plugins.dokka.id)
 
     dependencies {
         dokkaPlugin(rootProject.libs.dokka.android)
-    }
-
-    tasks {
-        withType<Test>().configureEach {
-            useJUnitPlatform()
-            filter { isFailOnNoMatchingTests = true }
-        }
     }
 }
 

@@ -32,7 +32,6 @@ versionCatalogUpdatePlugin = "0.8.4"
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
-androidx-core = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
@@ -81,9 +80,10 @@ ktor-server-engine = { module = "io.ktor:ktor-server-netty", version.ref = "ktor
 ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
 ktor-server-partialcontent = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
-lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
 lifecycle-savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.5"
+lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
