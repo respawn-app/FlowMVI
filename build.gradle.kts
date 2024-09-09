@@ -89,15 +89,6 @@ subprojects {
             useJUnitPlatform()
             filter { isFailOnNoMatchingTests = true }
         }
-        register<org.gradle.jvm.tasks.Jar>("dokkaJavadocJar") {
-            dependsOn(dokkaJavadoc)
-            from(dokkaJavadoc.flatMap { it.outputDirectory })
-            archiveClassifier.set("javadoc")
-        }
-
-        register<org.gradle.jvm.tasks.Jar>("emptyJavadocJar") {
-            archiveClassifier.set("javadoc")
-        }
     }
 }
 
