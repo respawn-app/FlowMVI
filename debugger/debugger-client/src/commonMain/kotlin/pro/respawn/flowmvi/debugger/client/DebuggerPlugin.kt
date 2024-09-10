@@ -6,6 +6,7 @@ import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.DebuggerDefaults.DefaultHistorySize
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreAction
@@ -17,6 +18,8 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreSubscribed
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreUnsubscribed
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.logging.warn
+import pro.respawn.flowmvi.plugins.NoOpPlugin
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
@@ -24,7 +27,7 @@ import kotlin.time.Duration
 
 @PublishedApi
 internal const val NonDebuggableStoreMessage: String = """
-Store must be debuggable in order to use the debugger.
+The debugger has been disabled because store is not debuggable!
 Please set `debuggable = true` before installing the plugin.
 Don't include debug code in production builds.
 """
@@ -81,7 +84,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): LazyPlugin<S, I, A> = LazyPlugin { config ->
-    require(config.debuggable) { NonDebuggableStoreMessage }
+    config.ensureDebuggable { return@LazyPlugin NoOpPlugin() }
     val name = config.name ?: "Store"
     debugClientStore(
         clientName = name,
@@ -113,6 +116,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     port: Int = DebuggerDefaults.Port,
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): LazyPlugin<S, I, A> = LazyPlugin { config ->
+    config.ensureDebuggable { return@LazyPlugin NoOpPlugin() }
     val tt = TimeTravel<S, I, A>(maxHistorySize = historySize)
     compositePlugin(
         name = "${config.name}DebuggerPlugin",
@@ -160,3 +164,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.en
         reconnectionDelay = reconnectionDelay
     )
 )
+
+private inline fun StoreConfiguration<*>.ensureDebuggable(orElse: () -> Unit) {
+    if (!debuggable) {
+        logger.warn(name) { NonDebuggableStoreMessage }
+        orElse()
+    }
+}
