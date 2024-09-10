@@ -74,7 +74,7 @@ internal fun debugClientStore(
                 }
             },
         ) {
-            log(StoreLogLevel.Debug) { "Starting connection at $host:$port/$id" }
+            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$id" }
             client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
@@ -86,9 +86,9 @@ internal fun debugClientStore(
                     this
                 }
                 sendSerialized<ClientEvent>(StoreConnected(clientName, id))
-                log(StoreLogLevel.Debug) { "Established connection to ${call.request.url}" }
+                log(StoreLogLevel.Trace) { "Established connection to ${call.request.url}" }
                 awaitEvents {
-                    log(StoreLogLevel.Debug) { "Received event: $it" }
+                    log(StoreLogLevel.Trace) { "Received event: $it" }
                     when (it) {
                         is ServerEvent.Stop -> close()
                     }
