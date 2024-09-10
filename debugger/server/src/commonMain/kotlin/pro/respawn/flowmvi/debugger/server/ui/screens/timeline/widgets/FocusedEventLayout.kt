@@ -34,13 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.toJavaLocalDateTime
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.debugger.server.ui.representation
+import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEntryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
-import pro.respawn.flowmvi.debugger.server.ui.type
+import pro.respawn.flowmvi.debugger.server.util.type
 import java.time.LocalDateTime
 
 @Composable

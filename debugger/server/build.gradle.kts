@@ -28,6 +28,10 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.materialIconsExtended)
 
+            implementation(applibs.decompose.compose)
+            implementation(applibs.decompose)
+            implementation(projects.essenty.essentyCompose)
+            implementation(projects.essenty)
             implementation(libs.bundles.serialization)
             implementation(libs.bundles.ktor.server)
             implementation(applibs.bundles.kmputils)

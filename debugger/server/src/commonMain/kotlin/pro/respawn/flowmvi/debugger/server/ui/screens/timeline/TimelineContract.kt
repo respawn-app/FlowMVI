@@ -9,12 +9,8 @@ import kotlinx.datetime.LocalDateTime
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
-import pro.respawn.kmmutils.inputforms.Input
-import pro.respawn.kmmutils.inputforms.dsl.input
-import pro.respawn.kmmutils.inputforms.dsl.isValid
 
 internal enum class EventType {
     Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
@@ -44,14 +40,10 @@ internal data class FocusedEvent(
 @Immutable
 internal sealed interface TimelineState : MVIState {
 
+    data object Loading : TimelineState
+
     data class Error(val e: Exception) : TimelineState
 
-    data class ConfiguringServer(
-        val host: Input = input(DebuggerDefaults.LocalHost),
-        val port: Input = input(DebuggerDefaults.Port.toString()),
-    ) : TimelineState {
-        val canStart = host.isValid && port.isValid
-    }
     data class DisplayingTimeline(
         val stores: ImmutableList<StoreItem>,
         val currentEvents: ImmutableList<ServerEventEntry>,
@@ -65,9 +57,6 @@ internal sealed interface TimelineState : MVIState {
 internal sealed interface TimelineIntent : MVIIntent {
 
     data class EventFilterSelected(val filter: EventType) : TimelineIntent
-    data class PortChanged(val port: String) : TimelineIntent
-    data class HostChanged(val host: String) : TimelineIntent
-    data object StartServerClicked : TimelineIntent
     data object CopyEventClicked : TimelineIntent
     data object StopServerClicked : TimelineIntent
     data class StoreFilterSelected(val store: StoreItem?) : TimelineIntent
@@ -82,4 +71,5 @@ internal sealed interface TimelineAction : MVIAction {
 
     data class CopyToClipboard(val text: String) : TimelineAction
     data class ScrollToItem(val index: Int) : TimelineAction
+    data object GoToConnect : TimelineAction
 }

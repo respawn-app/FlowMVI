@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.server.ui
+package pro.respawn.flowmvi.debugger.server.ui.util
 
 import pro.respawn.kmmutils.inputforms.Form
 import pro.respawn.kmmutils.inputforms.Rule

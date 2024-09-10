@@ -19,7 +19,7 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
-import pro.respawn.flowmvi.debugger.server.ui.type
+import pro.respawn.flowmvi.debugger.server.util.type
 import java.time.LocalDateTime
 
 @Composable

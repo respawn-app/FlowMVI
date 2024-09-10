@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.server.ui
+package pro.respawn.flowmvi.debugger.server.util
 
 import androidx.compose.runtime.Stable
 import pro.respawn.flowmvi.debugger.model.ClientEvent
@@ -18,7 +18,7 @@ internal val ClientEvent.type
 
 // TODO: Need a custom layout for some events, create a composable
 @Stable
-@Suppress("StringShouldBeRawString")
+@Suppress("StringShouldBeRawString", "MultilineRawStringIndentation")
 internal val ClientEvent.representation: String
     get() = when (this) {
         is ClientEvent.StoreConnected -> "Connected $name ($id)"
@@ -27,16 +27,16 @@ internal val ClientEvent.representation: String
         is ClientEvent.StoreException -> "$name:\n\n$message\n$stackTrace"
         is ClientEvent.StoreIntent -> "$name:\n\n${data.prettyPrintToString()}"
         is ClientEvent.StoreStarted -> "$name started"
-        is ClientEvent.StoreStateChanged -> """
-            ${from.name} ---> 
-
-            ${from.body.prettyPrintToString()} 
-
-            <--- ${to.name}
-
-            ${to.body.prettyPrintToString()}
-        """.trimIndent()
         is ClientEvent.StoreStopped -> "$name stopped"
         is ClientEvent.StoreSubscribed -> "Subscription count changed to $newSubscriptionCount"
         is ClientEvent.StoreUnsubscribed -> "Subscription count changed to $newSubscriptionCount"
+        is ClientEvent.StoreStateChanged -> """
+${from.name} ---> 
+
+${from.body.prettyPrintToString()} 
+
+<--- ${to.name}
+
+${to.body.prettyPrintToString()}
+""".trimIndent()
     }

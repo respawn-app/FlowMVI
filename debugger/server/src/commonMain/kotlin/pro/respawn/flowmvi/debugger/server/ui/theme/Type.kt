@@ -1,5 +1,4 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
-@file:OptIn(ExperimentalResourceApi::class)
 
 package pro.respawn.flowmvi.debugger.server.ui.theme
 
