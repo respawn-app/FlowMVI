@@ -1,6 +1,6 @@
 import org.intellij.lang.annotations.Language
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
@@ -159,7 +159,7 @@ android {
             }
     }
     signingConfigs {
-        val props = localProperties()
+        val props by localProperties()
         val passwd = props["signing.password"].toString().trim()
         create("release") {
             keyAlias = "key"

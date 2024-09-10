@@ -49,13 +49,15 @@ fun List<String>.toJavaArrayString() = buildString {
 
 fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
 
-fun Project.localProperties() = Properties().apply {
-    val file = File(rootProject.rootDir.absolutePath, "local.properties")
-    if (!file.exists()) {
-        println("w: Local.properties file does not exist. You may be missing some publishing keys")
-        return@apply
+fun Project.localProperties() = lazy {
+    Properties().apply {
+        val file = File(rootProject.rootDir.absolutePath, "local.properties")
+        if (!file.exists()) {
+            println("w: Local.properties file does not exist. You may be missing some publishing keys")
+            return@apply
+        }
+        load(FileInputStream(file))
     }
-    load(FileInputStream(file))
 }
 
 fun stabilityLevel(version: String): Int {
