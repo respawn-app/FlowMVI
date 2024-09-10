@@ -4,9 +4,15 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.dsl.StorePlugin
+
+private data object NoOpPlugin : StorePlugin<Nothing, Nothing, Nothing> {
+
+    override val name: String? = null
+}
 
 /**
  * A plugin that does nothing. Useful for testing or mocking
  */
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> NoOpPlugin(): StorePlugin<S, I, A> = StorePlugin()
+@Suppress("UNCHECKED_CAST")
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> NoOpPlugin(
+): StorePlugin<S, I, A> = NoOpPlugin as StorePlugin<S, I, A>

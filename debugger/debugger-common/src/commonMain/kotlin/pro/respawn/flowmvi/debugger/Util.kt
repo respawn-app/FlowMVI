@@ -21,4 +21,4 @@ internal inline val <T : MVIState> T.name: String
     }
 
 internal inline val <T : Exception> T.name: String
-    get() = this::class.simpleName?.removeSuffix("Exception") ?: "Anonymous"
+    get() = this::class.simpleName ?: "Anonymous"

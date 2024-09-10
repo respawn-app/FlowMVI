@@ -22,8 +22,10 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
+import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.ActionShareBehavior.Disabled
 import pro.respawn.flowmvi.api.EmptyState
+import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
@@ -31,13 +33,14 @@ import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.log
+import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import kotlin.time.Duration
 
-internal typealias DebugClientStore = Store<EmptyState, ClientEvent, Nothing>
+internal typealias DebugClientStore = Store<EmptyState, ClientEvent, ServerEvent>
 
 internal fun debugClientStore(
     clientName: String,
@@ -46,7 +49,7 @@ internal fun debugClientStore(
     port: Int,
     reconnectionDelay: Duration,
     logEvents: Boolean = false,
-) = store<EmptyState, ClientEvent, Nothing>(EmptyState) {
+) = store(EmptyState) {
     val id = uuid4()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     configure {
@@ -54,7 +57,7 @@ internal fun debugClientStore(
         coroutineContext = Dispatchers.Default
         debuggable = true
         parallelIntents = false // ensure the order of events matches server's expectations
-        actionShareBehavior = Disabled
+        actionShareBehavior = ActionShareBehavior.Distribute()
         allowIdleSubscriptions = true
         onOverflow = BufferOverflow.DROP_OLDEST // drop old events in the queue
     }
@@ -89,9 +92,7 @@ internal fun debugClientStore(
                 log(StoreLogLevel.Trace) { "Established connection to ${call.request.url}" }
                 awaitEvents {
                     log(StoreLogLevel.Trace) { "Received event: $it" }
-                    when (it) {
-                        is ServerEvent.Stop -> close()
-                    }
+                    if (it.storeId == id) action(it)
                 }
             }
         }
