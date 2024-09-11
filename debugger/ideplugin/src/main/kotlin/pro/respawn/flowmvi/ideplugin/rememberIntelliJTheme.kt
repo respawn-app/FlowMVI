@@ -1,3 +1,5 @@
+@file:Suppress("Filename")
+
 package pro.respawn.flowmvi.ideplugin
 
 import androidx.compose.runtime.Composable
@@ -10,8 +12,8 @@ import androidx.compose.ui.graphics.Color
 import com.intellij.ide.ui.LafManager
 import com.intellij.ide.ui.LafManagerListener
 import com.intellij.openapi.application.ApplicationManager
-import java.awt.Color as AwtColor
 import javax.swing.UIManager
+import java.awt.Color as AwtColor
 
 @Composable
 fun rememberIntelliJTheme(): IntelliJTheme {

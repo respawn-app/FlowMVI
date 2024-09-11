@@ -25,7 +25,7 @@ internal class DefaultStoreConfiguration(
         serializer: KSerializer<S>,
         fileName: String,
     ) = CompressedFileSaver(
-        // STOPSHIP: Abstract away
+        // TODO: Abstract away
         path = File("states").apply { mkdirs() }.resolve("$fileName.json").absolutePath,
         recover = NullRecover
     ).let { JsonSaver(json, serializer, it) }

@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,9 +16,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
-import pro.respawn.flowmvi.compose.dsl.subscribe
-import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +28,9 @@ import com.benasher44.uuid.uuid4
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.requireLifecycle
+import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.StoreCommand
@@ -41,10 +42,10 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsI
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
-import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
+import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.kmmutils.common.copies
@@ -124,6 +125,7 @@ private val StoreCommand.label: String
     }
 
 @Composable
+@Preview
 private fun StoreDetailsScreenPreview() = RespawnTheme {
     EmptyReceiver {
         StoreDetailsScreenContent(

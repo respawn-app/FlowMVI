@@ -42,7 +42,7 @@ public class SubscriberManager {
     /**
      * Complete the wait period, freeing the store and coroutines that called [await] to continue.
      */
-     public fun complete() {
+    public fun complete() {
         subscriber.getAndSet(null)?.cancel()
     }
 

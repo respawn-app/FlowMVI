@@ -11,15 +11,15 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import pro.respawn.flowmvi.compose.dsl.requireLifecycle
-import pro.respawn.flowmvi.compose.dsl.subscribe
-import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import pro.respawn.flowmvi.api.IntentReceiver
+import pro.respawn.flowmvi.compose.dsl.requireLifecycle
+import pro.respawn.flowmvi.compose.dsl.subscribe
+import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import pro.respawn.flowmvi.debugger.server.di.container
 import pro.respawn.flowmvi.debugger.server.navigation.AppNavigator
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectIntent.HostChanged
@@ -37,7 +37,6 @@ import pro.respawn.flowmvi.server.generated.resources.icon_nobg_32
 fun ConnectScreen(
     navigator: AppNavigator,
 ) = with(container<ConnectContainer, _, _, _>()) {
-
     val state by subscribe(requireLifecycle()) {
         when (it) {
             is ConnectAction.GoToTimeline -> navigator.timeline()

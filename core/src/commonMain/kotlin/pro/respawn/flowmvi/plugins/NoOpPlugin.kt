@@ -14,5 +14,5 @@ private data object NoOpPlugin : StorePlugin<Nothing, Nothing, Nothing> {
  * A plugin that does nothing. Useful for testing or mocking
  */
 @Suppress("UNCHECKED_CAST")
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> NoOpPlugin(
-): StorePlugin<S, I, A> = NoOpPlugin as StorePlugin<S, I, A>
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> NoOpPlugin(): StorePlugin<S, I, A> =
+    NoOpPlugin as StorePlugin<S, I, A>

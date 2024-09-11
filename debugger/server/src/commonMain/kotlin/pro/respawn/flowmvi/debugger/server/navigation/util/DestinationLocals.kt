@@ -6,8 +6,8 @@ import org.koin.compose.LocalKoinScope
 import pro.respawn.flowmvi.compose.dsl.LocalSubscriberLifecycle
 import pro.respawn.flowmvi.compose.dsl.rememberSubscriberLifecycle
 import pro.respawn.flowmvi.debugger.server.di.LocalDestinationScope
-import pro.respawn.flowmvi.essenty.lifecycle.asSubscriberLifecycle
 import pro.respawn.flowmvi.debugger.server.navigation.component.DestinationComponent
+import pro.respawn.flowmvi.essenty.lifecycle.asSubscriberLifecycle
 
 @Composable
 internal fun ProvideDestinationLocals(

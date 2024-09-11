@@ -10,8 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -28,12 +26,11 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.Cl
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
-import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
+import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.kmmutils.compose.annotate
-import pro.respawn.kmmutils.compose.style
 
 /**
  * The Timeline (Main) screen of the debugger.

@@ -33,9 +33,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDateTime
-import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
+import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.util.type
 
 @Composable
@@ -76,7 +76,7 @@ internal fun FocusedEventLayout(
                 Row {
                     val colors = IconButtonDefaults.filledIconButtonColors(MaterialTheme.colorScheme.surfaceVariant)
                     IconButton(
-                        onClick =onCopy,
+                        onClick = onCopy,
                         colors = colors,
                     ) {
                         Icon(Icons.Rounded.ContentCopy, contentDescription = null)

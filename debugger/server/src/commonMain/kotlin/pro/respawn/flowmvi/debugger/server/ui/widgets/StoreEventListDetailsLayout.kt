@@ -22,8 +22,8 @@ internal fun StoreEventListDetailsLayout(
     onClick: (ServerEventEntry) -> Unit,
     onCopy: () -> Unit,
     onClose: () -> Unit,
-    listState: LazyListState = rememberLazyListState(),
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
 ) = DynamicTwoPaneLayout(
     modifier = modifier,
     secondPaneVisible = focusedEvent != null,

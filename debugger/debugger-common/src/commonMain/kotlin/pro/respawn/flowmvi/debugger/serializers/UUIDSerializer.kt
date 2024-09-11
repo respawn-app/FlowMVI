@@ -9,6 +9,9 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/**
+ * Serializer for the internal flowmvi UUID type
+ */
 public object UUIDSerializer : KSerializer<Uuid> {
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(

@@ -47,9 +47,9 @@ class DropDownMenuState internal constructor(
  */
 @Composable
 fun RDropDownMenu(
-    button: @Composable DropDownMenuState.() -> Unit,
     modifier: Modifier = Modifier,
     state: DropDownMenuState = rememberDropDownMenuState(),
+    button: @Composable DropDownMenuState.() -> Unit,
     actions: @Composable DropDownMenuState.() -> Unit,
 ) {
     // box needed for popup anchoring
