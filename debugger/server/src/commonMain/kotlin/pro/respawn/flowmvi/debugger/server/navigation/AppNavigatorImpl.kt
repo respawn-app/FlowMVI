@@ -14,10 +14,8 @@ import pro.respawn.flowmvi.debugger.server.navigation.details.DetailsComponent
 fun rememberAppNavigator(
     isWideScreen: Boolean,
     root: RootComponent
-): AppNavigator {
-    return remember(isWideScreen, root) {
-        AppNavigatorImpl(isWideScreen, root, root.details)
-    }
+): AppNavigator = remember(isWideScreen, root) {
+    AppNavigatorImpl(isWideScreen, root, root.details)
 }
 
 private class AppNavigatorImpl(
@@ -26,16 +24,20 @@ private class AppNavigatorImpl(
     private val details: DetailsComponent,
 ) : AppNavigator {
 
+    private val currentDestination get() = stack.stack.value.active.configuration
+
     override fun back() = if (details.isOpen) details.back() else stack.back()
 
     private fun navigate(destination: Destination) = when {
-        !isWideScreen -> stack.navigate(destination)
-        else -> details.navigate(destination)
+        isWideScreen && destination detailsOf currentDestination -> details.navigate(destination)
+        else -> {
+            details.back()
+            stack.navigate(destination)
+        }
     }
 
-
-    override fun timeline() = stack.navigate(Destination.Timeline)
-    override fun connect() = stack.navigate(Destination.Connect)
+    override fun timeline() = navigate(Destination.Timeline)
+    override fun connect() = navigate(Destination.Connect)
 
     @Composable
     override fun rememberBackNavigationState(): State<Boolean> {

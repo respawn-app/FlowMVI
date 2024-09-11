@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 sealed interface Destination {
     val topLevel: Boolean get() = false
     val singleTop: Boolean get() = topLevel
+    infix fun detailsOf(other: Destination) = false
 
     @Serializable
     data object Timeline : Destination {
