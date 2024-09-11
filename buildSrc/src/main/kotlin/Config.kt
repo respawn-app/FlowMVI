@@ -17,7 +17,7 @@ object Config {
 
     const val versionCode = 8
     const val majorRelease = 3
-    const val minorRelease = 0
+    const val minorRelease = 1
     const val patch = 1
     const val postfix = "-beta02" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
@@ -80,7 +80,6 @@ object Config {
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
-    const val publishingVariant = "release"
 
     // android
     const val namespace = artifactId
