@@ -20,8 +20,8 @@ kotlin = "2.0.20"
 kotlin-collections = "0.3.8"
 kotlin-io = "0.5.3"
 kotlinx-atomicfu = "0.25.0"
-ktor = "3.0.0-beta-2"
-lifecycle = "2.8.1"
+ktor = "3.0.0-rc-1"
+lifecycle = "2.8.2"
 maven-publish-plugin = "0.29.0"
 serialization = "1.7.2"
 turbine = "1.1.0"
@@ -31,8 +31,8 @@ versionCatalogUpdatePlugin = "0.8.4"
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -80,10 +80,10 @@ ktor-server-engine = { module = "io.ktor:ktor-server-netty", version.ref = "ktor
 ktor-server-host-common = { module = "io.ktor:ktor-server-host-common", version.ref = "ktor" }
 ktor-server-partialcontent = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
 ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
-lifecycle-savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.5"
-lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 lifecycle-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "lifecycle" }
+lifecycle-savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.8.5"
+lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
