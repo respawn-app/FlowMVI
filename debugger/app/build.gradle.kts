@@ -24,6 +24,8 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation(applibs.apiresult)
+            implementation(applibs.decompose)
+            implementation(applibs.decompose.compose)
             implementation(applibs.bundles.kmputils)
             implementation(applibs.bundles.koin)
 

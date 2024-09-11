@@ -33,14 +33,14 @@ internal fun DynamicTwoPaneLayout(
     secondPaneVisible: Boolean,
     modifier: Modifier = Modifier,
     widthRange: ClosedFloatingPointRange<Float> = 0.25f..0.75f,
-    secondaryPaneContent: @Composable () -> Unit,
-    firstPaneContent: @Composable () -> Unit
+    firstPaneContent: @Composable () -> Unit,
+    secondaryPaneContent: @Composable () -> Unit
 ) {
     var contentWidth by remember { mutableStateOf(0f) }
     var paneWidth by remember { mutableStateOf(widthRange.midpoint) }
     val animatedPaneWidth by animateFloatAsState(
         targetValue = paneWidth.takeIf { secondPaneVisible } ?: 0f,
-        animationSpec = tween(easing = EaseOutCubic, durationMillis = 400)
+        animationSpec = tween(easing = EaseOutCubic, durationMillis = 500)
     )
     val draggableState = rememberDraggableState {
         paneWidth = (paneWidth + it / (contentWidth.takeIfNotZero() ?: 1f)).coerceIn(widthRange)

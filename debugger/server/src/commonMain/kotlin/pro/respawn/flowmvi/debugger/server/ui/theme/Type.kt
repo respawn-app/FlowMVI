@@ -1,5 +1,4 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty")
-@file:OptIn(ExperimentalResourceApi::class)
 
 package pro.respawn.flowmvi.debugger.server.ui.theme
 
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 import pro.respawn.flowmvi.server.generated.resources.Res
 import pro.respawn.flowmvi.server.generated.resources.comfortaa

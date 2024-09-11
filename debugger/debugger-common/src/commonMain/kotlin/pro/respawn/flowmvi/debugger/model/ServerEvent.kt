@@ -4,16 +4,39 @@
 package pro.respawn.flowmvi.debugger.model
 
 import com.benasher44.uuid.Uuid
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
-public sealed interface ServerEvent : MVIIntent {
+@SerialName("ServerEvent")
+public sealed interface ServerEvent : MVIAction {
 
     public val storeId: Uuid
 
     @Serializable
-    public data class Stop(val index: Int, override val storeId: Uuid) : ServerEvent
+    @SerialName("Stop")
+    public data class Stop(override val storeId: Uuid) : ServerEvent
+
+    @Serializable
+    @SerialName("ResendLastIntent")
+    public data class ResendLastIntent(override val storeId: Uuid) : ServerEvent
+
+    @Serializable
+    @SerialName("RollbackState")
+    public data class RollbackState(override val storeId: Uuid) : ServerEvent
+
+    @Serializable
+    @SerialName("ResendLastAction")
+    public data class ResendLastAction(override val storeId: Uuid) : ServerEvent
+
+    @Serializable
+    @SerialName("RethrowLastException")
+    public data class RethrowLastException(override val storeId: Uuid) : ServerEvent
+
+    @Serializable
+    @SerialName("RollbackToInitialState")
+    public data class RollbackToInitialState(override val storeId: Uuid) : ServerEvent
 }

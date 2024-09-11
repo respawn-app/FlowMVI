@@ -3,11 +3,9 @@
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberUpdatedState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,20 +46,18 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.
     mode: SubscriptionMode = SubscriptionMode.Started,
     consume: suspend CoroutineScope.(action: A) -> Unit,
 ): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
     val block by rememberUpdatedState(consume)
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
+    return produceState(state, this, mode, lifecycle) {
         withContext(Dispatchers.Main.immediateOrDefault) {
             lifecycle.repeatOnLifecycle(mode) {
                 subscribe(
                     store = this@subscribe,
                     consume = { block(it) },
-                    render = { state.value = it }
+                    render = { value = it }
                 ).join()
             }
         }
     }
-    return state
 }
 
 /**
@@ -82,17 +78,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.subscribe(
     lifecycle: SubscriberLifecycle = DefaultLifecycle,
     mode: SubscriptionMode = SubscriptionMode.Started,
-): State<S> {
-    val state = remember(this) { mutableStateOf(state) }
-    LaunchedEffect(this@subscribe, mode, lifecycle) {
-        withContext(Dispatchers.Main.immediateOrDefault) {
-            lifecycle.repeatOnLifecycle(mode) {
-                subscribe(
-                    store = this@subscribe,
-                    render = { state.value = it }
-                ).join()
-            }
+): State<S> = produceState(state, mode, lifecycle, this@subscribe) {
+    withContext(Dispatchers.Main.immediateOrDefault) {
+        lifecycle.repeatOnLifecycle(mode) {
+            subscribe(
+                store = this@subscribe,
+                render = { value = it },
+            ).join()
         }
     }
-    return state
 }

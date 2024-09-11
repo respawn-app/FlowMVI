@@ -55,3 +55,35 @@ internal inline fun template(
     tag: String?,
     message: () -> String
 ) = "${level.asSymbol} ${if (tag.isNullOrBlank()) "" else "$tag: "}${message()}"
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Trace] as the log level.
+ */
+public fun StoreLogger.trace(
+    tag: String? = null,
+    message: () -> String
+): Unit = log(StoreLogLevel.Trace, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Debug] as the log level.
+ */
+public fun StoreLogger.debug(tag: String? = null, message: () -> String): Unit =
+    log(StoreLogLevel.Debug, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Info] as the log level.
+ */
+public fun StoreLogger.info(tag: String? = null, message: () -> String): Unit =
+    log(StoreLogLevel.Info, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Warn] as the log level.
+ */
+public fun StoreLogger.warn(tag: String? = null, message: () -> String): Unit =
+    log(StoreLogLevel.Warn, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Error] as the log level.
+ */
+public fun StoreLogger.error(tag: String? = null, message: () -> String): Unit =
+    log(StoreLogLevel.Error, tag, message)

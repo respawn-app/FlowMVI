@@ -1,12 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.intellij.ide)
     kotlin("jvm")
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.intellij.ide)
 }
-val props by localProperties
+
+val props by localProperties()
 
 repositories {
     mavenCentral()
@@ -20,8 +21,10 @@ configurations.all {
 }
 
 intellijPlatform {
-    projectName = Config.debuggerName
-    verifyPlugin {
+    projectName = Config.name
+// needed when plugin provides custom settings exposed to the UI
+    buildSearchableOptions = false
+    pluginVerification {
         ides {
             recommended()
         }
@@ -36,18 +39,17 @@ intellijPlatform {
     }
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "233"
-            untilBuild = "241.*"
+            sinceBuild = "241"
+            untilBuild = "242.*"
         }
         vendor {
             name = Config.vendorName
             email = Config.supportEmail
             url = Config.url
         }
-        changeNotes
         id = "${Config.artifactId}.ideplugin"
-        description = Config.debuggerPluginDescription
-        name = Config.debuggerName
+        description = Config.Debugger.appDescription
+        name = Config.Debugger.name
         version = Config.versionName
     }
 }
@@ -64,12 +66,12 @@ tasks {
 
 dependencies {
     compileOnly(compose.desktop.currentOs)
+    implementation(compose.desktop.common)
     implementation(projects.core)
     intellijPlatform {
-        plugin("org.jetbrains.compose.intellij.platform")
         // bundledPlugin("org.jetbrains.kotlin")
         // props["plugin.local.ide.path"]?.toString()?.let(::local)
-        intellijIdeaCommunity("2023.3.3")
+        // intellijIdeaCommunity("2024.2.1")
         pluginVerifier()
         zipSigner()
         instrumentationTools()
@@ -77,8 +79,12 @@ dependencies {
 }
 
 tasks {
-// needed when plugin provides custom settings exposed to the UI
-    buildSearchableOptions {
-        enabled = false
+    // workaround for https://youtrack.jetbrains.com/issue/IDEA-285839/Classpath-clash-when-using-coroutines-in-an-unbundled-IntelliJ-plugin
+    buildPlugin {
+        exclude { "coroutines" in it.name }
+        archiveFileName = "valkyrie-$version.zip"
+    }
+    prepareSandbox {
+        exclude { "coroutines" in it.name }
     }
 }

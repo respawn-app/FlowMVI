@@ -29,42 +29,68 @@ public class SubscriberManager {
         internal const val Name = "AwaitSubscribersPlugin"
     }
 
-    private var subscriber by atomic<Job?>(null)
+    private val subscriber = atomic<Job?>(null)
 
     /**
      * Start waiting for subscribers, suspending until the given number of subscribers arrive.
      * After the subscribers arrived, this call will return immediately
      */
     public suspend fun await() {
-        subscriber?.join()
+        subscriber.value?.join()
     }
 
     /**
      * Complete the wait period, freeing the store and coroutines that called [await] to continue.
      */
     public fun complete() {
-        subscriber?.cancel()
+        subscriber.getAndSet(null)?.cancel()
     }
 
     /**
      * Same as [complete], but suspends until completion
      */
-    public suspend fun completeAndWait(): Unit? = subscriber?.cancelAndJoin()
+    public suspend fun completeAndWait(): Unit? = subscriber.getAndSet(null)?.cancelAndJoin()
 
     /**
      * Starts waiting for the subscribers until either [this] [CoroutineScope] is cancelled or [complete] is called.
      * Usually not called manually but rather launched by the [awaitSubscribersPlugin].
      */
-    public fun CoroutineScope.launch(timeout: Duration) {
-        val previous = subscriber
-        subscriber = launch {
-            previous?.cancelAndJoin()
-            withTimeoutOrNull<Nothing>(timeout) { awaitCancellation() }
-        }.apply {
-            invokeOnCompletion {
-                subscriber = null
+    private fun CoroutineScope.launch(timeout: Duration) {
+        val previous = subscriber.value
+        subscriber.getAndSet(
+            launch {
+                previous?.cancelAndJoin()
+                withTimeoutOrNull<Nothing>(timeout) { awaitCancellation() }
+            }.apply {
+                invokeOnCompletion { complete() }
             }
+        )
+    }
+
+    internal fun <S : MVIState, I : MVIIntent, A : MVIAction> asPlugin(
+        name: String,
+        timeout: Duration,
+        suspendStore: Boolean,
+        minSubs: Int,
+    ) = plugin<S, I, A> {
+        this.name = name
+
+        onStart { launch(timeout) }
+
+        onState { _, new ->
+            if (suspendStore) await()
+            new
         }
+        onAction {
+            if (suspendStore) await()
+            it
+        }
+        onIntent {
+            if (suspendStore) await()
+            it
+        }
+        onStop { complete() }
+        onSubscribe { current -> if (current >= minSubs) completeAndWait() }
     }
 }
 
@@ -96,27 +122,4 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> awaitSubscribersPlugin(
     suspendStore: Boolean = true,
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
-): StorePlugin<S, I, A> = plugin {
-    this.name = name
-    onStart {
-        with(manager) { launch(timeout) }
-    }
-    onState { _, new ->
-        if (suspendStore) manager.await()
-        new
-    }
-    onAction {
-        if (suspendStore) manager.await()
-        it
-    }
-    onIntent {
-        if (suspendStore) manager.await()
-        it
-    }
-    onStop {
-        manager.complete()
-    }
-    onSubscribe { current ->
-        if (current >= minSubs) manager.completeAndWait()
-    }
-}
+): StorePlugin<S, I, A> = manager.asPlugin(name, timeout, suspendStore, minSubs)

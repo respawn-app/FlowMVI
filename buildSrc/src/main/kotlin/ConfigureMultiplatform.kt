@@ -1,7 +1,6 @@
 @file:Suppress("MissingPackageDeclaration", "unused", "UndocumentedPublicFunction", "LongMethod", "UnusedImports")
 
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -117,7 +116,7 @@ fun Project.configureMultiplatform(
                 compilerOptions {
                     freeCompilerArgs.addAll(Config.compilerArgs)
                     optIn.addAll(Config.optIns)
-                    progressiveMode = true
+                    progressiveMode.set(true)
                 }
             }
         }

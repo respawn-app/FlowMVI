@@ -68,17 +68,17 @@ comments:
     endOfSentenceFormat: '([.?!][ \t\n\r\f<])|([.?!:]$)'
   UndocumentedPublicClass:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**','**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**','**/app/**', '**/debugger/server/**',  '**/ideplugin/**' ]
     searchInNestedClass: true
     searchInInnerClass: true
     searchInInnerObject: true
     searchInInnerInterface: true
   UndocumentedPublicFunction:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**', '**/app/**', '**/debugger/server/**',  '**/ideplugin/**' ]
   UndocumentedPublicProperty:
     active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**', '**/app/**' ]
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**',  '**.kts', '**/kotestTest/**', '**/sample/**', '**/app/**',  '**/debugger/server/**', '**/ideplugin/**' ]
 
 complexity:
   active: true

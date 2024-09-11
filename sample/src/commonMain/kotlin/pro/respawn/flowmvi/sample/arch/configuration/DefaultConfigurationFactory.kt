@@ -28,7 +28,7 @@ internal class DefaultConfigurationFactory(
         serializer: KSerializer<S>,
         fileName: String,
     ) = CompressedFileSaver(
-        path = files.cacheFile("states", "$fileName.json"),
+        path = files.cacheFile(".cache", "$fileName.json"),
         recover = NullRecover
     ).let { JsonSaver(json, serializer, it) }
 
