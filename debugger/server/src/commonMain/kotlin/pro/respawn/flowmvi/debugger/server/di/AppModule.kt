@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import pro.respawn.flowmvi.debugger.server.arch.configuration.StoreConfiguration
 import pro.respawn.flowmvi.debugger.server.arch.configuration.DefaultStoreConfiguration
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectContainer
+import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsContainer
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineContainer
 
 val appModule = module {
@@ -13,4 +14,5 @@ val appModule = module {
     single<StoreConfiguration> { DefaultStoreConfiguration(get()) }
     container { new(::ConnectContainer) }
     container { new(::TimelineContainer) }
+    container { new(::StoreDetailsContainer) }
 }

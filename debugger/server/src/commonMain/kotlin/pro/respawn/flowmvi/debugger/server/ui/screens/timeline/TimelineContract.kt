@@ -18,7 +18,6 @@ internal enum class EventType {
 
 @Immutable
 internal data class TimelineFilters(
-    val store: StoreItem? = null,
     val events: ImmutableSet<EventType> = EventType.entries.toImmutableSet(),
 )
 
@@ -57,12 +56,12 @@ internal sealed interface TimelineState : MVIState {
 internal sealed interface TimelineIntent : MVIIntent {
 
     data class EventFilterSelected(val filter: EventType) : TimelineIntent
-    data object CopyEventClicked : TimelineIntent
     data object StopServerClicked : TimelineIntent
-    data class StoreFilterSelected(val store: StoreItem?) : TimelineIntent
+    data class StoreSelected(val store: StoreItem) : TimelineIntent
     data object RetryClicked : TimelineIntent
-    data class EntryClicked(val entry: ServerEventEntry) : TimelineIntent
-    data object CloseFocusedEntryClicked : TimelineIntent
+    data class EventClicked(val entry: ServerEventEntry) : TimelineIntent
+    data object CopyEventClicked : TimelineIntent
+    data object CloseFocusedEventClicked : TimelineIntent
     data object AutoScrollToggled : TimelineIntent
 }
 
@@ -71,5 +70,6 @@ internal sealed interface TimelineAction : MVIAction {
 
     data class CopyToClipboard(val text: String) : TimelineAction
     data class ScrollToItem(val index: Int) : TimelineAction
+    data class GoToStoreDetails(val storeId: Uuid) : TimelineAction
     data object GoToConnect : TimelineAction
 }

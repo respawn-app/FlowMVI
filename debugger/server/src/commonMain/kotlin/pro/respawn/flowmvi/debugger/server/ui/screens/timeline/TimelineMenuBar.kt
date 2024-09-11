@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.debugger.server.ui.screens.timeline.widgets
+package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.api.IntentReceiver
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventType
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventFilterSelected
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StopServerClicked
+import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreSelectorDropDown
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -31,7 +31,7 @@ internal fun IntentReceiver<TimelineIntent>.TimelineMenuBar(
 ) {
     FlowRow(verticalArrangement = Arrangement.Center, modifier = modifier) {
         IconButton(
-            onClick = { intent(TimelineIntent.StopServerClicked) },
+            onClick = { intent(StopServerClicked) },
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.errorContainer
             ),
@@ -48,11 +48,11 @@ internal fun IntentReceiver<TimelineIntent>.TimelineMenuBar(
             }
             Text("Autoscroll")
         }
-        StoreSelectorDropDown(state.stores, state.filters, modifier = Modifier.padding(8.dp))
+        StoreSelectorDropDown(state.stores, modifier = Modifier.padding(8.dp))
         EventType.entries.forEach {
             FilterChip(
                 selected = it in state.filters.events,
-                onClick = { intent(TimelineIntent.EventFilterSelected(it)) },
+                onClick = { intent(EventFilterSelected(it)) },
                 modifier = Modifier.padding(8.dp),
                 label = { Text(it.name) },
             )

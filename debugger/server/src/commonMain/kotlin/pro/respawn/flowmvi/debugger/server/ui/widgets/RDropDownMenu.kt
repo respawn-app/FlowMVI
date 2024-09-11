@@ -2,77 +2,98 @@ package pro.respawn.flowmvi.debugger.server.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.window.PopupProperties
+import pro.respawn.flowmvi.debugger.server.ui.theme.Size
 
 @Composable
-internal fun rememberDropDownActions(
-    vararg key: Any,
-    builder: () -> List<DropDownActions.Action>
-) = remember(keys = key) { DropDownActions(builder()) }
+fun rememberDropDownMenuState(isVisible: Boolean = false) = remember { DropDownMenuState(isVisible) }
 
-@Immutable
-internal data class DropDownActions(
-    val actions: List<Action>,
+class DropDownMenuState internal constructor(
+    isVisible: Boolean = false,
 ) {
 
-    @Immutable
-    data class Action(
-        val text: String,
-        val tint: Color? = null,
-        val icon: ImageVector? = null,
-        val iconTint: Color = Color.Unspecified,
-        val badged: Boolean = false,
-        val onClick: () -> Unit,
-    )
+    var visible by mutableStateOf(isVisible)
+        private set
+
+    fun show() {
+        visible = true
+    }
+
+    fun hide() {
+        visible = false
+    }
+
+    fun toggle() {
+        visible = !visible
+    }
 }
 
 /**
  * Will be hidden when actions are empty
  */
 @Composable
-internal fun RDropDownMenu(
-    expanded: Boolean,
-    onExpand: () -> Unit,
-    actions: DropDownActions,
+fun RDropDownMenu(
+    button: @Composable DropDownMenuState.() -> Unit,
     modifier: Modifier = Modifier,
-    button: @Composable () -> Unit,
+    state: DropDownMenuState = rememberDropDownMenuState(),
+    actions: @Composable DropDownMenuState.() -> Unit,
 ) {
     // box needed for popup anchoring
     Box(modifier = modifier) {
-        AnimatedVisibility(
-            visible = actions.actions.isNotEmpty(),
-            modifier = Modifier.minimumInteractiveComponentSize(),
-            content = { button() },
-        )
-
+        state.button()
         DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = onExpand,
+            expanded = state.visible,
+            onDismissRequest = { state.hide() },
             properties = remember { PopupProperties() },
-        ) {
-            actions.actions.forEach { action ->
-                DropdownMenuItem(
-                    text = { Text(text = action.text) },
-                    leadingIcon = icon@{
-                        Icon(action.icon ?: return@icon, contentDescription = null, tint = action.iconTint)
-                    },
-                    onClick = {
-                        action.onClick()
-                        onExpand()
-                    },
+            shape = MaterialTheme.shapes.medium,
+        ) { state.actions() }
+    }
+}
+
+@Composable
+fun DropDownMenuState.DropDownAction(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    hasBadge: Boolean = false,
+    tint: Color = LocalContentColor.current,
+) = DropdownMenuItem(
+    modifier = modifier,
+    text = { Text(text = text) },
+    leadingIcon = icon?.let {
+        {
+            BadgedBox(
+                badge = badge@{
+                    AnimatedVisibility(hasBadge) {
+                        Dot(color = MaterialTheme.colorScheme.error)
+                    }
+                },
+            ) {
+                RIcon(
+                    icon = it,
+                    color = tint,
+                    size = Size.smallIcon
                 )
             }
         }
-    }
-}
+    },
+    onClick = {
+        hide()
+        onClick()
+    },
+)

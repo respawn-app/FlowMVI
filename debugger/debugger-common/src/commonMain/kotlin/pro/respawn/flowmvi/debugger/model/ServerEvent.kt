@@ -8,7 +8,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.api.MVIAction
-import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
@@ -19,7 +18,7 @@ public sealed interface ServerEvent : MVIAction {
 
     @Serializable
     @SerialName("Stop")
-    public data class Stop(val index: Int, override val storeId: Uuid) : ServerEvent
+    public data class Stop(override val storeId: Uuid) : ServerEvent
 
     @Serializable
     @SerialName("ResendLastIntent")

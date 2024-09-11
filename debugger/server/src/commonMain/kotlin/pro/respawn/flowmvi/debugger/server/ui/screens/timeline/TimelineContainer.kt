@@ -16,18 +16,19 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
 import pro.respawn.flowmvi.debugger.server.ServerState
 import pro.respawn.flowmvi.debugger.server.arch.configuration.StoreConfiguration
 import pro.respawn.flowmvi.debugger.server.arch.configuration.configure
-import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.CopyToClipboard
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.GoToStoreDetails
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.ScrollToItem
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.AutoScrollToggled
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEntryClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CopyEventClicked
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EntryClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventFilterSelected
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.RetryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StopServerClicked
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StoreFilterSelected
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.StoreSelected
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
+import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.util.type
 import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.store
@@ -49,7 +50,6 @@ internal class TimelineContainer(
     private val filters = MutableStateFlow(TimelineFilters())
 
     override val store = store(State.Loading) {
-        val timezone = TimeZone.currentSystemDefault()
         configure(configuration, "Timeline")
         recover {
             updateState { State.Error(it) }
@@ -74,10 +74,7 @@ internal class TimelineContainer(
                                     .asSequence()
                                     .run {
                                         if (current == null) return@run this
-                                        val id = current.filters.store?.id
-                                        filter {
-                                            it.event.type in current.filters.events && (id == null || id == it.id)
-                                        }
+                                        filter { it.event.type in current.filters.events }
                                     }
                                     .toPersistentList(),
                                 stores = state.clients
@@ -98,6 +95,9 @@ internal class TimelineContainer(
         }
         reduce { intent ->
             when (intent) {
+                is StoreSelected -> action(GoToStoreDetails(intent.store.id))
+                is CloseFocusedEventClicked -> updateState<DisplayingTimeline, _> { copy(focusedEvent = null) }
+                is RetryClicked -> DebugServer.store.intent(RestoreRequested)
                 is CopyEventClicked -> withState<DisplayingTimeline, _> {
                     val event = focusedEvent?.event?.representation ?: return@withState
                     action(CopyToClipboard(event))
@@ -112,8 +112,6 @@ internal class TimelineContainer(
                     }
                     State.Loading
                 }
-                is RetryClicked -> DebugServer.store.intent(RestoreRequested)
-                is StoreFilterSelected -> filters.update { it.copy(store = intent.store) }
                 is EventFilterSelected -> filters.update {
                     it.copy(
                         events = it.events.toPersistentSet().run {
@@ -121,12 +119,11 @@ internal class TimelineContainer(
                         }
                     )
                 }
-                is CloseFocusedEntryClicked -> updateState<DisplayingTimeline, _> { copy(focusedEvent = null) }
-                is EntryClicked -> updateState<DisplayingTimeline, _> {
+                is EventClicked -> updateState<DisplayingTimeline, _> {
                     if (intent.entry.event == focusedEvent?.event) return@updateState copy(focusedEvent = null)
                     copy(
                         focusedEvent = FocusedEvent(
-                            timestamp = intent.entry.timestamp.toLocalDateTime(timezone),
+                            timestamp = intent.entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
                             storeName = intent.entry.name,
                             type = intent.entry.event.type,
                             event = intent.entry.event,

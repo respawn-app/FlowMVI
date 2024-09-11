@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.debugger.server
 
+import com.benasher44.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
@@ -9,8 +10,11 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
+import pro.respawn.flowmvi.debugger.model.ServerEvent
+import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
+import pro.respawn.flowmvi.debugger.server.ServerIntent.SendCommand
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerState.Idle
@@ -45,6 +49,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
             is RestoreRequested -> updateState<State.Error, _> { previous }
             is StopRequested -> updateStateImmediate { Idle } // needs to be fast
             is ServerStarted -> updateStateImmediate { Running() }
+            is SendCommand -> action(SendClientEvent(intent.storeId, intent.command.event(intent.storeId)))
             is EventReceived -> state {
                 when (val event = intent.event) {
                     is StoreDisconnected -> {
@@ -77,3 +82,12 @@ private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = 
     .takeLast(DebuggerDefaults.ServerHistorySize)
     .plus(event)
     .toPersistentList()
+
+private fun StoreCommand.event(storeId: Uuid) = when (this) {
+    StoreCommand.Stop -> ServerEvent.Stop(storeId)
+    StoreCommand.ResendIntent -> ServerEvent.ResendLastIntent(storeId)
+    StoreCommand.RollbackState -> ServerEvent.RollbackState(storeId)
+    StoreCommand.ResendAction -> ServerEvent.ResendLastAction(storeId)
+    StoreCommand.RethrowException -> ServerEvent.RethrowLastException(storeId)
+    StoreCommand.SetInitialState -> ServerEvent.RollbackToInitialState(storeId)
+}
