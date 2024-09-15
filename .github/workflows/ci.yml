@@ -29,7 +29,7 @@ jobs:
           cache: 'gradle'
 
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v4
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
