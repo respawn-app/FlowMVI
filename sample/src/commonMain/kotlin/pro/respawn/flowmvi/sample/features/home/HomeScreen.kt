@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -57,6 +58,7 @@ import pro.respawn.flowmvi.sample.lce_feature_title
 import pro.respawn.flowmvi.sample.logging_feature_title
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.platform_feature_unavailable_label
 import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
@@ -65,9 +67,9 @@ import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.undoredo_feature_title
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.platform
 import pro.respawn.flowmvi.sample.xml_feature_title
+import pro.respawn.kmmutils.compose.resources.string
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +106,7 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
         is DisplayingHome -> Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxHeight()
-                .adaptiveWidth()
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
         ) {
@@ -126,6 +128,7 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
                     title = stringResource(item.title),
                     color = rainbow[i % rainbow.size],
                     icon = item.icon,
+                    subtitle = item.subtitle?.string(),
                     onClick = { intent(ClickedFeature(item)) }
                 )
             }
@@ -159,3 +162,5 @@ private val HomeFeature.icon
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform
+
+private val HomeFeature.subtitle get() = Res.string.platform_feature_unavailable_label.takeIf { !enabled }

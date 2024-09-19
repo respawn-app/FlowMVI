@@ -10,4 +10,5 @@
     <string name="xml_feature_title">Android XML Support</string>
     <string name="undoredo_feature_title">Undo/Redo</string>
     <string name="decompose_feature_title">Decompose | Essenty Integration</string>
+    <string name="platform_feature_unavailable_label">Run the app on another platform to experience this feature</string>
 </resources>

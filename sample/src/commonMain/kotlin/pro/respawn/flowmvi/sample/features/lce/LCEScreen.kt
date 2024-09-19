@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +35,6 @@ import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
 import pro.respawn.flowmvi.sample.util.verticalListPaddings
 
@@ -112,7 +112,7 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
                 contentPadding = WindowInsets.verticalListPaddings(),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
-                    .adaptiveWidth()
+                    .fillMaxWidth()
             ) {
                 item {
                     Column(modifier = Modifier) {

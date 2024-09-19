@@ -17,12 +17,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.childContext
@@ -42,13 +44,14 @@ import pro.respawn.flowmvi.sample.features.decompose.pages.PagesComponentState.D
 import pro.respawn.flowmvi.sample.features.decompose.pages.PagesIntent.SelectedPage
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.ui.theme.Opacity
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
+import pro.respawn.kmmutils.compose.windowsize.isWideScreen
 
 private const val Description = """
     This feature showcases FlowMVI <> Essenty integration. 
@@ -148,7 +151,7 @@ private fun DecomposeScreenContent(
         is DisplayingPages -> Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .adaptiveWidth()
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -156,6 +159,7 @@ private fun DecomposeScreenContent(
                 text = Description.formatAsMultiline(),
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
+
             ChildPages(
                 pages = pagesComponent.pages,
                 onPageSelected = { pagesComponent.intent(SelectedPage(it)) },
@@ -163,6 +167,14 @@ private fun DecomposeScreenContent(
                 scrollAnimation = PagesScrollAnimation.Default,
                 pageContent = { _, page -> PageContent(page) },
             )
+            if (isWideScreen) {
+                Text(
+                    text = "On desktop, scroll while holding Shift or using a horizontal scroll wheel",
+                    style = MaterialTheme.typography.labelLarge,
+                    modifier = Modifier.padding(horizontal = 12.dp).alpha(Opacity.secondary)
+                )
+                Spacer(Modifier.height(12.dp))
+            }
             CodeText(Code, modifier = Modifier.padding(horizontal = 12.dp))
             Spacer(Modifier.navigationBarsPadding())
         }

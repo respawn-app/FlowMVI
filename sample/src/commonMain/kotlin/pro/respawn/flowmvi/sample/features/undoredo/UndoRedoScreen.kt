@@ -38,7 +38,6 @@ import pro.respawn.flowmvi.sample.ui.widgets.RIcon
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.RTextInput
 import pro.respawn.flowmvi.sample.undoredo_feature_title
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 private const val Description = """
@@ -115,7 +114,7 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     state: UndoRedoState,
 ) = Column(
     modifier = Modifier.fillMaxHeight()
-        .adaptiveWidth()
+        .fillMaxWidth()
         .padding(horizontal = 12.dp)
         .verticalScroll(rememberScrollState()),
     horizontalAlignment = Alignment.CenterHorizontally,

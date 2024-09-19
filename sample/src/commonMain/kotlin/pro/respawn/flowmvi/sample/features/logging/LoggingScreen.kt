@@ -38,7 +38,6 @@ import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RFilledButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
 import pro.respawn.flowmvi.sample.util.verticalListPaddings
 
@@ -111,7 +110,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
         is LoggingState.Loading -> CircularProgressIndicator()
         is LoggingState.Error -> RErrorView(e)
         is DisplayingLogs -> LazyColumn(
-            modifier = Modifier.fillMaxHeight().adaptiveWidth(),
+            modifier = Modifier.fillMaxHeight().fillMaxWidth(),
             contentPadding = WindowInsets.verticalListPaddings(),
             state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,

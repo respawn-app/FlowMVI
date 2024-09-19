@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -83,6 +84,7 @@ fun RTextInput(
     var isFocused by remember { mutableStateOf(false) }
     Column(
         modifier = modifier
+            .widthIn(max = 600.dp)
             .bringIntoViewOnFocus()
             .focusRequester(focusRequester)
             .onFocusChanged { isFocused = it.isFocused }

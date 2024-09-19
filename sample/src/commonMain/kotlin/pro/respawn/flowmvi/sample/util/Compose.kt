@@ -7,10 +7,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActionScope
@@ -45,7 +43,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.sample.ui.theme.Size
@@ -83,8 +80,6 @@ fun KeyboardActions.Companion.default(
 fun rememberSnackbarHostState() = remember { SnackbarHostState() }
 
 fun Modifier.minTouchTarget() = defaultMinSize(Size.touchTarget, Size.touchTarget)
-
-fun Modifier.adaptiveWidth(maxWidth: Dp = 600.dp) = widthIn(max = maxWidth).fillMaxWidth()
 
 @Suppress("ComposableParametersOrdering")
 @Composable

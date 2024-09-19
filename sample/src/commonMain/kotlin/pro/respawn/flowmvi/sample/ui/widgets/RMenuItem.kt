@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.sample.ui.theme.Opacity
 import pro.respawn.flowmvi.sample.ui.theme.rememberRandomColor
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.noIndicationClickable
 import pro.respawn.kmmutils.common.takeIfValid
 import kotlin.contracts.contract
@@ -50,7 +50,7 @@ fun RMenuItem(
         modifier = modifier
             .padding(horizontal = 4.dp, vertical = 4.dp)
             .animateContentSize()
-            .adaptiveWidth()
+            .widthIn(max = 600.dp)
             .then(if (onClick != null) Modifier.noIndicationClickable(onClick = onClick) else Modifier),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

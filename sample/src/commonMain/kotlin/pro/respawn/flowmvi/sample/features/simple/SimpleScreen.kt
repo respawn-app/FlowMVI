@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -28,7 +29,6 @@ import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.ROutlinedButton
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
-import pro.respawn.flowmvi.sample.util.adaptiveWidth
 import pro.respawn.flowmvi.sample.util.formatAsMultiline
 
 //language=kotlin
@@ -84,7 +84,7 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
 ) = Column(
     modifier = Modifier
         .fillMaxHeight()
-        .adaptiveWidth()
+        .fillMaxWidth()
         .padding(horizontal = 12.dp)
         .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.Center,
