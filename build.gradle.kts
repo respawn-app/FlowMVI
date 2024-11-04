@@ -15,7 +15,7 @@ plugins {
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
-    alias(libs.plugins.dependencyAnalysis)
+    // alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.serialization) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.maven.publish) apply false
@@ -98,12 +98,12 @@ doctor {
         ensureJavaHomeMatches.set(false)
     }
 }
-
-dependencyAnalysis {
-    structure {
-        ignoreKtx(true)
-    }
-}
+//
+// dependencyAnalysis {
+//     structure {
+//         ignoreKtx(true)
+//     }
+// }
 
 dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
@@ -127,7 +127,6 @@ atomicfu {
     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
     transformJvm = true
     jvmVariant = "VH"
-    transformJs = true
 }
 
 tasks {
