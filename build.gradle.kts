@@ -13,7 +13,6 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gradleDoctor)
     alias(libs.plugins.version.catalog.update)
-    alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
     // alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.serialization) apply false
@@ -80,13 +79,6 @@ subprojects {
             useJUnitPlatform()
             filter { isFailOnNoMatchingTests = true }
         }
-    }
-    // TODO: Migrate to applying dokka plugin per-project in conventions
-    if (name in setOf("sample", "debugger", "server")) return@subprojects
-    apply(plugin = rootProject.libs.plugins.dokka.id)
-
-    dependencies {
-        dokkaPlugin(rootProject.libs.dokka.android)
     }
 }
 

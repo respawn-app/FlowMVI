@@ -1,6 +1,7 @@
 plugins {
     id("pro.respawn.android-library")
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 android {
