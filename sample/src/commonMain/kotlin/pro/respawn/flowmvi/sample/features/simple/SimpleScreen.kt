@@ -66,7 +66,7 @@ private const val Description = """
 fun SimpleScreen(
     navigator: Navigator,
 ) = with(simpleStore) {
-    LaunchedEffect(Unit) { start(this).join() }
+    LaunchedEffect(Unit) { start(this).awaitUntilClosed() }
 
     val state by subscribe(DefaultLifecycle)
 

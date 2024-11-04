@@ -41,8 +41,8 @@ class StoreExceptionsTest : FreeSpec({
                 }
             }
             "then store is not closed when thrown" {
-                store.test { job ->
-                    job.isActive shouldBe true
+                store.test {
+                    isActive shouldBe true
                     idle()
                     plugin.starts shouldBe 1
                     plugin.exceptions.shouldContainExactly(e)
@@ -50,10 +50,10 @@ class StoreExceptionsTest : FreeSpec({
             }
 
             "then exceptions in processing scope do not cancel the pipeline" {
-                store.test { job ->
+                store.test {
                     intent { }
                     idle()
-                    job.isActive shouldBe true
+                    isActive shouldBe true
                     plugin.intents.shouldBeSingleton()
                 }
             }
@@ -80,7 +80,7 @@ class StoreExceptionsTest : FreeSpec({
             val store = testStore(plugin) {
                 recover { null }
             }
-            store.test { job ->
+            store.test {
                 intent {
                     launch a@{
                         println("job 1 started")
@@ -96,7 +96,7 @@ class StoreExceptionsTest : FreeSpec({
                     }
                 }
                 idle()
-                job.isActive shouldBe true
+                isActive shouldBe true
             }
             idle()
             plugin.intents.shouldBeSingleton()

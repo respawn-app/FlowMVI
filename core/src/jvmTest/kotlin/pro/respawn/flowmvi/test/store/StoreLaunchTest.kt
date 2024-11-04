@@ -37,14 +37,14 @@ class StoreLaunchTest : FreeSpec({
                 store.close()
                 idle()
                 job.isActive shouldBe false
-                job.join()
+                job.awaitUntilClosed()
             }
         }
         "then can be launched twice" {
             coroutineScope {
-                store.start(this).cancelAndJoin()
+                store.start(this).closeAndWait()
                 idle()
-                store.start(this).cancelAndJoin()
+                store.start(this).closeAndWait()
             }
         }
         "then cannot be launched when already launched" {
@@ -52,8 +52,8 @@ class StoreLaunchTest : FreeSpec({
                 supervisorScope {
                     val job1 = store.start(this)
                     val job2 = store.start(this)
-                    job1.cancelAndJoin()
-                    job2.cancelAndJoin()
+                    job1.closeAndWait()
+                    job2.closeAndWait()
                 }
             }
         }

@@ -3,12 +3,13 @@ package pro.respawn.flowmvi.api
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import pro.respawn.flowmvi.api.lifecycle.ImmutableStoreLifecycle
 
 /**
  * A [Store] that does not allow sending intents.
  * @see Store
  */
-public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> {
+public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIAction> : ImmutableStoreLifecycle {
 
     /**
      *  The name of the store. Used for debugging purposes and when storing multiple stores in a collection.
@@ -24,7 +25,7 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
      * assuming you cancel the job used before or call [Store.close].
      * @return a [Job] that the store is running on that can be cancelled later. [Store.close] will cancel that job.
      */
-    public fun start(scope: CoroutineScope): Job
+    public fun start(scope: CoroutineScope): ImmutableStoreLifecycle
 
     /**
      * Subscribe to the store, obtaining a [Provider] to consume [MVIState]s and [MVIAction]s.
