@@ -10,7 +10,7 @@ plugins {
 
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    configureMultiplatform(this) {
+    configureMultiplatform(this, wasmWasi = false) {
         common {
             group("nonBrowser") {
                 withJvm()

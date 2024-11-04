@@ -1,3 +1,5 @@
+import org.jetbrains.dokka.gradle.engine.parameters.VisibilityModifier
+
 plugins {
     id("org.jetbrains.dokka")
     // id("org.jetbrains.dokka-javadoc")
@@ -19,13 +21,14 @@ dokka {
         suppressObviousFunctions = true
     }
     dokkaSourceSets.configureEach {
-        reportUndocumented = true
+        reportUndocumented = false
         enableJdkDocumentationLink = true
         enableAndroidDocumentationLink = true
         enableKotlinStdLibDocumentationLink = true
         skipEmptyPackages = true
         skipDeprecated = true
         jdkVersion = Config.javaVersion.majorVersion.toInt()
+        documentedVisibilities(VisibilityModifier.Public)
     }
     // remoteUrl = Config.docsUrl
 }

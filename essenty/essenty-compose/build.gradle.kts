@@ -23,6 +23,7 @@ kotlin {
         watchOs = false,
         linux = false,
         windows = false,
+        wasmWasi = false,
     )
     sourceSets {
         androidMain.dependencies {

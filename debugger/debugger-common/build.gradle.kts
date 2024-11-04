@@ -7,7 +7,7 @@ plugins {
 }
 
 kotlin {
-    configureMultiplatform(this)
+    configureMultiplatform(this, wasmWasi = false)
 }
 
 android {

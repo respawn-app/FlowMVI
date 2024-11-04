@@ -21,7 +21,7 @@ fun Project.configureMultiplatform(
     watchOs: Boolean = true,
     windows: Boolean = true,
     wasmJs: Boolean = true,
-    wasmWasi: Boolean = false, // TODO: Coroutines do not support wasmWasi yet
+    wasmWasi: Boolean = true,
     configure: KotlinHierarchyBuilder.Root.() -> Unit = {},
 ) = ext.apply {
     val libs by versionCatalog
@@ -49,7 +49,9 @@ fun Project.configureMultiplatform(
         binaries.library()
     }
 
-    if (wasmWasi) wasmWasi()
+    if (wasmWasi) wasmWasi {
+        nodejs()
+    }
 
     if (android) androidTarget {
         publishLibraryVariants("release")

@@ -11,6 +11,7 @@ kotlin {
         // not supported by all needed ktor artifacts?
         watchOs = false,
         wasmJs = false,
+        wasmWasi = false,
     )
 }
 android {

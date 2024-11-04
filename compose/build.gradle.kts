@@ -31,6 +31,7 @@ kotlin {
         linux = false,
         js = true,
         wasmJs = true,
+        wasmWasi = false,
         windows = false,
     )
     sourceSets {

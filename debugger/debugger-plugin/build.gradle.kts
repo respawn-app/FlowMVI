@@ -15,6 +15,7 @@ kotlin {
         js = false,
         wasmJs = false,
         windows = false,
+        wasmWasi = false,
     )
 }
 
