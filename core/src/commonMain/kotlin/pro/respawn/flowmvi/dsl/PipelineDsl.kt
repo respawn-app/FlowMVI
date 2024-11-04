@@ -25,8 +25,9 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> pipelineC
  * Invoke [handler] when the store stops.
  *
  * The biggest difference from [StorePlugin.onStop] is that this handler is attached to the pipeline's job and thus:
- * * there's **no guarantee** on the order of invocations between **all** registered handlers and **any plugins**
- * * there's no guarantee as to which **thread or coroutine context** this will be invoked on.
+ * * This handler must not throw, or the app will crash.
+ * * There's **no guarantee** on the order of invocations between **all** registered handlers and **any plugins**
+ * * There's no guarantee as to which **thread or coroutine context** this will be invoked on.
  * * Implementation of [handler] must be fast, non-blocking, and thread-safe. This handler can be invoked concurrently with the surrounding code.
  *
  * As a rule, this can be useful for cleanup work that you can't put into a [StorePlugin.onStop] callback and that does

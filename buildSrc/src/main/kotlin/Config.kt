@@ -19,7 +19,7 @@ object Config {
     const val majorRelease = 3
     const val minorRelease = 1
     const val patch = 0
-    const val postfix = "-beta01" // include dash (-)
+    const val postfix = "-beta02" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
@@ -76,7 +76,7 @@ object Config {
     val jvmTarget = JvmTarget.JVM_11
     val idePluginJvmTarget = JvmTarget.JVM_17
     val javaVersion = JavaVersion.VERSION_11
-    const val compileSdk = 34
+    const val compileSdk = 35
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
