@@ -1,12 +1,12 @@
 [versions]
-decompose = "3.2.0-beta01"
+decompose = "3.2.0-beta03"
 apiresult = "2.0.0"
-koin = "4.0.0-RC2"
+koin = "4.0.0"
 kmputils = "1.4.4"
 material = "1.12.0"
 okio = "3.9.0"
 splashscreen = "1.1.0-rc01"
-xml-constraintlayout = "2.2.0-beta01"
+xml-constraintlayout = "2.2.0"
 codehighlights = "0.9.0"
 
 [libraries]
