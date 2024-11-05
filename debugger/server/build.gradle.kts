@@ -1,8 +1,36 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.serialization)
+}
+
+val parentNamespace = namespaceByPath()
+
+// must be earlier than other config or build tasks
+val generateBuildConfig by tasks.registering(Sync::class) {
+    from(
+        resources.text.fromString(
+            """
+                package $parentNamespace
+                
+                object BuildFlags {
+                    const val VersionCode = ${Config.versionCode}
+                    const val VersionName = "${Config.versionName}"
+                    const val SupportEmail = "${Config.supportEmail}"
+                    const val ProjectUrl = "${Config.url}"
+                
+                }
+            """.trimIndent()
+        )
+    ) {
+        rename { "BuildFlags.kt" }
+        into(parentNamespace.replace(".", "/"))
+    }
+    // the target directory
+    into(layout.buildDirectory.dir("generated/kotlin/src/commonMain"))
 }
 
 compose.resources {
@@ -14,15 +42,20 @@ tasks {
         sourceCompatibility = Config.jvmTarget.target
         targetCompatibility = Config.jvmTarget.target
     }
+
 }
 kotlin {
     jvm {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget = Config.jvmTarget
         }
     }
 
     sourceSets {
+        commonMain {
+            kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
+        }
         commonMain.dependencies {
             implementation(projects.core)
             implementation(projects.compose)

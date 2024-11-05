@@ -1,5 +1,5 @@
 package pro.respawn.flowmvi.debugger.server.arch.configuration
 
-data object BuildFlags {
-    val debuggable = System.getenv("DEBUG")?.toBooleanStrictOrNull() ?: false
-}
+import pro.respawn.flowmvi.debugger.server.BuildFlags
+
+val BuildFlags.debuggable by lazy { System.getenv("DEBUG")?.toBooleanStrictOrNull() ?: false }

@@ -71,3 +71,5 @@ fun Config.version(isRelease: Boolean) = buildString {
     append(versionName)
     if (!isRelease) append("-SNAPSHOT")
 }
+
+fun Project.namespaceByPath() = "${Config.namespace}.${path.replace(":", ".").removePrefix(".")}"
