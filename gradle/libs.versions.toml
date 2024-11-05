@@ -13,6 +13,7 @@ fragment = "1.8.5"
 gradleAndroid = "8.7.2"
 gradleDoctorPlugin = "0.10.0"
 intellij-ide-plugin = "2.1.0"
+intellij-idea = "2024.1"
 junit = "4.13.2"
 kotest = "6.0.0.M1"
 # @pin
@@ -50,6 +51,7 @@ kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref =
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

@@ -1,7 +1,13 @@
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
     repositories {
-        google()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         gradlePluginPortal()
         mavenCentral()
     }
@@ -39,4 +45,4 @@ include(":debugger:debugger-client")
 include(":debugger:debugger-plugin")
 include(":debugger:server")
 include(":debugger:debugger-common")
-// include(":debugger:ideplugin")
+include(":debugger:ideplugin")

@@ -174,3 +174,4 @@ hs_err_pid*
 **/plugin_encrypted_key.pem
 **/plugin_rsa_private_key.pem
 **/.cache
+/.intellijPlatform/
