@@ -47,6 +47,8 @@ data class IntelliJTheme(
     val background: Color,
     val onBackground: Color,
 ) {
+
+    val isDark = mode == Mode.DARK
     enum class Mode {
         LIGHT,
         DARK,

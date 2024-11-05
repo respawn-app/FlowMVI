@@ -13,6 +13,7 @@ import org.jetbrains.compose.resources.painterResource
 import pro.respawn.flowmvi.debugger.server.di.koin
 import pro.respawn.flowmvi.debugger.server.navigation.AppContent
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
+import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.server.generated.resources.icon_nobg_32
 import pro.respawn.flowmvi.server.generated.resources.Res as UiR
 
@@ -38,5 +39,5 @@ fun main() = application {
         icon = painterResource(UiR.drawable.icon_nobg_32),
         title = "FlowMVI Debugger",
         state = state,
-    ) { AppContent(component) }
+    ) { RespawnTheme { AppContent(component) } }
 }

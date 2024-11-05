@@ -19,20 +19,19 @@ class PluginToolWindow :
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         System.setProperty("compose.swing.render.on.graphics", "true")
         koin.createEagerInstances()
+        val lifecycle = LifecycleRegistry()
+
+        // STOPSHIP: TODO
+        // LifecycleController()
+
+        val component = RootComponent(
+            context = DefaultComponentContext(
+                lifecycle = lifecycle,
+            )
+        )
         toolWindow.apply {
-            // setTitleActions(listOf())
             addComposePanel {
-                val lifecycle = LifecycleRegistry()
-
-                // STOPSHIP: TODO
-                // LifecycleController()
-
-                val component = RootComponent(
-                    context = DefaultComponentContext(
-                        lifecycle = lifecycle,
-                    )
-                )
-                AppContent(component)
+                PluginTheme { AppContent(component) }
             }
         }
     }

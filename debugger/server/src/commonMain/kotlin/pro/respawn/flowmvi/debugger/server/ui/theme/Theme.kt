@@ -4,6 +4,7 @@ package pro.respawn.flowmvi.debugger.server.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
@@ -49,13 +50,13 @@ private val LightColors = lightColorScheme(
     surfaceTint = md_theme_light_surfaceTint,
     outlineVariant = md_theme_light_outlineVariant,
     scrim = md_theme_light_scrim,
-//    surfaceBright = md_theme_light_surfaceBright,
-//    surfaceContainer = md_theme_light_surfaceContainer,
-//    surfaceContainerHigh = md_theme_light_surfaceContainerHigh,
-//    surfaceContainerHighest = md_theme_light_surfaceContainerHighest,
-//    surfaceContainerLow = md_theme_light_surfaceContainerLow,
-//    surfaceContainerLowest = md_theme_light_surfaceContainerLowest,
-//    surfaceDim = md_theme_light_surfaceDim,
+    surfaceBright = md_theme_light_surfaceBright,
+    surfaceContainer = md_theme_light_surfaceContainer,
+    surfaceContainerHigh = md_theme_light_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_light_surfaceContainerHighest,
+    surfaceContainerLow = md_theme_light_surfaceContainerLow,
+    surfaceContainerLowest = md_theme_light_surfaceContainerLowest,
+    surfaceDim = md_theme_light_surfaceDim,
 )
 
 private val DarkColors = darkColorScheme(
@@ -88,27 +89,27 @@ private val DarkColors = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
-    //    surfaceBright = md_theme_dark_surfaceBright,
-    //    surfaceContainer = md_theme_dark_surfaceContainer,
-    //    surfaceContainerHigh = md_theme_dark_surfaceContainerHigh,
-    //    surfaceContainerHighest = md_theme_dark_surfaceContainerHighest,
-    //    surfaceContainerLow = md_theme_dark_surfaceContainerLow,
-    //    surfaceContainerLowest = md_theme_dark_surfaceContainerLowest,
-    //    surfaceDim = md_theme_dark_surfaceDim,
+    surfaceBright = md_theme_dark_surfaceBright,
+    surfaceContainer = md_theme_dark_surfaceContainer,
+    surfaceContainerHigh = md_theme_dark_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_dark_surfaceContainerHighest,
+    surfaceContainerLow = md_theme_dark_surfaceContainerLow,
+    surfaceContainerLowest = md_theme_dark_surfaceContainerLowest,
+    surfaceDim = md_theme_dark_surfaceDim,
 )
 
 @Composable
-internal fun rememberColorScheme(dark: Boolean) = remember(dark) { if (dark) DarkColors else LightColors }
+fun rememberColorScheme(dark: Boolean) = remember(dark) { if (dark) DarkColors else LightColors }
 
 /**
  * Respawn branded theme
  */
 @Composable
 fun RespawnTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    colors: ColorScheme = rememberColorScheme(dark = isSystemInDarkTheme()),
     content: @Composable () -> Unit,
 ) = MaterialTheme(
-    colorScheme = rememberColorScheme(dark = useDarkTheme),
+    colorScheme = colors,
     shapes = shapes,
     typography = AppTypography,
     content = content,
