@@ -24,7 +24,6 @@ class GlobalToolWindowListener(project: Project) : ToolWindowManagerListener {
     ) {
         if (PluginToolWindow.Id !in toolWindowManager.toolWindowIds) return
         val toolWindow = toolWindowManager.getToolWindow(PluginToolWindow.Id) ?: return
-        println("Tool window: $changeType, ${toolWindow.id}")
         when (changeType) {
             RegisterToolWindow -> lifecycle.create()
             UnregisterToolWindow -> lifecycle.destroy()

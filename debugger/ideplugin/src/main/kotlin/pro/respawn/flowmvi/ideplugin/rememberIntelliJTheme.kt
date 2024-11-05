@@ -46,6 +46,9 @@ data class IntelliJTheme(
     val primary: Color,
     val background: Color,
     val onBackground: Color,
+    val surface: Color,
+    val onSurface: Color,
+    val onPrimary: Color,
 ) {
 
     val isDark = mode == Mode.DARK
@@ -69,18 +72,15 @@ private class IntelliJThemeExtractorImpl : IntelliJThemeExtractor {
         theme = buildIntelliJTheme()
     }
 
-    private fun buildIntelliJTheme(): IntelliJTheme {
-        val theme = getCurrentTheme()
-        val primary = getColor(PRIMARY)
-        val background = getColor(BACKGROUND_KEY)
-        val onBackground = getColor(ON_BACKGROUND_KEY)
-        return IntelliJTheme(
-            mode = theme,
-            primary = primary,
-            background = background,
-            onBackground = onBackground,
-        )
-    }
+    private fun buildIntelliJTheme() = IntelliJTheme(
+        mode = getCurrentTheme(),
+        primary = getColor(ColorKey.LinkFg),
+        onPrimary = getColor(ColorKey.ButtonBg),
+        background = getColor(ColorKey.PanelBg),
+        onBackground = getColor(ColorKey.PanelFg),
+        surface = getColor(ColorKey.EditorBg),
+        onSurface = getColor(ColorKey.EditorFg),
+    )
 
     @Suppress("UnstableApiUsage")
     private fun getCurrentTheme(): IntelliJTheme.Mode {
@@ -92,12 +92,19 @@ private class IntelliJThemeExtractorImpl : IntelliJThemeExtractor {
         }
     }
 
-    private fun getColor(key: String): Color = UIManager.getColor(key).toComposeColor()
+    private fun getColor(key: ColorKey): Color = requireNotNull(UIManager.getColor(key.key)?.toComposeColor()) {
+        "Color not found: ${key.key}"
+    }
 
     companion object {
-        private const val PRIMARY = "Link.activeForeground"
-        private const val BACKGROUND_KEY = "Panel.background"
-        private const val ON_BACKGROUND_KEY = "Panel.foreground"
+        enum class ColorKey(val key: String) {
+            ButtonBg("Button.background"),
+            LinkFg("Link.activeForeground"),
+            PanelBg("Panel.background"),
+            PanelFg("Panel.foreground"),
+            EditorBg("EditorPane.background"),
+            EditorFg("EditorPane.foreground"),
+        }
 
         private fun AwtColor.toComposeColor(): Color = Color(red, green, blue, alpha)
     }

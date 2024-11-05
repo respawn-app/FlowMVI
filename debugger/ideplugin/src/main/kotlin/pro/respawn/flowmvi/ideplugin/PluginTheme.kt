@@ -13,7 +13,17 @@ fun PluginTheme(content: @Composable () -> Unit) {
         colorTheme.copy(
             primary = ideTheme.primary,
             background = ideTheme.background,
-            onBackground = ideTheme.onBackground
+            onBackground = ideTheme.onBackground,
+            surface = ideTheme.surface,
+            onSurface = ideTheme.onSurface,
+            surfaceContainer = ideTheme.surface,
+            surfaceContainerLowest = ideTheme.surface,
+            surfaceContainerLow = ideTheme.surface,
+            surfaceContainerHigh = ideTheme.surface,
+            surfaceContainerHighest = ideTheme.surface,
+            surfaceVariant = ideTheme.surface,
+            onSurfaceVariant = ideTheme.onSurface,
+            onPrimary = ideTheme.onPrimary,
         )
     }
     RespawnTheme(
