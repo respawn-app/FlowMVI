@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("jvm")
     alias(libs.plugins.compose)
@@ -23,10 +21,6 @@ repositories {
     intellijPlatform {
         defaultRepositories()
     }
-}
-
-configurations.all {
-    exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib")
 }
 
 intellijPlatform {
@@ -71,9 +65,21 @@ tasks {
     }
 }
 
+// https://youtrack.jetbrains.com/issue/IJPL-1901
+configurations.implementation.configure {
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+}
+configurations.api.configure {
+    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+}
+
 dependencies {
     compileOnly(compose.desktop.currentOs)
     compileOnly(libs.kotlin.stdlib)
+    compileOnly(libs.kotlin.coroutines.core)
+
+    // implementation(libs.kotlin.coroutines.swing)
+
     implementation(compose.desktop.common)
     implementation(compose.desktop.linux_arm64)
     implementation(compose.desktop.linux_x64)
@@ -98,20 +104,7 @@ dependencies {
 }
 
 tasks {
-    // workaround for https://youtrack.jetbrains.com/issue/IDEA-285839/Classpath-clash-when-using-coroutines-in-an-unbundled-IntelliJ-plugin
     buildPlugin {
-        exclude { "coroutines" in it.name }
         archiveFileName = "flowmvi-$version.zip"
     }
-    prepareSandbox {
-        exclude { "coroutines" in it.name }
-    }
 }
-//
-// configurations.configureEach {
-//     resolutionStrategy.eachDependency {
-//         if (requested.group == libs.kotlin.stdlib.get().group) {
-//             useVersion(libs.versions.kotlin.asProvider().get())
-//         }
-//     }
-// }

@@ -9,8 +9,17 @@ compose.resources {
     publicResClass = true
 }
 
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = Config.jvmTarget.target
+        targetCompatibility = Config.jvmTarget.target
+    }
+}
 kotlin {
     jvm {
+        compilerOptions {
+            jvmTarget = Config.jvmTarget
+        }
     }
 
     sourceSets {
@@ -44,7 +53,6 @@ kotlin {
             implementation(libs.kotlin.atomicfu)
         }
         jvmMain.dependencies {
-            implementation(libs.kotlin.coroutines.swing)
             implementation(compose.desktop.common)
         }
     }
