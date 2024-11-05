@@ -4,9 +4,9 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.api.StorePlugin
 
 /**
  * Alias for [StorePlugin.onStop] callback or `plugin { onStop { block() } }`

@@ -42,7 +42,6 @@ tasks {
         sourceCompatibility = Config.jvmTarget.target
         targetCompatibility = Config.jvmTarget.target
     }
-
 }
 kotlin {
     jvm {

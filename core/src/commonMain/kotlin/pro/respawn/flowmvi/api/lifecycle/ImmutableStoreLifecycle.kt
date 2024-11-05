@@ -1,7 +1,16 @@
 package pro.respawn.flowmvi.api.lifecycle
 
+import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.Store
 
+/**
+ * A lifecycle of a [Store]. This handle allows syncing operations with the events of the store's startup and shutdown.
+ *
+ * * [Store] implements [StoreLifecycle]
+ * * [ImmutableStore] implements [ImmutableStoreLifecycle]
+ *
+ * This is also returned from [Store.start]
+ */
 public interface ImmutableStoreLifecycle {
 
     /**

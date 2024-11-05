@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import pro.respawn.flowmvi.api.lifecycle.ImmutableStoreLifecycle
+import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
 /**
  * A [Store] that does not allow sending intents.
@@ -20,10 +21,21 @@ public interface ImmutableStore<out S : MVIState, in I : MVIIntent, out A : MVIA
     /**
      * Starts store intent processing in a new coroutine in the given [scope].
      * Intents are processed as long as the parent scope is active.
+     *
      * **Starting store processing when it is already started will result in an exception.**
+     *
      * Although not always needed, store can be launched multiple times,
      * assuming you cancel the job used before or call [Store.close].
-     * @return a [Job] that the store is running on that can be cancelled later. [Store.close] will cancel that job.
+     *
+     * Returns an [ImmutableStoreLifecycle] that the store is running on that can be cancelled later.
+     * A mutable version [Store] returns a mutable [StoreLifecycle] that can be used to stop the store.
+     *
+     * The [Store] also implements [StoreLifecycle] but there is an **important** distinction between the one returned
+     * by this method and the [Store] itself. The returned reference only tracks the lifecycle resulting from this call,
+     * while the [Store] tracks **all** starts and stops as a single lifecycle.
+     *
+     * For example, waiting for startup or closing the returned lifecycle multiple times is a no-op, while the store
+     * object itself will have the opposite behavior and wait for the next [start] call.
      */
     public fun start(scope: CoroutineScope): ImmutableStoreLifecycle
 
