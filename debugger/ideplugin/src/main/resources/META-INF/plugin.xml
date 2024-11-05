@@ -5,7 +5,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="FlowMVI" anchor="bottom" doNotActivateOnStart="false"
-            factoryClass="pro.respawn.flowmvi.ideplugin.PluginToolWindow" icon="/icon.svg" />
+            factoryClass="pro.respawn.flowmvi.ideplugin.PluginToolWindow" icon="/ic_flowmvi_13.svg" />
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
