@@ -11,4 +11,9 @@
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <supportsKotlinPluginMode supportsK2="true" />
     </extensions>
+
+    <projectListeners>
+        <listener class="pro.respawn.flowmvi.ideplugin.GlobalToolWindowListener"
+            topic="com.intellij.openapi.wm.ex.ToolWindowManagerListener" />
+    </projectListeners>
 </idea-plugin>

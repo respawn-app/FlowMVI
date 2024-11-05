@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.ideplugin
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.awt.ComposePanel
 import com.arkivanov.decompose.DefaultComponentContext
-import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
@@ -19,21 +18,23 @@ class PluginToolWindow :
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         System.setProperty("compose.swing.render.on.graphics", "true")
         koin.createEagerInstances()
-        val lifecycle = LifecycleRegistry()
-
-        // STOPSHIP: TODO
-        // LifecycleController()
 
         val component = RootComponent(
             context = DefaultComponentContext(
-                lifecycle = lifecycle,
+                lifecycle = GlobalToolWindowListener.lifecycle
             )
         )
         toolWindow.apply {
-            addComposePanel {
+            addComposePanel(displayName = Id) {
                 PluginTheme { AppContent(component) }
             }
         }
+    }
+
+    companion object {
+
+        // value derived from the plugin.xml and MUST be kept in sync
+        const val Id = "FlowMVI"
     }
 }
 

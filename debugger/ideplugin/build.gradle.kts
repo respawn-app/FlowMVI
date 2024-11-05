@@ -86,6 +86,7 @@ dependencies {
     implementation(compose.desktop.macos_arm64)
     implementation(compose.desktop.macos_x64)
     implementation(compose.desktop.windows_x64)
+    implementation(compose.material3)
 
     implementation(projects.core)
     implementation(projects.debugger.server)
