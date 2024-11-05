@@ -32,7 +32,7 @@ import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 @OptIn(DelicateStoreApi::class)
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipeline(
     parent: CoroutineScope,
-    config: StoreConfiguration<S>,
+    storeConfig: StoreConfiguration<S>,
     crossinline onStop: (e: Exception?) -> Unit,
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
@@ -54,19 +54,19 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
         StoreLifecycleModule by storeLifecycle(job),
         ActionReceiver<A> {
 
-        override val config get() = config
+        override val config = storeConfig
         override val key = PipelineContext // recoverable should be separate from this key
         private val handler = PipelineExceptionHandler()
         private val pipelineName = CoroutineName(toString())
 
         override val coroutineContext = parent.coroutineContext +
-            config.coroutineContext +
+                storeConfig.coroutineContext +
             pipelineName +
             job +
             handler +
             this
 
-        override fun toString(): String = "${config.name.orEmpty()}PipelineContext"
+        override fun toString(): String = "${storeConfig.name.orEmpty()}PipelineContext"
 
         override suspend fun updateState(transform: suspend S.() -> S) = catch { onTransformState(transform) }
         override suspend fun action(action: A) = catch { onAction(action) }

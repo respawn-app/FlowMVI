@@ -52,7 +52,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun start(scope: CoroutineScope) = launchPipeline(
         parent = scope,
-        config = config,
+        storeConfig = config,
         onAction = { action -> onAction(action)?.let { this@StoreImpl.action(it) } },
         onTransformState = { transform ->
             this@StoreImpl.updateState { onState(this, transform()) ?: this }

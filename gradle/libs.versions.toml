@@ -23,7 +23,9 @@ kotlin-io = "0.5.4"
 kotlinx-atomicfu = "0.26.0"
 ktor = "3.0.1"
 lifecycle = "2.8.3"
-androidx-lifecycle = "2.8.7"
+# @pin
+#noinspection GradleDependency - must match jb-lifecycle
+androidx-lifecycle = "2.8.3"
 maven-publish-plugin = "0.30.0"
 serialization = "1.7.3"
 turbine = "1.2.0"
