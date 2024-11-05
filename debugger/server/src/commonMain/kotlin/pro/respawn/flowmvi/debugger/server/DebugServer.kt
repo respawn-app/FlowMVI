@@ -34,37 +34,40 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
     private var server: EmbeddedServer<*, *>? by atomic(null)
     private val logger = PlatformStoreLogger
 
-    fun start(host: String, port: Int) = embeddedServer(Netty, port = port, host = host) {
-        configureDebugServer()
-        // store will be started / closed along with the server
-        store.start(this)
-        store.intent(ServerStarted)
-        routing {
-            get("/") { call.respondText("FlowMVI Debugger Online", null) }
-            webSocket("/{id}") {
-                val storeId = call.parameters.getOrFail("id").asUUID
-                with(store) {
-                    try {
-                        subscribe {
-                            actions
-                                .filterIsInstance<SendClientEvent>()
-                                .filter { it.client == storeId }
-                                .collect { sendSerialized<ServerEvent>(it.event) }
+    fun start(host: String, port: Int) {
+        if (store.isActive) return
+        embeddedServer(Netty, port = port, host = host) {
+            configureDebugServer()
+            // store will be started / closed along with the server
+            store.start(this)
+            store.intent(ServerStarted)
+            routing {
+                get("/") { call.respondText("FlowMVI Debugger Online", null) }
+                webSocket("/{id}") {
+                    val storeId = call.parameters.getOrFail("id").asUUID
+                    with(store) {
+                        try {
+                            subscribe {
+                                actions
+                                    .filterIsInstance<SendClientEvent>()
+                                    .filter { it.client == storeId }
+                                    .collect { sendSerialized<ServerEvent>(it.event) }
+                            }
+                            while (true) {
+                                val event = receiveDeserialized<ClientEvent>()
+                                intent(EventReceived(event, storeId))
+                            }
+                        } finally {
+                            logger(StoreLogLevel.Debug) { "Store $storeId disconnected" }
+                            intent(EventReceived(StoreDisconnected(storeId), storeId))
                         }
-                        while (true) {
-                            val event = receiveDeserialized<ClientEvent>()
-                            intent(EventReceived(event, storeId))
-                        }
-                    } finally {
-                        logger(StoreLogLevel.Debug) { "Store $storeId disconnected" }
-                        intent(EventReceived(StoreDisconnected(storeId), storeId))
                     }
                 }
             }
         }
+            .also { server = it }
+            .start()
     }
-        .also { server = it }
-        .start()
 
     suspend fun stop() = withContext(Dispatchers.IO) {
         store.intent(StopRequested)
