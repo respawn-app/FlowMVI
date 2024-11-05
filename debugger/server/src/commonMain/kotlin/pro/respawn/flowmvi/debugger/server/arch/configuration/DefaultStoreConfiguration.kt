@@ -26,7 +26,7 @@ internal class DefaultStoreConfiguration(
         fileName: String,
     ) = CompressedFileSaver(
         // TODO: Abstract away
-        path = File("states").apply { mkdirs() }.resolve("$fileName.json").absolutePath,
+        path = File(".cache").apply { mkdirs() }.resolve("$fileName.json.gz").absolutePath,
         recover = NullRecover
     ).let { JsonSaver(json, serializer, it) }
 
