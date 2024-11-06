@@ -4,7 +4,6 @@ plugins {
     id(libs.plugins.kotlinMultiplatform.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
 }
 
 kotlin {
@@ -23,21 +22,11 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
 
-            implementation(applibs.apiresult)
             implementation(applibs.decompose)
             implementation(applibs.decompose.compose)
-            implementation(applibs.bundles.kmputils)
             implementation(applibs.bundles.koin)
 
-            implementation(libs.bundles.serialization)
-            implementation(libs.kotlin.datetime)
-            implementation(libs.uuid)
-            implementation(libs.kotlin.io)
-
-            implementation(projects.core)
             implementation(projects.debugger.server)
-            implementation(projects.debugger.debuggerCommon)
-            implementation(projects.compose)
         }
         desktopMain.apply {
             dependencies {

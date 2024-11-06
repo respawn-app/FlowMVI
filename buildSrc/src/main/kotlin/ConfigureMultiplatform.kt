@@ -4,11 +4,11 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyBuilder
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
-@OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
+@OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
 fun Project.configureMultiplatform(
     ext: KotlinMultiplatformExtension,
     jvm: Boolean = true,
@@ -21,7 +21,7 @@ fun Project.configureMultiplatform(
     watchOs: Boolean = true,
     windows: Boolean = true,
     wasmJs: Boolean = true,
-    wasmWasi: Boolean = false, // TODO: Coroutines do not support wasmWasi yet
+    wasmWasi: Boolean = true,
     configure: KotlinHierarchyBuilder.Root.() -> Unit = {},
 ) = ext.apply {
     val libs by versionCatalog
@@ -49,7 +49,9 @@ fun Project.configureMultiplatform(
         binaries.library()
     }
 
-    if (wasmWasi) wasmWasi()
+    if (wasmWasi) wasmWasi {
+        nodejs()
+    }
 
     if (android) androidTarget {
         publishLibraryVariants("release")

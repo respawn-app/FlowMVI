@@ -14,7 +14,6 @@ import pro.respawn.flowmvi.debugger.server.di.koin
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
 import pro.respawn.flowmvi.debugger.server.navigation.destination.Destinations
 import pro.respawn.flowmvi.debugger.server.navigation.util.defaultNavAnimation
-import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
 import pro.respawn.kmmutils.compose.windowsize.isWideScreen
 
@@ -22,33 +21,31 @@ import pro.respawn.kmmutils.compose.windowsize.isWideScreen
 fun AppContent(
     root: RootComponent
 ) = KoinContext(koin) {
-    RespawnTheme {
-        val navigator = rememberAppNavigator(isWideScreen, root)
-        val details by root.details.details.subscribeAsState()
-        DynamicTwoPaneLayout(
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-            secondPaneVisible = details.child != null && isWideScreen,
-            firstPaneContent = {
-                Children(
-                    stack = root.stack,
-                    animation = defaultNavAnimation(root),
-                ) { child ->
-                    Destinations(
-                        component = child.instance,
-                        destination = child.configuration,
-                        navigator = navigator,
-                    )
-                }
-            },
-            secondaryPaneContent = pane@{
-                Crossfade(details.child) { value ->
-                    Destinations(
-                        component = value?.instance ?: return@Crossfade,
-                        destination = value.configuration,
-                        navigator = navigator,
-                    )
-                }
-            },
-        )
-    }
+    val navigator = rememberAppNavigator(isWideScreen, root)
+    val details by root.details.details.subscribeAsState()
+    DynamicTwoPaneLayout(
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+        secondPaneVisible = details.child != null && isWideScreen,
+        firstPaneContent = {
+            Children(
+                stack = root.stack,
+                animation = defaultNavAnimation(root),
+            ) { child ->
+                Destinations(
+                    component = child.instance,
+                    destination = child.configuration,
+                    navigator = navigator,
+                )
+            }
+        },
+        secondaryPaneContent = pane@{
+            Crossfade(details.child) { value ->
+                Destinations(
+                    component = value?.instance ?: return@Crossfade,
+                    destination = value.configuration,
+                    navigator = navigator,
+                )
+            }
+        },
+    )
 }

@@ -48,7 +48,7 @@ class ActionShareBehaviorTest : FreeSpec({
                                 intent { action(TestAction.Some) }
                             }.join()
                         }
-                        job.join()
+                        job.closeAndWait()
                     }
                 }
             }

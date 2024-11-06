@@ -52,7 +52,7 @@ jobs:
         run: cp ./README.md ./docs/README.md
 
       - name: Generate docs
-        run: ./gradlew :dokkaHtmlMultiModule --no-configuration-cache
+        run: ./gradlew :dokkaGenerateHtml
 
       - name: Move docs to the parent docs dir
         run: cp -r ./build/dokka/htmlMultiModule/ ./docs/javadocs/

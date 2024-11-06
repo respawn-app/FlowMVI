@@ -3,13 +3,15 @@ package pro.respawn.flowmvi.debugger.server.ui.screens.connect
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -58,14 +60,17 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(Res.drawable.icon_nobg_32),
-                modifier = Modifier.padding(64.dp).size(120.dp),
-                contentDescription = null,
-            )
+            Box(Modifier.weight(1f).aspectRatio(1f), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(Res.drawable.icon_nobg_32),
+                    modifier = Modifier.matchParentSize().padding(64.dp).sizeIn(maxWidth = 120.dp, maxHeight = 120.dp),
+                    contentDescription = null,
+                )
+            }
             RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
             RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
-            TextButton(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
+            Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
+            Box(Modifier.weight(0.5f, fill = false))
         }
     }
 }

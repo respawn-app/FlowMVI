@@ -6,6 +6,7 @@ plugins {
 
     // TODO: https://github.com/kotest/kotest/issues/3598
     // alias(libs.plugins.kotest)
+    dokkaDocumentation
 }
 
 android {

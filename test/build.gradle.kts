@@ -1,6 +1,7 @@
 plugins {
     id("pro.respawn.shared-library")
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 android {
     namespace = "${Config.namespace}.test"

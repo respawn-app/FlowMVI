@@ -3,10 +3,11 @@ plugins {
     id("com.android.library")
     alias(libs.plugins.serialization)
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 kotlin {
-    configureMultiplatform(this)
+    configureMultiplatform(this, wasmWasi = false)
 }
 
 android {

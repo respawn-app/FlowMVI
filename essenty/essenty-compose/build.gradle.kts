@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 android {
@@ -22,6 +23,7 @@ kotlin {
         watchOs = false,
         linux = false,
         windows = false,
+        wasmWasi = false,
     )
     sourceSets {
         androidMain.dependencies {

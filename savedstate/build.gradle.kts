@@ -5,11 +5,12 @@ plugins {
     alias(libs.plugins.serialization)
     id("com.android.library")
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    configureMultiplatform(this) {
+    configureMultiplatform(this, wasmWasi = false) {
         common {
             group("nonBrowser") {
                 withJvm()

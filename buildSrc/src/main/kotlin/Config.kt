@@ -19,7 +19,7 @@ object Config {
     const val majorRelease = 3
     const val minorRelease = 1
     const val patch = 0
-    const val postfix = "-beta01" // include dash (-)
+    const val postfix = "-beta02" // include dash (-)
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
@@ -28,6 +28,7 @@ object Config {
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
+    const val docsUrl = "https://opensource.respawn.pro/FlowMVI/#/"
     const val description = """A Kotlin Multiplatform MVI library based on coroutines with a powerful plugin system"""
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
@@ -76,7 +77,7 @@ object Config {
     val jvmTarget = JvmTarget.JVM_11
     val idePluginJvmTarget = JvmTarget.JVM_17
     val javaVersion = JavaVersion.VERSION_11
-    const val compileSdk = 34
+    const val compileSdk = 35
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26

@@ -31,7 +31,7 @@ internal fun HttpClient(
     pingInterval: Long = 5000L
 ) = HttpClient(CIO) {
     install(WebSockets) {
-        this.pingInterval = pingInterval
+        pingIntervalMillis = pingInterval
         contentConverter = KotlinxWebsocketSerializationConverter(json)
     }
     install(Logging) {
@@ -57,7 +57,6 @@ internal fun HttpClient(
         identity(0.5f)
     }
     addDefaultResponseValidation()
-    developmentMode = true
     expectSuccess = true
     followRedirects = true
     engine {

@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StateConsumer
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.dsl.subscribe
+import kotlin.jvm.JvmName
 
 /**
  *  Subscribe to the [store] lifecycle-aware.

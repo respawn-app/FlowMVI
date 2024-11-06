@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.DelicateStoreApi
@@ -18,7 +17,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.StoreConfiguration
-import kotlin.coroutines.CoroutineContext
+import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
 /**
  * Coroutine context consists of the following: job, name, handler, dispatcher.
@@ -31,23 +30,15 @@ import kotlin.coroutines.CoroutineContext
  * * using this pipeline instance as the context element
  */
 @OptIn(DelicateStoreApi::class)
-@Suppress("Indentation")
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipeline(
     parent: CoroutineScope,
-    config: StoreConfiguration<S>,
+    storeConfig: StoreConfiguration<S>,
     crossinline onStop: (e: Exception?) -> Unit,
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     crossinline onTransformState: suspend PipelineContext<S, I, A>.(transform: suspend S.() -> S) -> Unit,
-    onStart: PipelineContext<S, I, A>.() -> Unit,
-): Job where T : IntentReceiver<I>, T : StateReceiver<S>, T : RecoverModule<S, I, A> = object :
-    IntentReceiver<I> by this,
-    StateReceiver<S> by this,
-    PipelineContext<S, I, A>,
-    ActionReceiver<A> {
-
-    override val config get() = config
-    override val key = PipelineContext // recoverable should be separate.
-    private val job = SupervisorJob(parent.coroutineContext[Job]).apply {
+    onStart: PipelineContext<S, I, A>.(lifecycle: StoreLifecycleModule) -> Unit,
+): StoreLifecycle where T : IntentReceiver<I>, T : StateReceiver<S>, T : RecoverModule<S, I, A> {
+    val job = SupervisorJob(parent.coroutineContext[Job]).apply {
         invokeOnCompletion {
             when (it) {
                 null, is CancellationException -> onStop(null)
@@ -56,23 +47,33 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
             }
         }
     }
-    private val handler = PipelineExceptionHandler()
-    private val pipelineName = CoroutineName(toString())
-    override val coroutineContext: CoroutineContext = parent.coroutineContext +
-        config.coroutineContext +
-        pipelineName +
-        job +
-        handler +
-        this
+    return object :
+        IntentReceiver<I> by this,
+        StateReceiver<S> by this,
+        PipelineContext<S, I, A>,
+        StoreLifecycleModule by storeLifecycle(job),
+        ActionReceiver<A> {
 
-    override fun toString(): String = "${config.name.orEmpty()}PipelineContext"
+        override val config = storeConfig
+        override val key = PipelineContext // recoverable should be separate from this key
+        private val handler = PipelineExceptionHandler()
+        private val pipelineName = CoroutineName(toString())
 
-    override suspend fun updateState(transform: suspend S.() -> S) = catch { onTransformState(transform) }
-    override suspend fun action(action: A) = catch { onAction(action) }
-    override fun send(action: A) {
-        launch { action(action) }
+        override val coroutineContext = parent.coroutineContext +
+            storeConfig.coroutineContext +
+            pipelineName +
+            job +
+            handler +
+            this
+
+        override fun toString(): String = "${storeConfig.name.orEmpty()}PipelineContext"
+
+        override suspend fun updateState(transform: suspend S.() -> S) = catch { onTransformState(transform) }
+        override suspend fun action(action: A) = catch { onAction(action) }
+        override fun send(action: A) {
+            launch { action(action) }
+        }
+    }.apply {
+        onStart(this)
     }
-}.run {
-    onStart()
-    coroutineContext.job
 }

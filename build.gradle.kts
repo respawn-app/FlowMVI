@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
@@ -13,9 +15,8 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.gradleDoctor)
     alias(libs.plugins.version.catalog.update)
-    alias(libs.plugins.dokka)
     alias(libs.plugins.atomicfu)
-    alias(libs.plugins.dependencyAnalysis)
+    // alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.serialization) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.maven.publish) apply false
@@ -46,6 +47,13 @@ subprojects {
     afterEvaluate {
         extensions.findByType<MavenPublishBaseExtension>()?.run {
             val isReleaseBuild = properties["release"]?.toString().toBoolean()
+            configure(
+                KotlinMultiplatform(
+                    javadocJar = JavadocJar.Empty(),
+                    sourcesJar = true,
+                    androidVariantsToPublish = listOf("release"),
+                )
+            )
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, false)
             if (isReleaseBuild) signAllPublications()
             coordinates(Config.artifactId, name, Config.version(isReleaseBuild))
@@ -81,13 +89,6 @@ subprojects {
             filter { isFailOnNoMatchingTests = true }
         }
     }
-    // TODO: Migrate to applying dokka plugin per-project in conventions
-    if (name in setOf("sample", "debugger", "server")) return@subprojects
-    apply(plugin = rootProject.libs.plugins.dokka.id)
-
-    dependencies {
-        dokkaPlugin(rootProject.libs.dokka.android)
-    }
 }
 
 doctor {
@@ -98,12 +99,12 @@ doctor {
         ensureJavaHomeMatches.set(false)
     }
 }
-
-dependencyAnalysis {
-    structure {
-        ignoreKtx(true)
-    }
-}
+//
+// dependencyAnalysis {
+//     structure {
+//         ignoreKtx(true)
+//     }
+// }
 
 dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
@@ -127,7 +128,6 @@ atomicfu {
     dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
     transformJvm = true
     jvmVariant = "VH"
-    transformJs = true
 }
 
 tasks {

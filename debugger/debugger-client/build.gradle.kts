@@ -3,6 +3,7 @@ plugins {
     id("com.android.library")
     alias(libs.plugins.serialization)
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 kotlin {
     configureMultiplatform(
@@ -10,6 +11,7 @@ kotlin {
         // not supported by all needed ktor artifacts?
         watchOs = false,
         wasmJs = false,
+        wasmWasi = false,
     )
 }
 android {

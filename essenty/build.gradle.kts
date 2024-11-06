@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 kotlin {
@@ -13,7 +14,8 @@ kotlin {
         tvOs = false,
         watchOs = false,
         linux = false,
-        windows = false
+        windows = false,
+        wasmWasi = false,
     )
 }
 

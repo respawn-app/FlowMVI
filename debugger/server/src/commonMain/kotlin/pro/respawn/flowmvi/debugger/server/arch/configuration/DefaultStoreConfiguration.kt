@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.debugger.server.BuildFlags
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.savedstate.api.NullRecover
@@ -26,7 +27,7 @@ internal class DefaultStoreConfiguration(
         fileName: String,
     ) = CompressedFileSaver(
         // TODO: Abstract away
-        path = File("states").apply { mkdirs() }.resolve("$fileName.json").absolutePath,
+        path = File(".cache").apply { mkdirs() }.resolve("$fileName.json.gz").absolutePath,
         recover = NullRecover
     ).let { JsonSaver(json, serializer, it) }
 

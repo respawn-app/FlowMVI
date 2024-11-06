@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.maven.publish)
+    dokkaDocumentation
 }
 
 android {
@@ -30,6 +31,7 @@ kotlin {
         linux = false,
         js = true,
         wasmJs = true,
+        wasmWasi = false,
         windows = false,
     )
     sourceSets {

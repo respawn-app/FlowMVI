@@ -10,7 +10,6 @@ import kotlin.time.Duration.Companion.seconds
 class CoreTestConfig : AbstractProjectConfig() {
 
     override val coroutineTestScope = true
-    override var testCoroutineDispatcher = true
     override val includeTestScopePrefixes: Boolean = true
     override val failOnEmptyTestSuite: Boolean = true
     override val isolationMode: IsolationMode = IsolationMode.SingleInstance
