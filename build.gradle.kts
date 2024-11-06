@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.SonatypeHost
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
@@ -45,6 +47,13 @@ subprojects {
     afterEvaluate {
         extensions.findByType<MavenPublishBaseExtension>()?.run {
             val isReleaseBuild = properties["release"]?.toString().toBoolean()
+            configure(
+                KotlinMultiplatform(
+                    javadocJar = JavadocJar.Empty(),
+                    sourcesJar = true,
+                    androidVariantsToPublish = listOf("release"),
+                )
+            )
             publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, false)
             if (isReleaseBuild) signAllPublications()
             coordinates(Config.artifactId, name, Config.version(isReleaseBuild))
