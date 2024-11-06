@@ -80,11 +80,11 @@ dependencies {
 
 ## Why FlowMVI?
 
-* Powerful Plug-In system to automate processes and **reuse any business logic** you desire.
+* Powerful Plug-In system to automate processes and **reuse any business logic** you desire
     * Create automatic analytics handlers, websocket connections, error handling mechanisms, or anything else once and
-      reuse them throughout your whole project automatically.
+      reuse them throughout your whole project automatically
 * Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
-* Create multiplatform business logic components with pluggable UI using **0 platform code**.
+* Create multiplatform business logic components with pluggable UI using **0 platform code**
 * Automatically **recover from any errors** and prevent crashes
 * Automatic multiplatform system **lifecycle handling**
 * Out of the box **debugging, logging, testing, undo/redo, caching and long-running tasks** support
@@ -95,11 +95,11 @@ dependencies {
 * First class Compose Multiplatform support optimized for performance and ease of use
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
-* Dedicated remote debugger app for Windows, Linux, MacOS
-* The core library depends on kotlin coroutines. Nothing else.
+* Dedicated remote debugger IDEA/AS plugin and app for Windows, Linux, MacOS
+* The core library depends on kotlin coroutines. Nothing else
 * Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
 * Core library is fully covered by tests
-* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser.
+* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 
 ## How does it look?
 
@@ -332,9 +332,11 @@ timerPlugin(timer).test(Loading) {
 }
 ```
 
-## Debugger App
+## Debugger Plugin + App
 
-<img src="docs/images/debugger.gif" width="1200" alt="">
+
+https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
+
 
 Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
