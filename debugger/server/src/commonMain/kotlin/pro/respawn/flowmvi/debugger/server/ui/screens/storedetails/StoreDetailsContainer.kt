@@ -4,8 +4,6 @@ import com.benasher44.uuid.Uuid
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.server.DebugServer
@@ -21,7 +19,6 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsI
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
 import pro.respawn.flowmvi.debugger.server.util.representation
-import pro.respawn.flowmvi.debugger.server.util.type
 import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
@@ -79,16 +76,8 @@ internal class StoreDetailsContainer(
                     action(CopyToClipboard(event))
                 }
                 is EventClicked -> updateState<DisplayingStore, _> {
-                    if (intent.entry.event == focusedEvent?.event) return@updateState copy(focusedEvent = null)
-                    copy(
-                        focusedEvent = FocusedEvent(
-                            timestamp = intent.entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
-                            storeName = intent.entry.name,
-                            type = intent.entry.event.type,
-                            event = intent.entry.event,
-                            id = intent.entry.id,
-                        )
-                    )
+                    if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
+                    copy(focusedEvent = FocusedEvent(intent.entry))
                 }
             }
         }

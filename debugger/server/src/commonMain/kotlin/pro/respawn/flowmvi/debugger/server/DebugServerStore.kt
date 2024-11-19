@@ -1,13 +1,13 @@
 package pro.respawn.flowmvi.debugger.server
 
 import com.benasher44.uuid.Uuid
-import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.debugger.DebuggerDefaults
+import pro.respawn.flowmvi.debugger.DebuggerDefaults.ServerHistorySize
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
@@ -78,10 +78,15 @@ private suspend inline fun Ctx.state(
     crossinline update: suspend Running.() -> State
 ) = updateState<Running, _>(update)
 
-private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = this
-    .takeLast(DebuggerDefaults.ServerHistorySize)
-    .plus(event)
+private fun PersistentList<ServerEventEntry>.putEvent(event: ServerEventEntry) = sequenceOf(event)
+    .plus(this)
+    .take(ServerHistorySize)
     .toPersistentList()
+
+// private fun PersistentList<ServerEventEntry>.putEvent(event: ServerEventEntry) = mutate {
+//     add(0, event)
+//     if (size > ServerHistorySize) removeAt(lastIndex)
+// }
 
 private fun StoreCommand.event(storeId: Uuid) = when (this) {
     StoreCommand.Stop -> ServerEvent.Stop(storeId)
