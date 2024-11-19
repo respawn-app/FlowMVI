@@ -23,9 +23,9 @@ internal val ClientEvent.representation: String
     get() = when (this) {
         is ClientEvent.StoreConnected -> "Connected $name ($id)"
         is ClientEvent.StoreDisconnected -> "Disconnected $id"
-        is ClientEvent.StoreAction -> "$name:\n\n${data.prettyPrintToString()}"
+        is ClientEvent.StoreAction -> data.prettyPrintToString()
+        is ClientEvent.StoreIntent -> data.prettyPrintToString()
         is ClientEvent.StoreException -> "$name:\n\n$message\n$stackTrace"
-        is ClientEvent.StoreIntent -> "$name:\n\n${data.prettyPrintToString()}"
         is ClientEvent.StoreStarted -> "$name started"
         is ClientEvent.StoreStopped -> "$name stopped"
         is ClientEvent.StoreSubscribed -> "Subscription count changed to $newSubscriptionCount"
