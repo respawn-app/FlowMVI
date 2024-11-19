@@ -66,10 +66,7 @@ internal class TimelineContainer(
                                 filters = currentFilters,
                                 currentEvents = state.eventLog
                                     .asSequence()
-                                    .run {
-                                        if (current == null) return@run this
-                                        filter { it.event.type in current.filters.events }
-                                    }
+                                    .filter { it.event.type in currentFilters.events }
                                     .toImmutableList(),
                                 stores = state.clients
                                     .asSequence()
