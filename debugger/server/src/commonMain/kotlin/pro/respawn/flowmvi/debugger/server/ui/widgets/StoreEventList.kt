@@ -16,13 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
-import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 
 @Composable
 internal fun StoreEventList(
     events: ImmutableList<ServerEventEntry>,
-    isSelected: (ClientEvent) -> Boolean,
+    isSelected: (ServerEventEntry) -> Boolean,
     onClick: (ServerEventEntry) -> Unit,
     formatTimestamp: (LocalDateTime) -> String,
     listState: LazyListState = rememberLazyListState(),
@@ -33,7 +32,7 @@ internal fun StoreEventList(
             onClick = { onClick(it) },
             format = formatTimestamp,
             modifier = Modifier.animateItem(),
-            selected = isSelected(it.event),
+            selected = isSelected(it),
         )
     }
     if (events.isEmpty()) item {

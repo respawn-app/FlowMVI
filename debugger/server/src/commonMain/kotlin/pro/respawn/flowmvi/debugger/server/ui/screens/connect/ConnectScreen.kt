@@ -68,7 +68,7 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
                         painter = painterResource(Res.drawable.icon_nobg_32),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(64.dp)
+                            .padding(44.dp)
                             .sizeIn(maxWidth = 144.dp, maxHeight = 144.dp)
                             .fillMaxSize(),
                     )

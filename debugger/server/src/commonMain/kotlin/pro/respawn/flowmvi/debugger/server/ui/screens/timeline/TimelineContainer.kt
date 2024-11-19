@@ -127,6 +127,7 @@ internal class TimelineContainer(
                             storeName = intent.entry.name,
                             type = intent.entry.event.type,
                             event = intent.entry.event,
+                            id = intent.entry.id,
                         )
                     )
                 }

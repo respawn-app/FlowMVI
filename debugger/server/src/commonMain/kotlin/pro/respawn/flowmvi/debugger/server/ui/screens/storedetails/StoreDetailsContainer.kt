@@ -59,7 +59,8 @@ internal class StoreDetailsContainer(
                                     name = client.name,
                                     connected = client.isConnected,
                                     focusedEvent = current?.focusedEvent,
-                                    eventLog = state.eventLog.asSequence()
+                                    eventLog = state.eventLog
+                                        .asSequence()
                                         .filter { it.storeId == client.id }
                                         .toPersistentList()
                                 )
@@ -85,6 +86,7 @@ internal class StoreDetailsContainer(
                             storeName = intent.entry.name,
                             type = intent.entry.event.type,
                             event = intent.entry.event,
+                            id = intent.entry.id,
                         )
                     )
                 }

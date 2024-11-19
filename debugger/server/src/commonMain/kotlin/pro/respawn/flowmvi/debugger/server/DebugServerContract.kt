@@ -36,6 +36,7 @@ internal data class ServerEventEntry(
     val id: Uuid = uuid4(),
 )
 
+@Immutable
 internal sealed interface ServerState : MVIState {
     data class Error(val e: Exception, val previous: ServerState) : ServerState
     data object Idle : ServerState
@@ -49,6 +50,7 @@ internal sealed interface ServerState : MVIState {
     }
 }
 
+@Immutable
 internal sealed interface ServerIntent : MVIIntent {
     data object RestoreRequested : ServerIntent
     data object StopRequested : ServerIntent
@@ -57,6 +59,7 @@ internal sealed interface ServerIntent : MVIIntent {
     data class SendCommand(val command: StoreCommand, val storeId: Uuid) : ServerIntent
 }
 
+@Immutable
 internal sealed interface ServerAction : MVIAction {
     data class SendClientEvent(val client: Uuid, val event: ServerEvent) : ServerAction
 }

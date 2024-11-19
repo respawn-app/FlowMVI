@@ -34,6 +34,7 @@ internal data class FocusedEvent(
     val storeName: String,
     val type: EventType,
     val event: ClientEvent,
+    val id: Uuid,
 )
 
 @Immutable
