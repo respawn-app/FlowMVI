@@ -10,10 +10,9 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import pro.respawn.flowmvi.debugger.server.di.koin
 import pro.respawn.flowmvi.debugger.server.navigation.AppContent
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
+import pro.respawn.flowmvi.ideplugin.ui.PluginTheme
 
-class PluginToolWindow :
-    ToolWindowFactory,
-    DumbAware {
+class PluginToolWindow : ToolWindowFactory, DumbAware {
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         System.setProperty("compose.swing.render.on.graphics", "true")
