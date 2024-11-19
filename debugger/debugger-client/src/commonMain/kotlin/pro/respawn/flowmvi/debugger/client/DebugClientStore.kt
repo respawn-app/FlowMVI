@@ -63,10 +63,9 @@ internal fun debugClientStore(
         log(it)
         null
     }
-
     init {
         launchConnectionLoop(
-            reconnectionDelay,
+            reconnectionDelay = reconnectionDelay,
             onError = {
                 session.update {
                     it?.close()
