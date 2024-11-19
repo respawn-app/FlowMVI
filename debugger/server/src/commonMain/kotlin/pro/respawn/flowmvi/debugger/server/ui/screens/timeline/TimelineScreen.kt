@@ -25,6 +25,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineAction.Sc
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CloseFocusedEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.RetryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
@@ -49,30 +50,30 @@ fun TimelineScreen(
             is GoToStoreDetails -> navigator.storeDetails(it.storeId)
         }
     }
-    RScaffold {
-        TimelineScreenContent(state, listState)
-    }
+    TimelineScreenContent(state, listState)
 }
 
 @Composable
 private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
     state: TimelineState,
     listState: LazyListState,
-) = TypeCrossfade(state) {
-    when (this) {
-        is TimelineState.Loading -> CircularProgressIndicator()
-        is TimelineState.Error -> RErrorView(e)
-        is DisplayingTimeline -> Column {
-            TimelineMenuBar(this@TypeCrossfade)
-            StoreEventListDetailsLayout(
-                events = currentEvents,
-                focusedEvent = focusedEvent,
-                listState = listState,
-                onCopy = { intent(CopyEventClicked) },
-                onClose = { intent(CloseFocusedEventClicked) },
-                onClick = { intent(EventClicked(it)) },
-                modifier = Modifier.fillMaxSize().padding(8.dp)
-            )
-        } // column
-    } // when
+) = RScaffold {
+    TypeCrossfade(state) {
+        when (this) {
+            is TimelineState.Loading -> CircularProgressIndicator()
+            is TimelineState.Error -> RErrorView(e) { intent(RetryClicked) }
+            is DisplayingTimeline -> Column {
+                TimelineMenuBar(this@TypeCrossfade)
+                StoreEventListDetailsLayout(
+                    events = currentEvents,
+                    focusedEvent = focusedEvent,
+                    listState = listState,
+                    onCopy = { intent(CopyEventClicked) },
+                    onClose = { intent(CloseFocusedEventClicked) },
+                    onClick = { intent(EventClicked(it)) },
+                    modifier = Modifier.fillMaxSize().padding(8.dp)
+                )
+            } // column
+        } // when
+    }
 }

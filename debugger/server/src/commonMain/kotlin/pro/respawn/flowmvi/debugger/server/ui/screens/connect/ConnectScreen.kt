@@ -24,12 +24,15 @@ import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import pro.respawn.flowmvi.debugger.server.di.container
 import pro.respawn.flowmvi.debugger.server.navigation.AppNavigator
+import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectAction.GoToTimeline
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectIntent.HostChanged
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectIntent.PortChanged
+import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectIntent.RetryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectIntent.StartServerClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectState.ConfiguringServer
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
+import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RTextInput
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.server.generated.resources.Res
@@ -41,36 +44,40 @@ fun ConnectScreen(
 ) = with(container<ConnectContainer, _, _, _>()) {
     val state by subscribe(requireLifecycle()) {
         when (it) {
-            is ConnectAction.GoToTimeline -> navigator.timeline()
+            is GoToTimeline -> navigator.timeline()
         }
     }
-
     ConnectScreenContent(state)
 }
 
 @Composable
 private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
     state: ConnectState,
-) = TypeCrossfade(state) {
-    when (this) {
-        is ConnectState.Loading -> CircularProgressIndicator()
-        is ConnectState.Error -> RErrorView(e)
-        is ConfiguringServer -> Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(Modifier.weight(1f).aspectRatio(1f), contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(Res.drawable.icon_nobg_32),
-                    modifier = Modifier.matchParentSize().padding(64.dp).sizeIn(maxWidth = 120.dp, maxHeight = 120.dp),
-                    contentDescription = null,
-                )
+) = RScaffold {
+    TypeCrossfade(state) {
+        when (this) {
+            is ConnectState.Loading -> CircularProgressIndicator()
+            is ConnectState.Error -> RErrorView(e) { intent(RetryClicked) }
+            is ConfiguringServer -> Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(Modifier.weight(1f).aspectRatio(1f), contentAlignment = Alignment.Center) {
+                    Image(
+                        painter = painterResource(Res.drawable.icon_nobg_32),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(64.dp)
+                            .sizeIn(maxWidth = 144.dp, maxHeight = 144.dp)
+                            .fillMaxSize(),
+                    )
+                }
+                RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
+                RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
+                Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
+                Box(Modifier.weight(0.5f, fill = false))
             }
-            RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
-            RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
-            Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
-            Box(Modifier.weight(0.5f, fill = false))
         }
     }
 }
