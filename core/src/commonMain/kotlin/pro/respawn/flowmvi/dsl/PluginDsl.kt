@@ -4,6 +4,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.ShutdownContext
 import pro.respawn.flowmvi.api.StorePlugin
 
 /**
@@ -19,7 +20,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin(
     @BuilderInference crossinline onStart: suspend PipelineContext<S, I, A>.() -> Unit = {},
     @BuilderInference crossinline onSubscribe: suspend PipelineContext<S, I, A>.(subs: Int) -> Unit = {},
     @BuilderInference crossinline onUnsubscribe: suspend PipelineContext<S, I, A>.(subs: Int) -> Unit = {},
-    @BuilderInference crossinline onStop: (e: Exception?) -> Unit = {},
+    @BuilderInference crossinline onStop: ShutdownContext<S, I, A>.(e: Exception?) -> Unit = {},
     @BuilderInference crossinline onUndeliveredIntent: (i: I) -> Unit = {},
     name: String? = null,
 ): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
@@ -31,8 +32,8 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin(
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I) = onIntent(this, intent)
     override suspend fun PipelineContext<S, I, A>.onAction(action: A) = onAction(this, action)
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception) = onException(this, e)
+    override fun ShutdownContext<S, I, A>.onStop(e: Exception?) = onStop.invoke(this, e)
     override fun onUndeliveredIntent(intent: I) = onUndeliveredIntent.invoke(intent)
-    override fun onStop(e: Exception?) = onStop.invoke(e)
 
     override suspend fun PipelineContext<S, I, A>.onSubscribe(
         newSubscriberCount: Int

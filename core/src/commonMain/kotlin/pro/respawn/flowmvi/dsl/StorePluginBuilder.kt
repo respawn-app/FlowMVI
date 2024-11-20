@@ -5,6 +5,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.ShutdownContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.util.setOnce
 
@@ -26,7 +27,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     private var subscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var unsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var undeliveredIntent: ((intent: I) -> Unit)? = null
-    private var stop: ((e: Exception?) -> Unit)? = null
+    private var stop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null
 
     /**
      * @see [StorePlugin.name]
@@ -86,7 +87,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
      * @see [StorePlugin.onStop]
      */
     @FlowMVIDSL
-    public fun onStop(block: (e: Exception?) -> Unit): Unit = setOnce(::stop, block)
+    public fun onStop(block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit): Unit = setOnce(::stop, block)
 
     @FlowMVIDSL
     public fun onUndeliveredIntent(block: (intent: I?) -> Unit): Unit = setOnce(::undeliveredIntent, block)
@@ -104,7 +105,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
             onSubscribe = { builder.subscribe?.invoke(this, it) },
             onUnsubscribe = { builder.unsubscribe?.invoke(this, it) },
             onUndeliveredIntent = { builder.undeliveredIntent?.invoke(it) },
-            onStop = { builder.stop?.invoke(it) },
+            onStop = { builder.stop?.invoke(this, it) },
         )
     }
 }

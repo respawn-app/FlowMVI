@@ -154,7 +154,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * @param e the exception the store is closed with. Can be null for normal completions.
      * For everything except [kotlinx.coroutines.CancellationException]s, will not be null.
      */
-    public fun onStop(e: Exception?): Unit = Unit
+    public fun ShutdownContext<S, I, A>.onStop(e: Exception?): Unit = Unit
 
     public fun onUndeliveredIntent(intent: I): Unit = Unit
 

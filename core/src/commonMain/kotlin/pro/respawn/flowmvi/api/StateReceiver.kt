@@ -4,7 +4,7 @@ package pro.respawn.flowmvi.api
  * An entity that handles [MVIState] updates. This entity modifies the state of the [StateProvider].
  * This is most often implemented by a [Store] and exposed through [PipelineContext].
  */
-public interface StateReceiver<S : MVIState> {
+public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
 
     /**
      * Obtain the current [StateProvider.state] and update it with the result of [transform].
@@ -44,30 +44,6 @@ public interface StateReceiver<S : MVIState> {
      */
     @FlowMVIDSL
     public suspend fun withState(block: suspend S.() -> Unit)
-
-    /**
-     * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in
-     * the coroutine context, which means it can cause races when you want to update states in parallel.
-     *
-     * This function is performant, but **ignores ALL plugins** and
-     * **does not perform a serializable state transaction**
-     *
-     * It should only be used for the state updates that demand the highest performance and happen very often.
-     * If [StoreConfiguration.atomicStateUpdates] is `false`, then this function is the same as [updateState]
-     *
-     * @see updateState
-     * @see withState
-     */
-    @FlowMVIDSL
-    public fun updateStateImmediate(block: S.() -> S)
-
-    /**
-     * Obtain the current value of state in an unsafe manner.
-     * It is recommended to always use [withState] or [updateState] as obtaining this value can lead
-     * to data races when the state transaction changes the value of the state previously obtained.
-     */
-    @DelicateStoreApi
-    public val state: S
 
     // region deprecated
 

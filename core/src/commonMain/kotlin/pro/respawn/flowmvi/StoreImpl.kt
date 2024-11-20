@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Provider
+import pro.respawn.flowmvi.api.ShutdownContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
@@ -29,9 +30,8 @@ import pro.respawn.flowmvi.modules.recoverModule
 import pro.respawn.flowmvi.modules.restartableLifecycle
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscriptionModule
-
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
-    private val config: StoreConfiguration<S>,
+    override val config: StoreConfiguration<S>,
     plugin: StorePlugin<S, I, A>,
     recover: RecoverModule<S, I, A> = recoverModule(plugin),
     subs: SubscriptionModule = subscriptionModule(),
@@ -45,6 +45,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     ),
 ) : Store<S, I, A>,
     Provider<S, I, A>,
+    ShutdownContext<S, I, A>,
     RestartableLifecycle by restartableLifecycle(),
     StorePlugin<S, I, A> by plugin,
     RecoverModule<S, I, A> by recover,

@@ -5,6 +5,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.ShutdownContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.TimeTravel
@@ -25,7 +26,7 @@ import pro.respawn.flowmvi.plugins.timeTravelPlugin
 public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
     private val ctx: TestPipelineContext<S, I, A>,
     public val timeTravel: TimeTravel<S, I, A>,
-) : PipelineContext<S, I, A> by ctx, StorePlugin<S, I, A> by ctx.plugin {
+) : PipelineContext<S, I, A> by ctx, ShutdownContext<S, I, A>, StorePlugin<S, I, A> by ctx.plugin {
 
     public constructor(
         configuration: StoreConfiguration<S>,
