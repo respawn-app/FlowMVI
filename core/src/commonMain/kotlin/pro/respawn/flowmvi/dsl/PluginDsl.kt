@@ -20,6 +20,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin(
     @BuilderInference crossinline onSubscribe: suspend PipelineContext<S, I, A>.(subs: Int) -> Unit = {},
     @BuilderInference crossinline onUnsubscribe: suspend PipelineContext<S, I, A>.(subs: Int) -> Unit = {},
     @BuilderInference crossinline onStop: (e: Exception?) -> Unit = {},
+    @BuilderInference crossinline onUndeliveredIntent: (i: I) -> Unit = {},
     name: String? = null,
 ): StorePlugin<S, I, A> = object : StorePlugin<S, I, A> {
 
@@ -30,6 +31,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin(
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I) = onIntent(this, intent)
     override suspend fun PipelineContext<S, I, A>.onAction(action: A) = onAction(this, action)
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception) = onException(this, e)
+    override fun onUndeliveredIntent(intent: I) = onUndeliveredIntent.invoke(intent)
     override fun onStop(e: Exception?) = onStop.invoke(e)
 
     override suspend fun PipelineContext<S, I, A>.onSubscribe(

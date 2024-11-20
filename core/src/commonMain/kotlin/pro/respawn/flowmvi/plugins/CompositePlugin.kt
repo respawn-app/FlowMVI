@@ -31,7 +31,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     onSubscribe = { subs: Int -> plugins.chain { onSubscribe(subs) } },
     onUnsubscribe = { subs: Int -> plugins.chain { onUnsubscribe(subs) } },
     onStart = { plugins.chain { onStart() } },
-    onStop = { plugins.asReversed().chain { onStop(it) } }
+    onStop = { plugins.asReversed().chain { onStop(it) } },
+    onUndeliveredIntent = { intent: I -> plugins.chain { onUndeliveredIntent(intent) } },
 )
 
 private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> List<StorePlugin<S, I, A>>.chain(

@@ -156,6 +156,8 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      */
     public fun onStop(e: Exception?): Unit = Unit
 
+    public fun onUndeliveredIntent(intent: I): Unit = Unit
+
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
     override fun toString(): String

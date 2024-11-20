@@ -25,6 +25,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     private var start: (suspend PipelineContext<S, I, A>.() -> Unit)? = null
     private var subscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var unsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
+    private var undeliveredIntent: ((intent: I) -> Unit)? = null
     private var stop: ((e: Exception?) -> Unit)? = null
 
     /**
@@ -87,6 +88,9 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onStop(block: (e: Exception?) -> Unit): Unit = setOnce(::stop, block)
 
+    @FlowMVIDSL
+    public fun onUndeliveredIntent(block: (intent: I?) -> Unit): Unit = setOnce(::undeliveredIntent, block)
+
     @PublishedApi
     internal fun build(): StorePlugin<S, I, A> {
         val builder = this@StorePluginBuilder
@@ -99,6 +103,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
             onException = call@{ e -> builder.exception?.let { return@call it(e) } ?: e },
             onSubscribe = { builder.subscribe?.invoke(this, it) },
             onUnsubscribe = { builder.unsubscribe?.invoke(this, it) },
+            onUndeliveredIntent = { builder.undeliveredIntent?.invoke(it) },
             onStop = { builder.stop?.invoke(it) },
         )
     }

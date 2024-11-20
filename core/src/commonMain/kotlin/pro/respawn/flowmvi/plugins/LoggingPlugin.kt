@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.logging.StoreLogLevel.Debug
 import pro.respawn.flowmvi.logging.StoreLogLevel.Error
 import pro.respawn.flowmvi.logging.StoreLogLevel.Info
 import pro.respawn.flowmvi.logging.StoreLogLevel.Trace
+import pro.respawn.flowmvi.logging.StoreLogLevel.Warn
 import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.logging.invoke
 import kotlin.math.log
@@ -71,6 +72,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     }
     onUnsubscribe {
         log(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" }
+    }
+    onUndeliveredIntent {
+        log(level ?: Warn, currentTag) { "Intent dropped due to overflow: $it" }
     }
     onStop { e ->
         if (e == null) {
