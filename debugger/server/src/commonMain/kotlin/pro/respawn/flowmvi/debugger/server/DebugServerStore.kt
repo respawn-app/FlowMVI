@@ -38,6 +38,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
         coroutineContext = Dispatchers.Default
         actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
         debuggable = BuildFlags.debuggable
+        allowIdleSubscriptions = true
         onOverflow = BufferOverflow.DROP_OLDEST
     }
     enableLogging()

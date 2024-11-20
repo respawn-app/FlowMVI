@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +23,7 @@ import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.requireLifecycle
 import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.compose.preview.EmptyReceiver
+import pro.respawn.flowmvi.debugger.server.BuildFlags
 import pro.respawn.flowmvi.debugger.server.di.container
 import pro.respawn.flowmvi.debugger.server.navigation.AppNavigator
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectAction.GoToTimeline
@@ -68,11 +70,12 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
                         painter = painterResource(Res.drawable.icon_nobg_32),
                         contentDescription = null,
                         modifier = Modifier
-                            .padding(44.dp)
+                            .padding(28.dp)
                             .sizeIn(maxWidth = 144.dp, maxHeight = 144.dp)
                             .fillMaxSize(),
                     )
                 }
+                Text("Compatible with v${BuildFlags.VersionName}", style = MaterialTheme.typography.labelMedium)
                 RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
                 RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
                 Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
