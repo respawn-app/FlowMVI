@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FlowMVI</string>
+
+    <!--  region Validation Errors  -->
+    <string name="did_not_contain_error_template">Input must contain %1$s</string>
+    <string name="contains_digits_error_message">Please do not use digits</string>
+    <string name="contains_letters_error_message">Please do not use letters</string>
+    <string name="does_not_end_with_error_template">Please end your value with "%1$s"</string>
+    <string name="invalid_value_error_message">Please provide a valid value</string>
+    <string name="inputs_dont_match_error_message">Inputs don't match</string>
+    <string name="max_length_error_template">Please provide a value between %1$d and %2$d characters long</string>
+    <string name="value_is_not_error">Please provide a valid %1$s value</string>
+    <string name="alphanumeric_error">Only letters and digits are allowed</string>
+    <string name="start_with_error">Please start your input with "%1$s"</string>
+    <string name="has_no_digits_error_message">Please use at least one digit</string>
+    <string name="has_no_letters_error_message">Please include at least one letter</string>
+    <string name="has_whitespace_error_message">Please do not use spaces</string>
+    <string name="not_alphanumeric_error_message">Please use only letters and digits</string>
+    <string name="not_ascii_error_message">Please use only English characters</string>
+    <string name="not_digits_only_error_message">Please use only digits</string>
+    <string name="not_letters_only_error_message">Please use only letters</string>
+    <string name="not_lowercase_error_message">Please use only lowercase letters</string>
+    <string name="not_uppercase_error_message">Please use only uppercase letters</string>
+    <string name="has_linebreaks_error_message">Please do not include line breaks in the input</string>
+    <string name="too_long_error_template">Please provide a value shorter than %1$d characters</string>
+    <string name="too_short_error_template">Please provide a value longer than %1$d characters</string>
+    <string name="length_is_not_exactly_error_template">Please enter a value %1$d characters long</string>
+    <string name="no_uppercase_letters_error_message">Please include at least one uppercase letter</string>
+    <string name="empty_input_error_message">Please fill out this field</string>
+    <!--  endregion  -->
 </resources>

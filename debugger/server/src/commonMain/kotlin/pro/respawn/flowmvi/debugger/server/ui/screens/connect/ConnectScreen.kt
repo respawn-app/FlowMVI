@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -61,7 +62,7 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
             is ConnectState.Loading -> CircularProgressIndicator()
             is ConnectState.Error -> RErrorView(e) { intent(RetryClicked) }
             is ConfiguringServer -> Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().widthIn(max = 600.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
