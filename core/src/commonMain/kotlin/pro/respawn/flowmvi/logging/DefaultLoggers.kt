@@ -11,3 +11,8 @@ public val NoOpStoreLogger: StoreLogger by lazy { StoreLogger { _, _, _ -> } }
 public val ConsoleStoreLogger: StoreLogger by lazy {
     StoreLogger { level, tag, message -> println(template(level, tag, message)) }
 }
+
+/**
+ * A [StoreLogger] instance for each supported platform
+ */
+public expect val PlatformStoreLogger: StoreLogger
