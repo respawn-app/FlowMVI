@@ -1,7 +1,7 @@
 package pro.respawn.flowmvi.debugger.server
 
 import com.benasher44.uuid.Uuid
-import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -19,6 +19,7 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerState.Idle
 import pro.respawn.flowmvi.debugger.server.ServerState.Running
+import pro.respawn.flowmvi.debugger.server.arch.configuration.debuggable
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.enableLogging
@@ -36,7 +37,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
         parallelIntents = true
         coroutineContext = Dispatchers.Default
         actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
-        debuggable = true
+        debuggable = BuildFlags.debuggable
         onOverflow = BufferOverflow.DROP_OLDEST
     }
     enableLogging()
@@ -78,15 +79,10 @@ private suspend inline fun Ctx.state(
     crossinline update: suspend Running.() -> State
 ) = updateState<Running, _>(update)
 
-private fun PersistentList<ServerEventEntry>.putEvent(event: ServerEventEntry) = sequenceOf(event)
+private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = sequenceOf(event)
     .plus(this)
     .take(ServerHistorySize)
     .toPersistentList()
-
-// private fun PersistentList<ServerEventEntry>.putEvent(event: ServerEventEntry) = mutate {
-//     add(0, event)
-//     if (size > ServerHistorySize) removeAt(lastIndex)
-// }
 
 private fun StoreCommand.event(storeId: Uuid) = when (this) {
     StoreCommand.Stop -> ServerEvent.Stop(storeId)

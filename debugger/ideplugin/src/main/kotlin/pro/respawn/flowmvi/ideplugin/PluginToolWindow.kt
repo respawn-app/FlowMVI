@@ -24,7 +24,7 @@ class PluginToolWindow : ToolWindowFactory, DumbAware {
             )
         )
         toolWindow.apply {
-            addComposePanel(displayName = Id) {
+            addComposePanel {
                 PluginTheme { AppContent(component) }
             }
         }

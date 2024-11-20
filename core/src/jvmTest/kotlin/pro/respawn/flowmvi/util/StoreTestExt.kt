@@ -1,5 +1,4 @@
 @file:Suppress("Filename")
-@file:OptIn(ExperimentalStdlibApi::class)
 
 package pro.respawn.flowmvi.util
 
@@ -10,7 +9,6 @@ import io.kotest.core.spec.style.scopes.FreeSpecContainerScope
 import io.kotest.core.spec.style.scopes.FreeSpecTerminalScope
 import io.kotest.core.test.TestCase
 import io.kotest.core.test.testCoroutineScheduler
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.withContext
@@ -26,8 +24,6 @@ fun Spec.asUnconfined() {
     }
 }
 
-@OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
 fun FreeSpecContainerScope.idle() = testCoroutineScheduler.advanceUntilIdle()
 
-@OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class)
 fun FreeSpecTerminalScope.idle() = testCoroutineScheduler.advanceUntilIdle()

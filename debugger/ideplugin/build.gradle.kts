@@ -28,7 +28,7 @@ intellijPlatform {
     // needed when plugin provides custom settings exposed to the UI
     buildSearchableOptions = false
     signing {
-        certificateChainFile = File("plugin_certificate_chain.crt")
+        certificateChainFile = rootProject.rootDir.resolve(Config.Plugin.certPath)
         privateKey = props["plugin.publishing.privatekey"]?.toString()
         password = props["signing.password"]?.toString()
     }
@@ -37,7 +37,7 @@ intellijPlatform {
     }
     pluginConfiguration {
         ideaVersion {
-            sinceBuild = "241"
+            sinceBuild = Config.Plugin.minIdeaVersion
             untilBuild = provider { null }
         }
         vendor {
@@ -45,32 +45,37 @@ intellijPlatform {
             email = Config.supportEmail
             url = Config.url
         }
-        id = "${Config.artifactId}.ideplugin"
-        description = Config.Debugger.appDescription
-        name = Config.Debugger.name
+        id = Config.Plugin.id
+        description = Config.Plugin.description
+        name = Config.Plugin.name
         version = Config.versionName
     }
 }
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(Config.idePluginJvmTarget)
+        jvmTarget.set(Config.Plugin.jvmTarget)
     }
 }
 
 tasks {
     withType<JavaCompile> {
-        sourceCompatibility = Config.idePluginJvmTarget.target
-        targetCompatibility = Config.idePluginJvmTarget.target
+        sourceCompatibility = Config.Plugin.jvmTarget.target
+        targetCompatibility = Config.Plugin.jvmTarget.target
+    }
+    buildPlugin {
+        archiveFileName = "${Config.artifact}-$version.zip"
     }
 }
 
 // https://youtrack.jetbrains.com/issue/IJPL-1901
-configurations.implementation.configure {
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
-}
-configurations.api.configure {
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+configurations {
+    implementation.configure {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+    }
+    api.configure {
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core-jvm")
+    }
 }
 
 dependencies {
@@ -78,6 +83,7 @@ dependencies {
     compileOnly(libs.kotlin.stdlib)
     compileOnly(libs.kotlin.coroutines.core)
 
+    // platform already includes bindings
     // implementation(libs.kotlin.coroutines.swing)
 
     implementation(compose.desktop.common)
@@ -101,11 +107,5 @@ dependencies {
         zipSigner()
         instrumentationTools()
         bundledPlugin(libs.kotlin.stdlib.map(Dependency::getGroup))
-    }
-}
-
-tasks {
-    buildPlugin {
-        archiveFileName = "flowmvi-$version.zip"
     }
 }
