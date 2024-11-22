@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.api
 
+import pro.respawn.flowmvi.api.context.ShutdownContext
+import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.StorePluginBuilder
 import pro.respawn.flowmvi.dsl.plugin
@@ -156,7 +158,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      */
     public fun ShutdownContext<S, I, A>.onStop(e: Exception?): Unit = Unit
 
-    public fun onUndeliveredIntent(intent: I): Unit = Unit
+    public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean

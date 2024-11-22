@@ -5,7 +5,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.api.ShutdownContext
+import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.plugins.TimeTravel

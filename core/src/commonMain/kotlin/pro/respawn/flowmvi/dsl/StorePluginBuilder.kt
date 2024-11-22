@@ -5,8 +5,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.api.ShutdownContext
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.context.ShutdownContext
+import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.util.setOnce
 
 /**
@@ -26,7 +27,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     private var start: (suspend PipelineContext<S, I, A>.() -> Unit)? = null
     private var subscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var unsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
-    private var undeliveredIntent: ((intent: I) -> Unit)? = null
+    private var undeliveredIntent: (UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit)? = null
     private var stop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null
 
     /**
@@ -90,7 +91,9 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     public fun onStop(block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit): Unit = setOnce(::stop, block)
 
     @FlowMVIDSL
-    public fun onUndeliveredIntent(block: (intent: I?) -> Unit): Unit = setOnce(::undeliveredIntent, block)
+    public fun onUndeliveredIntent(
+        block: UndeliveredHandlerContext<S, I, A>.(intent: I?) -> Unit
+    ): Unit = setOnce(::undeliveredIntent, block)
 
     @PublishedApi
     internal fun build(): StorePlugin<S, I, A> {
@@ -104,7 +107,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
             onException = call@{ e -> builder.exception?.let { return@call it(e) } ?: e },
             onSubscribe = { builder.subscribe?.invoke(this, it) },
             onUnsubscribe = { builder.unsubscribe?.invoke(this, it) },
-            onUndeliveredIntent = { builder.undeliveredIntent?.invoke(it) },
+            onUndeliveredIntent = { builder.undeliveredIntent?.invoke(this, it) },
             onStop = { builder.stop?.invoke(this, it) },
         )
     }
