@@ -16,11 +16,12 @@ object Config {
 
     const val artifactId = "$group.$artifact"
 
-    const val versionCode = 8
     const val majorRelease = 3
     const val minorRelease = 1
     const val patch = 0
-    const val postfix = "-beta02" // include dash (-)
+    const val postfix = "-beta03" // include dash (-)
+
+    const val versionCode = 8
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
