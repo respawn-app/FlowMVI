@@ -4,11 +4,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.impl.PluginInstance
 
-private data object NoOpPlugin : StorePlugin<Nothing, Nothing, Nothing> {
-
-    override val name: String? = null
-}
+private val NoOpPlugin by lazy { PluginInstance<Nothing, Nothing, Nothing>() }
 
 /**
  * A plugin that does nothing. Useful for testing or mocking

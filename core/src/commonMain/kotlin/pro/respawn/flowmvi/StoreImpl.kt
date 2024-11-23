@@ -10,14 +10,15 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Provider
-import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
+import pro.respawn.flowmvi.impl.PluginInstance
 import pro.respawn.flowmvi.modules.ActionModule
 import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.RecoverModule
@@ -32,9 +33,10 @@ import pro.respawn.flowmvi.modules.recoverModule
 import pro.respawn.flowmvi.modules.restartableLifecycle
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscriptionModule
+
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override val config: StoreConfiguration<S>,
-    plugin: StorePlugin<S, I, A>,
+    private val plugin: PluginInstance<S, I, A>,
     recover: RecoverModule<S, I, A> = recoverModule(plugin),
     subs: SubscriptionModule = subscriptionModule(),
     states: StateModule<S> = stateModule(config.initial, config.atomicStateUpdates),
@@ -43,8 +45,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     Provider<S, I, A>,
     ShutdownContext<S, I, A>,
     UndeliveredHandlerContext<S, I, A>,
-    RestartableLifecycle by restartableLifecycle(),
     StorePlugin<S, I, A> by plugin,
+    RestartableLifecycle by restartableLifecycle(),
     RecoverModule<S, I, A> by recover,
     SubscriptionModule by subs,
     StateModule<S> by states,
@@ -55,7 +57,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         parallel = config.parallelIntents,
         capacity = config.intentCapacity,
         overflow = config.onOverflow,
-        onUndeliveredIntent = { with(plugin) { onUndeliveredIntent(it) } },
+        onUndeliveredIntent = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
     )
 
     override suspend fun emit(intent: I) = intents.emit(intent)
@@ -64,30 +66,33 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun start(scope: CoroutineScope) = launchPipeline(
         parent = scope,
         storeConfig = config,
-        onAction = { action -> onAction(action)?.let { this@StoreImpl.action(it) } },
+        onAction = { action ->
+            with(plugin) { onAction(action)?.let { this@StoreImpl.action(it) } }
+        },
         onTransformState = { transform ->
-            this@StoreImpl.updateState { onState(this, transform()) ?: this }
+            this@StoreImpl.updateState {
+                val current = this
+                with(plugin) { onState(current, transform()) ?: current }
+            }
         },
         onStop = {
             close() // makes sure to also clear the reference from RestartableLifecycle
-            onStop(it)
+            plugin.onStop?.invoke(this, it)
         },
         onStart = { lifecycle ->
             beginStartup(lifecycle)
             launch intents@{
                 coroutineScope {
                     // run onStart plugins first to not let subscribers appear before the store is started fully
-                    catch { onStart() }
-                    launch {
+                    if (plugin.onStart != null) catch { onStart() }
+                    if (plugin.onSubscribe != null && plugin.onUnsubscribe != null) launch {
                         observeSubscribers(
                             onSubscribe = { catch { onSubscribe(it) } },
                             onUnsubscribe = { catch { onUnsubscribe(it) } }
                         )
                     }
-                    launch {
-                        intents.awaitIntents {
-                            catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
-                        }
+                    if (plugin.onIntent != null) intents.awaitIntents {
+                        catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
                     }
                     lifecycle.completeStartup()
                 }
@@ -106,8 +111,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     // region contract
-    override
-    val name by config::name
+    override val name by config::name
     override fun hashCode() = name?.hashCode() ?: super.hashCode()
     override fun toString(): String = name ?: super.toString()
     override fun equals(other: Any?): Boolean {

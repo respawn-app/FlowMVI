@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
+import pro.respawn.flowmvi.impl.PluginInstance
 import pro.respawn.flowmvi.util.setOnce
 
 /**
@@ -96,21 +97,18 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::undeliveredIntent, block)
 
     @PublishedApi
-    internal fun build(): StorePlugin<S, I, A> {
-        val builder = this@StorePluginBuilder
-        return StorePlugin(
-            name = name,
-            onStart = { builder.start?.invoke(this) },
-            onState = call@{ old, new -> builder.state?.let { return@call it(old, new) } ?: new },
-            onIntent = call@{ intent -> builder.intent?.let { return@call it(intent) } ?: intent },
-            onAction = call@{ action -> builder.action?.let { return@call it(action) } ?: action },
-            onException = call@{ e -> builder.exception?.let { return@call it(e) } ?: e },
-            onSubscribe = { builder.subscribe?.invoke(this, it) },
-            onUnsubscribe = { builder.unsubscribe?.invoke(this, it) },
-            onUndeliveredIntent = { builder.undeliveredIntent?.invoke(this, it) },
-            onStop = { builder.stop?.invoke(this, it) },
-        )
-    }
+    internal fun build(): PluginInstance<S, I, A> = PluginInstance(
+        name = name,
+        onStart = start,
+        onState = state,
+        onIntent = intent,
+        onAction = action,
+        onException = exception,
+        onSubscribe = subscribe,
+        onUnsubscribe = unsubscribe,
+        onUndeliveredIntent = undeliveredIntent,
+        onStop = stop,
+    )
 }
 
 /**

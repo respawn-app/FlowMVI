@@ -11,10 +11,11 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.impl.asInstance
+import pro.respawn.flowmvi.impl.compose
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
-import pro.respawn.flowmvi.plugins.compositePlugin
 import kotlin.coroutines.CoroutineContext
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
@@ -165,9 +166,6 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        StoreImpl(
-            config = config,
-            plugin = compositePlugin(plugins.map { it(config) }),
-        )
+        StoreImpl(config, plugins.map { it(config).asInstance() }.compose())
     }
 }
