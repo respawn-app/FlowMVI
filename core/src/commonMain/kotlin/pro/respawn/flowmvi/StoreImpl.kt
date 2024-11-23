@@ -4,7 +4,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.api.ActionProvider
+import pro.respawn.flowmvi.api.ActionReceiver
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -19,8 +23,6 @@ import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
 import pro.respawn.flowmvi.impl.PluginInstance
-import pro.respawn.flowmvi.modules.ActionModule
-import pro.respawn.flowmvi.modules.IntentModule
 import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.RestartableLifecycle
 import pro.respawn.flowmvi.modules.StateModule
@@ -40,52 +42,48 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     recover: RecoverModule<S, I, A> = recoverModule(plugin),
     subs: SubscriptionModule = subscriptionModule(),
     states: StateModule<S> = stateModule(config.initial, config.atomicStateUpdates),
-    actions: ActionModule<A> = actionModule(config.actionShareBehavior),
 ) : Store<S, I, A>,
     Provider<S, I, A>,
     ShutdownContext<S, I, A>,
     UndeliveredHandlerContext<S, I, A>,
-    StorePlugin<S, I, A> by plugin,
+    IntentReceiver<I>,
+    ActionProvider<A>,
+    ActionReceiver<A>,
     RestartableLifecycle by restartableLifecycle(),
+    StorePlugin<S, I, A> by plugin,
     RecoverModule<S, I, A> by recover,
     SubscriptionModule by subs,
-    StateModule<S> by states,
-    IntentReceiver<I>,
-    ActionModule<A> by actions {
+    StateModule<S> by states {
 
-    private val intents: IntentModule<I> = intentModule(
+    private val intents = intentModule<I>(
         parallel = config.parallelIntents,
         capacity = config.intentCapacity,
         overflow = config.onOverflow,
         onUndeliveredIntent = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
     )
 
+    private val _actions = actionModule<A>(
+        config.actionShareBehavior,
+        plugin.onUndeliveredAction?.let { { action -> it(this, action) } }
+    )
+
     override suspend fun emit(intent: I) = intents.emit(intent)
     override fun intent(intent: I) = intents.intent(intent)
 
+    // region pipeline
     override fun start(scope: CoroutineScope) = launchPipeline(
         parent = scope,
         storeConfig = config,
-        onAction = { action ->
-            with(plugin) { onAction(action)?.let { this@StoreImpl.action(it) } }
-        },
-        onTransformState = { transform ->
-            this@StoreImpl.updateState {
-                val current = this
-                with(plugin) { onState(current, transform()) ?: current }
-            }
-        },
-        onStop = {
-            close() // makes sure to also clear the reference from RestartableLifecycle
-            plugin.onStop?.invoke(this, it)
-        },
+        onAction = { action -> onAction(action)?.let { _actions.action(it) } },
+        onTransformState = { transform -> this@StoreImpl.updateState { onState(this, transform()) ?: this } },
+        onStop = { e -> close().also { plugin.onStop?.invoke(this, e) } },
         onStart = { lifecycle ->
             beginStartup(lifecycle)
             launch intents@{
                 coroutineScope {
                     // run onStart plugins first to not let subscribers appear before the store is started fully
                     if (plugin.onStart != null) catch { onStart() }
-                    if (plugin.onSubscribe != null && plugin.onUnsubscribe != null) launch {
+                    if (plugin.onSubscribe != null || plugin.onUnsubscribe != null) launch {
                         observeSubscribers(
                             onSubscribe = { catch { onSubscribe(it) } },
                             onUnsubscribe = { catch { onUnsubscribe(it) } }
@@ -99,6 +97,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
             }
         }
     )
+    // endregion
 
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
@@ -112,6 +111,11 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     // region contract
     override val name by config::name
+    override val actions: Flow<A> by _actions::actions
+
+    @DelicateStoreApi
+    override fun send(action: A) = _actions.send(action)
+    override suspend fun action(action: A) = _actions.action(action)
     override fun hashCode() = name?.hashCode() ?: super.hashCode()
     override fun toString(): String = name ?: super.toString()
     override fun equals(other: Any?): Boolean {

@@ -21,6 +21,7 @@ internal class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
     val onUnsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null,
     val onStop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null,
     val onUndeliveredIntent: (UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit)? = null,
+    val onUndeliveredAction: (UndeliveredHandlerContext<S, I, A>.(action: A) -> Unit)? = null,
     override val name: String? = null,
 ) : StorePlugin<S, I, A> {
 
@@ -58,6 +59,10 @@ internal class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     override fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I) {
         onUndeliveredIntent?.invoke(this, intent)
+    }
+
+    override fun UndeliveredHandlerContext<S, I, A>.onUndeliveredAction(action: A) {
+        onUndeliveredAction?.invoke(this, action)
     }
 
     override fun toString(): String = "StorePlugin${name?.let { " \"$it\"" }.orEmpty()}"

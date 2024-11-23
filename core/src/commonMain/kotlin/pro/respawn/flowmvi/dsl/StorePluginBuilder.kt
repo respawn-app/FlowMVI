@@ -19,6 +19,7 @@ import pro.respawn.flowmvi.util.setOnce
  * have **one** block per each type of [StorePlugin] callback.
  */
 @FlowMVIDSL
+@Suppress("TooManyFunctions") // intended
 public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var intent: (suspend PipelineContext<S, I, A>.(I) -> I?)? = null
@@ -29,6 +30,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     private var subscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var unsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null
     private var undeliveredIntent: (UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit)? = null
+    private var undeliveredAction: (UndeliveredHandlerContext<S, I, A>.(action: A) -> Unit)? = null
     private var stop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null
 
     /**
@@ -93,8 +95,13 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
 
     @FlowMVIDSL
     public fun onUndeliveredIntent(
-        block: UndeliveredHandlerContext<S, I, A>.(intent: I?) -> Unit
+        block: UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit
     ): Unit = setOnce(::undeliveredIntent, block)
+
+    @FlowMVIDSL
+    public fun onUndeliveredAction(
+        block: UndeliveredHandlerContext<S, I, A>.(action: A) -> Unit
+    ): Unit = setOnce(::undeliveredAction, block)
 
     @PublishedApi
     internal fun build(): PluginInstance<S, I, A> = PluginInstance(
@@ -107,6 +114,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
         onSubscribe = subscribe,
         onUnsubscribe = unsubscribe,
         onUndeliveredIntent = undeliveredIntent,
+        onUndeliveredAction = undeliveredAction,
         onStop = stop,
     )
 }

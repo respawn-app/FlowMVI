@@ -160,6 +160,8 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
 
     public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
 
+    public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
+
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
     override fun toString(): String
