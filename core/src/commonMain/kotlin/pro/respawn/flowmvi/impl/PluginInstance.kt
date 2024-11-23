@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 /**
  * Optimized plugin implementation that stores optional lambdas directly and avoids their invocations
  */
-internal class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
+internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
     val onState: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)? = null,
     val onIntent: (suspend PipelineContext<S, I, A>.(intent: I) -> I?)? = null,
     val onAction: (suspend PipelineContext<S, I, A>.(action: A) -> A?)? = null,
