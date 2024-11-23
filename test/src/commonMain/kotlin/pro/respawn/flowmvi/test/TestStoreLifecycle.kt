@@ -2,7 +2,7 @@ package pro.respawn.flowmvi.test
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.api.ExperimentalStoreApi
+import pro.respawn.flowmvi.annotation.ExperimentalStoreApi
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
 @ExperimentalStoreApi

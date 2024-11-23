@@ -8,30 +8,58 @@ import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 
-internal fun <I : MVIIntent> intentModule(
-    parallel: Boolean,
-    capacity: Int,
-    overflow: BufferOverflow,
-    onUndeliveredIntent: ((intent: I) -> Unit)?,
-): IntentModule<I> = IntentModuleImpl(parallel, capacity, overflow, onUndeliveredIntent)
-
 internal interface IntentModule<I : MVIIntent> : IntentReceiver<I> {
 
     suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit)
 }
 
-private class IntentModuleImpl<I : MVIIntent>(
-    private val parallel: Boolean,
+internal fun <I : MVIIntent> intentModule(
+    parallel: Boolean,
+    capacity: Int,
+    overflow: BufferOverflow,
+    onUndeliveredIntent: ((intent: I) -> Unit)?,
+): IntentModule<I> = when {
+    !parallel -> SequentialChannelIntentModule(capacity, overflow, onUndeliveredIntent)
+    else -> ParallelChannelIntentModule(capacity, overflow, onUndeliveredIntent)
+}
+
+private abstract class ChannelIntentModule<I : MVIIntent>(
     capacity: Int,
     overflow: BufferOverflow,
     onUndeliveredIntent: ((intent: I) -> Unit)?,
 ) : IntentModule<I> {
 
-    private val intents = Channel(
-        capacity,
-        overflow,
-        onUndeliveredIntent,
-    )
+    protected val intents = Channel(capacity, overflow, onUndeliveredIntent)
+
+    override suspend fun emit(intent: I) = intents.send(intent)
+    override fun intent(intent: I) {
+        intents.trySend(intent)
+    }
+}
+
+private class SequentialChannelIntentModule<I : MVIIntent>(
+    capacity: Int,
+    overflow: BufferOverflow,
+    onUndeliveredIntent: ((intent: I) -> Unit)?,
+) : ChannelIntentModule<I>(capacity, overflow, onUndeliveredIntent) {
+
+
+    override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
+        // must always suspend the current scope to wait for intents
+        for (intent in intents) {
+            onIntent(intent)
+            yield()
+        }
+    }
+}
+
+private class ParallelChannelIntentModule<I : MVIIntent>(
+    capacity: Int,
+    overflow: BufferOverflow,
+    onUndeliveredIntent: ((intent: I) -> Unit)?,
+) : IntentModule<I> {
+
+    private val intents = Channel(capacity, overflow, onUndeliveredIntent)
 
     override suspend fun emit(intent: I) = intents.send(intent)
     override fun intent(intent: I) {
@@ -40,9 +68,6 @@ private class IntentModuleImpl<I : MVIIntent>(
 
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         // must always suspend the current scope to wait for intents
-        for (intent in intents) {
-            if (parallel) launch { onIntent(intent) } else onIntent(intent)
-            yield()
-        }
+        for (intent in intents) launch { onIntent(intent) }
     }
 }

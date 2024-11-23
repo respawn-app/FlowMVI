@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.api
+package pro.respawn.flowmvi.annotation
 
 private const val Message = """
 This API is experimental - it has no automated testing and breaking changes are very likely. Use at your own risk.
