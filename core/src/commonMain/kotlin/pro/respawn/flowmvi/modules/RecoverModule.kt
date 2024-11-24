@@ -39,7 +39,7 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
      * context of the [recover] block.
      */
     suspend fun PipelineContext<S, I, A>.catch(block: suspend () -> Unit): Unit = try {
-         block()
+        block()
     } catch (expected: Exception) {
         when {
             expected is CancellationException || expected is UnrecoverableException -> throw expected

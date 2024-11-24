@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
-import pro.respawn.flowmvi.impl.PluginInstance
+import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.util.setOnce
 
 /**

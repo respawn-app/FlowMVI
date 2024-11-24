@@ -7,7 +7,8 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.decorator.DecoratorContext
 import pro.respawn.flowmvi.decorator.StoreDecorator
-import pro.respawn.flowmvi.impl.PluginInstance
+import pro.respawn.flowmvi.impl.plugin.PluginInstance
+import pro.respawn.flowmvi.util.typed
 
 @Suppress("Wrapping")
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A>.decorate(
@@ -38,7 +39,7 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A
 )
 
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreDecorator<S, I, A>.asInstance() =
-    this as? DecoratorInstance<S, I, A> ?: DecoratorInstance(
+    typed<DecoratorInstance<S, I, A>>() ?: DecoratorInstance(
         name = name,
         onState = { old, new -> onState(old, new) },
         onIntent = { intent -> onIntent(intent) },

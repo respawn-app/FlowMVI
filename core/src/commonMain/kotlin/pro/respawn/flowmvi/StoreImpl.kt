@@ -23,7 +23,7 @@ import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
-import pro.respawn.flowmvi.impl.PluginInstance
+import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.modules.RecoverModule
 import pro.respawn.flowmvi.modules.RestartableLifecycle
 import pro.respawn.flowmvi.modules.StateModule
@@ -65,8 +65,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     )
 
     private val _actions = actionModule<A>(
-        config.actionShareBehavior,
-        plugin.onUndeliveredAction?.let { { action -> it(this, action) } }
+        behavior = config.actionShareBehavior,
+        onUndeliveredAction = plugin.onUndeliveredAction?.let { { action -> it(this, action) } }
     )
 
     override suspend fun emit(intent: I) = intents.emit(intent)

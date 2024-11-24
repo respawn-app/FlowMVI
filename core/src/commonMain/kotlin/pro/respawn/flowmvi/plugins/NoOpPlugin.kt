@@ -4,7 +4,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.impl.PluginInstance
+import pro.respawn.flowmvi.impl.plugin.PluginInstance
 
 private val NoOpPlugin by lazy { PluginInstance<Nothing, Nothing, Nothing>() }
 

@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.impl
+package pro.respawn.flowmvi.impl.plugin
 
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.MVIAction

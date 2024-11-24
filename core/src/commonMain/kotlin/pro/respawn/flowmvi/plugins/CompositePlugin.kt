@@ -5,8 +5,8 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.impl.asInstance
-import pro.respawn.flowmvi.impl.compose
+import pro.respawn.flowmvi.impl.plugin.asInstance
+import pro.respawn.flowmvi.impl.plugin.compose
 
 /**
  * A plugin that delegates to [plugins] in the iteration order.
