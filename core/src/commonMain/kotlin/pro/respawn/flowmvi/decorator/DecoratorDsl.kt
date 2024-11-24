@@ -13,6 +13,9 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Decorator
     proceed(Unit)
 }
 
+public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> DecoratorContext<S, I, A, T>.ignore(): T? =
+    proceed(null)
+
 @FlowMVIDSL
 public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.decoratedWith(
     decorator: StoreDecorator<S, I, A>

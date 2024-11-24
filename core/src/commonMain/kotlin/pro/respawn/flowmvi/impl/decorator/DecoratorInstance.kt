@@ -16,8 +16,8 @@ internal class DecoratorInstance<S : MVIState, I : MVIIntent, A : MVIAction> int
     internal val onAction: (suspend DecoratorContext<S, I, A, A>.(A) -> A?)? = null,
     internal val onException: (suspend DecoratorContext<S, I, A, Exception>.(Exception) -> Exception?)? = null,
     internal val onStart: (suspend DecoratorContext<S, I, A, Unit>.() -> Unit)? = null,
-    internal val onSubscribe: (suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit)? = null,
-    internal val onUnsubscribe: (suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit)? = null
+    internal val onSubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null,
+    internal val onUnsubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null
 ) : StoreDecorator<S, I, A> {
 
     override suspend fun DecoratorContext<S, I, A, Unit>.onStart(): Unit = onStart?.invoke(this) ?: proceed()
@@ -39,13 +39,17 @@ internal class DecoratorInstance<S : MVIState, I : MVIIntent, A : MVIAction> int
         e: Exception
     ): Exception? = onException?.invoke(this, e) ?: proceed(e)
 
-    override suspend fun DecoratorContext<S, I, A, Unit>.onSubscribe(
+    override suspend fun DecoratorContext<S, I, A, Int>.onSubscribe(
         newSubscriberCount: Int
-    ) = onSubscribe?.invoke(this, newSubscriberCount) ?: proceed()
+    ) {
+        onSubscribe?.invoke(this, newSubscriberCount) ?: proceed(newSubscriberCount)
+    }
 
-    override suspend fun DecoratorContext<S, I, A, Unit>.onUnsubscribe(
+    override suspend fun DecoratorContext<S, I, A, Int>.onUnsubscribe(
         newSubscriberCount: Int
-    ) = onUnsubscribe?.invoke(this, newSubscriberCount) ?: proceed()
+    ) {
+        onUnsubscribe?.invoke(this, newSubscriberCount) ?: proceed(newSubscriberCount)
+    }
 
     // region contract
     override fun toString(): String = "StoreDecorator${name?.let { " \"$it\"" }.orEmpty()}"

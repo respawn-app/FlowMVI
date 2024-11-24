@@ -28,10 +28,10 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A
         { withContext(decorator, { proceed() }) { wrap() } }
     },
     onSubscribe = wrapNotNull(onSubscribe, decorator.onSubscribe) { proceed, wrap ->
-        { withContext(decorator, { proceed(it) }) { wrap(it) } }
+        { subs -> withContext(decorator, { proceed(it); subs }) { wrap(subs) } }
     },
     onUnsubscribe = wrapNotNull(onUnsubscribe, decorator.onUnsubscribe) { proceed, wrap ->
-        { withContext(decorator, { proceed(it) }) { wrap(it) } }
+        { subs -> withContext(decorator, { proceed(it); subs }) { wrap(subs) } }
     },
 )
 

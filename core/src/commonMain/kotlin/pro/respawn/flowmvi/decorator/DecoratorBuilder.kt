@@ -15,8 +15,8 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
     private var _onAction: (suspend DecoratorContext<S, I, A, A>.(A) -> A?)? = null
     private var _onException: (suspend DecoratorContext<S, I, A, Exception>.(Exception) -> Exception?)? = null
     private var _onStart: (suspend DecoratorContext<S, I, A, Unit>.() -> Unit)? = null
-    private var _onSubscribe: (suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit)? = null
-    private var _onUnsubscribe: (suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit)? = null
+    private var _onSubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null
+    private var _onUnsubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null
 
     public var name: String? = null
 
@@ -47,12 +47,12 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     @FlowMVIDSL
     public fun onSubscribe(
-        block: suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit
+        block: suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit
     ): Unit = setOnce(::_onSubscribe, block)
 
     @FlowMVIDSL
     public fun onUnsubscribe(
-        block: suspend DecoratorContext<S, I, A, Unit>.(subs: Int) -> Unit
+        block: suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit
     ): Unit = setOnce(::_onUnsubscribe, block)
 
     @PublishedApi

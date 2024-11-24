@@ -10,5 +10,5 @@ import pro.respawn.flowmvi.api.PipelineContext
 @SubclassOptInRequired(NotIntendedForInheritance::class)
 public interface DecoratorContext<S : MVIState, I : MVIIntent, A : MVIAction, R> : PipelineContext<S, I, A> {
 
-    public suspend fun proceed(with: R): R?
+    public suspend fun proceed(with: R?): R?
 }
