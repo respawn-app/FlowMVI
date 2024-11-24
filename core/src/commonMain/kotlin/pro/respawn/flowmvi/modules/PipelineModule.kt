@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -29,7 +30,7 @@ import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
  * * using exception handler that uses the scope itself to recover from unhandled exceptions
  * * using this pipeline instance as the context element
  */
-@OptIn(DelicateStoreApi::class)
+@OptIn(DelicateStoreApi::class, NotIntendedForInheritance::class)
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipeline(
     parent: CoroutineScope,
     storeConfig: StoreConfiguration<S>,

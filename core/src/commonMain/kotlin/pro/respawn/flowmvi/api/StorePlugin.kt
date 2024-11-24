@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.api
 
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
@@ -16,7 +17,9 @@ import pro.respawn.flowmvi.dsl.plugin
  *
  * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
+@OptIn(ExperimentalSubclassOptIn::class)
 @Suppress("ComplexInterface")
+@SubclassOptInRequired(NotIntendedForInheritance::class)
 public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyPlugin<S, I, A> {
 
     /**

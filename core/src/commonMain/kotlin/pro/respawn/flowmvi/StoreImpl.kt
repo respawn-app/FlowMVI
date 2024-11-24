@@ -6,6 +6,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.ActionProvider
 import pro.respawn.flowmvi.api.ActionReceiver
 import pro.respawn.flowmvi.api.DelicateStoreApi
@@ -36,6 +37,7 @@ import pro.respawn.flowmvi.modules.restartableLifecycle
 import pro.respawn.flowmvi.modules.stateModule
 import pro.respawn.flowmvi.modules.subscriptionModule
 
+@OptIn(NotIntendedForInheritance::class)
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override val config: StoreConfiguration<S>,
     private val plugin: PluginInstance<S, I, A>,

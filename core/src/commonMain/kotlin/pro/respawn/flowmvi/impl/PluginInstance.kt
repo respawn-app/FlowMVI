@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.impl
 
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -11,6 +12,7 @@ import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 /**
  * Optimized plugin implementation that stores optional lambdas directly and avoids their invocations
  */
+@OptIn(NotIntendedForInheritance::class)
 internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
     val onState: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)? = null,
     val onIntent: (suspend PipelineContext<S, I, A>.(intent: I) -> I?)? = null,

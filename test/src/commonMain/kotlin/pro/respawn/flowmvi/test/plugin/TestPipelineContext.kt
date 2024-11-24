@@ -7,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.annotation.ExperimentalStoreApi
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -17,7 +18,7 @@ import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 import pro.respawn.flowmvi.test.TestStoreLifecycle
 import pro.respawn.flowmvi.test.ensureStarted
 
-@OptIn(ExperimentalStoreApi::class)
+@OptIn(ExperimentalStoreApi::class, NotIntendedForInheritance::class)
 internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     override val config: StoreConfiguration<S>,
     val plugin: StorePlugin<S, I, A>,
