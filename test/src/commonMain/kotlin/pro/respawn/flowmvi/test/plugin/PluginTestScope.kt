@@ -44,12 +44,10 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
             config = configuration,
             plugin = compositePlugin(
                 sequenceOf(
+                    plugin,
                     loggingPlugin(),
                     timeTravelPlugin(timeTravel),
-                    plugin,
-                )
-                    .map { it.invoke(configuration) }
-                    .toList(),
+                ).map { it(configuration) }.toList(),
             )
         )
     )
