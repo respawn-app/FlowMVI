@@ -1,7 +1,7 @@
 package pro.respawn.flowmvi.test.plugin
 
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.plugins.recoverPlugin
@@ -20,7 +20,7 @@ class RecoverPluginTest : FreeSpec({
                 val exception = RuntimeException()
                 val result = onException(exception)
                 "then exception should be handled" {
-                    timeTravel.exceptions.shouldContainExactly(exception)
+                    timeTravel.exceptions.shouldBeEmpty()
                     result.shouldBeNull()
                     recovers shouldBe 1
                 }

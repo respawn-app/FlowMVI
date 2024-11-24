@@ -22,22 +22,22 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     @FlowMVIDSL
     public fun onIntent(
-        block: suspend DecoratorContext<S, I, A, I>.(I) -> I?
+        block: suspend DecoratorContext<S, I, A, I>.(intent: I) -> I?
     ): Unit = setOnce(::_onIntent, block)
 
     @FlowMVIDSL
     public fun onState(
-        block: suspend DecoratorContext<S, I, A, S>.(S, S) -> S?
+        block: suspend DecoratorContext<S, I, A, S>.(old: S, new: S) -> S?
     ): Unit = setOnce(::_onState, block)
 
     @FlowMVIDSL
     public fun onAction(
-        block: suspend DecoratorContext<S, I, A, A>.(A) -> A?
+        block: suspend DecoratorContext<S, I, A, A>.(action: A) -> A?
     ): Unit = setOnce(::_onAction, block)
 
     @FlowMVIDSL
     public fun onException(
-        block: suspend DecoratorContext<S, I, A, Exception>.(Exception) -> Exception?
+        block: suspend DecoratorContext<S, I, A, Exception>.(e: Exception) -> Exception?
     ): Unit = setOnce(::_onException, block)
 
     @FlowMVIDSL
