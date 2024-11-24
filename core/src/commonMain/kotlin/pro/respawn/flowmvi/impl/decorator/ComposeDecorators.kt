@@ -1,11 +1,8 @@
 package pro.respawn.flowmvi.impl.decorator
 
-import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.decorator.DecoratorContext
 import pro.respawn.flowmvi.decorator.StoreDecorator
 import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.util.typed
@@ -15,26 +12,26 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A
     decorator: DecoratorInstance<S, I, A>,
 ): PluginInstance<S, I, A> = copy(
     name = decorator.name,
-    onState = compose(onState, decorator.onState) { handler, wrapper ->
-        { old, new -> context { handler(old, new) }.wrapper(old, new) }
+    onState = wrapNotNull(onState, decorator.onState) { proceed, wrap ->
+        { old, new -> withContext(decorator, { proceed(old, new) }) { wrap(old, new) } }
     },
-    onIntent = compose(onIntent, decorator.onIntent) { handler, wrapper ->
-        { context { handler(it) }.wrapper(it) }
+    onIntent = wrapNotNull(onIntent, decorator.onIntent) { proceed, wrap ->
+        { withContext(decorator, { proceed(it) }) { wrap(it) } }
     },
-    onAction = compose(onAction, decorator.onAction) { handler, wrapper ->
-        { context { handler(it) }.wrapper(it) }
+    onAction = wrapNotNull(onAction, decorator.onAction) { proceed, wrap ->
+        { withContext(decorator, { proceed(it) }) { wrap(it) } }
     },
-    onException = compose(onException, decorator.onException) { handler, wrapper ->
-        { context { handler(it) }.wrapper(it) }
+    onException = wrapNotNull(onException, decorator.onException) { proceed, wrap ->
+        { withContext(decorator, { proceed(it) }) { wrap(it) } }
     },
-    onStart = compose(onStart, decorator.onStart) { handler, wrapper ->
-        { context { handler() }.wrapper() }
+    onStart = wrapNotNull(onStart, decorator.onStart) { proceed, wrap ->
+        { withContext(decorator, { proceed() }) { wrap() } }
     },
-    onSubscribe = compose(onSubscribe, decorator.onSubscribe) { handler, wrapper ->
-        { context { handler(it) }.wrapper(it) }
+    onSubscribe = wrapNotNull(onSubscribe, decorator.onSubscribe) { proceed, wrap ->
+        { withContext(decorator, { proceed(it) }) { wrap(it) } }
     },
-    onUnsubscribe = compose(onUnsubscribe, decorator.onUnsubscribe) { handler, wrapper ->
-        { context { handler(it) }.wrapper(it) }
+    onUnsubscribe = wrapNotNull(onUnsubscribe, decorator.onUnsubscribe) { proceed, wrap ->
+        { withContext(decorator, { proceed(it) }) { wrap(it) } }
     },
 )
 
@@ -50,16 +47,8 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreDecorator<S, I, A
         onException = { e -> onException(e) },
     )
 
-@OptIn(NotIntendedForInheritance::class)
-private inline fun <S : MVIState, I : MVIIntent, A : MVIAction, R> PipelineContext<S, I, A>.context(
-    crossinline block: suspend () -> R?
-): DecoratorContext<S, I, A, R> = object : DecoratorContext<S, I, A, R>, PipelineContext<S, I, A> by this {
-
-    override suspend fun proceed(with: R): R? = block()
-}
-
-private inline fun <H, W, R> compose(
-    handler: H?,
+private inline fun <H, W> wrapNotNull(
+    action: H?,
     wrapper: W?,
-    block: (handler: H, wrapper: W) -> R
-) = handler?.let { h -> wrapper?.let { w -> block(h, w) } }
+    transform: (handler: H, wrapper: W) -> H
+): H? = action?.let { h -> wrapper?.let { w -> transform(h, w) } } ?: action

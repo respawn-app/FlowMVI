@@ -23,5 +23,6 @@ public data class StoreConfiguration<S : MVIState>(
     val coroutineContext: CoroutineContext,
     val logger: StoreLogger,
     val atomicStateUpdates: Boolean,
+    val verifyDecorators: Boolean,
     val name: String?,
 )
