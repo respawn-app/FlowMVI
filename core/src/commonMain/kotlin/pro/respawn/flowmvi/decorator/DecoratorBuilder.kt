@@ -67,8 +67,3 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
         onUnsubscribe = _onUnsubscribe
     )
 }
-
-@ExperimentalFlowMVIAPI
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> decorator(
-    block: DecoratorBuilder<S, I, A>.() -> Unit
-): StoreDecorator<S, I, A> = DecoratorBuilder<S, I, A>().apply(block).build()

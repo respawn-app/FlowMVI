@@ -118,13 +118,3 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
         onStop = stop,
     )
 }
-
-/**
- * Build a new [StorePlugin] using [StorePluginBuilder].
- * See [StoreBuilder.install] to install the plugin automatically.
- * @see [StorePlugin]
- */
-@FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> plugin(
-    @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>().apply(builder).build()

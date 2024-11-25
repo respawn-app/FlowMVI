@@ -29,3 +29,13 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyPlugin(
 ): LazyPlugin<S, I, A> = LazyPlugin {
     LazyPluginBuilder<S, I, A>(it).apply(builder).build()
 }
+
+/**
+ * Build a new [StorePlugin] using [StorePluginBuilder].
+ * See [StoreBuilder.install] to install the plugin automatically.
+ * @see [StorePlugin]
+ */
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> plugin(
+    @BuilderInference builder: StorePluginBuilder<S, I, A>.() -> Unit,
+): StorePlugin<S, I, A> = StorePluginBuilder<S, I, A>().apply(builder).build()

@@ -113,7 +113,7 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     public var atomicStateUpdates: Boolean = true
 
     @FlowMVIDSL
-    public var verifyDecorators: Boolean? = null
+    public var verifyPlugins: Boolean? = null
 
     /**
      * Set the future name of the store.
@@ -140,7 +140,7 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
         atomicStateUpdates = atomicStateUpdates,
         name = name,
         allowIdleSubscriptions = allowIdleSubscriptions ?: !debuggable,
-        verifyDecorators = verifyDecorators ?: debuggable,
+        verifyPlugins = verifyPlugins ?: debuggable,
     )
 }
 

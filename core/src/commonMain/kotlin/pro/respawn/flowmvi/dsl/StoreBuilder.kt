@@ -174,25 +174,25 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 
     // region Decorators
 
-    @ExperimentalFlowMVIAPI
     @FlowMVIDSL
-    public infix fun decorate(with: Iterable<StoreDecorator<S, I, A>>): Unit = with.forEach {
+    @ExperimentalFlowMVIAPI
+    public infix fun install(decorators: Iterable<StoreDecorator<S, I, A>>): Unit = decorators.forEach {
         require(this.decorators.add(it)) { duplicatePluginMessage("decorator", it.toString()) }
     }
 
     @FlowMVIDSL
     @ExperimentalFlowMVIAPI
-    public fun decorate(with: StoreDecorator<S, I, A>, vararg other: StoreDecorator<S, I, A>) {
-        decorate(sequenceOf(with).plus(other).asIterable())
+    public fun install(decorator: StoreDecorator<S, I, A>, vararg other: StoreDecorator<S, I, A>) {
+        install(sequenceOf(decorator).plus(other).asIterable())
     }
 
     @FlowMVIDSL
     @ExperimentalFlowMVIAPI
-    public inline infix fun decorate(block: DecoratorBuilder<S, I, A>.() -> Unit): Unit = decorate(decorator(block))
+    public inline infix fun decorate(block: DecoratorBuilder<S, I, A>.() -> Unit): Unit = install(decorator(block))
 
     @FlowMVIDSL
     @ExperimentalFlowMVIAPI
-    public fun StoreDecorator<S, I, A>.install(): Unit = decorate(this)
+    public fun StoreDecorator<S, I, A>.install(): Unit = install(this)
 
     // endregion
 

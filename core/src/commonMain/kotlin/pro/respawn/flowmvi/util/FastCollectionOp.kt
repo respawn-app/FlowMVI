@@ -17,3 +17,11 @@ internal inline fun <T, R> List<T>.fastFold(initial: R, operation: (acc: R, T) -
     }
     return accumulator
 }
+
+/**
+ * Only use this where you know the **exact size** of the sequence after it is reduced.
+ */
+internal inline fun <reified T> Sequence<T>.toArray(size: Int): Array<T> {
+    val iterator = iterator()
+    return Array(size) { iterator.next() }
+}

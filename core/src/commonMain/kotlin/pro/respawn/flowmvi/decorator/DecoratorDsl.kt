@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.decorator
 
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -15,6 +16,12 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Decorator
 
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> DecoratorContext<S, I, A, T>.ignore(): T? =
     proceed(null)
+
+@FlowMVIDSL
+@ExperimentalFlowMVIAPI
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> decorator(
+    block: DecoratorBuilder<S, I, A>.() -> Unit
+): StoreDecorator<S, I, A> = DecoratorBuilder<S, I, A>().apply(block).build()
 
 @FlowMVIDSL
 public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.decoratedWith(

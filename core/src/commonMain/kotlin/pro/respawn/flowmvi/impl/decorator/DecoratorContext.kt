@@ -24,6 +24,6 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T, R> PipelineC
     }
 
     fun verifyProceeded() {
-        if (config.verifyDecorators && !proceeded) throw NeverProceededException(decorator.toString())
+        if (config.verifyPlugins && !proceeded) throw NeverProceededException(decorator.toString())
     }
 }.run { block().also { verifyProceeded() } }
