@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.decorator.DecoratorContext
+import pro.respawn.flowmvi.exceptions.NeverProceededException
 
 @OptIn(NotIntendedForInheritance::class)
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T, R> PipelineContext<S, I, A>.withContext(
@@ -15,14 +16,14 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T, R> PipelineC
     block: DecoratorContext<S, I, A, T>.() -> R,
 ): R = object : DecoratorContext<S, I, A, T>, PipelineContext<S, I, A> by this {
 
-    private val proceeded = atomic(false)
+    private var proceeded by atomic(false)
 
     override suspend fun proceed(with: T?): T? {
-        if (config.verifyDecorators && proceeded.getAndSet(true)) throw AlreadyProceededException(decorator.toString())
+        proceeded = true
         return with?.let { proceed.invoke(it) }
     }
 
-    inline fun verifyProceeded() {
-        if (config.verifyDecorators && !proceeded.value) throw NeverProceededException(decorator.toString())
+    fun verifyProceeded() {
+        if (config.verifyDecorators && !proceeded) throw NeverProceededException(decorator.toString())
     }
 }.run { block().also { verifyProceeded() } }

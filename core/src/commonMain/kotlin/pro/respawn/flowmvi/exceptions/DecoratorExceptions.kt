@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.impl.decorator
+package pro.respawn.flowmvi.exceptions
 
 import pro.respawn.flowmvi.api.UnrecoverableException
 

@@ -9,8 +9,7 @@ import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorates
 import pro.respawn.flowmvi.decorator.proceed
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.impl.decorator.AlreadyProceededException
-import pro.respawn.flowmvi.impl.decorator.NeverProceededException
+import pro.respawn.flowmvi.exceptions.NeverProceededException
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.test.plugin.test
 import pro.respawn.flowmvi.util.TestAction
@@ -39,22 +38,6 @@ class StoreDecoratorTest : FreeSpec({
                     onStart()
                 }
                 timeTravel.starts shouldBe 0
-            }
-        }
-    }
-    "given decorator that calls proceed twice" - {
-        val decorator = testDecorator {
-            onStart {
-                proceed()
-                proceed()
-            }
-        }
-        "then decorator throws" {
-            (decorator decorates timeTravelPlugin).test(TestState.Some) {
-                shouldThrow<AlreadyProceededException> {
-                    onStart()
-                }
-                timeTravel.starts shouldBe 1 // also verified proceed works exactly once
             }
         }
     }
