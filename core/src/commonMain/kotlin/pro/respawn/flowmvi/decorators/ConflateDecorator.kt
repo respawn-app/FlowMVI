@@ -6,10 +6,9 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
-import pro.respawn.flowmvi.decorator.ignore
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.decorator.PluginDecorator
 
 private class Conflated<T : Any> {
 
@@ -26,18 +25,18 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateDecorator(
 ): PluginDecorator<S, I, A> = decorator {
     if (compareIntents != null) {
         val lastIntent = Conflated<I>()
-        onIntent { cur ->
+        onIntent { chain, cur ->
             val prev = lastIntent.update(cur)
-            if (prev != null && compareIntents(prev, cur)) return@onIntent ignore()
-            proceed(cur)
+            if (prev != null && compareIntents(prev, cur)) return@onIntent null
+            with(chain) { onIntent(cur) }
         }
     }
     if (compareActions != null) {
         val lastAction = Conflated<A>()
-        onAction { action ->
-            val prev = lastAction.update(action)
-            if (prev != null && compareActions(prev, action)) return@onAction ignore()
-            proceed(action)
+        onAction { chain, cur ->
+            val prev = lastAction.update(cur)
+            if (prev != null && compareActions(prev, cur)) return@onAction null
+            with(chain) { onAction(cur) }
         }
     }
 }

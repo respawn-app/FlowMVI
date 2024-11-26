@@ -9,9 +9,9 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -77,23 +77,22 @@ public data class RetryStrategy private constructor(
     }
 }
 
-internal suspend fun <T> CoroutineScope.retryRecursive(
+internal suspend fun <R> CoroutineScope.retryRecursive(
     strategy: RetryStrategy,
-    with: T,
-    attempt: suspend (T?) -> T?,
     attemptNo: Int = RetryStrategy.FirstAttempt,
-): T? {
+    attempt: suspend () -> R?,
+): R? {
     try {
-        return attempt(with)
+        return attempt()
     } catch (e: CancellationException) {
         throw e
     } catch (expected: Exception) {
         if (!strategy.shouldRetry(attemptNo)) throw expected
         val delay = strategy.delay(attemptNo)
-        if (delay <= Duration.ZERO) return retryRecursive(strategy, with, attempt, attemptNo + 1)
+        if (delay <= Duration.ZERO) return retryRecursive(strategy, attemptNo + 1, attempt)
         launch {
             delay(delay)
-            retryRecursive(strategy, with, attempt, attemptNo + 1)
+            retryRecursive(strategy, attemptNo + 1, attempt)
         }
         return null
     }
@@ -106,8 +105,12 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> retryDecorator(
     retryIntents: Boolean,
     retryActions: Boolean
 ): PluginDecorator<S, I, A> = decorator {
-    if (retryIntents) onIntent { retryRecursive(strategy, it, ::proceed) }
-    if (retryActions) onAction { retryRecursive(strategy, it, ::proceed) }
+    if (retryIntents) onIntent { chain, intent ->
+        retryRecursive(strategy) { with(chain) { onIntent(intent) } }
+    }
+    if (retryActions) onAction { chain, action ->
+        retryRecursive(strategy) { with(chain) { onAction(action) } }
+    }
 }
 
 @FlowMVIDSL

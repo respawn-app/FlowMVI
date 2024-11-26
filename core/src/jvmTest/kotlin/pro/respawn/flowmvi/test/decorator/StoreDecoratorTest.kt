@@ -1,15 +1,12 @@
 package pro.respawn.flowmvi.test.decorator
 
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorates
-import pro.respawn.flowmvi.decorator.proceed
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.exceptions.NeverProceededException
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 import pro.respawn.flowmvi.test.plugin.test
 import pro.respawn.flowmvi.util.TestAction
@@ -27,20 +24,6 @@ class StoreDecoratorTest : FreeSpec({
     afterEach {
         timeTravel.reset()
     }
-    "given a decorator that never calls proceed" - {
-        val decorator = testDecorator {
-            onStart { /* do nothing */ }
-        }
-
-        "then decorator throws" {
-            (decorator decorates timeTravelPlugin).test(TestState.Some) {
-                shouldThrow<NeverProceededException> {
-                    onStart()
-                }
-                timeTravel.starts shouldBe 0
-            }
-        }
-    }
     "given decorator that doesn't have a callback wrapper defined" - {
         val decorator = testDecorator {}
         "then the plugin is invoked directly" {
@@ -56,8 +39,8 @@ class StoreDecoratorTest : FreeSpec({
         "and a decorator that defines a callback wrapper" - {
             var invocations = 0
             val decorator = testDecorator {
-                onStart {
-                    proceed()
+                onStart { chain ->
+                    chain.run { onStart() }
                     ++invocations
                 }
             }
@@ -72,14 +55,14 @@ class StoreDecoratorTest : FreeSpec({
     "given multiple decorators" - {
         val invocations = mutableListOf<Int>()
         val decorator1 = testDecorator {
-            onStart {
-                proceed()
+            onStart { chain ->
+                chain.run { onStart() }
                 invocations += 1
             }
         }
         val decorator2 = testDecorator {
-            onStart {
-                proceed()
+            onStart { chain ->
+                chain.run { onStart() }
                 invocations += 2
             }
         }
@@ -95,8 +78,8 @@ class StoreDecoratorTest : FreeSpec({
         val invocations = mutableListOf<Int>()
         beforeEach { invocations.clear() }
         val decorator1 = testDecorator {
-            onStart {
-                proceed()
+            onStart { chain ->
+                chain.run { onStart() }
                 invocations += 1
             }
         }
@@ -120,13 +103,13 @@ class StoreDecoratorTest : FreeSpec({
     }
     "given a decorator with all callbacks defined" - {
         val decorator = testDecorator {
-            onStart { proceed() }
-            onIntent { proceed(it) }
-            onException { proceed(it) }
-            onState { _, new -> proceed(new) }
-            onAction { proceed(it) }
-            onSubscribe { proceed(it) }
-            onUnsubscribe { proceed(it) }
+            onStart { it.run { onStart() } }
+            onIntent { chain, it -> chain.run { onIntent(it) } }
+            onException { chain, it -> chain.run { onException(it) } }
+            onState { chain, old, new -> chain.run { onState(old, new) } }
+            onAction { chain, it -> chain.run { onAction(it) } }
+            onSubscribe { chain, it -> chain.run { onSubscribe(it) } }
+            onUnsubscribe { chain, it -> chain.run { onUnsubscribe(it) } }
         }
         "then all callbacks are invoked" {
             (timeTravelPlugin decoratedWith decorator).test(TestState.Some) {

@@ -13,10 +13,8 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
-import pro.respawn.flowmvi.decorator.ignore
-import pro.respawn.flowmvi.decorator.proceed
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.logging.info
 import kotlin.time.Duration
 
@@ -41,26 +39,30 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     mode: BatchingMode,
     queue: BatchQueue<I> = BatchQueue(),
 ): PluginDecorator<S, I, A> = decorator {
-    if (mode is BatchingMode.Time) onStart {
-        launch {
-            while (isActive) {
-                delay(mode.flushEvery)
-                val intents = queue.flush()
-                config.logger.info { "Flushing ${intents.size} after batching for ${mode.flushEvery}" }
-                intents.forEach { onIntent(it) }
+    if (mode is BatchingMode.Time) onStart { child ->
+        with(child) {
+            launch {
+                while (isActive) {
+                    delay(mode.flushEvery)
+                    val intents = queue.flush()
+                    config.logger.info { "Flushing ${intents.size} after batching for ${mode.flushEvery}" }
+                    intents.forEach { onIntent(it) }
+                }
             }
+            onStart()
         }
-        proceed()
     }
-    onIntent { intent ->
-        when (mode) {
-            is BatchingMode.Time -> queue.onIntent(intent)
-            is BatchingMode.Amount -> {
-                queue.onIntent(intent)
-                if (queue.queue.value.size <= mode.maxSize) return@onIntent ignore()
-                val intents = queue.flush()
-                config.logger.info { "Flushing ${intents.size} after batching" }
-                intents.forEach { proceed(it) }
+    onIntent { child, intent ->
+        with(child) {
+            when (mode) {
+                is BatchingMode.Time -> queue.onIntent(intent)
+                is BatchingMode.Amount -> {
+                    queue.onIntent(intent)
+                    if (queue.queue.value.size <= mode.maxSize) return@onIntent null
+                    val intents = queue.flush()
+                    config.logger.info { "Flushing ${intents.size} after batching" }
+                    intents.forEach { onIntent(it) }
+                }
             }
         }
         null

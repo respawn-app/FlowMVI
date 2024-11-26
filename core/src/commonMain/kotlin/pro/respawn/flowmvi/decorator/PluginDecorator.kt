@@ -4,29 +4,27 @@ import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StorePlugin
 
-@OptIn(ExperimentalSubclassOptIn::class)
-@Suppress("ComplexInterface")
-@SubclassOptInRequired(NotIntendedForInheritance::class)
-public interface PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> {
+@OptIn(NotIntendedForInheritance::class)
+public class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
+    override val name: String?,
+    internal val onIntent: DecorateValue<S, I, A, I>? = null,
+    internal val onState: DecorateState<S, I, A>? = null,
+    internal val onAction: DecorateValue<S, I, A, A>? = null,
+    internal val onException: DecorateValue<S, I, A, Exception>? = null,
+    internal val onStart: Decorate<S, I, A>? = null,
+    internal val onSubscribe: DecorateArg<S, I, A, Int>? = null,
+    internal val onUnsubscribe: DecorateArg<S, I, A, Int>? = null,
+) : StorePlugin<S, I, A> {
 
-    public val name: String?
-
-    public suspend fun DecoratorContext<S, I, A, Unit>.onStart()
-
-    public suspend fun DecoratorContext<S, I, A, I>.onIntent(intent: I): I?
-
-    public suspend fun DecoratorContext<S, I, A, S>.onState(old: S, new: S): S?
-
-    public suspend fun DecoratorContext<S, I, A, A>.onAction(action: A): A?
-
-    public suspend fun DecoratorContext<S, I, A, Exception>.onException(e: Exception): Exception?
-
-    public suspend fun DecoratorContext<S, I, A, Int>.onSubscribe(newSubscriberCount: Int)
-
-    public suspend fun DecoratorContext<S, I, A, Int>.onUnsubscribe(newSubscriberCount: Int)
-
-    override fun toString(): String
-    override fun hashCode(): Int
-    override fun equals(other: Any?): Boolean
+    // region contract
+    override fun toString(): String = "PluginDecorator for ${name?.let { " \"$it\"" }.orEmpty()}"
+    override fun hashCode(): Int = name?.hashCode() ?: super.hashCode()
+    override fun equals(other: Any?): Boolean = when {
+        other !is PluginDecorator<*, *, *> -> false
+        other.name == null && name == null -> this === other
+        else -> name == other.name
+    }
+    //endregion
 }

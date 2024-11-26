@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.decorator.decorates
-import pro.respawn.flowmvi.decorator.ignore
+import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.testDecorator
 import pro.respawn.flowmvi.util.testTimeTravel
 import pro.respawn.flowmvi.util.withType
+import sun.invoke.util.ValueConversions.ignore
 
 class DecoratorValuesTest : FreeSpec({
     asUnconfined()
@@ -35,11 +36,13 @@ class DecoratorValuesTest : FreeSpec({
         }
         "and a decorator that calls the chain and returns the result" - {
             val decorator = testDecorator {
-                onState { old, new ->
-                    old shouldBe TestState.Some
-                    val result = proceed(new)
-                    result shouldBe SomeData(1)
-                    result
+                onState { chain, old, new ->
+                    chain.run {
+                        old shouldBe TestState.Some
+                        val result = onState(old, new)
+                        result shouldBe SomeData(1)
+                        result
+                    }
                 }
             }
             "then the final result is the new state" {
@@ -52,8 +55,8 @@ class DecoratorValuesTest : FreeSpec({
         "and a decorator that replaces the final state" - {
             val replacement = SomeData(2)
             val decorator = testDecorator {
-                onState { _, new ->
-                    proceed(new)
+                onState { chain, old, new ->
+                    chain.run { onState(old, new) }
                     replacement
                 }
             }
@@ -66,9 +69,8 @@ class DecoratorValuesTest : FreeSpec({
         }
         "and a decorator that ignores the chain" - {
             val decorator = testDecorator {
-                onState { old, _ ->
+                onState { chain, old, new ->
                     old shouldBe TestState.Some
-                    ignore()
                     old
                 }
             }

@@ -13,9 +13,9 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.decorator.DecoratorBuilder
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.impl.plugin.asInstance
 import pro.respawn.flowmvi.impl.plugin.compose
 import pro.respawn.flowmvi.logging.NoOpStoreLogger

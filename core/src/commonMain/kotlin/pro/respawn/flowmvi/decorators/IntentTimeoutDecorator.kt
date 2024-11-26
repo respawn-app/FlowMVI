@@ -7,9 +7,9 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import kotlin.time.Duration
 
 @ExperimentalFlowMVIAPI
@@ -18,11 +18,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDeco
     timeout: Duration,
     crossinline onTimeout: suspend PipelineContext<S, I, A>.(attempted: I) -> I? = { null },
 ): PluginDecorator<S, I, A> = decorator {
-    onIntent {
+    onIntent { chain, intent ->
         withTimeoutOrNull(timeout) {
             // can also return null so exit early to not confuse the 2 outcomes
-            return@withTimeoutOrNull proceed(it)
-        } ?: onTimeout(it)
+            return@withTimeoutOrNull with(chain) { onIntent(intent) }
+        } ?: onTimeout(intent)
     }
 }
 
