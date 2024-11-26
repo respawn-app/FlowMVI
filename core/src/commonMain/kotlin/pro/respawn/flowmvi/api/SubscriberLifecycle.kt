@@ -3,9 +3,9 @@ package pro.respawn.flowmvi.api
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * A subscriber lifecycle is the lifecycle of the UI element used to subscribe to the store. This is usually the
- * "screen"'s lifecycle. The lifecycle implementation must follow the [SubscriptionMode] contract as described in the
- * documentation.
+ * A subscriber lifecycle is the lifecycle of the [Consumer]. This is usually the UI lifecycle.
+ *
+ * The lifecycle implementation must follow the [SubscriptionMode] contract as described in the documentation.
  */
 public interface SubscriberLifecycle {
 

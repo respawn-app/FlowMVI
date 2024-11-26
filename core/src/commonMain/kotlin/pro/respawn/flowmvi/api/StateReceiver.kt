@@ -10,11 +10,11 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      * Obtain the current [StateProvider.state] and update it with the result of [transform].
      *
      * * **This function will suspend until all previous [withState] or [updateState] invocations are finished if
-     * [StoreConfiguration.atomicStateUpdates] is enabled**
+     * [StoreConfiguration.atomicStateUpdates] are enabled.**
      * * **This function is reentrant, for more info, see [withState]**
      * * If you want to operate on a state of particular subtype, use the typed version of this function.
      * * If you wish to ignore plugins and thread-safety of state updates in favor of greater performance,
-     * see [updateStateImmediate]
+     * see [updateStateImmediate].
      *
      * @see [withState]
      * @see [updateStateImmediate]
@@ -27,7 +27,7 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      *
      * * This function does NOT update the state, for that, use [updateState].
      * * **This function will suspend until all previous [withState] or [updateState] invocations are finished if
-     * [StoreConfiguration.atomicStateUpdates] is enabled**
+     * [StoreConfiguration.atomicStateUpdates] are enabled.**
      * * If you want to operate on a state of particular subtype, use the typed version of this function.
      * * If you wish to ignore plugins and thread-safety of state updates in favor of greater performance,
      * see [updateStateImmediate]
@@ -38,9 +38,7 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      *   withState { }
      * }
      * ```
-     * you will not get a deadlock.
-     *
-     * @returns the value of [S], i.e. the result of the block.
+     * you will not get a deadlock even if the transaction is serializable.
      */
     @FlowMVIDSL
     public suspend fun withState(block: suspend S.() -> Unit)

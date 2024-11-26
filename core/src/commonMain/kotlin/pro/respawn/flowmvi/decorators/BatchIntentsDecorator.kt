@@ -38,14 +38,18 @@ public class BatchQueue<I : MVIIntent> {
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     mode: BatchingMode,
     queue: BatchQueue<I> = BatchQueue(),
+    name: String? = "BatchIntentsDecorator"
 ): PluginDecorator<S, I, A> = decorator {
+    this.name = name
     if (mode is BatchingMode.Time) onStart { child ->
         with(child) {
             launch {
                 while (isActive) {
                     delay(mode.flushEvery)
                     val intents = queue.flush()
-                    config.logger.info { "Flushing ${intents.size} after batching for ${mode.flushEvery}" }
+                    config.logger.info(this@decorator.name) {
+                        "Flushing ${intents.size} after batching for ${mode.flushEvery}"
+                    }
                     intents.forEach { onIntent(it) }
                 }
             }
@@ -60,7 +64,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                     queue.onIntent(intent)
                     if (queue.queue.value.size <= mode.maxSize) return@onIntent null
                     val intents = queue.flush()
-                    config.logger.info { "Flushing ${intents.size} after batching" }
+                    config.logger.info(this@decorator.name) {
+                        "Flushing ${intents.size} after batching"
+                    }
                     intents.forEach { onIntent(it) }
                 }
             }

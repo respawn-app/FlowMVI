@@ -7,7 +7,7 @@ package pro.respawn.flowmvi.api
 public enum class SubscriptionMode {
 
     /**
-     * Subscribe using a composable function's lifecycle without considering if the UI is fully or partially visible.
+     * Subscribe immediately without considering if the UI is fully or partially visible.
      */
     Immediate,
 
