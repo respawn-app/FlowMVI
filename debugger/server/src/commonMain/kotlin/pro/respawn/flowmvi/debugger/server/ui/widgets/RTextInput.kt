@@ -7,7 +7,6 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.text.KeyboardActionScope
@@ -41,7 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import pro.respawn.flowmvi.debugger.server.ui.icons.*
+import pro.respawn.flowmvi.debugger.server.ui.icons.Close
+import pro.respawn.flowmvi.debugger.server.ui.icons.Icons
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.util.message
@@ -79,9 +79,9 @@ internal fun KeyboardActions.Companion.default(
 }
 
 private const val AutoFocusDelay = 200L
-private val ContentPadding = 12.dp
 
 @Composable
+@Suppress("ComposableParametersOrdering")
 fun RTextInput(
     input: Input,
     onTextChange: (String) -> Unit,
@@ -257,6 +257,7 @@ private fun LabelWithCounter(
     }
 }
 
+@Suppress("ComposableParametersOrdering")
 @Composable
 fun OutlinedTextFieldContent(
     input: Input,

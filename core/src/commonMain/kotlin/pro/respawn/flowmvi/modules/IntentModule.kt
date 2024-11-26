@@ -43,7 +43,6 @@ private class SequentialChannelIntentModule<I : MVIIntent>(
     onUndeliveredIntent: ((intent: I) -> Unit)?,
 ) : ChannelIntentModule<I>(capacity, overflow, onUndeliveredIntent) {
 
-
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         // must always suspend the current scope to wait for intents
         for (intent in intents) {

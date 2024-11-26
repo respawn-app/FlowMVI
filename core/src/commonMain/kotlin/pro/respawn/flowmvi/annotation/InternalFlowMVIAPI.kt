@@ -1,8 +1,9 @@
 package pro.respawn.flowmvi.annotation
 
-
 private const val Message = """
-Internal FlowMVI API. Do not use this API directly as public API already contains everything you should need.
+This API is internal to the library.
+Do not use this API directly as public API already exists for the same thing.
+If you have the use-case for this api you can't avoid, please submit an issue.
 """
 
 /**

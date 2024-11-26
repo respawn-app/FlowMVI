@@ -6,9 +6,23 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 
+/**
+ * This class is an (already created) instance of the decorator for a [StorePlugin].
+ *
+ * To use this instance, you first need to obtain a child plugin instance and apply the decorator using
+ * [StorePlugin.decoratedWith] or [PluginDecorator.decorates].
+ *
+ * You will get a new instance of [StorePlugin] that will be wrapped by this decorator.
+ *
+ * See detailed documentation in [DecoratorBuilder] where methods are defined.
+ *
+ * @see DecoratorBuilder
+ */
+@ConsistentCopyVisibility
 @OptIn(NotIntendedForInheritance::class)
-public class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    override val name: String?,
+public data class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
+    /** The name of the decorator. Must be unique or `null` */
+    public val name: String?,
     internal val onIntent: DecorateValue<S, I, A, I>? = null,
     internal val onState: DecorateState<S, I, A>? = null,
     internal val onAction: DecorateValue<S, I, A, A>? = null,
@@ -16,7 +30,10 @@ public class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> interna
     internal val onStart: Decorate<S, I, A>? = null,
     internal val onSubscribe: DecorateArg<S, I, A, Int>? = null,
     internal val onUnsubscribe: DecorateArg<S, I, A, Int>? = null,
-) : StorePlugin<S, I, A> {
+    internal val onStop: DecorateOnStop<S, I, A>? = null,
+    internal val onUndeliveredIntent: DecorateUndelivered<S, I, A, I>? = null,
+    internal val onUndeliveredAction: DecorateUndelivered<S, I, A, A>? = null,
+) {
 
     // region contract
     override fun toString(): String = "PluginDecorator for ${name?.let { " \"$it\"" }.orEmpty()}"

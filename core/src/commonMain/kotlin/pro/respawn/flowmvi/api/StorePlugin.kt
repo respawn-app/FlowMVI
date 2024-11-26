@@ -6,7 +6,7 @@ import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.StorePluginBuilder
 import pro.respawn.flowmvi.dsl.plugin
-
+import kotlinx.coroutines.channels.Channel
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
@@ -17,8 +17,8 @@ import pro.respawn.flowmvi.dsl.plugin
  *
  * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
-@OptIn(ExperimentalSubclassOptIn::class)
 @Suppress("ComplexInterface")
+@OptIn(ExperimentalSubclassOptIn::class)
 @SubclassOptInRequired(NotIntendedForInheritance::class)
 public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyPlugin<S, I, A> {
 
@@ -161,8 +161,41 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      */
     public fun ShutdownContext<S, I, A>.onStop(e: Exception?): Unit = Unit
 
+    /**
+     * Called when an intent is not delivered to the store.
+     *
+     * This can happen according to the [Channel]'s documentation:
+     * * When the store has a limited buffer and it overflows.
+     * * When store is stopped before this event could be handled, or while it is being handled.
+     * * When the [onIntent] function throws an exception that is not handled by the [onException] block.
+     * * When the store is stopped and there were intents in the buffer, in which case, `onUndeliveredIntent` will
+     * be called on all of them.
+     *
+     * ### Warning:
+     * This function is called in an undefined coroutine context on a random thread,
+     * while the store is running or already stopped. It should be fast, non-blocking,
+     * and must **not throw exceptions**, or the store will crash. The [onException] block will **not** handle
+     * exceptions in this function.
+     */
     public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
 
+    /**
+     * Called when an action is not delivered to the store.
+     *
+     * This can happen according to the [Channel]'s documentation:
+     * * When the Store's [ActionShareBehavior] is [ActionShareBehavior.Distribute] or [ActionShareBehavior.Restrict].
+     * In this case, depending on the configuration, the queue of actions may have a limited buffer and overflow.
+     * * When store is stopped before this event could be received by subscribers.
+     * * When the subscriber cancels their subscription or throws before it could process the action.
+     * * When the store is stopped and there were actions in the buffer, in which case, `onUndeliveredAction` will
+     * be called on all of them.
+     *
+     * ### Warning:
+     * This function is called in an undefined coroutine context on a random thread,
+     * while the store is running or already stopped. It should be fast, non-blocking,
+     * and must **not throw exceptions**, or the store will crash. The [onException] block will **not** handle
+     * exceptions in this function.
+     */
     public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
 
     override fun hashCode(): Int

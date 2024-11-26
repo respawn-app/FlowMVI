@@ -13,9 +13,9 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.decorator.DecoratorBuilder
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorator
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.impl.plugin.asInstance
 import pro.respawn.flowmvi.impl.plugin.compose
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
@@ -23,6 +23,7 @@ import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
+import pro.respawn.flowmvi.plugins.compositePlugin
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
@@ -49,7 +50,7 @@ private fun duplicatePluginMessage(type: String, name: String) {
  * A builder DSL for creating a [Store].
  * Cannot be instantiated outside of [store] functions.
  * After building, the [StoreConfiguration] is created and used in the [Store].
- * This configuration must **not** be changed in any way after the store is created through circumvention measures.
+ *
  * @param initial initial state the store will have.
  */
 @FlowMVIDSL
@@ -175,6 +176,16 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 
     // region Decorators
 
+    /**
+     * Install the [decorators]. Decorators will be installed **after all** plugins in the order they are in the list,
+     * and they will wrap **all** of the plugins of this store, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI
@@ -182,6 +193,16 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         require(this.decorators.add(it)) { duplicatePluginMessage("decorator", it.toString()) }
     }
 
+    /**
+     * Install these decorators. Decorators will be installed **after all** plugins in the order they are declared.
+     * and they will wrap **all** of the plugins of this store, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI
@@ -189,10 +210,31 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         install(sequenceOf(decorator).plus(other).asIterable())
     }
 
+    /**
+     * Create and install a new [PluginDecorator] that will decorate **all** plugins of this store and **all**
+     * decorators installed before this one!
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators and plugins.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
+
     @FlowMVIDSL
     @ExperimentalFlowMVIAPI
     public inline infix fun decorate(block: DecoratorBuilder<S, I, A>.() -> Unit): Unit = install(decorator(block))
 
+    /**
+     * Install `this` decorator. Decorator will be installed **after all** plugins and decorators installed before,
+     * and it will wrap **all** of them, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI

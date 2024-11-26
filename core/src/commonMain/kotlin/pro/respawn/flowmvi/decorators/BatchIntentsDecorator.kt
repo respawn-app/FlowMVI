@@ -13,8 +13,8 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.decorator.PluginDecorator
+import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.logging.info
 import kotlin.time.Duration
 

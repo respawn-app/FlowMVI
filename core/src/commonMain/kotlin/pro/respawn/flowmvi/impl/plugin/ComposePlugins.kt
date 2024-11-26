@@ -42,8 +42,12 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> List<PluginInstance<S,
     },
 )
 
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.asInstance(
-) = typed<PluginInstance<S, I, A>>() ?: PluginInstance(
+@Suppress("Indentation") // bug in detekt
+internal fun <
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction
+    > StorePlugin<S, I, A>.asInstance() = typed<PluginInstance<S, I, A>>() ?: PluginInstance(
     onState = { old: S, new: S -> onState(old, new) },
     onIntent = { intent: I -> onIntent(intent) },
     onAction = { action: A -> onAction(action) },

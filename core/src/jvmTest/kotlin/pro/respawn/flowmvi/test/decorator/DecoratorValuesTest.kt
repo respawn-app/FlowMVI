@@ -17,7 +17,6 @@ import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.testDecorator
 import pro.respawn.flowmvi.util.testTimeTravel
 import pro.respawn.flowmvi.util.withType
-import sun.invoke.util.ValueConversions.ignore
 
 class DecoratorValuesTest : FreeSpec({
     asUnconfined()

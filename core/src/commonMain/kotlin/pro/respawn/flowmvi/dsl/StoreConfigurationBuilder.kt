@@ -112,6 +112,11 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     @FlowMVIDSL
     public var atomicStateUpdates: Boolean = true
 
+    /**
+     * Signals to plugins that they should enable their own verification logic.
+     *
+     * By default, set to `true` only if the store is [debuggable].
+     */
     @FlowMVIDSL
     public var verifyPlugins: Boolean? = null
 

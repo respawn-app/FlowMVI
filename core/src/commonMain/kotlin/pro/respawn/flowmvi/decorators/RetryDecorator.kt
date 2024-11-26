@@ -9,9 +9,9 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -55,9 +55,7 @@ public data class RetryStrategy private constructor(
             delay: Duration,
             exponent: Double = 2.0,
             delayInitially: Boolean = true,
-        ): RetryStrategy {
-            return RetryStrategy(retries, delay, exponent, delayInitially)
-        }
+        ): RetryStrategy = RetryStrategy(retries, delay, exponent, delayInitially)
 
         public fun FixedDelay(
             retries: Int,

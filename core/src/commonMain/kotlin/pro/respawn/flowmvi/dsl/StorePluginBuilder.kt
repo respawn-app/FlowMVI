@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.dsl
 
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -34,37 +35,37 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     private var stop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null
 
     /**
-     * @see [StorePlugin.name]
+     * See [StorePlugin.name]
      */
     @FlowMVIDSL
     public var name: String? = null
 
     /**
-     * @see [StorePlugin.onStart]
+     * See [StorePlugin.onStart]
      */
     @FlowMVIDSL
     public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = setOnce(::start, block)
 
     /**
-     * @see [StorePlugin.onState]
+     * See [StorePlugin.onState]
      */
     @FlowMVIDSL
     public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?): Unit = setOnce(::state, block)
 
     /**
-     * @see [StorePlugin.onIntent]
+     * See [StorePlugin.onIntent]
      */
     @FlowMVIDSL
     public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = setOnce(::intent, block)
 
     /**
-     * @see [StorePlugin.onAction]
+     * See [StorePlugin.onAction]
      */
     @FlowMVIDSL
     public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = setOnce(::action, block)
 
     /**
-     * @see [StorePlugin.onException]
+     * See [StorePlugin.onException]
      */
     @FlowMVIDSL
     public fun onException(
@@ -72,7 +73,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::exception, block)
 
     /**
-     * @see [StorePlugin.onSubscribe]
+     * See [StorePlugin.onSubscribe]
      */
     @FlowMVIDSL
     public fun onSubscribe(
@@ -80,7 +81,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::subscribe, block)
 
     /**
-     * @see StorePlugin.onUnsubscribe
+     * See StorePlugin.onUnsubscribe
      */
     @FlowMVIDSL
     public fun onUnsubscribe(
@@ -88,17 +89,25 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::unsubscribe, block)
 
     /**
-     * @see [StorePlugin.onStop]
+     * See [StorePlugin.onStop]
      */
     @FlowMVIDSL
     public fun onStop(block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit): Unit = setOnce(::stop, block)
 
+    /**
+     * See [StorePlugin.onUndeliveredIntent]
+     */
     @FlowMVIDSL
+    @DelicateStoreApi
     public fun onUndeliveredIntent(
         block: UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit
     ): Unit = setOnce(::undeliveredIntent, block)
 
+    /**
+     * See [StorePlugin.onUndeliveredAction]
+     */
     @FlowMVIDSL
+    @DelicateStoreApi
     public fun onUndeliveredAction(
         block: UndeliveredHandlerContext<S, I, A>.(action: A) -> Unit
     ): Unit = setOnce(::undeliveredAction, block)
