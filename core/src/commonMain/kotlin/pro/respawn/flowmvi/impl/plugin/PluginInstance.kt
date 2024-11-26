@@ -7,7 +7,6 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 
 /**
  * Optimized plugin implementation that stores optional lambdas directly and avoids their invocations
@@ -22,8 +21,8 @@ internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
     val onSubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null,
     val onUnsubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null,
     val onStop: (ShutdownContext<S, I, A>.(e: Exception?) -> Unit)? = null,
-    val onUndeliveredIntent: (UndeliveredHandlerContext<S, I, A>.(intent: I) -> Unit)? = null,
-    val onUndeliveredAction: (UndeliveredHandlerContext<S, I, A>.(action: A) -> Unit)? = null,
+    val onUndeliveredIntent: (ShutdownContext<S, I, A>.(intent: I) -> Unit)? = null,
+    val onUndeliveredAction: (ShutdownContext<S, I, A>.(action: A) -> Unit)? = null,
     override val name: String? = null,
 ) : StorePlugin<S, I, A> {
 
@@ -59,11 +58,11 @@ internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
         onStop?.invoke(this, e)
     }
 
-    override fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I) {
+    override fun ShutdownContext<S, I, A>.onUndeliveredIntent(intent: I) {
         onUndeliveredIntent?.invoke(this, intent)
     }
 
-    override fun UndeliveredHandlerContext<S, I, A>.onUndeliveredAction(action: A) {
+    override fun ShutdownContext<S, I, A>.onUndeliveredAction(action: A) {
         onUndeliveredAction?.invoke(this, action)
     }
 

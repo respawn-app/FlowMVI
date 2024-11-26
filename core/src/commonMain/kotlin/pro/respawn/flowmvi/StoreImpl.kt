@@ -19,7 +19,6 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.exceptions.NonSuspendingSubscriberException
 import pro.respawn.flowmvi.exceptions.SubscribeBeforeStartException
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
@@ -47,7 +46,6 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 ) : Store<S, I, A>,
     Provider<S, I, A>,
     ShutdownContext<S, I, A>,
-    UndeliveredHandlerContext<S, I, A>,
     IntentReceiver<I>,
     ActionProvider<A>,
     ActionReceiver<A>,

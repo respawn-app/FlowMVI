@@ -30,9 +30,9 @@ public data class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> in
     internal val onStart: Decorate<S, I, A>? = null,
     internal val onSubscribe: DecorateArg<S, I, A, Int>? = null,
     internal val onUnsubscribe: DecorateArg<S, I, A, Int>? = null,
-    internal val onStop: DecorateOnStop<S, I, A>? = null,
-    internal val onUndeliveredIntent: DecorateUndelivered<S, I, A, I>? = null,
-    internal val onUndeliveredAction: DecorateUndelivered<S, I, A, A>? = null,
+    internal val onStop: DecorateShutdown<S, I, A, Exception?>? = null,
+    internal val onUndeliveredIntent: DecorateShutdown<S, I, A, I>? = null,
+    internal val onUndeliveredAction: DecorateShutdown<S, I, A, A>? = null,
 ) {
 
     // region contract

@@ -9,7 +9,6 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.loggingPlugin
@@ -31,7 +30,6 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
     public val timeTravel: TimeTravel<S, I, A>,
 ) : PipelineContext<S, I, A> by ctx,
     ShutdownContext<S, I, A>,
-    UndeliveredHandlerContext<S, I, A>,
     StorePlugin<S, I, A> by ctx.plugin {
 
     public constructor(

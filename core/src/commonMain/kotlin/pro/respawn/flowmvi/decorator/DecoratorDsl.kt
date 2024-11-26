@@ -8,7 +8,6 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.impl.plugin.asInstance
 
@@ -28,12 +27,8 @@ public typealias DecorateArg<S, I, A, V> = (
 suspend PipelineContext<S, I, A>.(child: StorePlugin<S, I, A>, it: V) -> Unit
 )
 
-public typealias DecorateOnStop<S, I, A> = (
-ShutdownContext<S, I, A>.(child: StorePlugin<S, I, A>, e: Exception?) -> Unit
-)
-
-public typealias DecorateUndelivered<S, I, A, V> = (
-UndeliveredHandlerContext<S, I, A>.(child: StorePlugin<S, I, A>, it: V) -> Unit
+public typealias DecorateShutdown<S, I, A, V> = (
+ShutdownContext<S, I, A>.(child: StorePlugin<S, I, A>, e: V) -> Unit
 )
 
 /**

@@ -1,12 +1,11 @@
 package pro.respawn.flowmvi.api
 
+import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.context.UndeliveredHandlerContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.StorePluginBuilder
 import pro.respawn.flowmvi.dsl.plugin
-import kotlinx.coroutines.channels.Channel
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.
@@ -177,7 +176,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * and must **not throw exceptions**, or the store will crash. The [onException] block will **not** handle
      * exceptions in this function.
      */
-    public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
+    public fun ShutdownContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
 
     /**
      * Called when an action is not delivered to the store.
@@ -196,7 +195,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * and must **not throw exceptions**, or the store will crash. The [onException] block will **not** handle
      * exceptions in this function.
      */
-    public fun UndeliveredHandlerContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
+    public fun ShutdownContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
 
     override fun hashCode(): Int
     override fun equals(other: Any?): Boolean
