@@ -22,6 +22,7 @@ import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmName
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
@@ -175,12 +176,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     // region Decorators
 
     @FlowMVIDSL
+    @JvmName("decorate")
     @ExperimentalFlowMVIAPI
     public infix fun install(decorators: Iterable<StoreDecorator<S, I, A>>): Unit = decorators.forEach {
         require(this.decorators.add(it)) { duplicatePluginMessage("decorator", it.toString()) }
     }
 
     @FlowMVIDSL
+    @JvmName("decorate")
     @ExperimentalFlowMVIAPI
     public fun install(decorator: StoreDecorator<S, I, A>, vararg other: StoreDecorator<S, I, A>) {
         install(sequenceOf(decorator).plus(other).asIterable())
@@ -191,6 +194,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     public inline infix fun decorate(block: DecoratorBuilder<S, I, A>.() -> Unit): Unit = install(decorator(block))
 
     @FlowMVIDSL
+    @JvmName("decorate")
     @ExperimentalFlowMVIAPI
     public fun StoreDecorator<S, I, A>.install(): Unit = install(this)
 
