@@ -8,7 +8,7 @@ import pro.respawn.flowmvi.api.MVIState
 @OptIn(ExperimentalSubclassOptIn::class)
 @Suppress("ComplexInterface")
 @SubclassOptInRequired(NotIntendedForInheritance::class)
-public interface StoreDecorator<S : MVIState, I : MVIIntent, A : MVIAction> {
+public interface PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> {
 
     public val name: String?
 

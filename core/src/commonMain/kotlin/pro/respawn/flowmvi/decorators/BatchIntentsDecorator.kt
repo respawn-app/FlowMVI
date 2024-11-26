@@ -13,7 +13,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.StoreDecorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.decorator.ignore
 import pro.respawn.flowmvi.decorator.proceed
@@ -40,7 +40,7 @@ public class BatchQueue<I : MVIIntent> {
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     mode: BatchingMode,
     queue: BatchQueue<I> = BatchQueue(),
-): StoreDecorator<S, I, A> = decorator {
+): PluginDecorator<S, I, A> = decorator {
     if (mode is BatchingMode.Time) onStart {
         launch {
             while (isActive) {

@@ -21,19 +21,19 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> Decora
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> decorator(
     block: DecoratorBuilder<S, I, A>.() -> Unit
-): StoreDecorator<S, I, A> = DecoratorBuilder<S, I, A>().apply(block).build()
+): PluginDecorator<S, I, A> = DecoratorBuilder<S, I, A>().apply(block).build()
 
 @FlowMVIDSL
 public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.decoratedWith(
-    decorator: StoreDecorator<S, I, A>
+    decorator: PluginDecorator<S, I, A>
 ): StorePlugin<S, I, A> = asInstance().decorate(decorator.asInstance())
 
 @FlowMVIDSL
-public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreDecorator<S, I, A>.decorates(
+public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginDecorator<S, I, A>.decorates(
     plugin: StorePlugin<S, I, A>
 ): StorePlugin<S, I, A> = plugin.asInstance().decorate(asInstance())
 
 @FlowMVIDSL
 public infix fun <S : MVIState, I : MVIIntent, A : MVIAction> StorePlugin<S, I, A>.decoratedWith(
-    decorators: Iterable<StoreDecorator<S, I, A>>
+    decorators: Iterable<PluginDecorator<S, I, A>>
 ): StorePlugin<S, I, A> = decorators.fold(this) { next, decorator -> next decoratedWith decorator }

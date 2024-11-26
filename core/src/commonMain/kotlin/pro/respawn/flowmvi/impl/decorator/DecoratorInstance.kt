@@ -5,7 +5,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.decorator.DecoratorContext
-import pro.respawn.flowmvi.decorator.StoreDecorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.proceed
 
 @OptIn(NotIntendedForInheritance::class)
@@ -18,7 +18,7 @@ internal class DecoratorInstance<S : MVIState, I : MVIIntent, A : MVIAction> int
     internal val onStart: (suspend DecoratorContext<S, I, A, Unit>.() -> Unit)? = null,
     internal val onSubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null,
     internal val onUnsubscribe: (suspend DecoratorContext<S, I, A, Int>.(subs: Int) -> Unit)? = null
-) : StoreDecorator<S, I, A> {
+) : PluginDecorator<S, I, A> {
 
     override suspend fun DecoratorContext<S, I, A, Unit>.onStart(): Unit = onStart?.invoke(this) ?: proceed()
 

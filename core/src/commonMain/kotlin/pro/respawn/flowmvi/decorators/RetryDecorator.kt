@@ -9,7 +9,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.StoreDecorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import kotlin.coroutines.cancellation.CancellationException
@@ -105,7 +105,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> retryDecorator(
     strategy: RetryStrategy,
     retryIntents: Boolean,
     retryActions: Boolean
-): StoreDecorator<S, I, A> = decorator {
+): PluginDecorator<S, I, A> = decorator {
     if (retryIntents) onIntent { retryRecursive(strategy, it, ::proceed) }
     if (retryActions) onAction { retryRecursive(strategy, it, ::proceed) }
 }

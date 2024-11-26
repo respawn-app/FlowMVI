@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.impl.decorator
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.decorator.StoreDecorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.util.typed
 
@@ -35,7 +35,7 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A
     },
 )
 
-internal fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreDecorator<S, I, A>.asInstance() =
+internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginDecorator<S, I, A>.asInstance() =
     typed<DecoratorInstance<S, I, A>>() ?: DecoratorInstance(
         name = name,
         onState = { old, new -> onState(old, new) },

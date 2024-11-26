@@ -13,7 +13,7 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.decorator.DecoratorBuilder
-import pro.respawn.flowmvi.decorator.StoreDecorator
+import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.impl.plugin.asInstance
@@ -62,7 +62,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
         private set
 
     private var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
-    private var decorators: MutableSet<StoreDecorator<S, I, A>> = mutableSetOf()
+    private var decorators: MutableSet<PluginDecorator<S, I, A>> = mutableSetOf()
 
     /**
      * Adjust the current [StoreConfiguration] of this [Store].
@@ -178,14 +178,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI
-    public infix fun install(decorators: Iterable<StoreDecorator<S, I, A>>): Unit = decorators.forEach {
+    public infix fun install(decorators: Iterable<PluginDecorator<S, I, A>>): Unit = decorators.forEach {
         require(this.decorators.add(it)) { duplicatePluginMessage("decorator", it.toString()) }
     }
 
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI
-    public fun install(decorator: StoreDecorator<S, I, A>, vararg other: StoreDecorator<S, I, A>) {
+    public fun install(decorator: PluginDecorator<S, I, A>, vararg other: PluginDecorator<S, I, A>) {
         install(sequenceOf(decorator).plus(other).asIterable())
     }
 
@@ -196,7 +196,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @FlowMVIDSL
     @JvmName("decorate")
     @ExperimentalFlowMVIAPI
-    public fun StoreDecorator<S, I, A>.install(): Unit = install(this)
+    public fun PluginDecorator<S, I, A>.install(): Unit = install(this)
 
     // endregion
 
