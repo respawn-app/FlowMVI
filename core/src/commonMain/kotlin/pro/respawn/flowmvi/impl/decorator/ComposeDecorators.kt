@@ -13,25 +13,25 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S, I, A
 ): PluginInstance<S, I, A> = copy(
     name = decorator.name,
     onState = wrapNotNull(onState, decorator.onState) { proceed, wrap ->
-        { old, new -> withContext(decorator, { proceed(old, new) }) { wrap(old, new) } }
+        { old, new -> withContext(this@decorate, decorator, { proceed(old, new) }) { wrap(old, new) } }
     },
     onIntent = wrapNotNull(onIntent, decorator.onIntent) { proceed, wrap ->
-        { withContext(decorator, { proceed(it) }) { wrap(it) } }
+        { withContext(this@decorate, decorator, { proceed(it) }) { wrap(it) } }
     },
     onAction = wrapNotNull(onAction, decorator.onAction) { proceed, wrap ->
-        { withContext(decorator, { proceed(it) }) { wrap(it) } }
+        { withContext(this@decorate, decorator, { proceed(it) }) { wrap(it) } }
     },
     onException = wrapNotNull(onException, decorator.onException) { proceed, wrap ->
-        { withContext(decorator, { proceed(it) }) { wrap(it) } }
+        { withContext(this@decorate, decorator, { proceed(it) }) { wrap(it) } }
     },
     onStart = wrapNotNull(onStart, decorator.onStart) { proceed, wrap ->
-        { withContext(decorator, { proceed() }) { wrap() } }
+        { withContext(this@decorate, decorator, { proceed() }) { wrap() } }
     },
     onSubscribe = wrapNotNull(onSubscribe, decorator.onSubscribe) { proceed, wrap ->
-        { subs -> withContext(decorator, { proceed(it); subs }) { wrap(subs) } }
+        { subs -> withContext(this@decorate, decorator, { proceed(it); subs }) { wrap(subs) } }
     },
     onUnsubscribe = wrapNotNull(onUnsubscribe, decorator.onUnsubscribe) { proceed, wrap ->
-        { subs -> withContext(decorator, { proceed(it); subs }) { wrap(subs) } }
+        { subs -> withContext(this@decorate, decorator, { proceed(it); subs }) { wrap(subs) } }
     },
 )
 

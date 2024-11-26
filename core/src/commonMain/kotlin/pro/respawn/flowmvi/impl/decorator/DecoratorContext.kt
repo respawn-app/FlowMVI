@@ -6,15 +6,17 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.decorator.DecoratorContext
 import pro.respawn.flowmvi.exceptions.NeverProceededException
 
 @OptIn(NotIntendedForInheritance::class)
 internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T, R> PipelineContext<S, I, A>.withContext(
+    child: StorePlugin<S, I, A>,
     decorator: DecoratorInstance<S, I, A>,
     crossinline proceed: suspend (value: T) -> T?,
     block: DecoratorContext<S, I, A, T>.() -> R,
-): R = object : DecoratorContext<S, I, A, T>, PipelineContext<S, I, A> by this {
+): R = object : DecoratorContext<S, I, A, T>, PipelineContext<S, I, A> by this, StorePlugin<S, I, A> by child {
 
     private var proceeded by atomic(false)
 

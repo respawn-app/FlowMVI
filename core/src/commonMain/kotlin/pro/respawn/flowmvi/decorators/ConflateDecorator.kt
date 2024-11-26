@@ -11,6 +11,13 @@ import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.decorator.ignore
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
+private class Conflated<T : Any> {
+
+    private val value = atomic<T?>(null)
+
+    fun update(with: T) = value.getAndSet(with)
+}
+
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateDecorator(
@@ -18,17 +25,17 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateDecorator(
     compareIntents: ((it: I, other: I) -> Boolean)?
 ): StoreDecorator<S, I, A> = decorator {
     if (compareIntents != null) {
-        val lastIntent = atomic<I?>(null)
+        val lastIntent = Conflated<I>()
         onIntent { cur ->
-            val prev = lastIntent.getAndSet(cur)
+            val prev = lastIntent.update(cur)
             if (prev != null && compareIntents(prev, cur)) return@onIntent ignore()
             proceed(cur)
         }
     }
     if (compareActions != null) {
-        val lastAction = atomic<A?>(null)
+        val lastAction = Conflated<A>()
         onAction { action ->
-            val prev = lastAction.getAndSet(action)
+            val prev = lastAction.update(action)
             if (prev != null && compareActions(prev, action)) return@onAction ignore()
             proceed(action)
         }
