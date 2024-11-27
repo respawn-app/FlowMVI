@@ -32,7 +32,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDeco
     this.name = name
     onIntent { chain, intent ->
         withTimeoutOrNull(timeout) {
-            // can also return null so exit early to not confuse the 2 outcomes
+            // Return early if onIntent returns null to avoid confusing it with a timeout result
             return@withTimeoutOrNull with(chain) { onIntent(intent) }
         } ?: onTimeout(intent)
     }

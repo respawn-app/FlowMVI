@@ -95,7 +95,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
             when (mode) {
                 is BatchingMode.Time -> {
                     queue.push(intent)
-                    job?.start()
+                    if (job?.isActive != true) job?.start()
                     null
                 }
                 is BatchingMode.Amount -> {
@@ -111,6 +111,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
         }
     }
     onStop { child, e ->
+        job?.cancel()
         job = null
         queue.flush()
         child.run { onStop(e) }

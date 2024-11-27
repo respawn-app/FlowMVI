@@ -4,7 +4,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 
@@ -45,10 +44,7 @@ private class SequentialChannelIntentModule<I : MVIIntent>(
 
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         // must always suspend the current scope to wait for intents
-        for (intent in intents) {
-            onIntent(intent)
-            yield()
-        }
+        for (intent in intents) onIntent(intent)
     }
 }
 
@@ -65,6 +61,7 @@ private class ParallelChannelIntentModule<I : MVIIntent>(
         intents.trySend(intent)
     }
 
+    // TODO: We should let the user limit parallelism here to avoid starvation
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         // must always suspend the current scope to wait for intents
         for (intent in intents) launch { onIntent(intent) }

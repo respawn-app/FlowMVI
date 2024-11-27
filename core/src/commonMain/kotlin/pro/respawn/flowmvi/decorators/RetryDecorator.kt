@@ -215,6 +215,7 @@ internal suspend fun <R> CoroutineScope.retryRecursive(
         if (!strategy.shouldRetry(attemptNo) || !selector(expected)) throw expected
         val delay = strategy.delay(attemptNo)
         if (delay <= Duration.ZERO) return retryRecursive(strategy, selector, attemptNo + 1, attempt)
+        // TODO: Maybe avoid launching here, needs api extension?
         launch {
             delay(delay)
             retryRecursive(strategy, selector, attemptNo + 1, attempt)

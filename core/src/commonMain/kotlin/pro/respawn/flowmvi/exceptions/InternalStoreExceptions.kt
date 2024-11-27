@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.exceptions
 
+import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.UnrecoverableException
 
 internal class NonSuspendingSubscriberException(cause: Exception? = null) : UnrecoverableException(
@@ -12,10 +13,10 @@ internal class NonSuspendingSubscriberException(cause: Exception? = null) : Unre
     """.trimIndent(),
 )
 
-internal class UnhandledIntentException(cause: Exception? = null) : UnrecoverableException(
+internal class UnhandledIntentException(intent: MVIIntent, cause: Exception? = null) : UnrecoverableException(
     cause = cause,
     message = """
-        An intent has not been handled after calling all plugins. 
+        An intent "$intent" not been handled after calling all plugins. 
         You likely don't want this to happen because intents are supposed to be acted upon.
         Make sure you have at least one plugin that handles intents, such as reducePlugin(), or set debuggable = false
         to suppress the error.
@@ -34,6 +35,10 @@ internal class UnhandledStoreException(cause: Exception) : UnrecoverableExceptio
     cause = cause,
     message = """
         Store has run all its plugins (exception handlers) but the exception was not handled by any of them.
+        Common solutions:
+        1. Add a recover() plugin
+        2. Review your existing plugins to ensure they handle this type of exception
+        3. Consider adding a catch-all handler if this is expected behavior
     """.trimIndent(),
 )
 

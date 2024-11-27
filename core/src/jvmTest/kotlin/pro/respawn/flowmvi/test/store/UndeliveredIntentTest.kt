@@ -11,6 +11,9 @@ import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
+// todo: test not invoked for normally processed intents
+//   consider invoking onUndelivered intent if plugins returned non-null intent
+
 @OptIn(DelicateStoreApi::class)
 class UndeliveredIntentTest : FreeSpec({
     asUnconfined()

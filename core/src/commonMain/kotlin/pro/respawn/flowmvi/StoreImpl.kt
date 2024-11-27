@@ -90,7 +90,10 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
                         )
                     }
                     if (plugin.onIntent != null) intents.awaitIntents {
-                        catch { if (onIntent(it) != null && config.debuggable) throw UnhandledIntentException() }
+                        catch {
+                            val result = onIntent(it)
+                            if (result != null && config.debuggable) throw UnhandledIntentException(result)
+                        }
                     }
                     lifecycle.completeStartup()
                 }

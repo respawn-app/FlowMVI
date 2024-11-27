@@ -36,20 +36,19 @@ internal fun restartableLifecycle() = object : RestartableLifecycle {
     override val isActive: Boolean get() = delegate.value?.isActive == true
     override val isStarted: Boolean get() = delegate.value?.isStarted == true
 
-    override suspend fun awaitStartup() {
-        delegate.filterNotNull().first().awaitStartup()
-    }
+    override suspend fun awaitStartup() = delegate.filterNotNull().first().awaitStartup()
+
     override suspend fun awaitUntilClosed() = delegate.update {
-        delegate.value?.awaitUntilClosed()
+        it?.awaitUntilClosed()
         null
     }
     override suspend fun closeAndWait() = delegate.update {
-        delegate.value?.closeAndWait()
+        it?.closeAndWait()
         null
     }
 
     override fun beginStartup(lifecycle: StoreLifecycle) = delegate.update {
-        check(it == null) { "Store is already started" }
+        check(it == null) { "Store is already running" }
         lifecycle
     }
 

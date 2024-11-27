@@ -3,6 +3,8 @@ package pro.respawn.flowmvi.api
 /**
  * An entity that handles [MVIState] updates. This entity modifies the state of the [StateProvider].
  * This is most often implemented by a [Store] and exposed through [PipelineContext].
+ *
+ * Implements [ImmediateStateReceiver]
  */
 public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
 
@@ -14,7 +16,7 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      * * **This function is reentrant, for more info, see [withState]**
      * * If you want to operate on a state of particular subtype, use the typed version of this function.
      * * If you wish to ignore plugins and thread-safety of state updates in favor of greater performance,
-     * see [updateStateImmediate].
+     * see [ImmediateStateReceiver.updateStateImmediate].
      *
      * @see [withState]
      * @see [updateStateImmediate]
@@ -30,7 +32,7 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      * [StoreConfiguration.atomicStateUpdates] are enabled.**
      * * If you want to operate on a state of particular subtype, use the typed version of this function.
      * * If you wish to ignore plugins and thread-safety of state updates in favor of greater performance,
-     * see [updateStateImmediate]
+     * see [ImmediateStateReceiver.updateStateImmediate]
      *
      * This function is reentrant, which means, if you call:
      * ```kotlin
