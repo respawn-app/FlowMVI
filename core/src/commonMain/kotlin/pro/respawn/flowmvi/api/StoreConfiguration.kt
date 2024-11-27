@@ -7,9 +7,8 @@ import kotlin.coroutines.CoroutineContext
 
 /**
  * A configuration of the [Store].
- * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
  *
- * @param initial The initial state the [Store] will have.
+ * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
  */
 @Suppress("UndocumentedPublicProperty")
 public data class StoreConfiguration<S : MVIState>(
@@ -23,5 +22,6 @@ public data class StoreConfiguration<S : MVIState>(
     val coroutineContext: CoroutineContext,
     val logger: StoreLogger,
     val atomicStateUpdates: Boolean,
+    val verifyPlugins: Boolean,
     val name: String?,
 )

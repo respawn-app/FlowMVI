@@ -11,3 +11,12 @@ public val NoOpStoreLogger: StoreLogger by lazy { StoreLogger { _, _, _ -> } }
 public val ConsoleStoreLogger: StoreLogger by lazy {
     StoreLogger { level, tag, message -> println(template(level, tag, message)) }
 }
+
+/**
+ * A platform-specific [StoreLogger] implementation that uses the current OS's log stream.
+ * This logger should be used as the default choice for platform-specific logging requirements.
+ *
+ * @see NoOpStoreLogger for no-op logging
+ * @see ConsoleStoreLogger for basic console output
+ */
+public expect val PlatformStoreLogger: StoreLogger

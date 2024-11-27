@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
@@ -24,6 +25,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  * The pipeline's context is always the context the store was started with.
  */
 @FlowMVIDSL
+@OptIn(ExperimentalSubclassOptIn::class)
+@SubclassOptInRequired(NotIntendedForInheritance::class)
 public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     IntentReceiver<I>,
     StateReceiver<S>,

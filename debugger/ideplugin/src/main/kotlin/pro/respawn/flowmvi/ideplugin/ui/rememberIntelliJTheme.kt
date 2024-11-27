@@ -1,6 +1,6 @@
 @file:Suppress("Filename")
 
-package pro.respawn.flowmvi.ideplugin
+package pro.respawn.flowmvi.ideplugin.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

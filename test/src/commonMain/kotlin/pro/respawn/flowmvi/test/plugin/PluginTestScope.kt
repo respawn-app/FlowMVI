@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.test.plugin
 
+import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -7,6 +8,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.loggingPlugin
@@ -22,10 +24,13 @@ import pro.respawn.flowmvi.plugins.timeTravelPlugin
  *
  * See [StorePlugin.test] for a function that allows to test the plugin
  */
+@OptIn(NotIntendedForInheritance::class)
 public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
     private val ctx: TestPipelineContext<S, I, A>,
     public val timeTravel: TimeTravel<S, I, A>,
-) : PipelineContext<S, I, A> by ctx, StorePlugin<S, I, A> by ctx.plugin {
+) : PipelineContext<S, I, A> by ctx,
+    ShutdownContext<S, I, A>,
+    StorePlugin<S, I, A> by ctx.plugin {
 
     public constructor(
         configuration: StoreConfiguration<S>,
@@ -37,12 +42,10 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
             config = configuration,
             plugin = compositePlugin(
                 sequenceOf(
+                    plugin,
                     loggingPlugin(),
                     timeTravelPlugin(timeTravel),
-                    plugin,
-                )
-                    .map { it.invoke(configuration) }
-                    .toList(),
+                ).map { it(configuration) }.toList(),
             )
         )
     )

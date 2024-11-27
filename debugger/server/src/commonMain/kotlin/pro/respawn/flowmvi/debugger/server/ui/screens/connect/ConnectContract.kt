@@ -34,6 +34,7 @@ internal sealed interface ConnectIntent : MVIIntent {
     data class PortChanged(val port: String) : ConnectIntent
     data class HostChanged(val host: String) : ConnectIntent
     data object StartServerClicked : ConnectIntent
+    data object RetryClicked : ConnectIntent
 }
 
 @Immutable

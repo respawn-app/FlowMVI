@@ -13,23 +13,33 @@ import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.exceptions.ActionsDisabledException
 
+internal interface ActionModule<A : MVIAction> : ActionProvider<A>, ActionReceiver<A>
+
 internal fun <A : MVIAction> actionModule(
     behavior: ActionShareBehavior,
+    onUndeliveredAction: ((action: A) -> Unit)?,
 ): ActionModule<A> = when (behavior) {
-    is ActionShareBehavior.Distribute -> DistributingModule(behavior.buffer, behavior.overflow)
-    is ActionShareBehavior.Restrict -> ConsumingModule(behavior.buffer, behavior.overflow)
+    is ActionShareBehavior.Distribute -> DistributingModule(
+        bufferSize = behavior.buffer,
+        overflow = behavior.overflow,
+        onUndeliveredAction,
+    )
+    is ActionShareBehavior.Restrict -> ConsumingModule(
+        behavior.buffer,
+        behavior.overflow,
+        onUndeliveredAction,
+    )
     is ActionShareBehavior.Share -> SharedModule(behavior.replay, behavior.buffer, behavior.overflow)
     is ActionShareBehavior.Disabled -> ThrowingModule()
 }
 
-internal interface ActionModule<A : MVIAction> : ActionProvider<A>, ActionReceiver<A>
-
 internal abstract class ChannelActionModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
+    onUndeliveredAction: ((action: A) -> Unit)?,
 ) : ActionModule<A> {
 
-    protected val delegate = Channel<A>(bufferSize, overflow)
+    protected val delegate = Channel(bufferSize, overflow, onUndeliveredAction)
 
     @DelicateStoreApi
     override fun send(action: A) {
@@ -42,7 +52,8 @@ internal abstract class ChannelActionModule<A : MVIAction>(
 internal class DistributingModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
-) : ChannelActionModule<A>(bufferSize, overflow) {
+    onUndeliveredAction: ((action: A) -> Unit)?,
+) : ChannelActionModule<A>(bufferSize, overflow, onUndeliveredAction) {
 
     override val actions = delegate.receiveAsFlow()
 }
@@ -50,7 +61,8 @@ internal class DistributingModule<A : MVIAction>(
 internal class ConsumingModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
-) : ChannelActionModule<A>(bufferSize, overflow) {
+    onUndeliveredAction: ((action: A) -> Unit)?,
+) : ChannelActionModule<A>(bufferSize, overflow, onUndeliveredAction) {
 
     override val actions = delegate.consumeAsFlow()
 }

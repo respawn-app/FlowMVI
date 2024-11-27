@@ -19,6 +19,7 @@ object Size {
     val icon = 22.dp
     val smallIcon = 18.dp
     val fab = 56.dp
+    val textInput = 44.dp
     val touchTarget = 40.dp // iOS accessibility recommended (android is 48)
 }
 

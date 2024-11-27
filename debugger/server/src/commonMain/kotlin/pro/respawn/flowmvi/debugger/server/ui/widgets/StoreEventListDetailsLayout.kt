@@ -30,7 +30,7 @@ internal fun StoreEventListDetailsLayout(
     firstPaneContent = {
         StoreEventList(
             events = events,
-            isSelected = { it == focusedEvent?.event },
+            isSelected = { it.id == focusedEvent?.id },
             onClick = onClick,
             formatTimestamp = TimestampFormatter,
             listState = listState,

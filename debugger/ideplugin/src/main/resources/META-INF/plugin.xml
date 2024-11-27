@@ -6,6 +6,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="FlowMVI" anchor="bottom" doNotActivateOnStart="false"
             factoryClass="pro.respawn.flowmvi.ideplugin.PluginToolWindow" icon="/ic_flowmvi_13.svg" />
+
+        <defaultLiveTemplates file="/LiveTemplates.xml" />
     </extensions>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">

@@ -19,6 +19,11 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreStateChanged
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreSubscribed
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreUnsubscribed
 import pro.respawn.flowmvi.debugger.model.ServerEvent
+import pro.respawn.flowmvi.debugger.model.ServerEvent.ResendLastAction
+import pro.respawn.flowmvi.debugger.model.ServerEvent.ResendLastIntent
+import pro.respawn.flowmvi.debugger.model.ServerEvent.RethrowLastException
+import pro.respawn.flowmvi.debugger.model.ServerEvent.RollbackState
+import pro.respawn.flowmvi.debugger.model.ServerEvent.RollbackToInitialState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.logging.warn
@@ -45,18 +50,17 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
         subscribe { // subscribe to store events
             actions.collectLatest { event ->
                 when (event) {
-                    is ServerEvent.ResendLastAction -> timeTravel.actions.lastOrNull()?.let { action(it) }
-                    is ServerEvent.ResendLastIntent -> timeTravel.intents.lastOrNull()?.let { intent(it) }
-                    is ServerEvent.RethrowLastException -> timeTravel.exceptions.lastOrNull()?.let {
+                    is ResendLastAction -> timeTravel.actions.lastOrNull()?.let { action(it) }
+                    is ResendLastIntent -> timeTravel.intents.lastOrNull()?.let { intent(it) }
+                    is RethrowLastException -> timeTravel.exceptions.lastOrNull()?.let {
                         // throw it async to let the exception handler handle it
                         runCatching { this@ctx.launch { throw it } }
                     }
-                    is ServerEvent.RollbackState -> timeTravel.states.getOrNull(
+                    is RollbackState -> timeTravel.states.getOrNull(
                         timeTravel.states.lastIndex - 1
-                    )?.let { previous ->
-                        updateState { previous }
-                    }
-                    is ServerEvent.RollbackToInitialState -> updateState { config.initial }
+                        // ignore plugins, including self, to not loop the event
+                    )?.let { previous -> updateStateImmediate { previous } }
+                    is RollbackToInitialState -> updateStateImmediate { config.initial }
                     is ServerEvent.Stop -> this@ctx.close()
                 }
             }

@@ -2,10 +2,10 @@ package pro.respawn.flowmvi.test
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.api.ExperimentalStoreApi
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
-@ExperimentalStoreApi
+@ExperimentalFlowMVIAPI
 public class TestStoreLifecycle(parent: Job?) : StoreLifecycle {
 
     private val closed = CompletableDeferred<Unit>(parent)

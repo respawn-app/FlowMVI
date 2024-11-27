@@ -21,6 +21,8 @@ public interface StateProvider<out S : MVIState> {
      * Such race conditions arise when using multiple data streams such as [Flow]s.
      *
      * Accessing and modifying the state this way will **circumvent ALL plugins** and will not make state updates atomic.
+     *
+     * Consider accessing state via [StateReceiver.withState] or [StateReceiver.updateState] instead.
      */
     @DelicateStoreApi
     public val state: S

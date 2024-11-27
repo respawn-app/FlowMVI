@@ -3,14 +3,15 @@ package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 import androidx.compose.runtime.Immutable
 import com.benasher44.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableSet
-import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
+import pro.respawn.flowmvi.debugger.server.util.type
 
 internal enum class EventType {
     Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
@@ -18,7 +19,7 @@ internal enum class EventType {
 
 @Immutable
 internal data class TimelineFilters(
-    val events: ImmutableSet<EventType> = EventType.entries.toImmutableSet(),
+    val events: Set<EventType> = EventType.entries.toSet(),
 )
 
 @Immutable
@@ -34,7 +35,16 @@ internal data class FocusedEvent(
     val storeName: String,
     val type: EventType,
     val event: ClientEvent,
-)
+    val id: Uuid,
+) {
+    constructor(entry: ServerEventEntry) : this(
+        timestamp = entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
+        storeName = entry.name,
+        type = entry.event.type,
+        event = entry.event,
+        id = entry.id,
+    )
+}
 
 @Immutable
 internal sealed interface TimelineState : MVIState {

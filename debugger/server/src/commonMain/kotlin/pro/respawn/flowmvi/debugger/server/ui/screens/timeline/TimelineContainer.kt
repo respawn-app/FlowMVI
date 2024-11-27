@@ -1,14 +1,11 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
-import kotlinx.collections.immutable.toPersistentList
-import kotlinx.collections.immutable.toPersistentSet
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.server.DebugServer
@@ -57,10 +54,7 @@ internal class TimelineContainer(
         }
         whileSubscribed {
             DebugServer.store.collect {
-                combine(
-                    states,
-                    filters
-                ) { state, currentFilters ->
+                combine(states, filters) { state, currentFilters ->
                     updateState {
                         val current = typed<DisplayingTimeline>()
                         when (state) {
@@ -72,21 +66,18 @@ internal class TimelineContainer(
                                 filters = currentFilters,
                                 currentEvents = state.eventLog
                                     .asSequence()
-                                    .run {
-                                        if (current == null) return@run this
-                                        filter { it.event.type in current.filters.events }
-                                    }
-                                    .toPersistentList(),
+                                    .filter { it.event.type in currentFilters.events }
+                                    .toImmutableList(),
                                 stores = state.clients
                                     .asSequence()
                                     .map { StoreItem(it.key, it.value.name, it.value.isConnected) }
-                                    .toPersistentList(),
+                                    .toImmutableList(),
                             ).also {
                                 val hasFocusedItem = it.focusedEvent != null
                                 val hasEvents = it.currentEvents.isNotEmpty()
                                 if (current == null || !it.autoScroll) return@also
                                 if (hasFocusedItem || !hasEvents) return@also
-                                action(ScrollToItem(it.currentEvents.lastIndex))
+                                action(ScrollToItem(0))
                             }
                         }
                     }
@@ -114,21 +105,14 @@ internal class TimelineContainer(
                 }
                 is EventFilterSelected -> filters.update {
                     it.copy(
-                        events = it.events.toPersistentSet().run {
-                            if (intent.filter in this) remove(intent.filter) else add(intent.filter)
+                        events = it.events.let { events ->
+                            if (intent.filter in events) events - intent.filter else events + intent.filter
                         }
                     )
                 }
                 is EventClicked -> updateState<DisplayingTimeline, _> {
-                    if (intent.entry.event == focusedEvent?.event) return@updateState copy(focusedEvent = null)
-                    copy(
-                        focusedEvent = FocusedEvent(
-                            timestamp = intent.entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
-                            storeName = intent.entry.name,
-                            type = intent.entry.event.type,
-                            event = intent.entry.event,
-                        )
-                    )
+                    if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
+                    copy(focusedEvent = FocusedEvent(intent.entry))
                 }
             }
         }

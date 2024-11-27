@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.StoreImpl
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.LazyPlugin
@@ -11,11 +12,18 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.decorator.DecoratorBuilder
+import pro.respawn.flowmvi.decorator.PluginDecorator
+import pro.respawn.flowmvi.decorator.decoratedWith
+import pro.respawn.flowmvi.decorator.decorator
+import pro.respawn.flowmvi.impl.plugin.asInstance
+import pro.respawn.flowmvi.impl.plugin.compose
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.plugins.compositePlugin
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmName
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
@@ -26,20 +34,23 @@ Accessing these properties outside of `configure` block can lead to scoping and 
 Removal cycle: 2 releases.
 """
 
-private fun duplicatePluginMessage(name: String) = """
-    You have attempted to install plugin $name which was already installed.
-    Plugins can be repeatable if they have different names or are different instances of the target class.
-    You either have installed the same plugin instance twice or have installed two plugins with the same name.
-    To fix, please either create a new plugin instance for each installation (when not using names) 
-    or override the plugin name to be unique among all plugins for this store.
-    Consult the StorePlugin docs to learn more.
-""".trimIndent()
+private fun duplicatePluginMessage(type: String, name: String) {
+    val title = type.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    """
+        You have attempted to install $type $name which was already installed.
+        $title can be repeatable if they have different names or are different instances of the target class.
+        You either have installed the same $type instance twice or have installed two ${type}s with the same name.
+        To fix, please either create a new $type instance for each installation (when not using names) 
+        or override the $type name to be unique among all ${type}s for this store.
+        Consult the Store$title docs to learn more.
+    """.trimIndent()
+}
 
 /**
  * A builder DSL for creating a [Store].
  * Cannot be instantiated outside of [store] functions.
  * After building, the [StoreConfiguration] is created and used in the [Store].
- * This configuration must **not** be changed in any way after the store is created through circumvention measures.
+ *
  * @param initial initial state the store will have.
  */
 @FlowMVIDSL
@@ -51,8 +62,14 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     internal var config: StoreConfigurationBuilder = StoreConfigurationBuilder()
         private set
 
-    @PublishedApi
-    internal var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
+    private var plugins: MutableSet<LazyPlugin<S, I, A>> = mutableSetOf()
+    private var decorators: MutableSet<PluginDecorator<S, I, A>> = mutableSetOf()
+
+    /**
+     * Adjust the current [StoreConfiguration] of this [Store].
+     */
+    @FlowMVIDSL
+    public inline fun configure(block: StoreConfigurationBuilder.() -> Unit): Unit = config.run(block)
 
     // region Deprecated props
 
@@ -107,6 +124,7 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
 
     // endregion
 
+    // region Plugins
     /**
      * Install [StorePlugin]s. See the other overload to build the plugin on the fly.
      * This installs prebuilt plugins.
@@ -118,8 +136,8 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      * See [StorePlugin.name] for more info and solutions.
      */
     @FlowMVIDSL
-    public fun install(plugins: Iterable<LazyPlugin<S, I, A>>): Unit = plugins.forEach {
-        require(this.plugins.add(it)) { duplicatePluginMessage(it.toString()) }
+    public infix fun install(plugins: Iterable<LazyPlugin<S, I, A>>): Unit = plugins.forEach {
+        require(this.plugins.add(it)) { duplicatePluginMessage("plugin", it.toString()) }
     }
 
     /**
@@ -144,15 +162,9 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      * @see install
      */
     @FlowMVIDSL
-    public inline fun install(
+    public inline infix fun install(
         crossinline block: LazyPluginBuilder<S, I, A>.() -> Unit
     ): Unit = install(lazyPlugin(block))
-
-    /**
-     * Adjust the current [StoreConfiguration] of this [Store].
-     */
-    @FlowMVIDSL
-    public inline fun configure(block: StoreConfigurationBuilder.() -> Unit): Unit = config.run(block)
 
     /**
      * Alias for [install]
@@ -160,11 +172,84 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
     @FlowMVIDSL
     public fun LazyPlugin<S, I, A>.install(): Unit = install(this)
 
+    // endregion
+
+    // region Decorators
+
+    /**
+     * Install the [decorators]. Decorators will be installed **after all** plugins in the order they are in the list,
+     * and they will wrap **all** of the plugins of this store, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
+    @FlowMVIDSL
+    @JvmName("decorate")
+    @ExperimentalFlowMVIAPI
+    public infix fun install(decorators: Iterable<PluginDecorator<S, I, A>>): Unit = decorators.forEach {
+        require(this.decorators.add(it)) { duplicatePluginMessage("decorator", it.toString()) }
+    }
+
+    /**
+     * Install these decorators. Decorators will be installed **after all** plugins in the order they are declared.
+     * and they will wrap **all** of the plugins of this store, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
+    @FlowMVIDSL
+    @JvmName("decorate")
+    @ExperimentalFlowMVIAPI
+    public fun install(decorator: PluginDecorator<S, I, A>, vararg other: PluginDecorator<S, I, A>) {
+        install(sequenceOf(decorator).plus(other).asIterable())
+    }
+
+    /**
+     * Create and install a new [PluginDecorator] that will decorate **all** plugins of this store and **all**
+     * decorators installed before this one!
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators and plugins.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
+
+    @FlowMVIDSL
+    @ExperimentalFlowMVIAPI
+    public inline infix fun decorate(block: DecoratorBuilder<S, I, A>.() -> Unit): Unit = install(decorator(block))
+
+    /**
+     * Install `this` decorator. Decorator will be installed **after all** plugins and decorators installed before,
+     * and it will wrap **all** of them, expressed as a single [compositePlugin].
+     *
+     * Any decorator installed after this invocation will also wrap all previous decorators.
+     *
+     * Decorators must be unique by name, or this method will throw [IllegalArgumentException].
+     *
+     * See [DecoratorBuilder] for more info on the behavior of decorators.
+     */
+    @FlowMVIDSL
+    @JvmName("decorate")
+    @ExperimentalFlowMVIAPI
+    public fun PluginDecorator<S, I, A>.install(): Unit = install(this)
+
+    // endregion
+
     // it's important to first convert the collection to an immutable before iterating, or the
     // iterator will throw
     @PublishedApi
     @FlowMVIDSL
     internal operator fun invoke(): Store<S, I, A> = config(initial).let { config ->
-        StoreImpl(config, compositePlugin(plugins.map { it(config) }))
+        StoreImpl(
+            config = config,
+            plugin = (plugins.map { it(config).asInstance() }.compose() decoratedWith decorators).asInstance()
+        )
     }
 }

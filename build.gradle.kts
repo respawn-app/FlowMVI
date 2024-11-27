@@ -1,6 +1,7 @@
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.MavenPublishBasePlugin
 import com.vanniktech.maven.publish.SonatypeHost
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import nl.littlerobots.vcu.plugin.versionSelector
@@ -13,7 +14,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 plugins {
     alias(libs.plugins.detekt)
-    alias(libs.plugins.gradleDoctor)
+    // alias(libs.plugins.gradleDoctor)
     alias(libs.plugins.version.catalog.update)
     alias(libs.plugins.atomicfu)
     // alias(libs.plugins.dependencyAnalysis)
@@ -36,7 +37,7 @@ subprojects {
     plugins.withType<ComposeCompilerGradleSubplugin>().configureEach {
         the<ComposeCompilerGradlePluginExtension>().apply {
             featureFlags.addAll(ComposeFeatureFlag.OptimizeNonSkippingGroups)
-            stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_definitions.txt")
+            stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("stability_definitions.txt"))
             if (properties["enableComposeCompilerReports"] == "true") {
                 val metricsDir = layout.buildDirectory.dir("compose_metrics")
                 metricsDestination = metricsDir
@@ -44,8 +45,8 @@ subprojects {
             }
         }
     }
-    afterEvaluate {
-        extensions.findByType<MavenPublishBaseExtension>()?.run {
+    plugins.withType<MavenPublishBasePlugin> {
+        the<MavenPublishBaseExtension>().apply {
             val isReleaseBuild = properties["release"]?.toString().toBoolean()
             configure(
                 KotlinMultiplatform(
@@ -91,14 +92,15 @@ subprojects {
     }
 }
 
-doctor {
-    warnWhenJetifierEnabled = true
-    warnWhenNotUsingParallelGC = true
-    disallowMultipleDaemons = false
-    javaHome {
-        ensureJavaHomeMatches.set(false)
-    }
-}
+// TODO: Incompatible with gradle isolated projects
+// doctor {
+//     warnWhenJetifierEnabled = true
+//     warnWhenNotUsingParallelGC = true
+//     disallowMultipleDaemons = false
+//     javaHome {
+//         ensureJavaHomeMatches.set(false)
+//     }
+// }
 //
 // dependencyAnalysis {
 //     structure {

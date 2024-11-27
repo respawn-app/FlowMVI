@@ -40,6 +40,9 @@ kotlin {
         nonBrowserMain.dependencies {
             implementation(libs.kotlin.io)
         }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlin.browser)
+        }
     }
 }
 

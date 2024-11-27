@@ -7,7 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.PipelineContext
-import pro.respawn.flowmvi.debugger.DebuggerDefaults
+import pro.respawn.flowmvi.debugger.DebuggerDefaults.ServerHistorySize
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
@@ -19,6 +19,7 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerState.Idle
 import pro.respawn.flowmvi.debugger.server.ServerState.Running
+import pro.respawn.flowmvi.debugger.server.arch.configuration.debuggable
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.plugins.enableLogging
@@ -36,7 +37,8 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
         parallelIntents = true
         coroutineContext = Dispatchers.Default
         actionShareBehavior = ActionShareBehavior.Share(overflow = BufferOverflow.DROP_OLDEST)
-        debuggable = true
+        debuggable = BuildFlags.debuggable
+        allowIdleSubscriptions = true
         onOverflow = BufferOverflow.DROP_OLDEST
     }
     enableLogging()
@@ -78,9 +80,9 @@ private suspend inline fun Ctx.state(
     crossinline update: suspend Running.() -> State
 ) = updateState<Running, _>(update)
 
-private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = this
-    .takeLast(DebuggerDefaults.ServerHistorySize)
-    .plus(event)
+private fun ImmutableList<ServerEventEntry>.putEvent(event: ServerEventEntry) = sequenceOf(event)
+    .plus(this)
+    .take(ServerHistorySize)
     .toPersistentList()
 
 private fun StoreCommand.event(storeId: Uuid) = when (this) {

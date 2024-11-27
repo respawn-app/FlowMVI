@@ -39,17 +39,13 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
      * context of the [recover] block.
      */
     suspend fun PipelineContext<S, I, A>.catch(block: suspend () -> Unit): Unit = try {
-        withContext(this@RecoverModule) { block() }
+        block()
     } catch (expected: Exception) {
         when {
             expected is CancellationException || expected is UnrecoverableException -> throw expected
             alreadyRecovered() -> throw RecursiveRecoverException(expected)
-            else -> recover(expected)
+            else -> withContext(this@RecoverModule) { handle(expected) }
         }
-    }
-
-    suspend fun PipelineContext<S, I, A>.recover(e: Exception) = withContext(this@RecoverModule) {
-        handle(e)
     }
 
     @Suppress("FunctionName")
@@ -61,7 +57,7 @@ internal fun interface RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>
             // add Recoverable to the coroutine context
             // and handle the exception asynchronously to allow suspending inside recover
             // Do NOT use the "ctx" parameter here, as that coroutine context is already invalid and will not launch
-            else -> launch(this@RecoverModule) { recover(e) }.invokeOnCompletion { cause ->
+            else -> launch(this@RecoverModule) { handle(e) }.invokeOnCompletion { cause ->
                 if (cause != null && cause !is CancellationException) throw cause
             }
         }
