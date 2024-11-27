@@ -2,7 +2,8 @@
     "MemberVisibilityCanBePrivate",
     "MissingPackageDeclaration",
     "UndocumentedPublicClass",
-    "UndocumentedPublicProperty"
+    "UndocumentedPublicProperty",
+    "MaxLineLength"
 )
 
 import org.gradle.api.JavaVersion
@@ -31,9 +32,8 @@ object Config {
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
     const val docsUrl = "https://opensource.respawn.pro/FlowMVI/#/"
-    const val description = """
-A Kotlin Multiplatform architecture framework based on coroutines with a powerful plugin system.
-"""
+    const val description =
+        """A Kotlin Multiplatform architecture framework based on coroutines with a powerful plugin system."""
     const val supportEmail = "hello@respawn.pro"
     const val vendorName = "Respawn Open Source Team"
     const val vendorId = "respawn-app"

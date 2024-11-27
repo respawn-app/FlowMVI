@@ -1,5 +1,5 @@
 [versions]
-decompose = "3.2.0-beta03"
+decompose = "3.2.2"
 apiresult = "2.0.0"
 koin = "4.0.0"
 kmputils = "1.4.4"
