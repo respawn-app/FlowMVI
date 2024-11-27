@@ -52,7 +52,10 @@ object Config {
         "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
         "-Xwasm-use-new-exception-proposal",
-        "-Xconsistent-data-class-copy-visibility"
+        "-Xconsistent-data-class-copy-visibility",
+        "-Xsuppress-warning=NOTHING_TO_INLINE",
+        "-Xsuppress-warning=UNUSED_ANONYMOUS_PARAMETER",
+        "-Xwasm-debugger-custom-formatters"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)

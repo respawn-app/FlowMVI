@@ -28,6 +28,9 @@ fun Project.configureMultiplatform(
     explicitApi()
     applyDefaultHierarchyTemplate(configure)
     withSourcesJar(true)
+    compilerOptions {
+        extraWarnings.set(true)
+    }
 
     if (linux) {
         linuxX64()
@@ -64,12 +67,10 @@ fun Project.configureMultiplatform(
         }
     }
 
-    if (jvm) jvm().compilations.all {
-        compileTaskProvider.configure {
-            compilerOptions {
-                jvmTarget.set(Config.jvmTarget)
-                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
-            }
+    if (jvm) jvm {
+        compilerOptions {
+            jvmTarget.set(Config.jvmTarget)
+            freeCompilerArgs.addAll(Config.jvmCompilerArgs)
         }
     }
 

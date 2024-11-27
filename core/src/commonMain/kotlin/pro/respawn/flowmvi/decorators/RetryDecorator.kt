@@ -30,7 +30,6 @@ import kotlin.time.times
  * @param delayInitially whether the delay should already be applied for the first retry. If not, the first retry will
  * be performed immediately
  */
-@ConsistentCopyVisibility
 public data class RetryStrategy private constructor(
     val retries: Int,
     val delay: Duration,

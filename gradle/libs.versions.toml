@@ -20,8 +20,9 @@ intellij-idea = "2024.1"
 junit = "4.13.2"
 kotest = "6.0.0.M1"
 # @pin
-kotlin = "2.0.21"
+kotlin = "2.1.0-RC2"
 kotlin-collections = "0.3.8"
+kotlin-browser = "0.3"
 kotlin-io = "0.6.0"
 kotlinx-atomicfu = "0.26.0"
 ktor = "3.0.1"
@@ -53,6 +54,7 @@ kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref =
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
+kotlin-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlin-browser" }
 kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

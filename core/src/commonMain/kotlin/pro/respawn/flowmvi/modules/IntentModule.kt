@@ -29,7 +29,7 @@ private abstract class ChannelIntentModule<I : MVIIntent>(
     onUndeliveredIntent: ((intent: I) -> Unit)?,
 ) : IntentModule<I> {
 
-    protected val intents = Channel(capacity, overflow, onUndeliveredIntent)
+    val intents = Channel(capacity, overflow, onUndeliveredIntent)
 
     override suspend fun emit(intent: I) = intents.send(intent)
     override fun intent(intent: I) {

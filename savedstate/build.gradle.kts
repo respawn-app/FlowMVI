@@ -26,6 +26,7 @@ kotlin {
 
     sourceSets {
         val nonBrowserMain by getting
+        val browserMain by getting
         nativeMain.dependencies {
             implementation(libs.kotlin.io)
         }
@@ -39,6 +40,9 @@ kotlin {
         }
         nonBrowserMain.dependencies {
             implementation(libs.kotlin.io)
+        }
+        wasmJsMain.dependencies {
+            implementation(libs.kotlin.browser)
         }
     }
 }
