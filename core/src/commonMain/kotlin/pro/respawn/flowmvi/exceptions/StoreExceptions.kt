@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.exceptions
 
+import pro.respawn.flowmvi.dsl.withStateOrThrow
 import kotlin.time.Duration
 
 /**
@@ -8,4 +9,12 @@ import kotlin.time.Duration
  */
 public class StoreTimeoutException(timeout: Duration) : RuntimeException(
     message = "Store has timed out after $timeout."
+)
+
+/**
+ * Exception thrown when the state is not of desired type when using state methods that validate it, such as
+ * [withStateOrThrow]
+ */
+public class InvalidStateException(expected: String?, got: String?) : IllegalStateException(
+    message = "Expected state of type $expected but got $got"
 )

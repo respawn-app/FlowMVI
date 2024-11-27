@@ -4,7 +4,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
-import pro.respawn.flowmvi.api.UnrecoverableException
+import pro.respawn.flowmvi.exceptions.InvalidStateException
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.flowmvi.util.withType
 
@@ -36,23 +36,28 @@ public inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateStateImme
     @BuilderInference crossinline transform: T.() -> S
 ) = updateStateImmediate { withType<T, _> { transform() } }
 
+/**
+ * Use the state if it is of type [T], otherwise, throw [InvalidStateException].
+ *
+ * Same rules apply as [StateReceiver.withState]
+ */
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.withStateOrThrow(
     @BuilderInference crossinline block: suspend T.() -> Unit
 ) = withState {
-    typed<T>()?.block() ?: run {
-        if (config.debuggable) throw UnrecoverableException(message = "State is not of type ${T::class.simpleName}")
-    }
+    typed<T>()?.block() ?: throw InvalidStateException(T::class.simpleName, this::class.simpleName)
 }
 
+/**
+ * Update the state if it is of type [T], otherwise throw [InvalidStateException].
+ *
+ * Same rules apply as [StateReceiver.updateState]
+ */
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.updateStateOrThrow(
     @BuilderInference crossinline transform: suspend T.() -> S
 ) = updateState {
-    typed<T>()?.transform() ?: run {
-        if (config.debuggable) throw UnrecoverableException(message = "State is not of type ${T::class.simpleName}")
-        this
-    }
+    typed<T>()?.transform() ?: throw InvalidStateException(T::class.simpleName, this::class.simpleName)
 }
 
 // region deprecated

@@ -1,5 +1,9 @@
 package pro.respawn.flowmvi.api
 
+/**
+ * [StateReceiver] version that can only accept immediate state updates. It is recommended to use [StateReceiver] and
+ * its methods if possible. See the method docs for details
+ */
 public interface ImmediateStateReceiver<S : MVIState> {
 
     /**
