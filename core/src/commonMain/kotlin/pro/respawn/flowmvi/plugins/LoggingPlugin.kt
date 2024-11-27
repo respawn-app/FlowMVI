@@ -2,6 +2,8 @@
 
 package pro.respawn.flowmvi.plugins
 
+import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
@@ -40,6 +42,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.en
  * * [level] level override to print all messages. If null, a default level will be used (null by default)
  * * [logger] Unless a non-null value is provided, a store logger will be used.
  */
+@OptIn(DelicateStoreApi::class)
 @Suppress("CyclomaticComplexMethod") // false-positive based on ternary ops
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
@@ -58,7 +61,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
     onIntent {
         it.also { log(level ?: Debug, currentTag) { "Intent -> $it" } }
     }
-    onAction {
+    if (config.actionShareBehavior !is ActionShareBehavior.Disabled) onAction {
         it.also { log(level ?: Debug, currentTag) { "Action -> $it" } }
     }
     onException {
@@ -74,7 +77,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> loggingPlugin(
         log(level ?: Info, currentTag) { "Subscriber #${it + 1} removed" }
     }
     onUndeliveredIntent {
-        log(level ?: Warn, currentTag) { "Intent dropped due to overflow: $it" }
+        log(level ?: Warn, currentTag) { "Intent has not been handled: $it" }
+    }
+    if (config.actionShareBehavior !is ActionShareBehavior.Share) onUndeliveredAction {
+        log(level ?: Warn, currentTag) { "Action has not been handled: $it" }
     }
     onStop { e ->
         if (e == null) {
