@@ -96,6 +96,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                 is BatchingMode.Time -> {
                     queue.push(intent)
                     job?.start()
+                    null
                 }
                 is BatchingMode.Amount -> {
                     queue.push(intent)
@@ -104,10 +105,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                     config.logger.info(name) { "Flushing ${intents.size} after batching" }
                     // todo: onIntent invocation result ignored?
                     intents.forEach { onIntent(it) }
+                    null
                 }
             }
         }
-        null
     }
     onStop { child, e ->
         job = null

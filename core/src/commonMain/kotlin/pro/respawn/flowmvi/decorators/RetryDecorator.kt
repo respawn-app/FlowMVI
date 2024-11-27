@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.logging.warn
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.pow
 import kotlin.time.Duration
@@ -58,7 +59,8 @@ public data class RetryStrategy private constructor(
      */
     public companion object {
 
-        internal const val FirstAttempt = 1
+        @PublishedApi
+        internal const val FirstAttempt: Int = 1
 
         /**
          * Default Strategy :
@@ -125,10 +127,17 @@ public data class RetryStrategy private constructor(
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> retryIntentsDecorator(
     strategy: RetryStrategy,
+    name: String? = null,
     crossinline selector: (intent: I, e: Exception) -> Boolean = { _, _ -> true },
 ): PluginDecorator<S, I, A> = decorator {
+    this.name = name
     onIntent { chain, intent ->
-        with(chain) { retryRecursive(strategy, { selector(intent, it) }) { onIntent(intent) } }
+        with(chain) {
+            retryRecursive(strategy, { selector(intent, it) }) { i ->
+                if (i > RetryStrategy.FirstAttempt) config.logger.warn { "Retry attempt #$i for $intent" }
+                onIntent(intent)
+            }
+        }
     }
 }
 
@@ -146,10 +155,17 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> retryIntentsDecor
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> retryActionsDecorator(
     strategy: RetryStrategy,
+    name: String? = null,
     crossinline selector: (action: A, e: Exception) -> Boolean = { _, _ -> true },
 ): PluginDecorator<S, I, A> = decorator {
+    this.name = name
     onAction { chain, action ->
-        with(chain) { retryRecursive(strategy, { selector(action, it) }) { onAction(action) } }
+        with(chain) {
+            retryRecursive(strategy, { selector(action, it) }) { i ->
+                if (i > RetryStrategy.FirstAttempt) config.logger.warn { "Retry attempt #$i for $action" }
+                onAction(action)
+            }
+        }
     }
 }
 
@@ -165,8 +181,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> retryActionsDecor
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.retryIntents(
     strategy: RetryStrategy = RetryStrategy.Default,
+    name: String? = null,
     crossinline selector: (intent: I, e: Exception) -> Boolean = { _, _ -> true },
-) = install(retryIntentsDecorator(strategy, selector))
+) = install(retryIntentsDecorator(strategy, name, selector))
 
 /**
  * Install a [retryActionsDecorator] over this Store.
@@ -180,18 +197,19 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.retryActions(
     strategy: RetryStrategy = RetryStrategy.Default,
+    name: String? = null,
     crossinline selector: (action: A, e: Exception) -> Boolean = { _, _ -> true },
-) = install(retryActionsDecorator(strategy, selector))
+) = install(retryActionsDecorator(strategy, name, selector))
 
 @PublishedApi
 internal suspend fun <R> CoroutineScope.retryRecursive(
     strategy: RetryStrategy,
     selector: (Exception) -> Boolean,
     attemptNo: Int = RetryStrategy.FirstAttempt,
-    attempt: suspend () -> R?,
+    attempt: suspend (attempt: Int) -> R?,
 ): R? {
     try {
-        return attempt()
+        return attempt(attemptNo)
     } catch (e: CancellationException) {
         throw e
     } catch (expected: Exception) {

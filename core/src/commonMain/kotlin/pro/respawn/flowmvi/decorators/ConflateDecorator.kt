@@ -30,8 +30,10 @@ internal class Conflated<T : Any> {
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateIntentsDecorator(
+    name: String? = "ConflateIntents",
     crossinline compare: ((it: I, other: I) -> Boolean) = MVIIntent::equals,
 ): PluginDecorator<S, I, A> = decorator {
+    this.name = name
     val lastIntent = Conflated<I>()
     onIntent { chain, cur ->
         val prev = lastIntent.update(cur)
@@ -55,8 +57,10 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateIntentsDe
  */
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateActionsDecorator(
+    name: String? = "ConflateActions",
     crossinline compare: ((it: A, other: A) -> Boolean) = MVIAction::equals,
 ): PluginDecorator<S, I, A> = decorator {
+    this.name = name
     val lastAction = Conflated<A>()
     onAction { chain, cur ->
         val prev = lastAction.update(cur)
@@ -75,8 +79,9 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateActionsDe
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateIntents(
+    name: String? = "ConflateIntents",
     crossinline compare: (it: I, other: I) -> Boolean = MVIIntent::equals,
-): Unit = install(conflateIntentsDecorator(compare))
+): Unit = install(conflateIntentsDecorator(name, compare))
 
 /**
  * Installs a new [conflateActionsDecorator] for all actions in this store.
@@ -84,5 +89,6 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateActions(
+    name: String? = "ConflateActions",
     crossinline compare: (it: A, other: A) -> Boolean = MVIAction::equals,
-): Unit = install(conflateActionsDecorator(compare))
+): Unit = install(conflateActionsDecorator(name, compare))
