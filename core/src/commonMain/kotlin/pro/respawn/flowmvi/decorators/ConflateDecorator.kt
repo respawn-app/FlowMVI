@@ -10,7 +10,8 @@ import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
-private class Conflated<T : Any> {
+@PublishedApi
+internal class Conflated<T : Any> {
 
     private val value = atomic<T?>(null)
 
@@ -18,57 +19,70 @@ private class Conflated<T : Any> {
 }
 
 /**
- * Conflates intents and actions going through this decorator based on the equality function provided in
- * [compareIntents] and [compareActions].
+ * Conflates intents going through this decorator based on the equality function provided in
+ * [compare].
  *
- * A default implementation uses a structural equality check.
+ * The default implementation uses a structural equality check.
  *
- * The first event (intent/action) since the store has started will never be dropped, then
+ * The first intent since the store has started will never be dropped, then
  * if the compare function returns true for the last sent event and the current one, the event will be dropped.
  */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateDecorator(
-    compareActions: ((it: A, other: A) -> Boolean)?,
-    compareIntents: ((it: I, other: I) -> Boolean)?
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateIntentsDecorator(
+    crossinline compare: ((it: I, other: I) -> Boolean) = MVIIntent::equals,
 ): PluginDecorator<S, I, A> = decorator {
     val lastIntent = Conflated<I>()
-    if (compareIntents != null) {
-        onIntent { chain, cur ->
-            val prev = lastIntent.update(cur)
-            if (prev != null && compareIntents(prev, cur)) return@onIntent null
-            with(chain) { onIntent(cur) }
-        }
-    }
-    val lastAction = Conflated<A>()
-    if (compareActions != null) {
-        onAction { chain, cur ->
-            val prev = lastAction.update(cur)
-            if (prev != null && compareActions(prev, cur)) return@onAction null
-            with(chain) { onAction(cur) }
-        }
+    onIntent { chain, cur ->
+        val prev = lastIntent.update(cur)
+        if (prev != null && compare(prev, cur)) return@onIntent null
+        with(chain) { onIntent(cur) }
     }
     onStop { child, e ->
         lastIntent.update(null)
+        child.run { onStop(e) }
+    }
+}
+
+/**
+ * Conflates intents going through this decorator based on the equality function provided in
+ * [compare].
+ *
+ * The default implementation uses a structural equality check.
+ *
+ * The first intent since the store has started will never be dropped, then
+ * if the compare function returns true for the last sent event and the current one, the event will be dropped.
+ */
+@ExperimentalFlowMVIAPI
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateActionsDecorator(
+    crossinline compare: ((it: A, other: A) -> Boolean) = MVIAction::equals,
+): PluginDecorator<S, I, A> = decorator {
+    val lastAction = Conflated<A>()
+    onAction { chain, cur ->
+        val prev = lastAction.update(cur)
+        if (prev != null && compare(prev, cur)) return@onAction null
+        with(chain) { onAction(cur) }
+    }
+    onStop { child, e ->
         lastAction.update(null)
         child.run { onStop(e) }
     }
 }
 
 /**
- * Returns a new [conflateDecorator] for all intents in this store.
+ * Returns a new [conflateIntentsDecorator] for all intents in this store.
  */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateIntents(
-    compare: (it: I, other: I) -> Boolean = { a, b -> a == b },
-): Unit = install(conflateDecorator(null, compare))
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateIntents(
+    crossinline compare: (it: I, other: I) -> Boolean = MVIIntent::equals,
+): Unit = install(conflateIntentsDecorator(compare))
 
 /**
- * Installs a new [conflateDecorator] for all actions in this store.
+ * Installs a new [conflateActionsDecorator] for all actions in this store.
  */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateActions(
-    compare: (it: A, other: A) -> Boolean = { a, b -> a == b },
-): Unit = install(conflateDecorator(compare, null))
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateActions(
+    crossinline compare: (it: A, other: A) -> Boolean = MVIAction::equals,
+): Unit = install(conflateActionsDecorator(compare))
