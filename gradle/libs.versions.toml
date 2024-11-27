@@ -20,7 +20,7 @@ intellij-idea = "2024.1"
 junit = "4.13.2"
 kotest = "6.0.0.M1"
 # @pin
-kotlin = "2.1.0-RC2"
+kotlin = "2.1.0"
 kotlin-collections = "0.3.8"
 kotlin-browser = "0.3"
 kotlin-io = "0.6.0"

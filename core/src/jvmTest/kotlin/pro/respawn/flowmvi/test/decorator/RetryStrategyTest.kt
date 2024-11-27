@@ -9,7 +9,7 @@ import kotlin.time.Duration.Companion.seconds
 
 // todo - test the rest of the decorator
 
-private fun testDelays(s: RetryStrategy, vararg delays: List<Duration>) {
+private fun testDelays(s: RetryStrategy, delays: List<Duration>) {
     repeat(s.retries) { i ->
         // attempts start at 1 from the client
         val attempt = i + 1
