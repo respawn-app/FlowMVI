@@ -21,9 +21,9 @@ import pro.respawn.flowmvi.impl.plugin.compose
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.plugins.compositePlugin
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
-import pro.respawn.flowmvi.plugins.compositePlugin
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 

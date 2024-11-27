@@ -6,6 +6,7 @@ import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.StorePluginBuilder
 import pro.respawn.flowmvi.dsl.plugin
+
 /**
  * A unit that can extend the business logic of the [Store].
  * All stores are mostly based on plugins, and their behavior is entirely determined by them.

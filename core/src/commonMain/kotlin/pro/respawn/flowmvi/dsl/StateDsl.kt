@@ -2,11 +2,11 @@ package pro.respawn.flowmvi.dsl
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.flowmvi.util.withType
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
 /**
  * A typed overload of [StateReceiver.withState].
@@ -14,12 +14,7 @@ import kotlin.contracts.contract
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withState(
     @BuilderInference crossinline block: suspend T.() -> Unit
-) {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-    }
-    withState { typed<T>()?.block() }
-}
+) = withState { typed<T>()?.block() }
 
 /**
  * A typed overload of [StateReceiver.updateState].
@@ -27,12 +22,7 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withSta
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
-) {
-    contract {
-        callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
-    }
-    return updateState { withType<T, _> { transform() } }
-}
+) = updateState { withType<T, _> { transform() } }
 
 /**
  * A typed overload of [StateReceiver.updateStateImmediate].
@@ -44,11 +34,25 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateS
 @FlowMVIDSL
 public inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateStateImmediate(
     @BuilderInference crossinline transform: T.() -> S
-) {
-    contract {
-        callsInPlace(transform)
+) = updateStateImmediate { withType<T, _> { transform() } }
+
+@FlowMVIDSL
+public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.withStateOrThrow(
+    @BuilderInference crossinline block: suspend T.() -> Unit
+) = withState {
+    typed<T>()?.block() ?: run {
+        if (config.debuggable) throw UnrecoverableException(message = "State is not of type ${T::class.simpleName}")
     }
-    updateStateImmediate { withType<T, _> { transform() } }
+}
+
+@FlowMVIDSL
+public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.updateStateOrThrow(
+    @BuilderInference crossinline transform: suspend T.() -> S
+) = updateState {
+    typed<T>()?.transform() ?: run {
+        if (config.debuggable) throw UnrecoverableException(message = "State is not of type ${T::class.simpleName}")
+        this
+    }
 }
 
 // region deprecated
