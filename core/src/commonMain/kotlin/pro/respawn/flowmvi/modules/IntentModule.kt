@@ -4,6 +4,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 
@@ -44,7 +45,10 @@ private class SequentialChannelIntentModule<I : MVIIntent>(
 
     override suspend fun awaitIntents(onIntent: suspend (intent: I) -> Unit) = coroutineScope {
         // must always suspend the current scope to wait for intents
-        for (intent in intents) onIntent(intent)
+        for (intent in intents) {
+            onIntent(intent)
+            yield()
+        }
     }
 }
 
