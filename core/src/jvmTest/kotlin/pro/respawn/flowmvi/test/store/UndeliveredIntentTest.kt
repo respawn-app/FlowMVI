@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.test.store
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
@@ -10,6 +11,7 @@ import pro.respawn.flowmvi.util.asUnconfined
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
+@OptIn(DelicateStoreApi::class)
 class UndeliveredIntentTest : FreeSpec({
     asUnconfined()
     "Given a store that processes intents slowly" - {

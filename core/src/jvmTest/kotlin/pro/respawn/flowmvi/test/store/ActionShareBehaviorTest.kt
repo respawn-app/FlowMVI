@@ -11,8 +11,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.joinAll
 import pro.respawn.flowmvi.api.ActionShareBehavior
-import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.dsl.intent
+import pro.respawn.flowmvi.exceptions.ActionsDisabledException
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestAction
@@ -30,17 +30,19 @@ class ActionShareBehaviorTest : FreeSpec({
     "Given store" - {
         "and actions disabled" - {
             val store = testStore(timeTravel) {
-                actionShareBehavior = ActionShareBehavior.Disabled
+                configure {
+                    actionShareBehavior = ActionShareBehavior.Disabled
+                }
             }
             "then trying to collect actions throws" {
-                shouldThrowExactly<UnrecoverableException> {
+                shouldThrowExactly<ActionsDisabledException> {
                     store.subscribeAndTest {
                         actions.first()
                     }
                 }
             }
             "then trying to send actions throws".config(enabled = false) {
-                shouldThrowExactly<UnrecoverableException> {
+                shouldThrowExactly<ActionsDisabledException> {
                     coroutineScope {
                         val job = store.start(this)
                         with(store) {
@@ -55,7 +57,9 @@ class ActionShareBehaviorTest : FreeSpec({
         }
         "and actions are shared" - {
             val store = testStore(timeTravel) {
-                actionShareBehavior = ActionShareBehavior.Share()
+                configure {
+                    actionShareBehavior = ActionShareBehavior.Share()
+                }
             }
 
             "then multiple subscribers both get action" {
@@ -81,7 +85,9 @@ class ActionShareBehaviorTest : FreeSpec({
         }
         "and actions are distributed" - {
             val store = testStore(timeTravel) {
-                actionShareBehavior = ActionShareBehavior.Distribute()
+                configure {
+                    actionShareBehavior = ActionShareBehavior.Distribute()
+                }
             }
             "then one subscriber gets the action only" {
                 store.test {
@@ -103,7 +109,9 @@ class ActionShareBehaviorTest : FreeSpec({
         }
         "and actions are consumed" - {
             val store = testStore(timeTravel) {
-                actionShareBehavior = ActionShareBehavior.Restrict()
+                configure {
+                    actionShareBehavior = ActionShareBehavior.Restrict()
+                }
             }
             "then one subscriber gets the action only" {
                 store.test {
