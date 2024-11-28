@@ -3,7 +3,6 @@ package pro.respawn.flowmvi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
@@ -77,25 +76,27 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         onAction = { action -> onAction(action)?.let { _actions.action(it) } },
         onTransformState = { transform -> this@StoreImpl.updateState { onState(this, transform()) ?: this } },
         onStop = { e -> close().also { plugin.onStop?.invoke(this, e) } },
-        onStart = { lifecycle ->
+        onStart = pipeline@{ lifecycle ->
             beginStartup(lifecycle)
-            launch intents@{
-                coroutineScope {
-                    // run onStart plugins first to not let subscribers appear before the store is started fully
-                    if (plugin.onStart != null) catch { onStart() }
-                    if (plugin.onSubscribe != null || plugin.onUnsubscribe != null) launch {
-                        observeSubscribers(
-                            onSubscribe = { catch { onSubscribe(it) } },
-                            onUnsubscribe = { catch { onUnsubscribe(it) } }
-                        )
+            val startup = launch {
+                if (plugin.onStart != null) catch { onStart() }
+                lifecycle.completeStartup()
+            }
+            if (plugin.onSubscribe != null || plugin.onUnsubscribe != null) launch {
+                startup.join()
+                // catch exceptions to not let this job fail
+                observeSubscribers(
+                    onSubscribe = { catch { onSubscribe(it) } },
+                    onUnsubscribe = { catch { onUnsubscribe(it) } }
+                )
+            }
+            if (plugin.onIntent != null) launch {
+                startup.join()
+                intents.awaitIntents {
+                    catch {
+                        val result = onIntent(it)
+                        if (result != null && config.debuggable) throw UnhandledIntentException(result)
                     }
-                    if (plugin.onIntent != null) intents.awaitIntents {
-                        catch {
-                            val result = onIntent(it)
-                            if (result != null && config.debuggable) throw UnhandledIntentException(result)
-                        }
-                    }
-                    lifecycle.completeStartup()
                 }
             }
         }
