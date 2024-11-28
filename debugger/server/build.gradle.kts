@@ -1,10 +1,10 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
-    id(libs.plugins.kotlinMultiplatform.id)
+    id(libs.plugins.kotlin.multiplatform.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val parentNamespace = namespaceByPath()

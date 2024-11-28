@@ -3,11 +3,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    id(libs.plugins.kotlinMultiplatform.id)
+    id(libs.plugins.kotlin.multiplatform.id)
     id(applibs.plugins.android.application.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // region buildconfig

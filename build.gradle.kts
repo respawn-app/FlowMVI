@@ -16,16 +16,18 @@ plugins {
     alias(libs.plugins.detekt)
     // alias(libs.plugins.gradleDoctor)
     alias(libs.plugins.version.catalog.update)
-    alias(libs.plugins.atomicfu)
     // alias(libs.plugins.dependencyAnalysis)
-    alias(libs.plugins.serialization) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.maven.publish) apply false
+    alias(libs.plugins.atomicfu) apply false
+    alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.kotlin.benchmark) apply false
     // plugins already on a classpath (conventions)
     // alias(libs.plugins.androidApplication) apply false
     // alias(libs.plugins.androidLibrary) apply false
+    // alias(libs.plugins.kotlin.multiplatform) apply false
     // alias(libs.plugins.kotlinMultiplatform) apply false
-    alias(libs.plugins.compose.compiler) apply false
     id(libs.plugins.dokka.id)
 }
 
@@ -140,11 +142,7 @@ versionCatalogUpdate {
     }
 }
 
-atomicfu {
-    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
-    transformJvm = true
-    jvmVariant = "VH"
-}
+
 
 tasks {
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
