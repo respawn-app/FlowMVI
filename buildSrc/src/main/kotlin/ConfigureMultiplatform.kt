@@ -22,10 +22,11 @@ fun Project.configureMultiplatform(
     windows: Boolean = true,
     wasmJs: Boolean = true,
     wasmWasi: Boolean = true,
+    explicitApi: Boolean = true,
     configure: KotlinHierarchyBuilder.Root.() -> Unit = {},
 ) = ext.apply {
     val libs by versionCatalog
-    explicitApi()
+    if(explicitApi) explicitApi()
     applyDefaultHierarchyTemplate(configure)
     withSourcesJar(true)
     compilerOptions {

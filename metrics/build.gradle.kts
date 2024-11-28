@@ -6,7 +6,6 @@ plugins {
     id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.atomicfu)
     alias(libs.plugins.maven.publish)
-    alias(libs.plugins.kotlin.benchmark)
     dokkaDocumentation
 }
 

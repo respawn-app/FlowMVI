@@ -19,6 +19,7 @@ intellij-ide-plugin = "2.1.0"
 intellij-idea = "2024.1"
 junit = "4.13.2"
 kotest = "6.0.0.M1"
+jmh = "1.37"
 # @pin
 kotlin = "2.1.0"
 kotlin-collections = "0.3.8"
@@ -147,6 +148,7 @@ gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
