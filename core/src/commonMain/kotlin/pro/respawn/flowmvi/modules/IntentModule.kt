@@ -47,7 +47,7 @@ private class SequentialChannelIntentModule<I : MVIIntent>(
         // must always suspend the current scope to wait for intents
         for (intent in intents) {
             onIntent(intent)
-            yield()
+            yield() // TODO: Accounts for 50% performance loss, way to get rid of? Why needed?
         }
     }
 }

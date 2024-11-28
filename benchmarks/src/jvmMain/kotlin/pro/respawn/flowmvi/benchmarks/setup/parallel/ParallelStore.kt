@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.benchmarks.setup.parallel
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior
@@ -21,7 +22,9 @@ private fun StoreBuilder<*, *, *>.config() = configure {
     intentCapacity = Channel.UNLIMITED
 }
 
-internal fun atomicParallelStore() = store<BenchmarkState, BenchmarkIntent>(BenchmarkState()) {
+internal fun atomicParallelStore(
+    scope: CoroutineScope
+) = store<BenchmarkState, BenchmarkIntent, Nothing>(BenchmarkState(), scope) {
     config()
     reduce {
         when (it) {
