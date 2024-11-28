@@ -1,3 +1,4 @@
+import configureMultiplatform
 import kotlinx.benchmark.gradle.JvmBenchmarkTarget
 import kotlinx.benchmark.gradle.benchmark
 
@@ -14,19 +15,28 @@ allOpen { // jmh benchmark classes must be open
 kotlin {
     configureMultiplatform(
         ext = this,
+        explicitApi = false,
         wasmWasi = false,
         android = false,
-        explicitApi = false,
+        linux = false,
+        iOs = false,
+        macOs = false,
+        watchOs = false,
+        tvOs = false,
+        windows = false,
+        wasmJs = false,
     )
 
 }
-
 tasks.withType<JavaExec>().configureEach {
     jvmArgs("-Dkotlinx.coroutines.debug=off")
 }
-
 dependencies {
     commonMainImplementation(projects.core)
+
+    val fluxo = "0.1-2306082-SNAPSHOT"
+    //noinspection UseTomlInstead
+    commonMainImplementation("io.github.fluxo-kt:fluxo-core:$fluxo")
 
     commonMainImplementation(libs.kotlin.coroutines.test)
     commonMainImplementation(libs.kotlin.test)
@@ -37,7 +47,7 @@ benchmark {
     configurations {
         named("main") {
             iterations = 100
-            warmups = 5
+            warmups = 10
             iterationTime = 100
             iterationTimeUnit = "ms"
             outputTimeUnit = "us"
