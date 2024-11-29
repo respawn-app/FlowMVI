@@ -50,10 +50,11 @@ benchmark {
             warmups = 10
             iterationTime = 100
             iterationTimeUnit = "ms"
-            outputTimeUnit = "us"
-            mode = "avgt"
+            outputTimeUnit = "ms"
+            mode = "thrpt" // "thrpt" - throughput, "avgt" - average
             reportFormat = "text"
             // advanced("nativeGCAfterIteration", true)
+            // advanced("jvmForks", "definedByJmh")
         }
     }
     targets {

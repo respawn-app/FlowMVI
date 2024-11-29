@@ -1,39 +1,41 @@
-package pro.respawn.flowmvi.benchmarks.setup.fluxo
+package pro.respawn.flowmvi.benchmarks.setup.channelbased
 
 import kotlinx.benchmark.TearDown
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kt.fluxo.core.closeAndWait
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
-import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.benchmarks.BenchmarkDefaults
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
-import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 
 @Suppress("unused")
 @State(Scope.Benchmark)
-internal class FluxoBenchmark {
+internal class ChannelTraditionalMVIBenchmark {
 
-    lateinit var store: kt.fluxo.core.Store<BenchmarkIntent, BenchmarkState>
+    lateinit var store: ChannelBasedTraditionalStore
+    lateinit var scope: CoroutineScope
 
     @Setup
-    fun setup() = runBlocking {
-        store = fluxoStore()
+    fun setup() {
+        scope = CoroutineScope(Dispatchers.Unconfined)
+        store = ChannelBasedTraditionalStore(scope)
     }
 
     @Benchmark
     fun benchmark() = runBlocking {
         repeat(BenchmarkDefaults.intentsPerIteration) {
-            store.send(BenchmarkIntent.Increment)
+            store.onIntent(BenchmarkIntent.Increment)
         }
-        store.first { state -> state.counter >= BenchmarkDefaults.intentsPerIteration }
+        store.state.first { state -> state.counter >= BenchmarkDefaults.intentsPerIteration }
     }
 
     @TearDown
     fun teardown() = runBlocking {
-        store.closeAndWait()
+        scope.cancel()
     }
 }
