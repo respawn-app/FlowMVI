@@ -29,7 +29,7 @@
 
 Here's an example of rules we use at [Respawn](https://respawn.pro) to name our Contract classes:
 
-* `MVIIntent` naming should be `<TypeOfActionInPastTense><Meaning>`.
+* `MVIIntent` naming should be `<TypeOfActionInPastTense><Target>`.
   Example: `ClickedCounter`, `SwipedDismiss` (~~CounterClick~~).
 * `MVIAction`s should be named using verbs in present tense. Example: `ShowConfirmationPopup`, `GoBack`.
     * Navigation actions should be using the `GoTo` verb (~~NavigateTo, Open...~~) Example: `GoToHome`.
@@ -40,8 +40,8 @@ Here's an example of rules we use at [Respawn](https://respawn.pro) to name our 
 
 ### My intents are not reduced! When I click buttons, nothing happens, the app just hangs.
 
-Did you call `Store.start(scope: CoroutineScope)`?
-Did you call `Store.subscribe()`?
+* Did you call `Store.start(scope: CoroutineScope)`?
+* Did you call `Store.subscribe()`?
 
 ### My Actions are not consumed, are dropped or missed.
 
@@ -52,6 +52,7 @@ Did you call `Store.subscribe()`?
    resolutions at the moment of writing. Try to use `Distribute` instead.
 3. If one of the subscribers doesn't need to handle Actions, you can use another overload of `subscribe` that does not
    subscribe to actions.
+4. Try to use an `onUndeliveredIntent` handler of a plugin or install a logging plugin to debug missed events.
 
 ### Why does `updateState` and `withState` not return the resulting state? Why is there no `state` property I can access?
 
@@ -71,11 +72,12 @@ As you continue working with FlowMVI, updating states safely will come naturally
 * Actions: FIFO.
 * States: FIFO.
 * Plugins: FIFO (Chain of Responsibility) based on installation order.
+* Decorators: FIFO, but after all of the regular plugins.
 
 ### When I consume an Action, the other actions are delayed or do not come.
 
 Since actions are processed sequentially, make sure you launch a coroutine to not prevent other actions from coming and
-suspending the scope.
+suspending the scope. This is particularly obvious with things like snackbars that suspend in compose.
 
 ### I want to expose a few public functions in my container for the store. Should I do that?
 
@@ -97,7 +99,7 @@ To fix this issue, use `cachePlugin` to cache the paginated flow, and then pass 
 This will prevent any leaks that you would otherwise get if you created a new flow each time a subscriber appears.
 
 ```kotlin
-val timeline by cache {
+val pagingFlow by cache {
     repo.getPagingDataFlow().cachedIn(this)
 }
 ```
@@ -126,7 +128,22 @@ You usually don't want to reuse your actions and intents because they are specif
 That makes your logic simpler, and the rest can be easily moved to your repository layer, use cases or just plain
 top-level functions. This is where this library is opinionated, and where one of its main advantages - simplicity, comes
 from. Everything you want to achieve by composing store element can also be achieved using plugins or child/parent
-stores. 
+stores. For example, if you still want a reducer object and a plugin for it, all you have to do is:
+
+```kotlin
+fun interface Reducer<S : MVIState, I : MVIIntent> {
+
+    operator fun S.invoke(intent: I): S
+}
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
+    reducer: Reducer<S, I>
+) = reducePlugin<S, I, A>(consume = true) {
+    updateState {
+        with(reducer) { invoke(it) }
+    }
+}.install()
+```
 
 ### How to avoid class explosion?
 
@@ -165,6 +182,7 @@ sealed interface NewsState : MVIState {
 * Use `T.withType<Type>(block: Type.() -> Unit)` to cast your sub-states easier as
   the `(this as? State)?.let { } ?: this` code can look ugly.
 * Use `T.typed<Type>()` to perform a safe cast to the given state to clean up the code.
+* You don't have to have a top-level sealed interface. If it's simpler, you can just use a data class on the top level.
 
 ### I want to use a resource or a framework dependency in my store. How can I do that?
 

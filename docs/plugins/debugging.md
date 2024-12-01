@@ -187,11 +187,9 @@ You can find the latest archive on the [releases](https://github.com/respawn-app
 Run the debugger app. The app will ask you to configure host and port. Unless you are using a physical external device,
 you can just use the defaults. Your devices must be on the same network to connect successfully.
 
-![setup.png](images/debugger_setup_1.png)
+![setup.png](../images/debugger_setup_1.png)
 
 Run the server and the app. After a few seconds, your devices should connect and you can start debugging.
-
-<img src="images/debugger.gif" width="1200" alt="">
 
 ## Step 3.2 External device configuration
 

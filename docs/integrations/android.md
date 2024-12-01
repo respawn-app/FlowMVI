@@ -10,7 +10,7 @@ The choice depends on your project's specific needs and each option has certain 
 The simplest way to organize code is to implement `Container` in your ViewModel.
 You are not required to implement any interfaces, however. They are only served as markers/nice dsl providers.
 
-Example that uses models from [quickstart](quickstart.md) and MVVM+ style.
+Example that uses models from [quickstart](../quickstart.md) and MVVM+ style.
 This example is also fully implemented in the sample app.
 
 ```kotlin

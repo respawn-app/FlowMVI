@@ -152,9 +152,15 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
     public suspend fun PipelineContext<S, I, A>.onUnsubscribe(newSubscriberCount: Int): Unit = Unit
 
     /**
-     * Invoked when [Store.close] is invoked. This is called **after** the store is already closed, and you cannot
-     * influence the outcome. This is invoked for both exceptional stops and normal stops.
-     * Will not be invoked when an [Error] is thrown
+     * Invoked when [Store.close] is invoked.
+     *
+     * * This is called **after** the store is already closed, and you cannot influence the outcome.
+     * * This is invoked for both exceptional stops and normal stops.
+     * * Will not be invoked when an [Error] is thrown.
+     *
+     * ### Warning:
+     * This function is called in an undefined coroutine context on a random thread,
+     * when the pipeline is already canceled. It should be fast and non-blocking.
      *
      * @param e the exception the store is closed with. Can be null for normal completions.
      * For everything except [kotlinx.coroutines.CancellationException]s, will not be null.

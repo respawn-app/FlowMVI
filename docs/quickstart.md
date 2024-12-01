@@ -76,19 +76,21 @@ Cannot inline bytecode built with JVM target 11 into bytecode that
 is being built with JVM target 1.8. Please specify proper '-jvm-target' option
 ```
 
-Then configure your kotlin compilation to target JVM 11 in your root `build.gradle.kts`:
+Then configure your kotlin multiplatform compilation to target JVM 11 in your subproject's `build.gradle.kts`:
 
 ```kotlin
-allprojects {
-    tasks.withType<KotlinCompile>().configureEach {
+kotlin {
+    androidTarget { // do the same for JVM/desktop target as well
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 }
+
+
 ```
 
-And in your module-level gradle files, set:
+And in your android gradle files, set:
 ```kotlin
 android {
     compileOptions {
@@ -117,7 +119,7 @@ So please consider the following comparison:
 | Greater separation of concerns as intent handling logic is strictly contained in the store's scope   | Boilerplatish: some intents will need to be duplicated for multiple screens, resulting in some amount of copy-paste             |
 | Verbose and readable - easily understand which intent does what judging by the contract              | Hard to navigate in the IDE. You have to jump twice: first to the declaration, and then to usage, to see the code of the intent |
 | Intents can be decomposed into sealed families, subclassed,  delegated, have properties or functions | Class explosion - class for every event may result in 50+ model classes per screen easily                                       |
-| Intents can be resent inside the store - by sending an intent while handling another intent          | Sealed classes work worse for some platforms, for example, in Swift, Enums are not used and names are mangled                   |
+| Intents can be re-sent inside the store - by sending an intent while handling another intent         | Sealed classes work worse for some platforms, for example, in Swift, Enums are not used and names are mangled                   |
 
 ### MVVM+ style:
 
@@ -190,14 +192,16 @@ sealed interface CounterIntent : MVIIntent {
 // MVVM+ Style Intents
 typealias CounterIntent = LambdaIntent<CounterState, CounterAction>
 
+// side-effects
 sealed interface CounterAction : MVIAction {
 
     data class ShowMessage(val message: String) : CounterAction
 }
 ```
 
-* If your store does not have a `State`, you can use an `EmptyState` object.
+* If your store does not have a `State`, you can use an `EmptyState` object provided by the library.
 * If your store does not have side effects, use `Nothing` in place of the side-effect type.
+* Consider using the [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) to generate the contract for you using the shortcut `fmvim`.
 
 ## Step 4: Configure your store
 
@@ -215,60 +219,62 @@ val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set 
         onOverflow = BufferOverflow.DROP_OLDEST
         intentCapacity = Channel.UNLIMITED
         atomicStateUpdates = true
-        allowIdleSubscriptions = null
-        logger = null
+        allowIdleSubscriptions = false
+        logger = if (debuggable) PlatformStoreLogger else null
+        verifyPlugins = debuggable
     }
 
     fun install(vararg plugins: LazyPlugin<S, I, A>)
     fun install(block: LazyPluginBuilder<S, I, A>.() -> Unit)
+    fun install(vararg decorators: StoreDecorator<S, I, A>)
+    fun decorate(decorator: DecoratorBuilder<S, I, A>.() -> Unit)
 }
 ```
 
 * `debuggable` - Setting this to `true` enables additional store validations and debug logging. The store will check your
   subscription events, launches/stops, and plugins for validity, as well as print logs to the system console.
-* `name` - Set the future name of the store. Needed for debug, logging, comparing and injecting stores
+* `name` - Set the future name of the store. Needed for debug, logging, comparing and injecting stores, analytics.
 * `parallelIntents` - Declare that intents must be processed in parallel. Intents may still be dropped according to the
   `onOverflow` param.
 * `coroutineContext` - A coroutine context override for the store. This context will be merged with the one the store
   was launched with (e.g. `viewModelScope`). All store operations will be launched in that context by default.
 * `actionShareBehavior` - Define how the store handles and sends actions. Choose one of the following:
     * `Distribute` - send side effects in a fan-out FIFO fashion to one subscriber at a time (default).
-    * `Share` - share side effects between subscribers using a `SharedFlow`.
-      !> If an event is sent and there are no subscribers, the event will be lost!
+    * `Share` - share side effects between subscribers using a `SharedFlow`. If an event is sent and there are no subscribers, the event **will be lost!**
     * `Restrict` - Allow only **one** subscription event per whole lifecycle of the store. If you want to subscribe
       again, you will have to re-create the store.
     * `Disable` - Disable side effects.
 * `onOverflow` - Designate behavior for when the store's intent queue overflows. Choose from:
-    * `SUSPEND` - Suspend on buffer overflow.
-    * `DROP_OLDEST` - Drop **the oldest** value in the buffer on overflow, add the new value to the buffer, do not
+    * `BufferOverflow.SUSPEND` - Suspend on buffer overflow.
+    * `BufferOverflow.DROP_OLDEST` - Drop **the oldest** value in the buffer on overflow, add the new value to the buffer, do not
       suspend (default).
-    * `DROP_LATEST` - Drop **the latest** value that is being added to the buffer right now on buffer overflow (so that
+    * `BufferOverflow.DROP_LATEST` - Drop **the latest** value that is being added to the buffer right now on buffer overflow (so that
       buffer contents stay the same), do not suspend.
 * `intentCapacity` - Designate the maximum capacity of store's intent queue. This should be either:
     * A positive value of the buffer size
-    * `UNLIMITED` - unlimited buffer (default)
-    * `CONFLATED` - A buffer of 1
-    * `RENDEZVOUS` - Zero buffer (all events not ready to be processed are dropped)
-    * `BUFFERED` - Default system buffer capacity
+    * `Channel.UNLIMITED` - unlimited buffer (default)
+    * `Channel.CONFLATED` - A buffer of 1
+    * `Channel.RENDEZVOUS` - Zero buffer (all events not ready to be processed are dropped)
+    * `Channel.BUFFERED` - Default system buffer capacity
 * `atomicStateUpdates` - Enables transaction serialization for state updates, making state updates atomic and
   suspendable. Synchronizes state updates, allowing only **one** client to read and/or update the state at a time. All
   other clients that attempt to get the state will wait in a FIFO queue and suspend the parent coroutine. For one-time
-  usage of non-atomic updates, see `updateStateImmediate`.
+  usage of non-atomic updates, see `updateStateImmediate`. Learn more [here](https://proandroiddev.com/how-to-safely-update-state-in-your-kotlin-apps-bf51ccebe2ef).
   Has a small performance impact because of coroutine context switching and mutex usage when enabled.
 * `allowIdleSubscriptions` - A flag to indicate that clients may subscribe to this store even while it is not started.
   If you intend to stop and restart your store while the subscribers are present, set this to `true`. By default, will
-  use the opposite value of the `debuggable` parameter (`false` on production).
+  use the opposite value of the `debuggable` parameter (`true` on production).
 * `logger` - An instance of `StoreLogger` to use for logging events. By default, the value is chosen based on
   the `debuggable` parameter:
     * `PlatformStoreLogger` that logs to the primary log stream of the system (e.g. Logcat on Android).
     * `NoOpStoreLogger` - if `debuggable` is false, logs will not be printed.
 
-You may want to eventually setup [injection](debugging.md) of the configuration and plugins.
+You may want to eventually setup [injection](plugins/debugging.md) of the configuration and plugins.
 
 Some interesting properties of the store:
 
 * Store can be launched, stopped, and relaunched again as many times as you want.
-  Use `close()`, or cancel the job returned from `start()` to stop the store.
+  Use `close()`, or cancel the `StoreLifecycle` returned from `start()` to stop the store.
 * The store's subscribers will **not** wait until the store is launched when they subscribe to the store.
   Such subscribers will not receive state updates or actions. Don't forget to start the store.
 * Stores are usually created eagerly, but the store *can* be lazy. There is `lazyStore()` for that.
@@ -281,7 +287,7 @@ FlowMVI is built entirely based on plugins!
 Call the `install` function using a prebuilt plugin, or use a lambda to create and install a plugin on the fly.
 
 For every store, you'll likely want to install a few plugins.
-Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins.md) page to learn how
+Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins/prebuilt.md) page to learn how
 to use them.
 
 ## Step 6: Create, inject and provide dependencies
@@ -312,11 +318,13 @@ class CounterContainer(
 }
 ```
 
+Use the [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) shortcut `fmvic` to generate a container for you.
+
 ## Step 7: Start and subscribe to your store
 
 !> Don't forget to start your store! Store will do nothing unless it is started using the `start(scope: CoroutineScope)`
 function. Provide a coroutine scope with a lifecycle that matches the duration your store should be accepting intents
-and running background jobs. For  [android](android.md), this will be `viewModelScope`, for example.
+and running background jobs. For  [android](integrations/android.md), this will be `viewModelScope`, for example.
 On desktop, you can use `rememberCoroutineScope()`. On iOS, provide a lifecycle scope manually or through a library.
 
 #### Automatically:
@@ -351,14 +359,14 @@ store.close()
 ```
 
 To subscribe to the store in compose, see the [compose](compose.md)
-To subscribe using Android Views, see [android](android.md)
+To subscribe using Android Views, see [android](integrations/android.md)
 
 ## Next steps:
 
-1. Learn how to [install](plugins.md) and [create](custom_plugins.md) plugins.
+1. Learn how to [install](plugins/prebuilt.md) and [create](plugins/custom_plugins.md) plugins.
 2. Learn how to use FlowMVI with [compose](compose.md)
-3. Learn how to [persist and restore state](savedstate.md)
-4. Get answers to common [questions](faq.md)
-5. Set up [remote debugging](debugging.md)
-6. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/)
-7. Learn how to use FlowMVI on [Android](android.md)
+3. Learn how to [persist and restore state](plugins/savedstate.md)
+4. Set up [remote debugging](plugins/debugging.md)
+5. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/)
+6. Learn how to use FlowMVI on [Android](integrations/android.md)
+7. Get answers to common [questions](faq.md)

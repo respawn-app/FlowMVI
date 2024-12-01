@@ -2,13 +2,13 @@
 * [Quickstart](quickstart.md)
 * [Compose](compose.md)
 * Plugins
-    * [Prebuilt Plugins](plugins.md)
-    * [Custom Plugins](custom_plugins.md)
-    * [Saving State](savedstate.md)
-    * [Remote Debugging](debugging.md)
+    * [Prebuilt Plugins](plugins/prebuilt.md)
+    * [Custom Plugins](plugins/custom_plugins.md)
+    * [Saving State](plugins/savedstate.md)
+    * [Remote Debugging](plugins/debugging.md)
 * Integrations
-    * [Android](android.md)
-    * [Essenty](essenty.md)
+    * [Android](integrations/android.md)
+    * [Essenty](integrations/essenty.md)
 * Misc
     * [FAQ](faq.md)
     * [Javadocs](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)

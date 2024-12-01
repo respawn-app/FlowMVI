@@ -58,12 +58,9 @@ fun Project.configureMultiplatform(
 
     if (android) androidTarget {
         publishLibraryVariants("release")
-    }.compilations.all {
-        compileTaskProvider.configure {
-            compilerOptions {
-                jvmTarget.set(Config.jvmTarget)
-                freeCompilerArgs.addAll(Config.jvmCompilerArgs)
-            }
+        compilerOptions {
+            jvmTarget.set(Config.jvmTarget)
+            freeCompilerArgs.addAll(Config.jvmCompilerArgs)
         }
     }
 

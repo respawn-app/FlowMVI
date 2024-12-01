@@ -17,7 +17,7 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowm
 Set up stability definitions for your project:
 
 <details>
-<summary>project_root/stability_definitions.txt</summary>
+<summary>/project_root/stability_definitions.txt</summary>
 
 ```text
 pro.respawn.flowmvi.api.MVIIntent
@@ -36,11 +36,11 @@ pro.respawn.flowmvi.api.IntentReceiver
 Then configure compose compiler to account for the definitions in your feature's `build.gradle.kts`:
 
 <details>
-<summary>feature-module/build.gradle.kts</summary>
+<summary>/feature-module/build.gradle.kts</summary>
 
 ```kotlin
 composeCompiler {
-    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_definitions.txt")
+    stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("stability_definitions.txt"))
 }
 ```
 
@@ -54,7 +54,7 @@ how to set compose compiler configuration globally and/or in gradle conventions.
 
 !> Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
 It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
-also degrade performance.
+also degrade performance, also forcing you to pass tons of function references as parameters.
 
 Subscribing to a store is as simple as calling `subscribe()`
 
@@ -92,8 +92,8 @@ launch new coroutines that will parallelize your flow (e.g. for snackbars).
 
 A best practice is to make your state handling (UI redraw composable) a pure function and extract it to a separate
 Composable such as `ScreenContent(state: ScreenState)` to keep your `*Screen` function clean, as shown below.
-It will also enable smart-casting by the compiler. If you want to send `MVIIntent`s from a nested composable, just
-use `IntentReceiver` as a context or pass a function reference:
+It will also enable smart-casting by the compiler make UI tests super easy. If you want to send `MVIIntent`s from a 
+nested composable, just use `IntentReceiver` as a context or pass a function reference:
 
 ```kotlin
 @Composable
@@ -108,15 +108,26 @@ private fun IntentReceiver<CounterIntent>.CounterScreenContent(state: CounterSta
     }
 }
 ```
+Now this function cannot be called outside of the required store's area of responsibility.
+You can also subclass your `Intent` class by target state to make it impossible at compilation time to send an intent 
+for an incorrect state:
 
-## Step 5: Create Previews
+```kotlin
+sealed interface CounterIntent: MVIIntent {
+    sealed interface DisplayingCounterIntent: MVIIntent
+    sealed interface ErrorIntent : MVIIntent
+    sealed interface LoadingIntent : MVIIntent
+}
+```
+
+## Step 5: Create Previews or UI Tests
 
 When you have defined your `*Content` function, you will get a composable that can be easily used in previews.
 That composable will not need DI, Local Providers from compose, or anything else for that matter, to draw itself.
 But there's a catch: It has an `IntentReceiver<I>` as a parameter. To deal with this, there is an `EmptyReceiver`
-composable. EmptyReceiver does nothing when an intent is sent, which is exactly what we want for previews. We can now
-define our `PreviewParameterProvider` and the Preview composable. You won't need an `EmptyReceiver` if you pass the
-`intent` callback manually.
+composable. EmptyReceiver does nothing when an intent is sent, which is exactly what we want for previews and UI tests.
+We can now define our `PreviewParameterProvider` and the Preview composable. 
+You won't need an `EmptyReceiver` if you pass the `intent` callback manually.
 
 ```kotlin
 private class StateProvider : CollectionPreviewParameterProvider<CounterState>(
