@@ -3,23 +3,30 @@
 Plugin is a unit that can extend the business logic of the Store.
 All stores are mostly based on plugins, and their behavior is entirely determined by them.
 
-* Plugins can influence subscription, stopping, and all other forms of store behavior.
+* Plugins can influence subscription, stopping, intent handling, and all other forms of store behavior.
 * Plugins are executed in the order they were installed and follow the Chain of Responsibility pattern.
 * Access the store's context & configuration and launch jobs through the `PipelineContext` receiver.
+* Plugins are highly optimized to conflate any operations not defined, which means you do not need to worry about having
+  too many plugins. The bottleneck will always be the longest chain of callbacks, not the plugin amount. If you don't
+  define a callback, then no CPU time is spent on running it and no memory is allocated.
+
+## Creating an Eager Plugin
 
 Plugins are simply built:
 
 ```kotlin
-
 val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
     // dsl for intercepting is available
 }
 
 ```
 
+You can generate a new generic plugin using the `fmvip` [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi)
+ shortcut because those type parameters are annoying.
+
 ### Lazy Plugins
 
-Lazy plugins are created **after** the store builder has been run ( they are still installed in the order they were
+Lazy plugins are created **after** the store builder has been run (they are still installed in the order they were
 declared). This gives you access to the `StoreConfiguration`, which contains various options, of which the most useful
 are:
 
@@ -32,7 +39,7 @@ To create a lazy plugin, use `lazyPlugin` builder function. It contains a `confi
 
 ```kotlin
 val resetStatePlugin = lazyPlugin<MVIState, MVIIntent, MVIAction> {
-    if (config.debuggable) config.logger(Warn) { "Plugin for store '${config.name}' is installed on a debug build" }
+    if (!config.debuggable) config.logger(Warn) { "Plugin for store '${config.name}' is installed on a release build" }
 
     onException {
         updateState { config.initial }  // reset the state
@@ -40,6 +47,11 @@ val resetStatePlugin = lazyPlugin<MVIState, MVIIntent, MVIAction> {
     }
 }
 ```
+
+* You can generate a lazy plugin using the `fmvilp` 
+  [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) shortcut.
+* You may not need to use a lazy plugin because `PipelineContext` has the `config` property too. If you miss `config` in
+  the builder body itself, then use a lazy plugin.
 
 ## Plugin DSL
 
@@ -90,18 +102,20 @@ suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = new
 ```
 
 A callback to be invoked each time `updateState` is called.
-This callback is invoked **before** the state changes, but **after** the function's `block` is invoked.
+This callback is invoked **before** the state changes, but **after** the consumer function's `block` is invoked.
 Any plugin can veto (forbid) or modify the state change.
 
 This callback is **not** invoked at all when state is changed through `updateStateImmediate`, used in `withState`
 or when `state` is obtained directly.
 
-* Return null to cancel the state change. All plugins registered later when building the store will not receive
+* Return `null` to cancel the state change. All plugins registered later when building the store will not receive
   this event.
 * Return `new` to continue the chain of modification, or allow the state to change,
   if no other plugins change it.
 * Return `old` to veto the state change, but allow next plugins in the queue to process the state.
 * Execute other operations using `PipelineContext`, including jobs.
+* If the store has `atomicStateUpdates`, then this block will already be invoked in the transaction context.
+* Avoid calling `updateState` here, as it will result in an infinite loop!
 
 ### onIntent
 
@@ -115,10 +129,11 @@ This callback is invoked **after** the intent is sent and **before** it is recei
 sometimes the time difference can be significant if the store was stopped for some time
 or even **never** if the store's buffer overflows or store is not ever used again.
 
-* Return null to veto the processing and prevent other plugins from using the intent.
+* Return `null` to veto the processing and prevent other plugins from using the intent.
 * Return another intent to replace `intent` with another one and continue with the chain.
 * Return `intent` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`.
+* Generally, you can send other intents inside this handler, but avoid infinite loops of course.
 
 ### onAction
 
@@ -128,15 +143,16 @@ or even **never** if the store's buffer overflows or store is not ever used agai
 
 A callback that is invoked each time an `MVIAction` has been sent.
 
-This is invoked **after** the action has been sent, but **before** the store handles it.
+This is invoked **after** the action has been sent by store's code, but **before** the subscriber handles it.
 This function will always be invoked, even after the action is later dropped because of `ActionShareBehavior`,
 and it will be invoked before the `action(action: A)` returns, if it has been suspended, so this handler may suspend the
 parent coroutine that wanted to send the action.
 
-* Return null to veto the processing and prevent other plugins from using the action.
+* Return `null` to veto the processing and prevent other plugins from using the action.
 * Return another action to replace `action` with another one and continue with the chain.
 * Return `action` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`
+* Generally, you can send other Actions here.
 
 ### onException
 
@@ -148,7 +164,7 @@ A callback that is invoked when Store catches an exception. It is invoked when e
 store throws, or when an exception occurs in any other plugin.
 
 * If none of the plugins handles the exception (returns `null`), **the exception is rethrown and the store fails**.
-* If you throw an exception in this block, **the store will fail**. Do not throw exceptions in this function.
+* If you throw an exception in this block, **the entire thread will crash**. Do not throw exceptions in this function.
 * This is invoked **before** the exception is rethrown or otherwise processed.
 * This is invoked **asynchronously in a background job** and after the job that has thrown was cancelled, meaning
   that some time may pass after the job is cancelled and the exception is handled.
@@ -171,7 +187,7 @@ suspend fun PipelineContext<S, I, A>.onStart(): Unit = Unit
 A callback that is invoked **each time** `Store.start` is called.
 
 * Suspending in this callback will **prevent** the store from starting until the plugin is finished.
-* Plugins that use `onSubscribe` will also not get their events until this is run.
+* Plugins that use `onSubscribe` will also not get their events until this is run and no intents will be processed.
 * Execute any operations using `PipelineContext`.
 
 ### onSubscribe
@@ -214,7 +230,7 @@ A callback to be executed when the subscriber cancels its subscription job (unsu
 ### onStop
 
 ```kotlin
-fun onStop(e: Exception?): Unit = Unit
+fun ShutdownContext<S, I, A>.onStop(e: Exception?): Unit = Unit
 ```
 
 Invoked when the store is closed.
@@ -223,3 +239,45 @@ Invoked when the store is closed.
 * This is invoked for both exceptional stops and normal stops.
 * Will not be invoked when an `Error` is thrown. You should not handle `Error`s.
 * `e` is the exception the store is closed with. Will be `null` for normal completions.
+* You can update the state in the `ShutdownContext`, but generally avoid relying on thread safety here, as this callback
+  is invoked synchronously on a **random thread** and in a **random context** 
+* This function should always be fast and non-blocking, and **not** throw exceptions, or the entire coroutine
+  machinery will fall apart.
+
+### onUndeliveredIntent
+
+```kotlin
+fun ShutdownContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
+```
+
+Called when an intent is not delivered to the store.
+This can happen, according to the [Channel]'s documentation:
+* When the store has a limited buffer and it overflows.
+* When store is stopped before this event could be handled, or while it is being handled.
+* When the [onIntent] function throws an exception that is not handled by the [onException] block.
+* When the store is stopped and there were intents in the buffer, in which case, `onUndeliveredIntent` will
+be called on all of them.
+
+!> This function is called in an undefined coroutine context on a random thread,
+while the store is running or already stopped. It should be fast, non-blocking,
+and must **not throw exceptions**, or the entire coroutine machinery will fall apart.
+The [onException] block will **not** handle exceptions in this function.
+
+### onUndeliveredAction
+
+```kotlin
+fun ShutdownContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
+```
+Called when an action is not delivered to the store.
+
+This can happen:
+* When the Store's [ActionShareBehavior] is [ActionShareBehavior.Distribute] or [ActionShareBehavior.Restrict].
+In this case, depending on the configuration, the queue of actions may have a limited buffer and overflow.
+* When store is stopped before this event could be received by subscribers.
+* When the subscriber cancels their subscription or throws before it could process the action.
+* When the store is stopped and there were actions in the buffer, in which case, `onUndeliveredAction` will
+be called on all of them.
+
+!> This function is called in an undefined coroutine context on a random thread,
+while the store is running or already stopped. It should be fast, non-blocking,
+and must **not throw exceptions**, or the entire coroutine machinery will fall apart.
