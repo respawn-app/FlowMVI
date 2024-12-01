@@ -11,15 +11,15 @@ Consider the following:
 ```kotlin
 val broken = store(Loading) {
     reduce {
-
+        
     }
     // ❌ - logging plugin will not log any intents
     // because they have been consumed by the reduce plugin
-    install(consoleLoggingPlugin())
+    enableLogging()
 }
 
 val working = store(Loading) {
-    install(consoleLoggingPlugin())
+    enableLogging()
 
     reduce {
         // ✅ - logging plugin will get the intent before reduce() is run, and it does not consume the intent
@@ -76,6 +76,8 @@ Here's a full list:
 * **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { }`
+* **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not 
+  delay the store's startup sequence.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
   work. Install with `awaitSubscribers()`.
@@ -84,10 +86,11 @@ Here's a full list:
   Install with `disallowRestart()`.
 * **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for  
   testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
-* **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order.
+* **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order. Install with
+  `consumeIntents()`.
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
-  See [saved state](./savedstate.md) for details.
-* **Remote Debugging Plugin** - connect to a remote debugger application shipped with FlowMVI. See
+  See [saved state](savedstate.md) for details.
+* **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
   the [documentation](debugging.md) to learn how to set up the environment.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
@@ -115,9 +118,10 @@ fun reducePlugin(
 }
 ```
 
-This plugin simply executes `reduce` when it receives an intent.
-If you set `consume = true`, the plugin will **not** let other plugins installed after this one receive the intent.
-Set `consume = false` to install more than one reduce plugin.
+* This plugin simply executes `reduce` when it receives an intent.
+* If you set `consume = true`, the plugin will **not** let other plugins installed after this one receive the intent.
+  Set `consume = false` to install more than one reduce plugin.
+* By default, you can see above that this plugin must be unique. Provide a custom name if you want to have multiple.
 
 Install this plugin in your stores by using
 
@@ -153,9 +157,9 @@ Here are some interesting properties that apply to all plugins that use `onStart
 * They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
 
 !> Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
-but also operates in the context of the store, which is still active even if the store is not visible. It does not
-respect system lifecycle and is not aware of subscriptions. Consider using `whileSubscribed` if you need lifecycle
-awareness.
+but also operates in the lifecycle of the store, which is active even if there are no subscribers (UI is not visible). 
+It does not respect system lifecycle and navigation backstack logic. 
+Consider using `whileSubscribed` if you need lifecycle awareness.
 
 This plugin can be useful when you want to do something **before** the store is fully started.
 
@@ -190,7 +194,7 @@ This callback is invoked asynchronously **after** the exception has been thrown 
 With this plugin, you cannot continue the execution of the job because it has already ended.
 If you return `null` from this plugin, this means that the exception was handled and it will be swallowed in this case.
 
-This plugin can be useful to display an error message to the user or to report an error to analytics.
+This plugin can be useful to display an error message to the user, retry an operation, or to report errors to analytics.
 
 Install this plugin by using:
 
@@ -198,7 +202,8 @@ Install this plugin by using:
 val store = store(Loading) {
 
     recover { e: Exception ->
-
+        
+        null
     }
 }
 ```
@@ -213,13 +218,12 @@ fun whileSubscribedPlugin(
     minSubscriptions: Int = 1,
     block: suspend PipelineContext.() -> Unit,
 ) = plugin {
-
     val job = SubscriptionHolder()
     onSubscribe { current ->
         when {
             current < minSubscriptions -> job.cancelAndJoin()
             job.isActive -> Unit // condition was already satisfied
-            current >= minSubscriptions -> job.start(this) { block() }
+            current >= minSubscriptions -> job.start(this) { block() } // new async job
         }
     }
     onUnsubscribe { current ->
@@ -229,16 +233,14 @@ fun whileSubscribedPlugin(
 }
 ```
 
-This plugin is designed to suspend inside its `block` because it already launches a background job.
+* This plugin is designed to suspend inside its `block` because it already launches a background job.
 You can safely collect flows and suspend forever in the `block`.
-
-After the store is started, this plugin will begin receiving subscription events from the store.
-
+* After the store is started, this plugin will begin receiving subscription events from the store.
 * The **first time** the number of plugins reaches the minimum, the block that you provided will be run.
 * The job will stay active until it either ends by itself or the number of subscriptions drops below the minimum.
 * If the job has ended by itself, it will only be launched **after** the count of subscriptions has dropped below the
-  minimum. I.e. it will not be relaunched each time a new subscriber appears, and only when the condition is satisfied
-  the first time.
+  minimum. I.e. it will not be relaunched each time an additional subscriber appears,
+  but only when the condition is satisfied the next time again.
 
 This plugin is useful for starting and stopping observation of some external data sources when the user can interact
 with the app. For example, you may want to collect some flows and call `updateState` on each emission to update
@@ -260,7 +262,7 @@ val store = store(Loading) {
 This plugin prints the events that happen in the store to the `logger` that you specified when you were creating the
 store.
 
-It will print to:
+The default `PlatformStoreLogger` will print to:
 
 * Logcat on Android
 * NSLog on Apple platforms
@@ -272,8 +274,10 @@ It will print to:
 
 * Tags are only used on Android, so on other platforms they will be appended as a part of the message.
 * On platforms that do not support levels, an emoji will be printed instead
+* Don't worry about heavy operations inside your `log { }` statements, the lambda is skipped if there is no logger.
+* Use `NoOpStoreLogger` if you want to prevent any kind of logging, for example on production.
 
-Install this plugin with
+Install this plugin with:
 
 ```kotlin
 val store = store(Loading) {
@@ -282,7 +286,7 @@ val store = store(Loading) {
 }
 ```
 
-### Cache Plugin
+### Cache / Async Cache Plugins
 
 Here's a simplified version of the code:
 
@@ -293,7 +297,7 @@ fun <T> cachePlugin(
 
     val value = CachedValue<T>(init)
 
-    onStart { value.create() }
+    onStart { value.init() }
 
     onStop { value.clear() }
 }
@@ -304,15 +308,22 @@ lifecycle of the store, which means when the store starts, the value is initiali
 and when the store stops, it clears the reference to the value. If you use the `PipelineContext` inside, it will be
 cancelled by the store itself.
 
-You can create a `CachedValue` outside of the store if you need to, but you **must** install the plugin using the value,
-and you must not try to access the value outside of the store's lifecycle.
+By default, the entire store startup sequence will suspend until all values are initialized, but if you don't want that,
+there is a second version of this plugin called `asyncCache` that returns a `Deferred` you can await. This one can
+be very useful to initialize a lot of heavy stuff in parallel and cleanup when the store stops.
+
+* You can create a `CachedValue` outside of the store if you need to access it outside of the store builder scope,
+  but you **must** install the plugin using the value, and you must **not** try to access the value outside of the 
+  store's lifecycle, or the attempt will throw. To create it, use the `cached { }` delegate.
+* You can access the value returned by `cache` in the `onStop` callback because the `onStop` is called in reverse plugin
+  installation order.
 
 This plugin is most useful:
 
 * When you want to either suspend in the initializer (like a suspending `lazy`), in which case it will function
   similarly to `init` plugin
 * When you want to use the `PipelineContext` (and its `CoroutineScope`) when initializing a value, for example with
-  pagination or shared flows.
+  pagination or shared flows
 
 Install this plugin using:
 
@@ -331,7 +342,8 @@ or provide the value externally:
 
 ```kotlin
 // do not access outside the store lifecycle
-val value = CachedValue<Int, State, Intent, Action> { produceTimer() }
+// need to specify type parameters - ambiguous
+val value by cached<_, State, Intent, Action> { produceTimer() }
 
 val store = store(Loading) {
 
@@ -375,7 +387,7 @@ val manager = JobManager<Jobs>()
 
 val store = store(Loading) {
 
-    install(jobManagerPlugin(manager))
+    manageJobs(manager)
 }
 ```
 
@@ -388,12 +400,12 @@ val store = store(Loading) {
 
     init {
         launch {
-            server.connect()
-        }.register(Jobs.Connection, jobs)
+            websocket.connect()
+        }.registerOrReplace(Jobs.Connection, jobs)
     }
 
     recover { e ->
-        jobs.cancel(Connection)
+        if (e is DeviceOfflineException) jobs.cancel(Connection)
         e
     }
 }
@@ -408,6 +420,7 @@ To use it, you can create an instance of `SubscriberManager` and call `await` to
 fun awaitSubscribersPlugin(
     manager: SubscriberManager,
     minSubs: Int = 1,
+    allowResubscription: Boolean = true,
     suspendStore: Boolean = true,
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
@@ -434,13 +447,17 @@ fun awaitSubscribersPlugin(
     onSubscribe { currentSubs ->
         if (currentSubs >= minSubs) manager.completeAndWait()
     }
+    onUnsubscribe { subs ->
+        if (allowResubscription && subs < minSubs) manager.reset()
+    }
 }
 ```
 
 * Specify `minSubs` to determine the minimum number of subscribers to reach.
 * Choose `suspendStore` to block all store operations until the condition is met. If you pass `false`, only the code
   that explicitly calls `await()` will suspend.
-* You can only await or complete the job once per start of the store.
+* If you pass the `allowResubscription` parameter, then after they leave, the state will reset and you 
+  can call `await()` again.
 * Specify a `timeout` duration or `complete()` the job manually if you want to finish early.
 
 ### Undo/Redo Plugin
@@ -493,7 +510,8 @@ val store = store(Loading) {
 }
 ```
 
-This plugin can be useful whenever you are implementing an "editor" type functionality.
+This plugin can be useful whenever you are implementing an "editor" type functionality, but currently not fully 
+implemented to handle all edge cases.
 
 ### Time Travel plugin
 
@@ -530,6 +548,21 @@ val store = store(Loading) {
     }
 }
 ```
+
+### Deinit plugin
+
+This one is a simple DSL for calling `onStop`:
+ 
+```kotlin
+fun deinitPlugin(
+    block: ShutdownContext.(e: Exception?) -> Unit
+) = plugin { onStop { block(it) } }
+```
+
+It is useful in combination with `cache` plugin, or if you need to clean up some external resource or set the state 
+as the store stops. It is called reliably (but synchronously) on store shutdown.
+
+The exception will be `null` on normal shutdowns, and non-null when there was an error, just before the store throws.
 
 ### Or Create Your Own
 
