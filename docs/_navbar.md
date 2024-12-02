@@ -4,6 +4,7 @@
 * Plugins
     * [Prebuilt Plugins](/plugins/prebuilt.md)
     * [Custom Plugins](/plugins/custom.md)
+    * [Decorators](/plugins/decorators.md)
     * [Saving State](/plugins/savedstate.md)
     * [Remote Debugging](/plugins/debugging.md)
 * Integrations
