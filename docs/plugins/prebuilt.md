@@ -95,7 +95,7 @@ Here's a full list:
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 All plugins are based on the essential callbacks that FlowMVI allows them to intercept, so most of them contain minimal
-amounts of code. The callbacks are explained on the [custom plugins page](custom_plugins.md).
+amounts of code. The callbacks are explained on the [custom plugins page](./custom.md).
 
 Here's an explanation of how each default plugin works:
 
@@ -566,6 +566,6 @@ The exception will be `null` on normal shutdowns, and non-null when there was an
 
 ### Or Create Your Own
 
-In case you are missing a feature or a plugin, you can create your own in just a few lines of code.
+In case you are missing a feature or a plugin, you can create your own in 1 line of code.
 
-Learn how to do in the [next guide](custom_plugins.md)
+Learn how to do in the [next guide](custom.md)

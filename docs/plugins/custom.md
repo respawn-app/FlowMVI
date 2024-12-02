@@ -251,17 +251,17 @@ fun ShutdownContext<S, I, A>.onUndeliveredIntent(intent: I): Unit = Unit
 ```
 
 Called when an intent is not delivered to the store.
-This can happen, according to the [Channel]'s documentation:
+This can happen, according to the `Channel`'s documentation:
 * When the store has a limited buffer and it overflows.
 * When store is stopped before this event could be handled, or while it is being handled.
-* When the [onIntent] function throws an exception that is not handled by the [onException] block.
+* When the `onIntent` function throws an exception that is not handled by the `onException` block.
 * When the store is stopped and there were intents in the buffer, in which case, `onUndeliveredIntent` will
 be called on all of them.
 
 !> This function is called in an undefined coroutine context on a random thread,
 while the store is running or already stopped. It should be fast, non-blocking,
 and must **not throw exceptions**, or the entire coroutine machinery will fall apart.
-The [onException] block will **not** handle exceptions in this function.
+The `onException` block will **not** handle exceptions in this function.
 
 ### onUndeliveredAction
 
@@ -271,7 +271,7 @@ fun ShutdownContext<S, I, A>.onUndeliveredAction(action: A): Unit = Unit
 Called when an action is not delivered to the store.
 
 This can happen:
-* When the Store's [ActionShareBehavior] is [ActionShareBehavior.Distribute] or [ActionShareBehavior.Restrict].
+* When the Store's `ActionShareBehavior` is `ActionShareBehavior.Distribute` or `ActionShareBehavior.Restrict`.
 In this case, depending on the configuration, the queue of actions may have a limited buffer and overflow.
 * When store is stopped before this event could be received by subscribers.
 * When the subscriber cancels their subscription or throws before it could process the action.

@@ -108,6 +108,7 @@ private fun IntentReceiver<CounterIntent>.CounterScreenContent(state: CounterSta
     }
 }
 ```
+
 Now this function cannot be called outside of the required store's area of responsibility.
 You can also subclass your `Intent` class by target state to make it impossible at compilation time to send an intent 
 for an incorrect state:
@@ -118,6 +119,9 @@ sealed interface CounterIntent: MVIIntent {
     sealed interface ErrorIntent : MVIIntent
     sealed interface LoadingIntent : MVIIntent
 }
+
+// then, use 
+IntentReceiver<DisplayingCounterIntent>.DisplayingCounterContent()
 ```
 
 ## Step 5: Create Previews or UI Tests
@@ -127,7 +131,7 @@ That composable will not need DI, Local Providers from compose, or anything else
 But there's a catch: It has an `IntentReceiver<I>` as a parameter. To deal with this, there is an `EmptyReceiver`
 composable. EmptyReceiver does nothing when an intent is sent, which is exactly what we want for previews and UI tests.
 We can now define our `PreviewParameterProvider` and the Preview composable. 
-You won't need an `EmptyReceiver` if you pass the `intent` callback manually.
+You won't need the `EmptyReceiver` if you pass the `intent` callback manually.
 
 ```kotlin
 private class StateProvider : CollectionPreviewParameterProvider<CounterState>(

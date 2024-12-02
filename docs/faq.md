@@ -127,7 +127,7 @@ of screens intact.
 You usually don't want to reuse your actions and intents because they are specific to a given screen or flow.
 That makes your logic simpler, and the rest can be easily moved to your repository layer, use cases or just plain
 top-level functions. This is where this library is opinionated, and where one of its main advantages - simplicity, comes
-from. Everything you want to achieve by composing store element can also be achieved using plugins or child/parent
+from. Everything you want to achieve with inheritance can already be achieved using plugins or child/parent
 stores. For example, if you still want a reducer object and a plugin for it, all you have to do is:
 
 ```kotlin
