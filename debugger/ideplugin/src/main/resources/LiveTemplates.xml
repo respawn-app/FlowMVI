@@ -1,35 +1,19 @@
 <templateSet group="FlowMVI">
-  <template name="fmvim" value="&#10;&#10;import pro.respawn.flowmvi.api.MVIAction&#10;import pro.respawn.flowmvi.api.MVIIntent&#10;import pro.respawn.flowmvi.api.MVIState&#10;&#10;internal sealed interface $NAME$State : MVIState {&#10;    data object Loading : $NAME$State&#10;    data class Error(val e: Exception?) : $NAME$State&#10;    $END$&#10;}&#10;&#10;internal sealed interface $NAME$Intent : MVIIntent {&#10;&#10;}&#10;&#10;internal sealed interface $NAME$Action : MVIAction {&#10;&#10;}" shortcut="ENTER" description="FlowMVI Model definition" toReformat="true" toShortenFQNames="true">
+  <template name="fmvic" value="import pro.respawn.flowmvi.api.Container&#10;import pro.respawn.flowmvi.api.PipelineContext&#10;import pro.respawn.flowmvi.dsl.store&#10;import pro.respawn.flowmvi.plugins.recover&#10;import pro.respawn.flowmvi.plugins.reduce&#10;&#10;private typealias Ctx = PipelineContext&lt;$NAME$State, $NAME$Intent, $NAME$Action&gt;&#10;&#10;internal class $NAME$Container(&#10;    $PARAMS$&#10;) : Container&lt;$NAME$State, $NAME$Intent, $NAME$Action&gt; {&#10;&#10;    override val store = store($NAME$State.Loading) {&#10;        configure {&#10;            name = &quot;$NAME$&quot;&#10;        }&#10;        recover {&#10;            updateState { $NAME$State.Error(it) }&#10;            null&#10;        }&#10;        reduce { intent -&gt;&#10;            when(intent) {&#10;                $END$&#10;                else -&gt; TODO()&#10;            }&#10;        }&#10;    }&#10;}" description="FlowMVI Container" toReformat="true" toShortenFQNames="true">
     <variable name="NAME" expression="camelCase(String)" defaultValue="" alwaysStopAt="true" />
-    <context>
-      <option name="KOTLIN_TOPLEVEL" value="true" />
-    </context>
+    <variable name="PARAMS" expression="" defaultValue=" " alwaysStopAt="false" />
+    <context />
   </template>
-  <template name="fmvic" value="import pro.respawn.flowmvi.api.Container&#10;import pro.respawn.flowmvi.api.PipelineContext&#10;import pro.respawn.flowmvi.dsl.store&#10;import pro.respawn.flowmvi.plugins.recover&#10;import pro.respawn.flowmvi.plugins.reduce&#10;&#10;private typealias Ctx = PipelineContext&lt;$NAME$State, $NAME$Intent, $NAME$Action&gt;&#10;&#10;internal class $NAME$Container(&#10;    $PARAMS$&#10;) : Container&lt;$NAME$State, $NAME$Intent, $NAME$Action&gt; {&#10;&#10;    override val store = store($NAME$State.Loading) {&#10;        configure {&#10;            name = &quot;$NAME$&quot;&#10;        }&#10;        recover {&#10;            updateState { $NAME$State.Error(it) }&#10;            null&#10;        }&#10;        $END$&#10;        reduce { intent -&gt;&#10;            when(intent) {&#10;                else -&gt; TODO()&#10;            }&#10;        }&#10;    }&#10;}" description="FlowMVI Container" toReformat="true" toShortenFQNames="true">
+  <template name="fmvis" value="import androidx.compose.runtime.Composable&#10;import pro.respawn.flowmvi.compose.dsl.subscribe&#10;import pro.respawn.flowmvi.compose.preview.EmptyReceiver&#10;import androidx.compose.runtime.getValue&#10;import pro.respawn.flowmvi.api.IntentReceiver&#10;&#10;@Composable&#10;fun $NAME$Screen(&#10;    container: $NAME$Container,&#10;) = with(container.store) {&#10;&#10;    val state by subscribe { action -&gt;&#10;        when(action) {&#10;            else -&gt; TODO()&#10;        }&#10;    }&#10;&#10;    $NAME$ScreenContent(state)&#10;}&#10;&#10;@Composable&#10;private fun IntentReceiver&lt;$NAME$Intent&gt;.$NAME$ScreenContent(&#10;    state: $NAME$State,&#10;) {&#10;    when(state) {&#10;        $END$&#10;        else -&gt; TODO()&#10;    }&#10;}&#10;&#10;@Composable&#10;@Preview&#10;private fun $NAME$ScreenPreview() = EmptyReceiver { &#10;    $NAME$ScreenContent(TODO()) &#10;}&#10;" shortcut="ENTER" description="FlowMVI Composable Screen" toReformat="true" toShortenFQNames="true">
     <variable name="NAME" expression="camelCase(String)" defaultValue="" alwaysStopAt="true" />
-    <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
-    <context>
-      <option name="KOTLIN_TOPLEVEL" value="true" />
-    </context>
+    <context />
   </template>
-  <template name="fmvis" value="import androidx.compose.runtime.Composable&#10;import pro.respawn.flowmvi.compose.dsl.subscribe&#10;import pro.respawn.flowmvi.compose.preview.EmptyReceiver&#10;import androidx.compose.runtime.getValue&#10;import pro.respawn.flowmvi.api.IntentReceiver&#10;&#10;@Composable&#10;fun $NAME$Screen(&#10;&#10;) = with($INJECT$) {&#10;&#10;    val state by subscribe { action -&gt;&#10;        when(action) {&#10;            else -&gt; TODO()&#10;        }&#10;    }&#10;&#10;    $NAME$ScreenContent(state)&#10;}&#10;&#10;@Composable&#10;private fun IntentReceiver&lt;$NAME$Intent&gt;.$NAME$ScreenContent(&#10;    state: $NAME$State,&#10;) {&#10;    $END$&#10;}&#10;&#10;@Composable&#10;@Preview&#10;private fun $NAME$ScreenPreview() = $THEME$ {&#10;    EmptyReceiver { &#10;        $NAME$ScreenContent($NAME$State.Loading) &#10;    }&#10;}&#10;" shortcut="ENTER" description="FlowMVI Composable Screen" toReformat="true" toShortenFQNames="true">
-    <variable name="NAME" expression="camelCase(String)" defaultValue="" alwaysStopAt="true" />
-    <variable name="INJECT" expression="" defaultValue="" alwaysStopAt="true" />
-    <variable name="THEME" expression="completeSmart()" defaultValue="" alwaysStopAt="true" />
-    <context>
-      <option name="KOTLIN_TOPLEVEL" value="true" />
-    </context>
-  </template>
-  <template name="fmvip" value="&#10;import pro.respawn.flowmvi.api.MVIAction&#10;import pro.respawn.flowmvi.api.MVIIntent&#10;import pro.respawn.flowmvi.api.MVIState&#10;import pro.respawn.flowmvi.dsl.plugin&#10;&#10;/**&#10; * STOPSHIP: Add documentation&#10; **/&#10;fun &lt;S: MVIState, I: MVIIntent, A: MVIAction&gt; $NAME$Plugin(&#10;    &#10;) = plugin&lt;S, I, A&gt; {&#10;    name = &quot;$NAME$Plugin&quot;&#10;    &#10;    $END$&#10;}" description="FlowMVI Plugin" toReformat="true" toShortenFQNames="true">
+  <template name="fmvip" value="&#10;import pro.respawn.flowmvi.api.MVIAction&#10;import pro.respawn.flowmvi.api.MVIIntent&#10;import pro.respawn.flowmvi.api.MVIState&#10;import pro.respawn.flowmvi.dsl.plugin&#10;&#10;/**&#10; * TODO: Add documentation&#10; **/&#10;fun &lt;S: MVIState, I: MVIIntent, A: MVIAction&gt; $NAME$Plugin(&#10;    &#10;) = plugin&lt;S, I, A&gt; {&#10;    name = &quot;$NAME$Plugin&quot;&#10;    &#10;    $END$&#10;}" description="FlowMVI Plugin" toReformat="true" toShortenFQNames="true">
     <variable name="NAME" expression="kotlinFunctionName()" defaultValue="" alwaysStopAt="true" />
-    <context>
-      <option name="KOTLIN_TOPLEVEL" value="true" />
-    </context>
+    <context />
   </template>
-  <template name="fmvilp" value="&#10;import pro.respawn.flowmvi.api.MVIAction&#10;import pro.respawn.flowmvi.api.MVIIntent&#10;import pro.respawn.flowmvi.api.MVIState&#10;import pro.respawn.flowmvi.dsl.lazyPlugin&#10;&#10;/**&#10; * STOPSHIP: Add documentation&#10; **/&#10;fun &lt;S: MVIState, I: MVIIntent, A: MVIAction&gt; $NAME$Plugin(&#10;    &#10;) = lazyPlugin&lt;S, I, A&gt; {&#10;    name = &quot;$NAME$Plugin&quot;&#10;    &#10;    $END$&#10;}" description="FlowMVI Lazy Plugin" toReformat="true" toShortenFQNames="true">
+  <template name="fmvilp" value="&#10;import pro.respawn.flowmvi.api.MVIAction&#10;import pro.respawn.flowmvi.api.MVIIntent&#10;import pro.respawn.flowmvi.api.MVIState&#10;import pro.respawn.flowmvi.dsl.lazyPlugin&#10;&#10;/**&#10; * TODO: Add documentation&#10; **/&#10;fun &lt;S: MVIState, I: MVIIntent, A: MVIAction&gt; $NAME$Plugin(&#10;    &#10;) = lazyPlugin&lt;S, I, A&gt; {&#10;    name = &quot;$NAME$Plugin&quot;&#10;    &#10;    $END$&#10;}" description="FlowMVI Lazy Plugin" toReformat="true" toShortenFQNames="true">
     <variable name="NAME" expression="kotlinFunctionName()" defaultValue="" alwaysStopAt="true" />
-    <context>
-      <option name="KOTLIN_TOPLEVEL" value="true" />
-    </context>
+    <context />
   </template>
 </templateSet>
