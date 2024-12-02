@@ -11,8 +11,9 @@
 
 ![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos] ![badge][badge-wasm]
 
-FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines with an extensive feature set, powerful
-plugin system and a rich DSL.
+FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines.
+It enables you to extend your business logic with reusable plugins, handle errors,
+achieve thread-safety, and more. It takes about 100 lines of code to get started.
 
 ## Quickstart:
 
@@ -24,6 +25,8 @@ plugin system and a rich DSL.
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
+* Ask questions on
+  [![Slack](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 
 <details>
 <summary>Version catalogs</summary>
@@ -80,25 +83,32 @@ dependencies {
 
 ## Why FlowMVI?
 
+Usually architecture frameworks mean boilerplate and support difficulty for marginal benefits of "clean code".
+This library focuses instead on building a supporting infrastructure to enable new possibilities for your app.
+
+Here's what you get:
+
 * Powerful Plug-In system to automate processes and **reuse any business logic** you desire
     * Create automatic analytics handlers, websocket connections, error handling mechanisms, or anything else once and
       reuse them throughout your whole project automatically
-* Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
-* Create multiplatform business logic components with pluggable UI using **0 platform code**
 * Automatically **recover from any errors** and prevent crashes
+* Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
+* Create business logic components with pluggable UI using **0 platform code**
 * Automatic multiplatform system **lifecycle handling**
 * Out of the box **debugging, logging, testing, undo/redo, caching and long-running tasks** support
+* Debounce, retry, batch, throttle, conflate any operations automatically.
 * **Compress, persist, and restore state** automatically on any platform
-* No base classes, complicated interfaces or factories of factories - logic is **declarative and built with a DSL**
+* No base classes, complicated interfaces, or factories of factories - logic is **declarative and built with a DSL**
 * Restartable, reusable business logic components with no external dependencies or dedicated lifecycles.
-* Create compile-time safe state machines with a readable DSL. Forget about casts and `null`s
+* Create compile-time safe state machines with a readable DSL. Forget about casts, inconsistent states, and `null`s
 * First class Compose Multiplatform support optimized for performance and ease of use
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
 * Dedicated remote debugger IDEA/AS plugin and app for Windows, Linux, MacOS
-* The core library depends on kotlin coroutines. Nothing else
 * Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
+* The core library depends on kotlin coroutines. Nothing else
 * Core library is fully covered by tests
+* Minimal performance overhead, equal to using a simple Channel. Benchmarks are run regularly
 * Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 
 ## How does it look?
@@ -128,6 +138,8 @@ sealed interface CounterAction : MVIAction {
 ```
 
 </details>
+
+Then define your business logic:
 
 ```kotlin
 class CounterContainer(
@@ -171,7 +183,7 @@ class CounterContainer(
             null
         }
 
-        // hooks into subscriber lifecycle
+        // saves resources when there are no subscribers
         whileSubscribed {
             repo.timer.collect {
                 updateState<DisplayingCounter, _> {
@@ -185,6 +197,7 @@ class CounterContainer(
             repo.getPagedDataSuspending()
         }
 
+        // testable reducer as a function
         reduce { intent: CounterIntent ->
             when (intent) {
                 is ClickedCounter -> updateState<DisplayingCounter, _> {
@@ -201,47 +214,40 @@ class CounterContainer(
 }
 ```
 
-### Subscribe one-liner:
+### ...And extend it with plugins!
+
+Powerful DSL allows you to hook into various events and amend any part of your logic:
 
 ```kotlin
-store.subscribe(
-    scope = coroutineScope,
-    consume = { action -> /* process side effects */ },
-    render = { state -> /* render states */ },
-)
-```
-
-### Plugins:
-
-Powerful DSL allows to hook into store events and amend any store's logic with reusable plugins.
-
-```kotlin
-val counterPlugin = lazyPlugin<CounterState, CounterIntent, CounterAction> {
-    
-    onStart { }
-
-    onStop { }
-
-    onIntent { intent -> }
-
-    onState { old, new -> }
-
-    onAction { action -> }
-
-    onSubscribe { subs -> }
-
-    onUnsubscribe { subs -> }
-
-    onException { e -> }
-
-    // access the store configuration
-    if (config.debuggable) config.logger(Debug) { "Store is debuggable" }
+fun analyticsPlugin(analytics: Analytics) = plugin<MVIState, MVIIntent, MVIAction> {
+    onStart {
+        analytics.logScreenView(config.name) // name of the screen
+    }
+    onIntent { intent ->
+        analytics.logUserAction(intent.name)
+    }
+    onException { e ->
+        analytics.logError(e)
+    }
+    onSubscribe {
+        analytics.logEngagementStart()
+    }
+    onUnsubscribe {
+        analytics.logEngagementEnd()
+    }
+    onStop {
+        analytics.logScreenLeave()
+    }
 }
 ```
+
+Never write analytics, debugging, or state persistence code again.
 
 ### Compose Multiplatform:
 
 ![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm] ![badge][badge-wasm] ![badge][badge-js]
+
+Using FlowMVI with Compose is a matter of one line of code:
 
 ```kotlin
 @Composable
@@ -264,6 +270,8 @@ fun CounterScreen() {
     }
 }
 ```
+
+Enjoy unit-testable UI and free `@Previews`.
 
 ### Android support:
 
@@ -296,11 +304,12 @@ class ScreenFragment : Fragment() {
 
 ## Testing DSL
 
+Finally stop doing UI tests and replace them with a unit test DSL:
+
 ### Test Stores
 
 ```kotlin
 counterStore().subscribeAndTest {
-
     // turbine + kotest example
     ClickedCounter resultsIn {
         states.test {
@@ -332,8 +341,9 @@ timerPlugin(timer).test(Loading) {
 }
 ```
 
-## Debugger Plugin + App
+## Debugger IDE Plugin + App
 
+[![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
 https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
 
