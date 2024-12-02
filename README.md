@@ -13,18 +13,18 @@
 
 FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines.
 It enables you to extend your business logic with reusable plugins, handle errors,
-achieve thread-safety, and more. It takes about 100 lines of code to get started.
+achieve thread-safety, and more. It takes about 10 minutes to try it.
 
 ## Quickstart:
 
-* Sample App ![badge-wasm]: 
-  [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample/)
+* Latest version:
+  [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 * Documentation:
   [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/)
 * KDoc:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
-* Latest version:
-  [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
+* Sample App (See features) ![badge-wasm]:
+  [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample/)
 * Ask questions on
   [![Slack](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 
@@ -84,7 +84,8 @@ dependencies {
 ## Why FlowMVI?
 
 Usually architecture frameworks mean boilerplate and support difficulty for marginal benefits of "clean code".
-This library focuses instead on building a supporting infrastructure to enable new possibilities for your app.
+FlowMVI does not dictate what your code should do or look like.
+Instead, this library focuses on building a supporting infrastructure to enable new possibilities for your app.
 
 Here's what you get:
 
@@ -214,7 +215,7 @@ class CounterContainer(
 }
 ```
 
-### ...And extend it with plugins!
+### Extend your logic with plugins!
 
 Powerful DSL allows you to hook into various events and amend any part of your logic:
 
@@ -271,7 +272,7 @@ fun CounterScreen() {
 }
 ```
 
-Enjoy unit-testable UI and free `@Previews`.
+Enjoy testable UI and free `@Previews`.
 
 ### Android support:
 
@@ -304,7 +305,7 @@ class ScreenFragment : Fragment() {
 
 ## Testing DSL
 
-Finally stop doing UI tests and replace them with a unit test DSL:
+Finally stop doing UI tests and replace them with unit tests:
 
 ### Test Stores
 
@@ -347,10 +348,7 @@ timerPlugin(timer).test(Loading) {
 
 https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
 
-
-Ready to try? Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
-
-## Star History
+## People love the library:
 
 <a href="https://star-history.com/#respawn-app/flowmvi&Date">
   <picture>
@@ -359,6 +357,12 @@ Ready to try? Start with reading the [Quickstart Guide](https://opensource.respa
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=respawn-app/flowmvi&type=Date" />
   </picture>
 </a>
+
+## Ready to try?
+
+Start with reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
+
+----
 
 ## License
 
