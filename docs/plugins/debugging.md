@@ -1,7 +1,7 @@
 # Remote Debugger Setup
 
-FlowMVI comes with a remote debugging setup with a dedicated Jetbrains IDEs / Android Studio plugin, a desktop app
-for Windows, Linux and MacOS.
+FlowMVI comes with a remote debugging setup with a dedicated Jetbrains IDEs / Android Studio plugin and a desktop app
+for Windows, Linux, and MacOS.
 
 [Embed](https://plugins.jetbrains.com/embeddable/card/25766 ':include :type=iframe width=400px height=300px style="border: none; !important; background-color: transparent;"')
 
@@ -16,7 +16,7 @@ use minification/obfuscation to remove the debugging code.
 To keep the source set structure simple, you can create a separate module for your store configuration logic and then
 inject configurations using DI.
 
-First, create a separate module where you'll keep the debug-only store configuration.
+First, create a separate module where you'll keep the Store configuration.
 
 ```
 project_root/
@@ -68,12 +68,12 @@ actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 ```
 
 ?> As of the date of writing, the Android Studio will not index the `androidRelease` source set correctly, but it _will_
-be picked up by the compiler. We'll have to resort to "notepad-style coding" for now unfortunately.
+be picked up by the compiler. We'll have to resort to "notepad-style coding" for that set unfortunately.
 
 ### 1.3 Set up store configuration injection
 
-?> If you're building a small pet project, you may omit this complicated setup and just use conditional
-installation if you know the risks you are taking.
+?> If you're building a small pet project, you may omit this complicated setup and just use a simple extension
+if you know the risks you are taking.
 
 Set up config injection using a factory pattern using your DI framework:
 
@@ -91,7 +91,7 @@ inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, 
 }
 ```
 
-?> You can also use this to inject other plugins, such as the Saved State plugin or your custom plugin.
+?> You can also use this to inject other plugins, such as the Saved State plugin or your custom plugins.
 
 Now we'll create a configuration factory.
 You can create more based on your needs, such as for testing stores and other source sets.
@@ -106,21 +106,21 @@ internal class DefaultStoreConfiguration(
     ) {
         configure {
             this.name = name
-            debuggable = BuildFlags.debuggable // set up using an expect-actual and BuildConfig.DEBUG
+            debuggable = BuildFlags.debuggable // set up using an expect-actual
             actionShareBehavior = ActionShareBehavior.Distribute()
             onOverflow = SUSPEND
             parallelIntents = true
             logger = CustomLogger
         }
         enableLogging()
-        remoteDebugger()
+        enableRemoteDebugging()
 
         install(analyticsPlugin(analytics)) // custom plugins
     }
 }
 ```
 
-Finally, inject your config:
+Finally, inject your config (example with Koin):
 
 ```kotlin
 val commonArchModule = module {
@@ -182,8 +182,8 @@ In your `app/src/debug/res/xml/network_security_config.xml`:
 
 ## Step 3.1: Install and run the debugger app for a single device
 
-Right now the debugger is packaged as a standalone app, with an IDE plugin upcoming.
-Choose a distribution for your platform and install the app like you would do for any other app.
+Either install the IDE plugin by clicking the card on top, or install a desktop from the Artifacts section of the
+repository.
 You can find the latest archive on the [releases](https://github.com/respawn-app/FlowMVI/releases) page on GitHub.
 
 Run the debugger app. The app will ask you to configure host and port. Unless you are using a physical external device,
@@ -191,7 +191,8 @@ you can just use the defaults. Your devices must be on the same network to conne
 
 ![setup.png](../images/debugger_setup_1.png)
 
-Run the server and the app. After a few seconds, your devices should connect and you can start debugging.
+Run the server and the client, or click the panel icon in the IDE.
+After a few seconds, your devices should connect and you can start debugging.
 
 ## Step 3.2 External device configuration
 
@@ -213,4 +214,4 @@ Feel free to create an issue for a feature you want to be added.
 
 You can also check out the sample app
 app [implementation](https://github.com/respawn-app/FlowMVI/tree/master/sample)
-to see how flowMVI can be used to build multiplatform apps.
+to see how FlowMVI can be used to build a multiplatform app with DI.

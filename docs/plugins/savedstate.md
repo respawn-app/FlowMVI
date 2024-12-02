@@ -17,8 +17,8 @@ The artifact depends on:
 * `kotlinx-serialization`, including Json
 * `androidx-lifecycle-savedstate` on Android to parcelize the state.
 
-The module depends on quite a few things, so it would be best to avoid adding it to all of your modules.
-Instead, you can inject the plugin or savers using DI.
+The artifact depends on quite a few things, so it would be best to avoid adding it to all of your modules.
+Instead, you can inject the plugin or savers using DI in [this guide](debugging.md).
 
 ## 2. Defining `Saver`s
 
@@ -101,9 +101,9 @@ serializeState(
 
 1. Provide a path where the state will be saved.
     * It's best to use a subdirectory of your cache dir to prevent it from being fiddled with by other code.
-   * On web platforms, the state will be saved to local storage.k
-2. Mark your state class as `@Serializable` to generate the serializer for it.
-    * It's best to store only a particular subset of states of the store because you don't want to restore the user
+    * On web platforms, the state will be saved to local storage.
+2. Mark your state class as `@Serializable` to generate a serializer for it.
+    * It's best to store only a particular subset of states of the Store because you don't want to restore the user
       to an error / loading state, do you?
 3. Provide a way for the plugin to recover from errors when parsing, saving or reading the state. The bare minimum
    is to ignore all errors and not restore or save anything, but a better solution like logging the errors can be used
@@ -120,12 +120,12 @@ parcelizeState<DisplayingCounter, _, _, _>(
 )
 ```
 
-* The `key` parameter will be derived from the store / class name if you don't specify it, but watch out for conflicts
+* The `key` parameter will be derived from the Store / class name if you don't specify it, but watch out for conflicts!
 * This plugin uses the `ParcelableSaver` by default, which you can use too.
 
 !> Watch out for parcel size overflow exceptions! The library will not check the resulting parcel size for you.
 
-?> According to the documentation, any writes to your saved state will only be restored if the activity
+?> According to the documentation, any writes to your saved state will only be restored if the app
 was killed by the OS. This means you will not see any state restoration results unless the OS kills the activity
 itself (i.e. exiting the app will not result in the state being restored).
 

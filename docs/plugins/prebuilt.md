@@ -3,7 +3,7 @@
 ## Plugin Ordering
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.
-Plugins can replace, veto, consume or otherwise change anything in the store.
+Plugins can replace, veto, consume, or otherwise change anything in the store.
 They can close the store or swallow exceptions!
 
 Consider the following:
@@ -94,8 +94,8 @@ Here's a full list:
   the [documentation](debugging.md) to learn how to set up the environment.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
-All plugins are based on the essential callbacks that FlowMVI allows them to intercept, so most of them contain minimal
-amounts of code. The callbacks are explained on the [custom plugins page](./custom.md).
+All plugins are based on the essential callbacks that FlowMVI allows them to intercept.
+The callbacks are explained on the [custom plugins](./custom.md) page.
 
 Here's an explanation of how each default plugin works:
 
@@ -133,6 +133,8 @@ val store = store(Loading) {
     }
 }
 ```
+
+You don't need "Reducers" with FlowMVI. Reducer is nothing more than a function.
 
 ### Init plugin
 
@@ -194,7 +196,7 @@ This callback is invoked asynchronously **after** the exception has been thrown 
 With this plugin, you cannot continue the execution of the job because it has already ended.
 If you return `null` from this plugin, this means that the exception was handled and it will be swallowed in this case.
 
-This plugin can be useful to display an error message to the user, retry an operation, or to report errors to analytics.
+This plugin can be useful to display an error message to the user, retry an operation, or report errors to analytics.
 
 Install this plugin by using:
 
@@ -310,7 +312,7 @@ cancelled by the store itself.
 
 By default, the entire store startup sequence will suspend until all values are initialized, but if you don't want that,
 there is a second version of this plugin called `asyncCache` that returns a `Deferred` you can await. This one can
-be very useful to initialize a lot of heavy stuff in parallel and cleanup when the store stops.
+be very useful to initialize a lot of heavy stuff in parallel.
 
 * You can create a `CachedValue` outside of the store if you need to access it outside of the store builder scope,
   but you **must** install the plugin using the value, and you must **not** try to access the value outside of the 
@@ -564,8 +566,10 @@ as the store stops. It is called reliably (but synchronously) on store shutdown.
 
 The exception will be `null` on normal shutdowns, and non-null when there was an error, just before the store throws.
 
+Install it by simply calling `deinit { }`.
+
 ### Or Create Your Own
 
-In case you are missing a feature or a plugin, you can create your own in 1 line of code.
+As if having so many plugins was not great in itself, the true power of the library is in creating custom plugins.
 
-Learn how to do in the [next guide](custom.md)
+Learn how to do that in the [next guide](custom.md)

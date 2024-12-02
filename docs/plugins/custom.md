@@ -7,7 +7,7 @@ All stores are mostly based on plugins, and their behavior is entirely determine
 * Plugins are executed in the order they were installed and follow the Chain of Responsibility pattern.
 * Access the store's context & configuration and launch jobs through the `PipelineContext` receiver.
 * Plugins are highly optimized to conflate any operations not defined, which means you do not need to worry about having
-  too many plugins. The bottleneck will always be the longest chain of callbacks, not the plugin amount. If you don't
+  too many plugins. The bottleneck will always be the longest chain of callbacks, not the plugin count. If you don't
   define a callback, then no CPU time is spent on running it and no memory is allocated.
 
 ## Creating an Eager Plugin
