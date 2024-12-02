@@ -1,7 +1,9 @@
 # Remote Debugger Setup
 
-FlowMVI 2.5.0 now comes with a remote debugging setup with a dedicated desktop app for Windows and MacOS, and an
-(upcoming in alphas) IDE plugin.
+FlowMVI comes with a remote debugging setup with a dedicated Jetbrains IDEs / Android Studio plugin, a desktop app
+for Windows, Linux and MacOS.
+
+[Embed](https://plugins.jetbrains.com/embeddable/card/25766 ':include :type=iframe width=400px height=300px style="border: none; !important; background-color: transparent;"')
 
 ## Step 1: Install the plugin on **debug builds only**
 
