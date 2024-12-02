@@ -26,6 +26,7 @@ plugins {
     // alias(libs.plugins.androidLibrary) apply false
     // alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.compose.compiler) apply false
+    id(libs.plugins.dokka.id)
 }
 
 allprojects {
@@ -112,6 +113,19 @@ dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
     detektPlugins(rootProject.libs.detekt.compose)
     detektPlugins(rootProject.libs.detekt.libraries)
+    projects.run {
+        listOf(
+            core,
+            essenty,
+            savedstate,
+            android,
+            compose,
+            essenty.essentyCompose,
+            test,
+            debugger.debuggerClient,
+            debugger.debuggerPlugin,
+        ).forEach { dokka(it) }
+    }
 }
 
 versionCatalogUpdate {
