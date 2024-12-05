@@ -28,11 +28,11 @@ import pro.respawn.flowmvi.modules.RestartableLifecycle
 import pro.respawn.flowmvi.modules.StateModule
 import pro.respawn.flowmvi.modules.SubscriptionModule
 import pro.respawn.flowmvi.modules.actionModule
+import pro.respawn.flowmvi.modules.catch
 import pro.respawn.flowmvi.modules.intentModule
 import pro.respawn.flowmvi.modules.launchPipeline
 import pro.respawn.flowmvi.modules.observeSubscribers
 import pro.respawn.flowmvi.modules.observesSubscribers
-import pro.respawn.flowmvi.modules.recoverModule
 import pro.respawn.flowmvi.modules.restartableLifecycle
 import pro.respawn.flowmvi.modules.subscriptionModule
 
@@ -40,12 +40,12 @@ import pro.respawn.flowmvi.modules.subscriptionModule
 internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override val config: StoreConfiguration<S>,
     private val plugin: PluginInstance<S, I, A>,
+    private val recover: RecoverModule<S, I, A> = RecoverModule(plugin.onException),
     private val stateModule: StateModule<S, I, A> = StateModule(
         config.initial,
         config.atomicStateUpdates,
         plugin.onState
     ),
-    recover: RecoverModule<S, I, A> = recoverModule(plugin),
 ) : Store<S, I, A>,
     Provider<S, I, A>,
     ShutdownContext<S, I, A>,
@@ -55,13 +55,12 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     RestartableLifecycle by restartableLifecycle(),
     SubscriptionModule by subscriptionModule(),
     StorePlugin<S, I, A> by plugin,
-    RecoverModule<S, I, A> by recover,
     StateProvider<S> by stateModule,
     ImmediateStateReceiver<S> by stateModule {
 
     private val intents = intentModule<S, I, A>(
         config = config,
-        onIntent = plugin.onIntent?.let { onIntent -> { intent -> catch { onIntent(this, intent) } } },
+        onIntent = plugin.onIntent?.let { onIntent -> { intent -> catch(recover) { onIntent(this, intent) } } },
         onUndeliveredIntent = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
     )
 
@@ -75,16 +74,17 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         parent = scope,
         storeConfig = config,
         states = stateModule,
+        recover = recover,
         onAction = { action -> onAction(action)?.let { _actions.action(it) } },
         onStop = { e -> close().also { plugin.onStop?.invoke(this, e) } },
         onStart = pipeline@{ lifecycle ->
             beginStartup(lifecycle)
             launch {
-                catch { onStart() }
+                catch(recover) { onStart() }
                 if (plugin.observesSubscribers) launch {
                     observeSubscribers(
-                        onSubscribe = { catch { onSubscribe(it) } },
-                        onUnsubscribe = { catch { onUnsubscribe(it) } }
+                        onSubscribe = { catch(recover) { onSubscribe(it) } },
+                        onUnsubscribe = { catch(recover) { onUnsubscribe(it) } }
                     )
                 }
                 lifecycle.completeStartup()

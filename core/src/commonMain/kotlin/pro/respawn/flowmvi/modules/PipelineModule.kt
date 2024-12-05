@@ -35,10 +35,11 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     parent: CoroutineScope,
     storeConfig: StoreConfiguration<S>,
     states: StateModule<S, I, A>,
+    recover: RecoverModule<S, I, A>,
     crossinline onStop: (e: Exception?) -> Unit,
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     onStart: PipelineContext<S, I, A>.(lifecycle: StoreLifecycleModule) -> Unit,
-): StoreLifecycle where T : IntentReceiver<I>, T : RecoverModule<S, I, A> {
+): StoreLifecycle where T : IntentReceiver<I> {
     val job = SupervisorJob(parent.coroutineContext[Job]).apply {
         invokeOnCompletion {
             when (it) {
@@ -57,7 +58,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
 
         override val config = storeConfig
         override val key = PipelineContext // recoverable should be separate from this key
-        private val handler = PipelineExceptionHandler()
+        private val handler = PipelineExceptionHandler(recover)
         private val pipelineName = CoroutineName(toString())
 
         override val coroutineContext = parent.coroutineContext +
@@ -69,11 +70,17 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
 
         override fun toString(): String = "${storeConfig.name.orEmpty()}PipelineContext"
 
-        override suspend fun updateState(transform: suspend S.() -> S) = catch { states.run { useState(transform) } }
+        override suspend fun updateState(transform: suspend S.() -> S) {
+            catch(recover) { states.run { useState(transform) } }
+        }
 
-        override suspend fun withState(block: suspend S.() -> Unit) = catch { states.withState(block) }
+        override suspend fun withState(block: suspend S.() -> Unit) {
+            catch(recover) { states.withState(block) }
+        }
 
-        override suspend fun action(action: A) = catch { onAction(action) }
+        override suspend fun action(action: A) {
+            catch(recover) { onAction(action) }
+        }
         override fun send(action: A) {
             launch { action(action) }
         }
