@@ -10,6 +10,27 @@ All stores are mostly based on plugins, and their behavior is entirely determine
   too many plugins. The bottleneck will always be the longest chain of callbacks, not the plugin count. If you don't
   define a callback, then no CPU time is spent on running it and no memory is allocated.
 
+If you want to install a custom Plugin, use the methods of the Store builder:
+
+```kotlin
+override val store = store(Loading) {
+
+    // install an existing plugin
+    install(
+        analyticsPlugin(),
+        diScopePlugin(),
+        // ...
+    )
+
+    // or build on-the-fly
+    install {
+        onIntent { intent ->
+            analytics.logUserAction(intent.name)
+        }
+    }
+}
+```
+
 ## Creating an Eager Plugin
 
 Plugins are simply built:
@@ -22,7 +43,7 @@ val plugin = plugin<ScreenState, ScreenIntent, ScreenAction> {
 ```
 
 You can generate a new generic plugin using the `fmvip` [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi)
- shortcut because those type parameters are annoying.
+shortcut.
 
 ### Lazy Plugins
 
@@ -54,6 +75,9 @@ val resetStatePlugin = lazyPlugin<MVIState, MVIIntent, MVIAction> {
   the builder body itself, then use a lazy plugin.
 
 ## Plugin DSL
+
+Each property of a plugin has a different set of responsibilities and some usage nuances. Here's an explanation of all
+of them:
 
 ### Name
 

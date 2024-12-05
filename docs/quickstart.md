@@ -1,12 +1,18 @@
 # Get Started with FlowMVI
 
-In this guide, we'll build a feature with UI in 10 minutes.
+In this guide, you can learn everything you need to get started and we'll build a feature with UI in 10 minutes.
+
+## Step 0: Understand the primary concepts
+
 First of all, here's how the library works:
 
-* **Stores** are classes that _respond_ to **events**, called `Intent`s, and _update_ their **state**. Responding to
-  Intents is called _reducing_.
-* You _add functionality_ to Stores using `Plugin`s, which form a **pipeline**.
-* Clients _subscribe_ to Stores to _render_ their **state** and _consume_ **side-effects**, called `Action`s.
+* **Stores** are classes that _respond_ to events, called **Intents**, and _update_ their **State**.
+    * Responding to Intents is called _reducing_.
+* You _add functionality_ to Stores using **Plugins**, which form a **Pipeline**.
+* Clients _subscribe_ to Stores to _render_ their **State** and _consume_ side-effects, called **Actions**.
+* States, Intents, and Actions together form a **Contract**.
+
+----
 
 ![](images/chart.png)
 
@@ -16,7 +22,7 @@ First of all, here's how the library works:
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
-<details>
+<details open>
 <summary>Version catalogs</summary>
 
 ```toml
@@ -71,8 +77,9 @@ dependencies {
 
 ### 1.2 Configure JDK
 
+  
 <details>
-<summary>Configure JDK</summary>
+<summary>If your target JDK is <11, see this section</summary>
 
 The library's minimum JVM target is set to 11 (sadly still not the default in Gradle).
 If you encounter an error:
@@ -111,33 +118,28 @@ enable [desugaring](https://developer.android.com/studio/write/java8-support).
 
 </details>
 
+### 1.3: Set up the IDE
+
+FMVI comes with an IDE plugin that provides lint checks and templates to generate code. Consider installing it to make
+the amount of boilerplate you write minimal.
+
+[Embed](https://plugins.jetbrains.com/embeddable/install/25766 ':include :type=iframe width=245px height=48px style="border: none; !important; background-color: transparent;"')
+
 ## Step 2: Choose your style
 
-FlowMVI supports both MVI (strict model-driven logic) and the MVVM+ (functional, lambda-driven logic) styles.
+FlowMVI supports both MVI (strict model-driven) and MVVM+ (functional, lambda-driven) styles.
 
 * **Model-driven** means that you create an `MVIIntent` subclass for every event that happens, and the store
-  decides how to handle it.
+  decides how to handle it. Model-driven intents are recommended to take full advantage of Plugins and are used in the
+  examples below.
 * **Functional** means that you invoke functions which contain your business logic, and then send the
   logic for processing to the store.
-
-Model-driven intents are recommended to take full advantage of plugins and are explained below.
-
-Functional intents look like this:
-
-```kotlin
-fun onItemClick(item: Item) = store.intent {
-    updateState {
-        copy(selectedItem = item)
-    }
-}
-```
 
 <details>
 <summary>See this section if you can't decide</summary>
 
 It's preferable to choose one style and use it throughout your project.
-Each style has its own pros and cons, so choosing can be hard.
-So please consider the following comparison:
+Each style has its own pros and cons, so choosing can be hard. So please consider the following comparison:
 
 ### MVI style:
 
@@ -154,25 +156,29 @@ So please consider the following comparison:
 |:--------------------------------------------------------------------------------------------------------|:---------------------------------------------------------------------------|
 | Elegant syntax - open a lambda block and write your logic there. Store's code remains clean             | You have to use `ImmutableStore` interface to not leak the store's context |
 | Easily navigate to and see what an intent does in one click                                             | Lambdas are less performant than regular intents                           |
-| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some plugins will become useless, such as logging/time travel/analytics    |
+| Easier to support on other platforms if handled correctly (not exposing store's logic in platform code) | Some Plugins will become useless, such as logging/time travel/analytics    |
 | Get rid of all Intent classes entirely, avoid class explosion                                           | Intents cannot be composed, delegated and organized into families          |
 
-* If you decide to use the MVVM+ style, consider using the `ImmutableStore` interface that won't let external code send
-intents. This will prevent leaking the context of the store to subscribers.
-* Additionally, you **must** install the `reduceLambdas` plugin to make the store handle your intents. Plugins are
-  explained below.
+If you decide to use the MVVM+ style, then your Intents will look like this:
+
+```kotlin
+fun onItemClick(item: Item) = store.intent {
+    updateState {
+        copy(selectedItem = item)
+    }
+}
+```
+
+* If you use MVVM+ style, you **must** install the `reduceLambdas` Plugin to make the store handle your intents.
+  Plugins are explained below.
+* With MVVM+ style, consider using the `ImmutableStore` and `ImmutableContainer` interfaces that won't let
+  external code send intents. This will prevent leaking the context of the Store to subscribers.
 
 </details>
 
 ## Step 3: Describe your Contract
 
-A Contract consists of 3 parts:
-
-* **States** that your Store can be in.
-* **Intents** that the **Store** must _reduce_ (respond to)
-* **Actions** that the **client** must __consume__ (take).
-
-It looks like this:
+Type `fmvim` in your editor to let the IDE Plugin generate a Contract for you:
 
 ```kotlin
 // States
@@ -202,10 +208,15 @@ sealed interface CounterAction : MVIAction {
 }
 ```
 
+* All Contract classes _must_ be **immutable** and **comparable**. If you don't define `equals`, your IDE will
+  complain.
+* If your store does not have a `State`, you can use an `EmptyState` object provided by the library.
+* If your store does not have side effects, use `Nothing` in place of the side-effect type.
+
 <details>
 <summary>Click if you need help defining a contract</summary>
 
-Describing the contract first makes building the logic easier because this helps make your business logic declarative.
+Describing the contract first makes building the logic easier because this helps make it declarative.
 To define your contract, ask yourself the following:
 
 1. What can be shown at what times? Can the page be empty? Can it be loading? Can errors happen? -
@@ -238,51 +249,76 @@ To define your contract, ask yourself the following:
 
 </details>
 
-* All Contract classes __must__ be **immutable** and **comparable**. If you don't define `equals`, your IDE will
-  complain.
-* Consider using the [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) to generate the contract for you
-  using the shortcut `fmvim`.
-* If your store does not have a `State`, you can use an `EmptyState` object provided by the library.
-* If your store does not have side effects, use `Nothing` in place of the side-effect type.
+## Step 4: Create your Store
 
-## Step 4: Configure your store
+You'll likely want to:
 
-Here's a full list of things that can be done when configuring the store (with defaults assigned):
+1. Provide some dependencies for the Store to use, and
+2. Create additional functions instead of just putting everything into the Store's builder.
+
+The best way to do this is to create a class that acts as a simple wrapper for your Store. By convention, it is
+usually named `Container`.
+
+Generate a Container using the IDE plugin by typing `fmvic`:
 
 ```kotlin
-val store = store<CounterState, CounterIntent, CounterAction>(Loading) { // set initial state
+private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
 
-    configure {
-        debuggable = false
-        name = null
-        parallelIntents = false
-        coroutineContext = EmptyCoroutineContext
-        actionShareBehavior = ActionShareBehavior.Distribute()
-        onOverflow = BufferOverflow.DROP_OLDEST
-        intentCapacity = Channel.UNLIMITED
-        atomicStateUpdates = true
-        allowIdleSubscriptions = false
-        logger = if (debuggable) PlatformStoreLogger else null
-        verifyPlugins = debuggable
+class CounterContainer(
+    private val repo: CounterRepository,
+) : Container<CounterState, CounterIntent, CounterAction> {
+
+    override val store = store(initial = CounterState.Loading) {
+
     }
 
-    fun install(vararg plugins: LazyPlugin<S, I, A>)
-    fun install(vararg decorators: StoreDecorator<S, I, A>)
-    fun install(block: LazyPluginBuilder<S, I, A>.() -> Unit)
-    fun decorate(decorator: DecoratorBuilder<S, I, A>.() -> Unit)
+    // custom function
+    private fun Ctx.produceState(timer: Int) = updateState { DisplayingCounter(timer) }
 }
 ```
 
+Use `lazyStore` function to create a Store lazily if you don't plan to use it right away.
+
+## Step 5: Configure your store
+
 To get started, you only need to set the `debuggable` parameter - it enables a lot of additional
 features like logging and validations.
-Everything else has a decent default value - you can learn more in the section below.
+
+Call `configure` inside your Store builder to change its settings:
+
+```kotlin
+val store = store<CounterState, CounterIntent, CounterAction>(initial = CounterState.Loading) {
+
+    configure {
+        debuggable = BuildFlags.debuggable
+        name = "CounterStore"
+    }
+}
+```
 
 <details>
 <summary>See this section for full explanation of the properties</summary>
 
+Here are all of the configurable settings with defaults assigned:
+
+```kotlin
+configure {
+    debuggable = false 
+    name = null
+    parallelIntents = false
+    coroutineContext = EmptyCoroutineContext
+    actionShareBehavior = ActionShareBehavior.Distribute()
+    onOverflow = BufferOverflow.DROP_OLDEST
+    intentCapacity = Channel.UNLIMITED
+    atomicStateUpdates = true
+    allowIdleSubscriptions = false
+    logger = if (debuggable) PlatformStoreLogger else NoOpStoreLogger
+    verifyPlugins = debuggable
+}
+```
+
 * `debuggable` - Setting this to `true` enables additional store validations and debug logging. The store will check
-  your
-  subscription events, launches/stops, and plugins for validity, as well as print logs to the system console.
+  your subscription events, launches/stops, and Plugins for validity, as well as print logs to the system console.
 * `name` - Set the future name of the store. Needed for debug, logging, comparing and injecting stores, analytics.
 * `parallelIntents` - Declare that intents must be processed in parallel. Intents may still be dropped according to the
   `onOverflow` param.
@@ -325,32 +361,14 @@ Everything else has a decent default value - you can learn more in the section b
 
 </details>
 
-As it's super easy to reuse configurations, you may want to eventually setup [injection](plugins/debugging.md)
-of the configuration.
+## Step 6: Install Plugins
 
-Some interesting properties of the Store:
+**Everything** in FlowMVI is a Plugin. This includes handling errors and even **reducing intents**.
 
-* Store can be `start`ed, `stop`ped, and restarted again as many times as you want. It will clean up everything except
-  its state after itself.
-* The store's subscribers will **not** wait until the store is started when they subscribe to the store.
-  Such subscribers will not receive State updates or Actions. Don't forget to start the store.
-* Stores are usually created eagerly, but the store *can* be lazy. There is `lazyStore()` for that.
-
-## Step 5: Install plugins
-
-FlowMVI is built entirely based on plugins!
-**Everything** in FlowMVI is a plugin. This includes handling errors and even **reducing intents**.
-
-For every store, you'll likely want to install a few plugins to add your business logic.
-Prebuilt plugins come with a nice dsl when building a store. Check out the [plugins](plugins/prebuilt.md) page to learn
-about all of them.
-
-Call the `install` function using a prebuilt plugin, or use a lambda to create and install a plugin on the fly.
-
-One plugin almost every store needs is the `reduce` plugin. Install it when building your store:
+One Plugin almost every Store needs is the `reduce` Plugin. Install it when building your store:
 
 ```kotlin
-val counterStore = store<CounterState, CounterIntent, CounterAction>(Loading) {
+override val store = store(Loading) {
     configure { /* ... */ }
 
     reduce { intent ->
@@ -363,53 +381,19 @@ val counterStore = store<CounterState, CounterIntent, CounterAction>(Loading) {
 }
 ```
 
-Every plugin has a special receiver called `PipelineContext`. It gives you access to everything you need:
+Every Plugin method has a special receiver called `PipelineContext`. It's like an "environment" the Store
+runs in, and gives you access to everything you need:
 
 * `updateState { }` - update the state of the store using the return value. Code in the block is thread-safe.
 * `withState { }` - grab the state thread-safely and use it, but do not change it.
 * `action()` - send a side-effect to subscribers
 * `intent()` - re-send and delegate to another intent
 * `config` - use the store's configuration, for example, to issue log calls:
-  `config.logger.info { "counter = $counter" }` or just `log { "logs" }`. It will only print if `debuggable` is true.
+  `log { "initial state = ${config.initial}" }`. It will only print if `debuggable` is `true` by default.
 
-## Step 6: Inject and provide dependencies
-
-You'll likely want to:
-
-1. Provide some dependencies for the Store to use, and
-2. Create additional functions instead of just putting everything into the Store's builder.
-
-The best way to do this is to create a class that acts as a simple wrapper for your store. By convention, it can
-usually be called `Container`. Feel free to not use the provided interface, its only purpose is to provide a DSL.
-
-```kotlin
-private typealias Ctx = PipelineContext<CounterState, CounterIntent, CounterAction>
-
-class CounterContainer(
-    private val repo: CounterRepository,
-) : Container<CounterState, CounterIntent, CounterAction> {
-
-    override val store = store(Loading) {
-        whileSubscribed { // installs a plugin that does something while there are subscribers
-            repo.timer
-                .onEach { produceState(it) } 
-                .consume()
-        }
-    }
-
-    // example custom function
-    private fun Ctx.produceState(timer: Int) = updateState { DisplayingCounter(timer) }
-}
-```
-
-* The `PipelineContext` is like an "environment" the store runs in. It is only available while the Store is running.
-* Use the [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) shortcut `fmvic` to generate a container and
-  a store for you.
+There are many other pre-made Plugins. Check out the [Plugins](plugins/prebuilt.md) page to learn about all of them.
 
 ## Step 7: Start your store
-
-!> Don't forget to start your Store! Store will do **nothing** unless it is started using the
-`start(scope: CoroutineScope)` function or a scope is provided as a parameter to the builder.
 
 Provide a coroutine scope with a lifecycle that matches the duration your Store should be accepting Intents
 and running background jobs.
@@ -424,16 +408,6 @@ and running background jobs.
 fun counterStore(scope: CoroutineScope) = store(initial = Loading, scope = scope) { /* ... */ }
 ```
 
-#### Separately:
-
-```kotlin
-fun counterStore() = store(initial = Loading) { /* ... */ }
-
-// somewhere else
-val store = counterStore()
-store.start(lifecycleScope)
-```
-
 #### Manually
 
 ```kotlin
@@ -441,18 +415,27 @@ val scope = CoroutineScope()
 val store = counterStore()
 
 // start
-store.start(scope)
+val lifecycle = store.start(scope)
 
 // stop
 scope.cancel()
+
 // or to keep the scope alive
-store.close()
+lifecycle.close()
 ```
+
+!> Don't forget to start your Store! Store will do **nothing** unless it is started using the
+`start(scope: CoroutineScope)` function or a scope is provided as a parameter to the builder.
+
+?> Store can be started and stopped as many times as you want. It will clean up everything except
+its state after itself.
 
 ### Step 8: Subscribe to your Store
 
-The way you do this varies a lot based on what you use the store for and your app's UI framework, if any.
-For this example, subscribing in Compose is extremely easy:
+The way you do this varies a lot based on what you will use the Store for and your app's UI framework, if any.
+In this example, we'll subscribe using Compose to a Store made for managing UI state.
+
+Type `fmvis` to generate a new composable screen using the IDE plugin:
 
 ```kotlin
 @Composable
@@ -472,28 +455,26 @@ fun CounterScreen(
     }
 
 @Composable
-fun IntentReceiver<CounterIntent>.CounterScreenContent(state: DisplayingCounterState) {
+private fun IntentReceiver<CounterIntent>.CounterScreenContent(state: DisplayingCounterState) {
     /* ... */
 }
 ```
 
-* Use the [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) shortcut `fmvis` to generate a composable
-  screen for you.
 * To learn more about FMVI in Compose, see [this guide](compose.md)
-* To subscribe using Android Views, see [android guide](integrations/android.md)
+* To subscribe using Android Views, see the [android guide](integrations/android.md)
 
 ## Next Steps
 
-That's it! You have set up a feature using FlowMVI in ~100 lines of code.
+That's it! You have set up FlowMVI in ~100 lines of code.
 
-Now you can start using the features of the library to write scalable business logic with plugins.
+Now you can start using the features of the library to write scalable business logic with Plugins.
 
 Continue learning by reading these articles:
 
-1. Learn how to [install](plugins/prebuilt.md) and [create](plugins/custom.md) plugins.
+1. Learn how to [install](plugins/prebuilt.md) and [create](plugins/custom.md) Plugins.
 2. Learn how to use FlowMVI with [compose](compose.md)
 3. Learn how to [persist and restore state](plugins/savedstate.md)
-4. Set up [remote debugging](plugins/debugging.md)
+4. Set up [remote debugging](plugins/debugging.md) and DI.
 5. Learn how to use FlowMVI on [Android](integrations/android.md)
 6. Get answers to common [questions](faq.md)
 7. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/) for code examples
