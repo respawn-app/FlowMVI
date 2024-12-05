@@ -44,13 +44,4 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      */
     @FlowMVIDSL
     public suspend fun withState(block: suspend S.() -> Unit)
-
-    // region deprecated
-
-    @FlowMVIDSL
-    @Suppress("UndocumentedPublicFunction")
-    @Deprecated("renamed to updateStateImmediate()", ReplaceWith("updateStateImmediate(block)"))
-    public fun useState(block: S.() -> S): Unit = updateStateImmediate(block)
-
-    // endregion
 }

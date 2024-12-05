@@ -9,7 +9,6 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.plugins.deinit
 import pro.respawn.flowmvi.plugins.reduce
 
 private fun StoreBuilder<*, *, *>.config() = configure {
@@ -32,5 +31,4 @@ internal fun atomicParallelStore(
             is Increment -> updateState { copy(counter = counter + 1) }
         }
     }
-    deinit { e -> updateStateImmediate { BenchmarkState() } }
 }

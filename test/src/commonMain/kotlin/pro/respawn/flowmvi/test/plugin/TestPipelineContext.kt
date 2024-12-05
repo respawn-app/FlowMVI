@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.test.TestStoreLifecycle
 import pro.respawn.flowmvi.test.ensureStarted
 
@@ -26,8 +27,10 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override val coroutineContext by config::coroutineContext
 
-    override var state: S by atomic(config.initial)
-        private set
+    private var _state = atomic(config.initial)
+    override val state by _state::value
+
+    override fun compareAndSet(old: S, new: S): Boolean = _state.compareAndSet(old, new)
 
     @DelicateStoreApi
     override fun send(action: A) {
@@ -51,17 +54,11 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override suspend fun updateState(transform: suspend S.() -> S) = with(plugin) {
         ensureStarted()
-        onState(state, state.transform())?.also { state = it }
-        Unit
+        updateStateImmediate { onState(state, state.transform()) ?: this }
     }
 
     override suspend fun withState(block: suspend S.() -> Unit) {
         ensureStarted()
         block(state)
-    }
-
-    override fun updateStateImmediate(block: S.() -> S) {
-        ensureStarted()
-        state = block(state)
     }
 }

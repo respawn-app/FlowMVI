@@ -1,44 +1,43 @@
-@file:Suppress("OVERRIDE_BY_INLINE")
-
 package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import pro.respawn.flowmvi.api.DelicateStoreApi
+import pro.respawn.flowmvi.api.ImmediateStateReceiver
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StateProvider
-import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.util.withReentrantLock
 
-internal fun <S : MVIState> stateModule(
+internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
     atomic: Boolean,
-): StateModule<S> = StateModuleImpl(initial, if (atomic) Mutex() else null)
-
-internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
-
-private class StateModuleImpl<S : MVIState>(
-    initial: S,
-    private val mutex: Mutex?,
-) : StateModule<S> {
+    private val transform: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)?
+) : StateProvider<S>, ImmediateStateReceiver<S> {
 
     @Suppress("VariableNaming")
     private val _states = MutableStateFlow(initial)
     override val states: StateFlow<S> = _states.asStateFlow()
+    private val mutex = if (atomic) Mutex() else null
 
     @DelicateStoreApi
     override val state: S by states::value
 
-    override inline fun updateStateImmediate(block: S.() -> S) = _states.update(block)
+    override fun compareAndSet(expect: S, new: S) = _states.compareAndSet(expect, new)
 
-    override suspend inline fun withState(
+    suspend inline fun withState(
         crossinline block: suspend S.() -> Unit
     ) = mutex.withReentrantLock { block(states.value) }
 
-    override suspend inline fun updateState(
+    suspend inline fun PipelineContext<S, I, A>.useState(
         crossinline transform: suspend S.() -> S
-    ) = mutex.withReentrantLock { _states.update { transform(it) } }
+    ) = mutex.withReentrantLock block@{
+        val delegate = this@StateModule.transform ?: return@block updateStateImmediate { transform() }
+        updateStateImmediate { delegate(this, transform()) ?: this }
+    }
 }
