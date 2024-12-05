@@ -25,7 +25,7 @@ internal class ChannelBasedTraditionalStore(scope: CoroutineScope) {
         }
     }
 
-    suspend fun onIntent(intent: BenchmarkIntent) = intents.send(intent)
+    fun onIntent(intent: BenchmarkIntent) = intents.trySend(intent)
 
     private fun reduce(intent: BenchmarkIntent) = when (intent) {
         is BenchmarkIntent.Increment -> _state.update { state ->

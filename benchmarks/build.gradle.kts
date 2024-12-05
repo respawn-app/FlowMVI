@@ -47,10 +47,10 @@ benchmark {
     configurations {
         named("main") {
             iterations = 100
-            warmups = 10
+            warmups = 20
             iterationTime = 100
             iterationTimeUnit = "ms"
-            outputTimeUnit = "ms"
+            outputTimeUnit = "us"
             mode = "avgt" // "thrpt" - throughput, "avgt" - average
             reportFormat = "text"
             // advanced("nativeGCAfterIteration", true)

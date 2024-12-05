@@ -15,7 +15,6 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
 @State(Scope.Benchmark)
 internal class FluxoIntentBenchmark {
 
-
     @Benchmark
     fun benchmark() = runBlocking {
         val store = fluxoStore()

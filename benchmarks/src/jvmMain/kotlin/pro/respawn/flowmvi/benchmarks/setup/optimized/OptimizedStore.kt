@@ -22,7 +22,7 @@ internal fun StoreBuilder<*, *, *>.config() {
         parallelIntents = false
         verifyPlugins = false
         onOverflow = BufferOverflow.SUSPEND
-        intentCapacity = Channel.RENDEZVOUS
+        intentCapacity = Channel.UNLIMITED
     }
 }
 

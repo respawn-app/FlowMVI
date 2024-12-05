@@ -19,11 +19,9 @@ internal class OptimizedFMVIBenchmark {
     fun benchmark() = runBlocking {
         val store = optimizedStore(this)
         repeat(BenchmarkDefaults.intentsPerIteration) {
-            store.emit(BenchmarkIntent.Increment)
+            store.intent(BenchmarkIntent.Increment)
         }
-        store.collect {
-            states.first { it.counter == BenchmarkDefaults.intentsPerIteration }
-        }
+        store.collect { states.first { it.counter == BenchmarkDefaults.intentsPerIteration } }
         store.closeAndWait()
     }
 }
