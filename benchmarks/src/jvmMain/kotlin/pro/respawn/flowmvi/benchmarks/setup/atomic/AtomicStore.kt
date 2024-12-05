@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.benchmarks.setup.parallel
+package pro.respawn.flowmvi.benchmarks.setup.atomic
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.store
+import pro.respawn.flowmvi.plugins.deinit
 import pro.respawn.flowmvi.plugins.reduce
 
 private fun StoreBuilder<*, *, *>.config() = configure {
@@ -16,7 +17,7 @@ private fun StoreBuilder<*, *, *>.config() = configure {
     debuggable = false
     actionShareBehavior = ActionShareBehavior.Disabled
     atomicStateUpdates = true
-    parallelIntents = true
+    parallelIntents = false
     verifyPlugins = false
     onOverflow = BufferOverflow.SUSPEND
     intentCapacity = Channel.UNLIMITED
@@ -31,4 +32,5 @@ internal fun atomicParallelStore(
             is Increment -> updateState { copy(counter = counter + 1) }
         }
     }
+    deinit { e -> updateStateImmediate { BenchmarkState() } }
 }

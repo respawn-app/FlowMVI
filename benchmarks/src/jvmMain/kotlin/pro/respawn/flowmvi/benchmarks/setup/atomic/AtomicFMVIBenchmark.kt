@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.benchmarks.setup.channelbased
+package pro.respawn.flowmvi.benchmarks.setup.atomic
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -8,19 +8,22 @@ import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Threads
 import pro.respawn.flowmvi.benchmarks.BenchmarkDefaults
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
+import pro.respawn.flowmvi.dsl.collect
 
 @Threads(Threads.MAX)
 @Suppress("unused")
 @State(Scope.Benchmark)
-internal class ChannelTraditionalMVIBenchmark {
+internal class AtomicFMVIBenchmark {
 
     @Benchmark
     fun benchmark() = runBlocking {
-        val store = ChannelBasedTraditionalStore(this)
+        val store = atomicParallelStore(this)
         repeat(BenchmarkDefaults.intentsPerIteration) {
-            store.onIntent(BenchmarkIntent.Increment)
+            store.emit(BenchmarkIntent.Increment)
         }
-        store.state.first { state -> state.counter == BenchmarkDefaults.intentsPerIteration }
-        store.close()
+        store.collect {
+            states.first { state -> state.counter == BenchmarkDefaults.intentsPerIteration }
+        }
+        store.closeAndWait()
     }
 }

@@ -1,20 +1,13 @@
 package pro.respawn.flowmvi.benchmarks.setup.optimized
 
-import kotlinx.benchmark.TearDown
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.Scope
-import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Threads
-import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.benchmarks.BenchmarkDefaults
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
-import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 import pro.respawn.flowmvi.dsl.collect
 
 @Threads(Threads.MAX)
@@ -22,27 +15,15 @@ import pro.respawn.flowmvi.dsl.collect
 @State(Scope.Benchmark)
 internal class OptimizedFMVIBenchmark {
 
-    lateinit var store: Store<BenchmarkState, BenchmarkIntent, Nothing>
-    lateinit var scope: CoroutineScope
-
-    @Setup
-    fun setup() = runBlocking {
-        scope = CoroutineScope(Dispatchers.Unconfined)
-        store = optimizedStore(scope)
-        store.awaitStartup()
-    }
-
     @Benchmark
     fun benchmark() = runBlocking {
+        val store = optimizedStore(this)
         repeat(BenchmarkDefaults.intentsPerIteration) {
-            store.intent(BenchmarkIntent.Increment)
+            store.emit(BenchmarkIntent.Increment)
         }
-        store.collect { states.first { it.counter >= BenchmarkDefaults.intentsPerIteration } }
-    }
-
-    @TearDown
-    fun teardown() = runBlocking {
-        scope.cancel()
+        store.collect {
+            states.first { it.counter == BenchmarkDefaults.intentsPerIteration }
+        }
         store.closeAndWait()
     }
 }

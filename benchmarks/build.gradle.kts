@@ -51,7 +51,7 @@ benchmark {
             iterationTime = 100
             iterationTimeUnit = "ms"
             outputTimeUnit = "ms"
-            mode = "thrpt" // "thrpt" - throughput, "avgt" - average
+            mode = "avgt" // "thrpt" - throughput, "avgt" - average
             reportFormat = "text"
             // advanced("nativeGCAfterIteration", true)
             // advanced("jvmForks", "definedByJmh")

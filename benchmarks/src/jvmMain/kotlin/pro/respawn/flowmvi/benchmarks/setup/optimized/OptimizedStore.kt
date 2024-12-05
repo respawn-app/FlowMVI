@@ -20,7 +20,7 @@ internal fun StoreBuilder<*, *, *>.config() {
         atomicStateUpdates = false
         parallelIntents = false
         verifyPlugins = false
-        onOverflow = BufferOverflow.DROP_OLDEST
+        onOverflow = BufferOverflow.SUSPEND
         intentCapacity = Channel.RENDEZVOUS
     }
 }

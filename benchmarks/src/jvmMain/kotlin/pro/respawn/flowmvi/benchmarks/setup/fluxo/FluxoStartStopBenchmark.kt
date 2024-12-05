@@ -9,6 +9,7 @@ import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Threads
 
 @Threads(Threads.MAX)
+@Suppress("unused")
 @State(Scope.Benchmark)
 class FluxoStartStopBenchmark {
 
