@@ -9,6 +9,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
+import pro.respawn.flowmvi.dsl.collect
 import kotlin.test.assertTrue
 
 /**
@@ -17,9 +18,12 @@ import kotlin.test.assertTrue
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.test(
     crossinline block: suspend Store<S, I, A>.() -> Unit
 ): Unit = coroutineScope {
-    start(this)
-    block()
-    closeAndWait()
+    try {
+        start(this)
+        block()
+    } finally {
+        closeAndWait()
+    }
 }
 
 /**
@@ -29,10 +33,8 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, 
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.subscribeAndTest(
     crossinline block: suspend StoreTestScope<S, I, A>.() -> Unit,
 ): Unit = test {
-    coroutineScope {
-        subscribe {
-            StoreTestScope(this, this@subscribeAndTest).run { block() }
-        }
+    collect {
+        StoreTestScope(this, this@subscribeAndTest).run { block() }
     }
 }
 
