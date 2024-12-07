@@ -58,10 +58,11 @@ internal class SubscribeBeforeStartException(cause: Exception? = null) : Unrecov
     """.trimIndent()
 )
 
-internal class RecursiveStateTransactionException(cause: Exception) : UnrecoverableException(
+@PublishedApi
+internal class RecursiveStateTransactionException(cause: Exception?) : UnrecoverableException(
     cause = cause,
     message = """
-        Tried to use start a state transaction while already in one.
+        You have tried to start a state transaction while already in one.
         This happened because state transactions are Atomic and reentrant = false.
         Please avoid using recursion in transactions, otherwise you will get a permanent deadlock, or use 
         StateStrategy.Atomic.reentrant = true at the cost of some performance.

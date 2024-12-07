@@ -17,10 +17,10 @@ import pro.respawn.flowmvi.api.StateStrategy
 import pro.respawn.flowmvi.api.StateStrategy.Atomic
 import pro.respawn.flowmvi.api.StateStrategy.Immediate
 import pro.respawn.flowmvi.dsl.updateStateImmediate
-import pro.respawn.flowmvi.exceptions.RecursiveStateTransactionException
 import pro.respawn.flowmvi.util.ReentrantMutexContextElement
 import pro.respawn.flowmvi.util.ReentrantMutexContextKey
 import pro.respawn.flowmvi.util.withReentrantLock
+import pro.respawn.flowmvi.util.withValidatedLock
 
 internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
@@ -41,19 +41,8 @@ internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     private suspend inline fun withLock(crossinline block: suspend () -> Unit) = when {
         mutexElement == null -> block()
         reentrant -> mutexElement.withReentrantLock(block)
-        !debuggable -> mutexElement.key.mutex.withLock { block() }
-        else -> {
-            try {
-                mutexElement.key.mutex.lock(this)
-            } catch (e: IllegalStateException) {
-                throw RecursiveStateTransactionException(e)
-            }
-            try {
-                block()
-            } finally {
-                mutexElement.key.mutex.unlock(this)
-            }
-        }
+        debuggable -> mutexElement.withValidatedLock(block)
+        else -> mutexElement.key.mutex.withLock { block() }
     }
 
     override fun compareAndSet(expect: S, new: S) = _states.compareAndSet(expect, new)
