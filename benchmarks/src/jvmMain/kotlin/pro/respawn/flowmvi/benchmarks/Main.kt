@@ -6,11 +6,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
-import pro.respawn.flowmvi.benchmarks.setup.optimized.optimizedStore
+import pro.respawn.flowmvi.benchmarks.setup.atomic.atomicParallelStore
 
 fun main() = runBlocking {
     println(ProcessHandle.current().pid())
-    val store = optimizedStore(this)
+    val store = atomicParallelStore(this)
     launch {
         while (isActive) {
             store.intent(Increment)

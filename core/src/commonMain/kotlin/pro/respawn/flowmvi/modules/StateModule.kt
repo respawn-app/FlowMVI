@@ -13,7 +13,10 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.dsl.updateStateImmediate
+import pro.respawn.flowmvi.util.ReentrantMutexContextElement
+import pro.respawn.flowmvi.util.ReentrantMutexContextKey
 import pro.respawn.flowmvi.util.withReentrantLock
+
 
 internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
@@ -24,7 +27,8 @@ internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     @Suppress("VariableNaming")
     private val _states = MutableStateFlow(initial)
     override val states: StateFlow<S> = _states.asStateFlow()
-    private val mutex = if (atomic) Mutex() else null
+    private val mutex = if (!atomic) null else
+        Mutex().let(::ReentrantMutexContextKey).let(::ReentrantMutexContextElement)
 
     override fun compareAndSet(expect: S, new: S) = _states.compareAndSet(expect, new)
 
