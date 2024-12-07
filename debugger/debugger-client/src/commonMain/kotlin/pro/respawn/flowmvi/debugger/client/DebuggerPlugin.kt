@@ -26,6 +26,7 @@ import pro.respawn.flowmvi.debugger.model.ServerEvent.RollbackState
 import pro.respawn.flowmvi.debugger.model.ServerEvent.RollbackToInitialState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.logging.warn
 import pro.respawn.flowmvi.plugins.NoOpPlugin
 import pro.respawn.flowmvi.plugins.TimeTravel
@@ -60,7 +61,7 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
                         timeTravel.states.lastIndex - 1
                         // ignore plugins, including self, to not loop the event
                     )?.let { previous -> updateStateImmediate { previous } }
-                    is RollbackToInitialState -> updateStateImmediate { config.initial }
+                    is RollbackToInitialState -> updateStateImmediate { this@ctx.config.initial }
                     is ServerEvent.Stop -> this@ctx.close()
                 }
             }
