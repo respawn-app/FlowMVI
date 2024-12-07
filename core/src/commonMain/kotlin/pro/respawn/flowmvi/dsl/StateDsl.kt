@@ -5,6 +5,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmediateStateReceiver
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StateProvider
 import pro.respawn.flowmvi.api.StateReceiver
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.exceptions.InvalidStateException
@@ -13,6 +14,19 @@ import pro.respawn.flowmvi.util.withType
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.jvm.JvmName
+
+/**
+ * Obtain the current state in an unsafe manner.
+ *
+ * This property is not thread-safe and parallel state updates will introduce a race condition when not
+ * handled properly.
+ * Such race conditions arise when using multiple data streams such as [Flow]s.
+ *
+ * Accessing and modifying the state this way will **circumvent ALL plugins** and will not make state updates atomic.
+ *
+ * Consider accessing state via [StateReceiver.withState] or [StateReceiver.updateState] instead.
+ */
+public inline val <S : MVIState> StateProvider<S>.state get() = states.value
 
 /**
  * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in

@@ -1,3 +1,5 @@
+@file:OptIn(InternalFlowMVIAPI::class)
+
 package pro.respawn.flowmvi
 
 import kotlinx.coroutines.CoroutineScope
@@ -5,6 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.ActionProvider
 import pro.respawn.flowmvi.api.ActionReceiver
@@ -105,8 +108,8 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     // region contract
-    override val state: S by stateModule::state
     override val name by config::name
+    override val states by stateModule::states
     override val actions: Flow<A> by _actions::actions
     override fun send(action: A) = _actions.send(action)
     override suspend fun emit(intent: I) = intents.emit(intent)

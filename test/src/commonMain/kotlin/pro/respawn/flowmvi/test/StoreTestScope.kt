@@ -1,8 +1,9 @@
 package pro.respawn.flowmvi.test
 
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeout
-import pro.respawn.flowmvi.api.DelicateStoreApi
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -14,14 +15,14 @@ import kotlin.test.assertIs
 /**
  * A class which implements a dsl for testing [Store].
  */
+@OptIn(InternalFlowMVIAPI::class)
 public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     public val provider: Provider<S, I, A>,
     public val store: Store<S, I, A>,
     public val timeoutMs: Long = 3000L,
 ) : Store<S, I, A> by store, Provider<S, I, A> by provider {
 
-    @OptIn(DelicateStoreApi::class)
-    override val state: S by store::state
+    override val states: StateFlow<S> by provider::states
     override fun hashCode(): Int = store.hashCode()
     override fun equals(other: Any?): Boolean = store == other
     override suspend fun emit(intent: I): Unit = store.emit(intent)

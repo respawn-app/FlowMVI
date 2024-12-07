@@ -7,6 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
