@@ -46,8 +46,9 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val recover: RecoverModule<S, I, A> = RecoverModule(plugin.onException),
     private val stateModule: StateModule<S, I, A> = StateModule(
         config.initial,
-        config.atomicStateUpdates,
-        plugin.onState
+        config.stateStrategy,
+        config.debuggable,
+        plugin.onState,
     ),
 ) : Store<S, I, A>,
     Provider<S, I, A>,

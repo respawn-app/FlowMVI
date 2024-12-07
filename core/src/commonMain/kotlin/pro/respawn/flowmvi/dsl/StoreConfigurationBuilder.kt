@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StateStrategy
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.logging.NoOpStoreLogger
@@ -41,6 +42,20 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
      */
     @FlowMVIDSL
     public var actionShareBehavior: ActionShareBehavior = ActionShareBehavior.Distribute()
+
+    /**
+     * Configure the [StateStrategy] of this [Store].
+     *
+     * Available strategies:
+     * * [StateStrategy.Atomic]
+     * * [StateStrategy.Immediate]
+     *
+     * Make sure to read the documentation of the strategy before modifying this property.
+     *
+     * [StateStrategy.Atomic] with [StateStrategy.Atomic.reentrant] = `true` by default
+     */
+    @FlowMVIDSL
+    public var stateStrategy: StateStrategy = StateStrategy.Atomic(true)
 
     /**
      * Designate the maximum capacity of [MVIIntent]s waiting for processing
@@ -98,21 +113,6 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     public var logger: StoreLogger? = null
 
     /**
-     * Enables transaction serialization for state updates, making state updates atomic and suspendable.
-     *
-     * * Serializes both state reads and writes using a mutex.
-     * * Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
-     *   All other clients attempt to get the state will wait on a FIFO queue and suspend the parent coroutine.
-     * * This property disables state transactions for the whole store.
-     *   For one-time usage of non-atomic updates, see [updateStateImmediate].
-     * * Has a small performance impact because of coroutine context switching and mutex usage.
-     *
-     * `true` by default
-     */
-    @FlowMVIDSL
-    public var atomicStateUpdates: Boolean = true
-
-    /**
      * Signals to plugins that they should enable their own verification logic.
      *
      * By default, set to `true` only if the store is [debuggable].
@@ -129,6 +129,20 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     @FlowMVIDSL
     public var name: String? = null
 
+    // region deprecated
+    @Deprecated(
+        "Please use the StateStrategy property",
+        replaceWith = ReplaceWith("stateStrategy = StateStrategy.Atomic()"),
+    )
+    @FlowMVIDSL
+    @Suppress("UndocumentedPublicProperty")
+    public var atomicStateUpdates: Boolean
+        get() = stateStrategy is StateStrategy.Atomic
+        set(value) {
+            stateStrategy = if (value) StateStrategy.Atomic(true) else StateStrategy.Immediate
+        }
+    // endregion
+
     /**
      * Create the [StoreConfiguration]
      */
@@ -142,10 +156,10 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
         debuggable = debuggable,
         coroutineContext = coroutineContext,
         logger = logger ?: if (debuggable) PlatformStoreLogger else NoOpStoreLogger,
-        atomicStateUpdates = atomicStateUpdates,
         name = name,
         allowIdleSubscriptions = allowIdleSubscriptions ?: !debuggable,
         verifyPlugins = verifyPlugins ?: debuggable,
+        stateStrategy = stateStrategy,
     )
 }
 

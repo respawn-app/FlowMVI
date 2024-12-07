@@ -10,18 +10,26 @@ import kotlin.coroutines.CoroutineContext
  *
  * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
  */
+@ConsistentCopyVisibility
 @Suppress("UndocumentedPublicProperty")
-public data class StoreConfiguration<S : MVIState>(
+public data class StoreConfiguration<S : MVIState> internal constructor(
     val initial: S,
     val allowIdleSubscriptions: Boolean,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
+    val stateStrategy: StateStrategy,
     val intentCapacity: Int,
     val onOverflow: BufferOverflow,
     val debuggable: Boolean,
     val coroutineContext: CoroutineContext,
     val logger: StoreLogger,
-    val atomicStateUpdates: Boolean,
     val verifyPlugins: Boolean,
     val name: String?,
-)
+) {
+
+    @Deprecated(
+        "Please use the StateStrategy directly",
+        ReplaceWith("this.stateStrategy is StateStrategy.Atomic")
+    )
+    val atomicStateUpdates: Boolean get() = stateStrategy is StateStrategy.Atomic
+}

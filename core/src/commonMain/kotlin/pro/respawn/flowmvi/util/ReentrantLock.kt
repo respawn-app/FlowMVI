@@ -10,15 +10,12 @@ import kotlin.jvm.JvmInline
 @PublishedApi
 internal suspend inline fun <T> ReentrantMutexContextElement?.withReentrantLock(
     crossinline block: suspend () -> T
-): T {
-    if (this == null) return block()
-    val key = this.key
+) = when {
+    this == null -> block()
     // call block directly when this mutex is already locked in the context
-    if (coroutineContext[key] != null) return block()
+    coroutineContext[key] != null -> block()
     // otherwise add it to the context and lock the mutex
-    return withContext(this) {
-        key.mutex.withLock { block() }
-    }
+    else -> withContext(this) { key.mutex.withLock { block() } }
 }
 
 @JvmInline
