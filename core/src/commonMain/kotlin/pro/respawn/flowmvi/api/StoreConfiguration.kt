@@ -15,6 +15,7 @@ import kotlin.coroutines.CoroutineContext
 public data class StoreConfiguration<S : MVIState> internal constructor(
     val initial: S,
     val allowIdleSubscriptions: Boolean,
+    val allowTransientSubscriptions: Boolean,
     val parallelIntents: Boolean,
     val actionShareBehavior: ActionShareBehavior,
     val stateStrategy: StateStrategy,

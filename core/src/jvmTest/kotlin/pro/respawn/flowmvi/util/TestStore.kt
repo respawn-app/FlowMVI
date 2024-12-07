@@ -4,6 +4,7 @@ package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.api.StateStrategy
 import pro.respawn.flowmvi.decorator.DecoratorBuilder
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.BuildStore
@@ -31,10 +32,11 @@ internal fun testStore(
     configure: BuildStore<TestState, LambdaIntent<TestState, TestAction>, TestAction> = {},
 ) = store(initial) {
     configure {
-        debuggable = false
+        debuggable = true
+        allowTransientSubscriptions = true
         name = "TestStore"
         actionShareBehavior = behavior
-        atomicStateUpdates = true
+        stateStrategy = StateStrategy.Atomic()
         logger = PlatformStoreLogger
     }
     enableLogging()

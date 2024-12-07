@@ -94,6 +94,18 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     public var allowIdleSubscriptions: Boolean? = null
 
     /**
+     * Whether to allow subscribers that can unsubscribe on their own.
+     *
+     * Normally, if a subscriber appears, but their subscription coroutine ends (i.e. they did not suspend forever),
+     * an exception will be thrown. This can indicate an error in the client code (e.g. forgot to collect a flow), but
+     * can be intended behavior sometimes.
+     *
+     * By default, this is enabled if [debuggable] is `true`.
+     */
+    @FlowMVIDSL
+    public var allowTransientSubscriptions: Boolean? = null
+
+    /**
      *  A coroutine context overrides for the [Store].
      *  This context will be merged with the one the store was launched with (e.g. `viewModelScope`).
      *
@@ -155,11 +167,12 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
         onOverflow = onOverflow,
         debuggable = debuggable,
         coroutineContext = coroutineContext,
-        logger = logger ?: if (debuggable) PlatformStoreLogger else NoOpStoreLogger,
         name = name,
+        logger = logger ?: if (debuggable) PlatformStoreLogger else NoOpStoreLogger,
         allowIdleSubscriptions = allowIdleSubscriptions ?: !debuggable,
+        allowTransientSubscriptions = allowTransientSubscriptions ?: !debuggable,
         verifyPlugins = verifyPlugins ?: debuggable,
-        stateStrategy = stateStrategy,
+        stateStrategy = stateStrategy
     )
 }
 

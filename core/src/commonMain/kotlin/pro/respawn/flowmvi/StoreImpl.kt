@@ -104,7 +104,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         if (!isActive && !config.allowIdleSubscriptions) throw SubscribeBeforeStartException()
         launch { awaitUnsubscription() }
         block(this@StoreImpl)
-        if (config.debuggable) throw NonSuspendingSubscriberException()
+        if (!config.allowTransientSubscriptions) throw NonSuspendingSubscriberException()
         cancel()
     }
 
