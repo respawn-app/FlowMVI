@@ -1,0 +1,11 @@
+name: Feature request
+description: Request a new feature
+title: "🚀: "
+labels: [ triage ]
+assignees: [ Nek-12 ]
+type: 'feature'
+body:
+  - type: textarea
+    description: What do you want to see being implemented? Code examples will be greatly appreciated.
+    validations:
+      required: true
