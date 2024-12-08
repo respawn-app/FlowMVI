@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations.Threads
 @Threads(Threads.MAX)
 @Suppress("unused")
 @State(Scope.Benchmark)
-class FluxoStartStopBenchmark {
+internal class FluxoStartStopBenchmark {
 
     @OptIn(ExperimentalFluxoApi::class)
     @Benchmark

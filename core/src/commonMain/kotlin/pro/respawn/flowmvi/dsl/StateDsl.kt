@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.dsl
 
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmediateStateReceiver
@@ -42,7 +43,7 @@ public inline val <S : MVIState> StateProvider<S>.state get() = states.value
  * @see StateReceiver.updateState
  * @see StateReceiver.withState
  */
-@OptIn(DelicateStoreApi::class)
+@OptIn(DelicateStoreApi::class, InternalFlowMVIAPI::class)
 @FlowMVIDSL
 public inline fun <S : MVIState> ImmediateStateReceiver<S>.updateStateImmediate(
     @BuilderInference transform: S.() -> S
@@ -50,9 +51,7 @@ public inline fun <S : MVIState> ImmediateStateReceiver<S>.updateStateImmediate(
     contract {
         callsInPlace(transform, InvocationKind.AT_LEAST_ONCE)
     }
-    while (true) {
-        if (compareAndSet(state, transform(state))) return
-    }
+    while (true) if (compareAndSet(state, transform(state))) return
 }
 
 /**

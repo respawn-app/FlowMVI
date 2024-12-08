@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.flow.StateFlow
 import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 
 /**
  * [StateReceiver] version that can only accept immediate state updates. It is recommended to use [StateReceiver] and
@@ -9,7 +10,12 @@ import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
  */
 public interface ImmediateStateReceiver<S : MVIState> : StateProvider<S> {
 
-    @FlowMVIDSL
+    /**
+     * Directly compare and set the current state.
+     *
+     * Please read [updateStateImmediate] to learn about repercussions of using this.
+     */
+    @InternalFlowMVIAPI
     public fun compareAndSet(old: S, new: S): Boolean
 
     @InternalFlowMVIAPI
