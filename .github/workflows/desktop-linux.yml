@@ -1,17 +1,24 @@
 name: debugger-linux
 
 on:
-  push:
-    branches: [ master ]
+  workflow_call:
+    outputs:
+      debugger:
+        value: ${{ jobs.publish.outputs.debugger-url }}
+      sample:
+        value: ${{ jobs.publish.outputs.sample-url }}
 
 concurrency:
   group: "publish-linux"
   cancel-in-progress: true
 
 jobs:
-  publish-windows:
+  publish:
     runs-on: ubuntu-latest
     environment: publishing
+    outputs:
+      debugger-url: ${{ steps.upload-debugger.outputs.artifact-url }}
+      sample-url: ${{ steps.upload-sample.outputs.artifact-url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -49,17 +56,21 @@ jobs:
         run: ./gradlew sample:packageDistributionForCurrentOS
 
       - name: Upload debugger
+        id: upload-debugger
         uses: actions/upload-artifact@v4.4.3
         with:
           name: Debugger_Linux
           path: ./debugger/app/build/compose/binaries/main/deb/*
           if-no-files-found: error
+          compression-level: 0
           overwrite: false
 
       - name: Upload sample
+        id: upload-sample
         uses: actions/upload-artifact@v4.4.3
         with:
           name: Sample_Linux
           path: ./sample/build/compose/binaries/main/deb/*
           if-no-files-found: error
+          compression-level: 0
           overwrite: false
