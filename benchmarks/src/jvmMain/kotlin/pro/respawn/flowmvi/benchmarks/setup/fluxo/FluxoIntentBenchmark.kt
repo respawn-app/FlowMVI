@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.benchmarks.setup.fluxo
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kt.fluxo.core.annotation.ExperimentalFluxoApi
 import kt.fluxo.core.closeAndWait
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.Scope
@@ -15,6 +16,7 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
 @State(Scope.Benchmark)
 internal class FluxoIntentBenchmark {
 
+    @OptIn(ExperimentalFluxoApi::class)
     @Benchmark
     fun benchmark() = runBlocking {
         val store = fluxoStore()

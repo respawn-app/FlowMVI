@@ -6,14 +6,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
-import pro.respawn.flowmvi.benchmarks.setup.atomic.atomicParallelStore
+import pro.respawn.flowmvi.benchmarks.setup.atomic.atomicStore
 
 /**
  * run an infinite process for profiling
  */
 fun main() = runBlocking {
     println(ProcessHandle.current().pid())
-    val store = atomicParallelStore(this)
+    val store = atomicStore(this)
     launch {
         while (isActive) {
             store.intent(Increment)

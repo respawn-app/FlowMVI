@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior
+import pro.respawn.flowmvi.api.StateStrategy
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
@@ -15,14 +16,14 @@ private fun StoreBuilder<*, *, *>.config() = configure {
     logger = null
     debuggable = false
     actionShareBehavior = ActionShareBehavior.Disabled
-    atomicStateUpdates = true
+    stateStrategy = StateStrategy.Atomic(reentrant = false)
     parallelIntents = false
     verifyPlugins = false
     onOverflow = BufferOverflow.SUSPEND
     intentCapacity = Channel.UNLIMITED
 }
 
-internal fun atomicParallelStore(
+internal fun atomicStore(
     scope: CoroutineScope
 ) = store<BenchmarkState, BenchmarkIntent, Nothing>(BenchmarkState(), scope) {
     config()

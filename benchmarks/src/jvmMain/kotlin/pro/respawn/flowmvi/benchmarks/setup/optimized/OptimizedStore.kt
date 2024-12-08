@@ -4,13 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import pro.respawn.flowmvi.api.ActionShareBehavior.Disabled
+import pro.respawn.flowmvi.api.StateStrategy.Immediate
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateStateImmediate
-import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.reducePlugin
 
 internal fun StoreBuilder<*, *, *>.config() {
@@ -18,7 +18,7 @@ internal fun StoreBuilder<*, *, *>.config() {
         logger = null
         debuggable = false
         actionShareBehavior = Disabled
-        atomicStateUpdates = false
+        stateStrategy = Immediate
         parallelIntents = false
         verifyPlugins = false
         onOverflow = BufferOverflow.SUSPEND

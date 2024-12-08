@@ -25,6 +25,7 @@ kotlin {
         tvOs = false,
         windows = false,
         wasmJs = false,
+        jvm = true,
     )
 }
 tasks.withType<JavaExec>().configureEach {
@@ -47,7 +48,7 @@ benchmark {
         named("main") {
             iterations = 100
             warmups = 20
-            iterationTime = 100
+            iterationTime = 500
             iterationTimeUnit = "ms"
             outputTimeUnit = "us"
             mode = "avgt" // "thrpt" - throughput, "avgt" - average

@@ -17,7 +17,7 @@ internal class AtomicFMVIBenchmark {
 
     @Benchmark
     fun benchmark() = runBlocking {
-        val store = atomicParallelStore(this)
+        val store = atomicStore(this)
         repeat(BenchmarkDefaults.intentsPerIteration) {
             store.emit(BenchmarkIntent.Increment)
         }
