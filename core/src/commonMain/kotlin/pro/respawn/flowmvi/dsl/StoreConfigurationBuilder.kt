@@ -144,7 +144,7 @@ public class StoreConfigurationBuilder @PublishedApi internal constructor() {
     // region deprecated
     @Deprecated(
         "Please use the StateStrategy property",
-        replaceWith = ReplaceWith("stateStrategy = StateStrategy.Atomic()"),
+        replaceWith = ReplaceWith("stateStrategy = StateStrategy.Immediate"),
     )
     @FlowMVIDSL
     @Suppress("UndocumentedPublicProperty")

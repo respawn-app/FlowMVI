@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.enableLogging
+import pro.respawn.flowmvi.plugins.resetStateOnStop
 import pro.respawn.flowmvi.plugins.timeTravel
 
 internal typealias TestTimeTravel = TimeTravel<TestState, LambdaIntent<TestState, TestAction>, TestAction>
@@ -28,17 +29,18 @@ internal fun testTimeTravel() = TestTimeTravel()
 internal fun testStore(
     timeTravel: TestTimeTravel = testTimeTravel(),
     initial: TestState = TestState.Some,
-    behavior: ActionShareBehavior = ActionShareBehavior.Distribute(),
     configure: BuildStore<TestState, LambdaIntent<TestState, TestAction>, TestAction> = {},
 ) = store(initial) {
     configure {
         debuggable = true
         allowTransientSubscriptions = true
         name = "TestStore"
-        actionShareBehavior = behavior
-        stateStrategy = StateStrategy.Atomic()
+        actionShareBehavior = ActionShareBehavior.Distribute()
+        stateStrategy = StateStrategy.Atomic(reentrant = false)
         logger = PlatformStoreLogger
+        parallelIntents = false
     }
+    resetStateOnStop()
     enableLogging()
     timeTravel(timeTravel)
     configure()

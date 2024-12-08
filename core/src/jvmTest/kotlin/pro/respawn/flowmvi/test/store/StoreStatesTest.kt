@@ -5,7 +5,7 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.StateStrategy.Atomic
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.dsl.intent
@@ -30,13 +30,15 @@ class StoreStatesTest : FreeSpec({
     "given lambdaIntent store" - {
         val store = testStore(timeTravel) {
             configure {
-                parallelIntents = true
+                parallelIntents = false
             }
         }
         "and intent that blocks state" - {
             val blockingIntent = LambdaIntent<TestState, TestAction> {
-                updateState {
-                    awaitCancellation()
+                launch {
+                    updateState {
+                        awaitCancellation()
+                    }
                 }
             }
             "then state is never updated by another intent" {
@@ -58,6 +60,7 @@ class StoreStatesTest : FreeSpec({
             "then withState is never executed" {
                 store.subscribeAndTest {
                     emit(blockingIntent)
+                    idle()
                     intent {
                         withState {
                             throw AssertionError("WithState was executed")
@@ -75,7 +78,8 @@ class StoreStatesTest : FreeSpec({
                 store.subscribeAndTest {
                     states.test {
                         awaitItem() shouldBe TestState.Some
-                        intent(blockingIntent)
+                        emit(blockingIntent)
+                        idle()
                         intent { updateStateImmediate { newState } }
                         awaitItem() shouldBe newState
                         state shouldBe newState
