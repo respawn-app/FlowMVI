@@ -2,10 +2,10 @@
 
 package pro.respawn.flowmvi.debugger.model
 
-import kotlin.uuid.Uuid
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.MVIAction
+import kotlin.uuid.Uuid
 
 @Serializable
 @SerialName("ServerEvent")

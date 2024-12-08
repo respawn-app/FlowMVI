@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.sample.navigation.destination
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import pro.respawn.kmmutils.common.fastLazy
 
 @Serializable

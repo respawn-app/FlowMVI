@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
-import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
@@ -27,6 +26,7 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.util.typed
+import kotlin.uuid.Uuid
 
 private typealias Ctx = PipelineContext<StoreDetailsState, StoreDetailsIntent, StoreDetailsAction>
 

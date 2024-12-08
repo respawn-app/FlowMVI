@@ -142,8 +142,6 @@ versionCatalogUpdate {
     }
 }
 
-
-
 tasks {
     withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         buildUponDefaultConfig = true

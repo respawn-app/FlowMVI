@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
     id(libs.plugins.kotlin.multiplatform.id)
     alias(libs.plugins.compose)

@@ -1,4 +1,4 @@
-import configureMultiplatform
+
 import kotlinx.benchmark.gradle.JvmBenchmarkTarget
 import kotlinx.benchmark.gradle.benchmark
 
@@ -26,7 +26,6 @@ kotlin {
         windows = false,
         wasmJs = false,
     )
-
 }
 tasks.withType<JavaExec>().configureEach {
     jvmArgs("-Dkotlinx.coroutines.debug=off")

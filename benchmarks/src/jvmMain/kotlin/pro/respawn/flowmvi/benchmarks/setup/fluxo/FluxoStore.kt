@@ -7,8 +7,7 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 
 @OptIn(ExperimentalFluxoApi::class)
-internal inline fun fluxoStore(
-) = store(BenchmarkState(), reducer = { it: BenchmarkIntent ->
+internal inline fun fluxoStore() = store(BenchmarkState(), reducer = { it: BenchmarkIntent ->
     when (it) {
         BenchmarkIntent.Increment -> copy(counter = counter + 1)
     }

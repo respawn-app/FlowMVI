@@ -26,7 +26,7 @@ fun Project.configureMultiplatform(
     configure: KotlinHierarchyBuilder.Root.() -> Unit = {},
 ) = ext.apply {
     val libs by versionCatalog
-    if(explicitApi) explicitApi()
+    if (explicitApi) explicitApi()
     applyDefaultHierarchyTemplate(configure)
     withSourcesJar(true)
     compilerOptions {

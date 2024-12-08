@@ -120,7 +120,7 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
         val qI = q[i]
 
         val numerator = (nI - nMinus1 + d) * (qPlus1 - qI) / (nPlus1 - nI) +
-                (nPlus1 - nI - d) * (qI - qMinus1) / (nI - nMinus1)
+            (nPlus1 - nI - d) * (qI - qMinus1) / (nI - nMinus1)
 
         return qI + d / (nPlus1 - nMinus1) * numerator
     }

@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
 import androidx.compose.runtime.Immutable
-import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -9,6 +8,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.StoreCommand
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
+import kotlin.uuid.Uuid
 
 @Immutable
 internal sealed interface StoreDetailsState : MVIState {

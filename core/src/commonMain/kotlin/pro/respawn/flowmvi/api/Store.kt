@@ -20,5 +20,4 @@ public interface Store<out S : MVIState, in I : MVIIntent, out A : MVIAction> :
 
     // override with a mutable return type
     override fun start(scope: CoroutineScope): StoreLifecycle
-
 }

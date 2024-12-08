@@ -2,7 +2,6 @@
 
 package pro.respawn.flowmvi.test.plugin
 
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
