@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.savedstate.api
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * An interface that specifies **when** [saveStatePlugin] is going to save the store's state.
@@ -34,6 +35,15 @@ public sealed interface SaveBehavior {
      * @see [saveStatePlugin]
      */
     public data class OnUnsubscribe(val remainingSubscribers: Int = 0) : SaveBehavior
+
+    /**
+     * Save the data periodically once [delay] period of time has passed.
+     *
+     * First save will occur **after** the delay defined.
+     *
+     * Do not use multiple values of this strategy, because only the smallest value will be respected.
+     */
+    public data class Periodic(val delay: Duration = 5.seconds) : SaveBehavior
 
     @Suppress("UndocumentedPublicClass") // document a companion?
     public companion object {

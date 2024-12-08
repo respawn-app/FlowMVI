@@ -39,7 +39,7 @@ public inline fun <T> DefaultFileSaver(
         mutex.withLock { write(state, path) }
     }
 
-    // allow cancelling reads (no "NonCancellable here")
+    // allow cancelling reads (no "NonCancellable" here)
     override suspend fun restore(): T? = mutex.withLock { read(path) }
 }
 
