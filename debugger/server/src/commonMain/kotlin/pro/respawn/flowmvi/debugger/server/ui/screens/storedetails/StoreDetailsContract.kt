@@ -1,7 +1,7 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
 import androidx.compose.runtime.Immutable
-import com.benasher44.uuid.Uuid
+import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

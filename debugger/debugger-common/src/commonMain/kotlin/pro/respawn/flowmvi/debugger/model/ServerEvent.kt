@@ -1,14 +1,11 @@
-@file:UseSerializers(UUIDSerializer::class)
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicProperty") // response models for internal usage
 
 package pro.respawn.flowmvi.debugger.model
 
-import com.benasher44.uuid.Uuid
+import kotlin.uuid.Uuid
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import pro.respawn.flowmvi.api.MVIAction
-import pro.respawn.flowmvi.debugger.serializers.UUIDSerializer
 
 @Serializable
 @SerialName("ServerEvent")

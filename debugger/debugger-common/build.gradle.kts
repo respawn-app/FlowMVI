@@ -19,5 +19,4 @@ dependencies {
     commonMainApi(projects.core)
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.bundles.serialization)
-    commonMainImplementation(libs.uuid)
 }

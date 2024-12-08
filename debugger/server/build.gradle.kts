@@ -45,13 +45,17 @@ tasks {
 }
 kotlin {
     jvm {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget = Config.jvmTarget
         }
     }
-
     sourceSets {
+        all {
+            languageSettings {
+                progressiveMode = true
+                Config.optIns.forEach { optIn(it) }
+            }
+        }
         commonMain {
             kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
         }
@@ -79,7 +83,6 @@ kotlin {
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.collections)
             implementation(applibs.apiresult)
-            implementation(libs.uuid)
             implementation(applibs.bundles.koin)
             implementation(libs.kotlin.io)
             implementation(libs.kotlin.atomicfu)

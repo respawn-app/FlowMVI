@@ -25,13 +25,12 @@ kotlin = "2.1.0"
 kotlin-collections = "0.3.8"
 kotlin-browser = "0.3"
 kotlin-io = "0.6.0"
-kotlinx-atomicfu = "0.26.0"
-ktor = "3.0.1"
+kotlinx-atomicfu = "0.26.1"
+ktor = "3.0.2"
 lifecycle = "2.8.4"
 maven-publish-plugin = "0.30.0"
 serialization = "1.7.3"
 turbine = "1.2.0"
-uuid = "0.8.4"
 versionCatalogUpdatePlugin = "0.8.5"
 kotlin-benchmark = "0.4.13"
 
@@ -96,7 +95,6 @@ lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 lifecycle-savedstate = { module = "androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "androidx-lifecycle" }
 lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
-uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 
 [bundles]
 ktor-client = [

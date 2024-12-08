@@ -26,5 +26,4 @@ dependencies {
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.bundles.ktor.client)
     commonMainImplementation(libs.bundles.serialization)
-    commonMainImplementation(libs.uuid)
 }

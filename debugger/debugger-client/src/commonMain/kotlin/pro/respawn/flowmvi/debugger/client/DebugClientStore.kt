@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.client
 
-import com.benasher44.uuid.uuid4
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.receiveDeserialized
@@ -36,6 +35,7 @@ import pro.respawn.flowmvi.plugins.init
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import kotlin.time.Duration
+import kotlin.uuid.Uuid
 
 internal typealias DebugClientStore = Store<EmptyState, ClientEvent, ServerEvent>
 
@@ -47,7 +47,7 @@ internal fun debugClientStore(
     reconnectionDelay: Duration,
     logEvents: Boolean = false,
 ) = store(EmptyState) {
-    val id = uuid4()
+    val id = Uuid.random()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     configure {
         name = "${clientName}Debugger"

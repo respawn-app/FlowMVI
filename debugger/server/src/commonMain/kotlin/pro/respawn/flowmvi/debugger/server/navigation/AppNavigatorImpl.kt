@@ -5,7 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import com.benasher44.uuid.Uuid
+import kotlin.uuid.Uuid
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
 import pro.respawn.flowmvi.debugger.server.navigation.component.StackComponent
 import pro.respawn.flowmvi.debugger.server.navigation.destination.Destination

@@ -23,8 +23,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.uuid4
+import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.parameter.parametersOf
 import pro.respawn.flowmvi.api.IntentReceiver
@@ -130,13 +129,13 @@ private fun StoreDetailsScreenPreview() = RespawnTheme {
     EmptyReceiver {
         StoreDetailsScreenContent(
             state = DisplayingStore(
-                id = uuid4(),
+                id = Uuid.random(),
                 name = "Store ".repeat(10),
                 connected = false,
                 eventLog = ServerEventEntry(
-                    storeId = uuid4(),
+                    storeId = Uuid.random(),
                     name = "Store",
-                    event = ClientEvent.StoreConnected("Store", id = uuid4())
+                    event = ClientEvent.StoreConnected("Store", id = Uuid.random())
                 ).copies(10).toImmutableList(),
             ),
         )

@@ -31,5 +31,4 @@ dependencies {
     commonMainImplementation(libs.bundles.ktor.client)
     commonMainImplementation(libs.ktor.client.engine)
     commonMainImplementation(libs.bundles.serialization)
-    commonMainImplementation(libs.uuid)
 }

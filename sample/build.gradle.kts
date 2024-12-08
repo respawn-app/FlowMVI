@@ -90,7 +90,6 @@ kotlin {
 
                 implementation(libs.bundles.serialization)
                 implementation(libs.kotlin.datetime)
-                implementation(libs.uuid)
                 implementation(libs.kotlin.io)
 
                 implementation(applibs.bundles.kmputils)

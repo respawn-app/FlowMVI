@@ -1,6 +1,6 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
-import com.benasher44.uuid.Uuid
+import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach

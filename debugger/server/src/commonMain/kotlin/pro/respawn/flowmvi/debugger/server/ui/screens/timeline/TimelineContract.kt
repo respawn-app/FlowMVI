@@ -1,7 +1,7 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.runtime.Immutable
-import com.benasher44.uuid.Uuid
+import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone

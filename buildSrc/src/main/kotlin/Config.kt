@@ -45,6 +45,7 @@ object Config {
         "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
+        "kotlin.uuid.ExperimentalUuidApi",
         "kotlin.contracts.ExperimentalContracts",
         "org.jetbrains.compose.resources.ExperimentalResourceApi"
     )
