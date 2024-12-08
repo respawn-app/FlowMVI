@@ -37,14 +37,14 @@ internal class RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>(
 private tailrec fun UnrecoverableException.unwrapRecursion(): Exception = when (val cause = cause) {
     null -> this
     this -> this // cause is the same exception
-    is UnrecoverableException -> cause.unwrapRecursion()
     is CancellationException -> throw cause
+    is UnrecoverableException -> cause.unwrapRecursion()
     else -> cause
 }
 
-private suspend fun alreadyRecovered() = coroutineContext.alreadyRecovered
+internal suspend inline fun alreadyRecovered() = coroutineContext.alreadyRecovered
 
-private val CoroutineContext.alreadyRecovered get() = this[RecoverModule] != null
+internal inline val CoroutineContext.alreadyRecovered get() = this[RecoverModule] != null
 
 /**
  * Run [block] catching any exceptions and invoking [recover]. This will add this [RecoverModule] key to the coroutine
