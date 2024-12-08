@@ -81,6 +81,7 @@ jobs:
 
       - name: Publish new plugin version
         run: ./gradlew debugger:ideplugin:publishPlugin --no-configuration-cache
+        continue-on-error: true # TODO: Remove once verified works
         env:
           CHANGELOG: ${{steps.build_changelog.outputs.changelog}}
 
