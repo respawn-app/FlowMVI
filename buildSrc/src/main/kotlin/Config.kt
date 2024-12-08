@@ -20,7 +20,7 @@ object Config {
     const val majorRelease = 3
     const val minorRelease = 1
     const val patch = 0
-    const val postfix = "-beta04" // include dash (-)
+    const val postfix = "-beta05" // include dash (-)
 
     const val versionCode = 8
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
@@ -45,6 +45,7 @@ object Config {
         "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
+        "kotlin.uuid.ExperimentalUuidApi",
         "kotlin.contracts.ExperimentalContracts",
         "org.jetbrains.compose.resources.ExperimentalResourceApi"
     )

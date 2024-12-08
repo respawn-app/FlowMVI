@@ -16,9 +16,10 @@ dependencyResolutionManagement {
     // REQUIRED for IDE module configuration to resolve IDE platform
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
-        mavenLocal()
+        // mavenLocal()
         google()
         mavenCentral()
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
 
     versionCatalogs {
@@ -38,6 +39,8 @@ include(":core")
 include(":android")
 include(":compose")
 include(":savedstate")
+include(":metrics")
+include(":benchmarks")
 include(":essenty")
 include(":essenty:essenty-compose")
 include(":debugger:app")

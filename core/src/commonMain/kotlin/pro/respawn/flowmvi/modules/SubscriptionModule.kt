@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import pro.respawn.flowmvi.impl.plugin.PluginInstance
 import pro.respawn.flowmvi.util.withPrevious
 
 internal fun subscriptionModule(): SubscriptionModule = SubscriptionModuleImpl()
@@ -37,3 +38,5 @@ internal suspend inline fun SubscriptionModule.observeSubscribers(
         new < previous -> onUnsubscribe(new)
     }
 }
+
+internal inline val PluginInstance<*, *, *>.observesSubscribers get() = onSubscribe != null || onUnsubscribe != null

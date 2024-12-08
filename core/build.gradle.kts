@@ -9,6 +9,12 @@ plugins {
     dokkaDocumentation
 }
 
+atomicfu {
+    dependenciesVersion = libs.versions.kotlinx.atomicfu.get()
+    transformJvm = true
+    jvmVariant = "VH"
+}
+
 android {
     namespace = Config.namespace
 }

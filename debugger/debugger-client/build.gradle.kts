@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.maven.publish)
     dokkaDocumentation
 }
@@ -26,5 +26,4 @@ dependencies {
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.bundles.ktor.client)
     commonMainImplementation(libs.bundles.serialization)
-    commonMainImplementation(libs.uuid)
 }

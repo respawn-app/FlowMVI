@@ -1,8 +1,6 @@
 package pro.respawn.flowmvi.debugger.server
 
 import androidx.compose.runtime.Immutable
-import com.benasher44.uuid.Uuid
-import com.benasher44.uuid.uuid4
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentListOf
@@ -14,6 +12,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ServerEvent
+import kotlin.uuid.Uuid
 
 internal enum class StoreCommand {
     Stop, ResendIntent, RollbackState, ResendAction, RethrowException, SetInitialState
@@ -33,7 +32,7 @@ internal data class ServerEventEntry(
     val name: String,
     val event: ClientEvent,
     val timestamp: Instant = Clock.System.now(),
-    val id: Uuid = uuid4(),
+    val id: Uuid = Uuid.random(),
 )
 
 @Immutable

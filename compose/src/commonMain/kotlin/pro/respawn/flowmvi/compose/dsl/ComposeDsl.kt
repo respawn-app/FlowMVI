@@ -18,6 +18,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.SubscriberLifecycle
 import pro.respawn.flowmvi.api.SubscriptionMode
+import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.util.immediateOrDefault
 import kotlin.jvm.JvmName

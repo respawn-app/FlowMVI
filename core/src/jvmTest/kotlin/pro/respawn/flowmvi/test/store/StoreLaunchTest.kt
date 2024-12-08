@@ -25,7 +25,11 @@ class StoreLaunchTest : FreeSpec({
     val timeTravel = testTimeTravel()
     afterEach { timeTravel.reset() }
     "Given store" - {
-        val store = testStore(timeTravel)
+        val store = testStore(timeTravel) {
+            configure {
+                allowIdleSubscriptions = true
+            }
+        }
         "then can be launched and stopped" {
             coroutineScope {
                 val job = shouldNotThrowAny {

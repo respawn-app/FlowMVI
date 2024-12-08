@@ -1,7 +1,7 @@
 package pro.respawn.flowmvi.debugger.server.navigation
 
-import com.benasher44.uuid.Uuid
 import pro.respawn.flowmvi.debugger.server.navigation.util.Navigator
+import kotlin.uuid.Uuid
 
 interface AppNavigator : Navigator {
     fun connect()

@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.server
 
-import com.benasher44.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +21,11 @@ import pro.respawn.flowmvi.debugger.server.ServerState.Running
 import pro.respawn.flowmvi.debugger.server.arch.configuration.debuggable
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
+import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
+import kotlin.uuid.Uuid
 import pro.respawn.flowmvi.debugger.server.ServerAction as Action
 import pro.respawn.flowmvi.debugger.server.ServerIntent as Intent
 import pro.respawn.flowmvi.debugger.server.ServerState as State

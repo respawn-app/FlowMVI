@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.runtime.Immutable
-import com.benasher44.uuid.Uuid
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -12,6 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.util.type
+import kotlin.uuid.Uuid
 
 internal enum class EventType {
     Intent, Action, StateChange, Subscription, Connection, Exception, Initialization

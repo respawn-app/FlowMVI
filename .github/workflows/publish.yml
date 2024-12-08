@@ -16,6 +16,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  debugger-macos:
+    uses: ./.github/workflows/desktop-macos.yml
+  debugger-linux:
+    uses: ./.github/workflows/desktop-linux.yml
+  debugger-win:
+    uses: ./.github/workflows/desktop-win.yml
+
   publish:
     runs-on: macos-latest
 
@@ -72,6 +79,13 @@ jobs:
           commitMode: true
           configuration: ".github/changelog_config.json"
 
+      - name: Publish new plugin version
+        run: ./gradlew debugger:ideplugin:publishPlugin --no-configuration-cache
+        continue-on-error: true # TODO: Remove once verified works
+        env:
+          CHANGELOG: ${{steps.build_changelog.outputs.changelog}}
+
+        # TODO: Use matrix strat and attach artifacts to the release
       - name: Create GH release
         uses: ncipollo/release-action@v1.14.0
         id: create_release

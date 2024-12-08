@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.dsl.lazyPlugin
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnChange
 import pro.respawn.flowmvi.savedstate.api.SaveBehavior.OnUnsubscribe
+import pro.respawn.flowmvi.savedstate.api.SaveBehavior.Periodic
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CallbackSaver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
@@ -73,11 +74,25 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     var job: Job? by atomic(null)
     val loggingSaver = LoggingSaver(saver, config.logger, tag = config.name)
 
+    val saveDelay = behaviors
+        .asSequence()
+        .filterIsInstance<Periodic>()
+        .minOfOrNull { it.delay }
+        ?.also { require(it.isPositive()) { "Periodic save delay must be positive" } }
+
     onStart {
         withContext(this + context) {
             updateState { loggingSaver.restoreCatching() ?: this }
         }
+
+        if (saveDelay != null) launch(this + context) {
+            while (isActive) {
+                delay(saveDelay)
+                withState { loggingSaver.saveCatching(this) }
+            }
+        }
     }
+
     if (resetOnException) onException {
         withContext(this + context) { loggingSaver.saveCatching(null) }
         it
@@ -88,6 +103,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
         .filterIsInstance<OnUnsubscribe>()
         .maxOfOrNull { it.remainingSubscribers }
         ?.also { require(it >= 0) { "Subscriber count must be >= 0" } }
+
     if (maxSubscribers != null) onUnsubscribe { remainingSubs ->
         if (remainingSubs > maxSubscribers) return@onUnsubscribe
         job?.cancelAndJoin()
@@ -99,6 +115,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
         .filterIsInstance<OnChange>()
         .minOfOrNull { it.delay }
         ?.also { require(!it.isNegative() && it.isFinite()) { "Delay must be >= 0" } }
+
     if (saveTimeout != null) onState { _, new ->
         job?.cancelAndJoin()
         job = launch(context) {

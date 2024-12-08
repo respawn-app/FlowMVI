@@ -34,6 +34,7 @@ intellijPlatform {
     }
     publishing {
         token = props["plugin.publishing.token"]?.toString()
+        hidden = true
     }
     pluginConfiguration {
         ideaVersion {
@@ -49,6 +50,7 @@ intellijPlatform {
         description = Config.Plugin.description
         name = Config.Plugin.name
         version = Config.versionName
+        changeNotes = System.getenv("CHANGELOG")
     }
 }
 

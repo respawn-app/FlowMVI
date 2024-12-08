@@ -27,6 +27,7 @@ import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.invoke
 import pro.respawn.kmmutils.common.asUUID
+import kotlin.uuid.toKotlinUuid
 
 internal object DebugServer : Container<ServerState, ServerIntent, ServerAction> {
 
@@ -44,7 +45,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
             routing {
                 get("/") { call.respondText("FlowMVI Debugger Online", null) }
                 webSocket("/{id}") {
-                    val storeId = call.parameters.getOrFail("id").asUUID
+                    val storeId = call.parameters.getOrFail("id").asUUID.toKotlinUuid()
                     with(store) {
                         try {
                             subscribe {

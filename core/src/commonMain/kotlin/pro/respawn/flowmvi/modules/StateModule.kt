@@ -1,44 +1,60 @@
-@file:Suppress("OVERRIDE_BY_INLINE")
+@file:OptIn(InternalFlowMVIAPI::class)
 
 package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
-import pro.respawn.flowmvi.api.DelicateStoreApi
+import kotlinx.coroutines.sync.withLock
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
+import pro.respawn.flowmvi.api.ImmediateStateReceiver
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
-import pro.respawn.flowmvi.api.StateProvider
-import pro.respawn.flowmvi.api.StateReceiver
+import pro.respawn.flowmvi.api.PipelineContext
+import pro.respawn.flowmvi.api.StateStrategy
+import pro.respawn.flowmvi.api.StateStrategy.Atomic
+import pro.respawn.flowmvi.api.StateStrategy.Immediate
+import pro.respawn.flowmvi.dsl.updateStateImmediate
+import pro.respawn.flowmvi.util.ReentrantMutexContextElement
+import pro.respawn.flowmvi.util.ReentrantMutexContextKey
 import pro.respawn.flowmvi.util.withReentrantLock
+import pro.respawn.flowmvi.util.withValidatedLock
 
-internal fun <S : MVIState> stateModule(
+internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     initial: S,
-    atomic: Boolean,
-): StateModule<S> = StateModuleImpl(initial, if (atomic) Mutex() else null)
-
-internal interface StateModule<S : MVIState> : StateReceiver<S>, StateProvider<S>
-
-private class StateModuleImpl<S : MVIState>(
-    initial: S,
-    private val mutex: Mutex?,
-) : StateModule<S> {
+    strategy: StateStrategy,
+    private val debuggable: Boolean,
+    private val chain: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)?
+) : ImmediateStateReceiver<S> {
 
     @Suppress("VariableNaming")
     private val _states = MutableStateFlow(initial)
     override val states: StateFlow<S> = _states.asStateFlow()
+    private val reentrant = strategy is Atomic && strategy.reentrant
+    private val mutexElement = when (strategy) {
+        is Immediate -> null
+        is Atomic -> Mutex().let(::ReentrantMutexContextKey).let(::ReentrantMutexContextElement)
+    }
 
-    @DelicateStoreApi
-    override val state: S by states::value
+    private suspend inline fun withLock(crossinline block: suspend () -> Unit) = when {
+        mutexElement == null -> block()
+        reentrant -> mutexElement.withReentrantLock(block)
+        debuggable -> mutexElement.withValidatedLock(block)
+        else -> mutexElement.key.mutex.withLock { block() }
+    }
 
-    override inline fun updateStateImmediate(block: S.() -> S) = _states.update(block)
+    override fun compareAndSet(expect: S, new: S) = _states.compareAndSet(expect, new)
 
-    override suspend inline fun withState(
+    suspend inline fun withState(
         crossinline block: suspend S.() -> Unit
-    ) = mutex.withReentrantLock { block(states.value) }
+    ) = withLock { block(states.value) }
 
-    override suspend inline fun updateState(
+    suspend inline fun PipelineContext<S, I, A>.useState(
         crossinline transform: suspend S.() -> S
-    ) = mutex.withReentrantLock { _states.update { transform(it) } }
+    ) = withLock {
+        val chain = chain ?: return@withLock updateStateImmediate { transform() }
+        updateStateImmediate { chain(this, transform()) ?: this }
+    }
 }

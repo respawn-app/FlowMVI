@@ -1,10 +1,8 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
-    id(libs.plugins.kotlinMultiplatform.id)
+    id(libs.plugins.kotlin.multiplatform.id)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 val parentNamespace = namespaceByPath()
@@ -45,13 +43,17 @@ tasks {
 }
 kotlin {
     jvm {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
             jvmTarget = Config.jvmTarget
         }
     }
-
     sourceSets {
+        all {
+            languageSettings {
+                progressiveMode = true
+                Config.optIns.forEach { optIn(it) }
+            }
+        }
         commonMain {
             kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
         }
@@ -79,7 +81,6 @@ kotlin {
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.collections)
             implementation(applibs.apiresult)
-            implementation(libs.uuid)
             implementation(applibs.bundles.koin)
             implementation(libs.kotlin.io)
             implementation(libs.kotlin.atomicfu)

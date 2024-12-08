@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a bug or an issue with existing features
+title: "🐞: "
+labels: [ triage ]
+assignees: [ Nek-12 ]
+type: 'bug'
+body:
+  - type: input
+    attributes:
+      label: FlowMVI Version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Kotlin Version
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Platforms
+      description: If not sure, select the platform where you reproduced this issue on
+      options:
+        - label: 'Android'
+        - label: 'iOS'
+        - label: 'macOS'
+        - label: 'Linux'
+        - label: 'Windows'
+        - label: 'JS'
+        - label: 'Wasm'
+  - type: checkboxes
+    attributes:
+      label: Before you submit
+      validations:
+        required: true
+      options:
+        - label: 'I have read the FAQ and documentation'
+        - label: 'I have used search to find similar issues already reported'
+  - type: textarea
+    description: Provide more details about what happened. Reproducers or examples will greatly speed up the resolution.
+    validations:
+      required: true

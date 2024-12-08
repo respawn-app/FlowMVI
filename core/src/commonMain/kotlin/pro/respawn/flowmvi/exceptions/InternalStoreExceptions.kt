@@ -57,3 +57,14 @@ internal class SubscribeBeforeStartException(cause: Exception? = null) : Unrecov
         If not, please always call Store.start() before you try using it.
     """.trimIndent()
 )
+
+@PublishedApi
+internal class RecursiveStateTransactionException(cause: Exception?) : UnrecoverableException(
+    cause = cause,
+    message = """
+        You have tried to start a state transaction while already in one.
+        This happened because state transactions are Atomic and reentrant = false.
+        Please avoid using recursion in transactions, otherwise you will get a permanent deadlock, or use 
+        StateStrategy.Atomic.reentrant = true at the cost of some performance.
+    """.trimIndent()
+)

@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
-    kotlin("multiplatform")
-    alias(libs.plugins.serialization)
-    id("com.android.library")
+    alias(libs.plugins.kotlin.serialization)
+    id(libs.plugins.kotlin.multiplatform.id)
+    id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.maven.publish)
     dokkaDocumentation
 }

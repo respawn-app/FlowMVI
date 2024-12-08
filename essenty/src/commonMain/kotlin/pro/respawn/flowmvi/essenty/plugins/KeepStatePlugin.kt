@@ -11,6 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
+import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.essenty.dsl.retainedStore
 import pro.respawn.flowmvi.essenty.savedstate.ensureNotRegistered
 import pro.respawn.flowmvi.util.typed
