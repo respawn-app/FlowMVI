@@ -6,14 +6,16 @@ assignees: [ Nek-12 ]
 type: 'task'
 body:
   - type: textarea
-    description: What do you want to know?
+    attributes:
+      label: Description
+      description: What do you want to know?
     validations:
       required: true
   - type: checkboxes
     attributes:
       label: Before you submit
-      validations:
-        required: true
       options:
         - label: 'I have read the FAQ and documentation'
+          required: true
         - label: 'I have used search to see if this question has already been answered'
+          required: true

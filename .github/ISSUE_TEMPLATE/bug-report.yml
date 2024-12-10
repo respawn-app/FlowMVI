@@ -30,12 +30,14 @@ body:
   - type: checkboxes
     attributes:
       label: Before you submit
-      validations:
-        required: true
       options:
         - label: 'I have read the FAQ and documentation'
+          required: true
         - label: 'I have used search to find similar issues already reported'
+          required: true
   - type: textarea
-    description: Provide more details about what happened. Reproducers or examples will greatly speed up the resolution.
     validations:
       required: true
+    attributes:
+      label: Issue details
+      description: Provide more details about what happened. Reproducers or examples will greatly speed up the resolution.
