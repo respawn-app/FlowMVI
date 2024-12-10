@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     kotlin("jvm")
     alias(libs.plugins.compose)
@@ -35,6 +37,14 @@ intellijPlatform {
     publishing {
         token = props["plugin.publishing.token"]?.toString()
         hidden = true
+    }
+    pluginVerification {
+        ides {
+            props["plugin.local.ide.path"]?.toString()?.let(::local) ?: ide(
+                IntelliJPlatformType.AndroidStudio,
+                libs.versions.intellij.idea.get()
+            )
+        }
     }
     pluginConfiguration {
         ideaVersion {

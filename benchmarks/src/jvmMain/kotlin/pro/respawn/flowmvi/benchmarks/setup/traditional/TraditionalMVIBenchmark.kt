@@ -20,6 +20,6 @@ internal class TraditionalMVIBenchmark {
         repeat(BenchmarkDefaults.intentsPerIteration) {
             store.onIntent(BenchmarkIntent.Increment)
         }
-        store.state.first { state -> state.counter >= BenchmarkDefaults.intentsPerIteration }
+        store.state.first { state -> state.counter == BenchmarkDefaults.intentsPerIteration }
     }
 }

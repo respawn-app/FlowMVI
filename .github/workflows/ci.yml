@@ -56,3 +56,6 @@ jobs:
 
       - name: Unit tests
         run: ./gradlew allTests --stacktrace --no-configuration-cache
+
+      - name: Verify IDE plugin
+        run: ./gradlew debugger:ideplugin:verifyPlugin

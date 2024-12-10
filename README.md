@@ -20,7 +20,7 @@ achieve thread-safety, and more. It takes about 10 minutes to try it.
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 * Documentation:
-  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/)
+  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/quickstart)
 * KDoc:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * Sample App (See features) ![badge-wasm]:
@@ -105,11 +105,11 @@ Here's what you get:
 * First class Compose Multiplatform support optimized for performance and ease of use
 * Use both MVVM+ (functional) or MVI (model-driven) style of programming
 * Share, distribute, or disable side-effects based on your team's needs
-* Dedicated remote debugger IDEA/AS plugin and app for Windows, Linux, MacOS
+* Dedicated remote debugger and code generation IDEA/AS plugin and app for Windows, Linux, MacOS
 * Integration with popular libraries, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
 * The core library depends on kotlin coroutines. Nothing else
 * Core library is fully covered by tests
-* Minimal performance overhead, equal to using a simple Channel. Benchmarks are run regularly
+* Minimal performance overhead, equal to using a simple Channel, with regular benchmarking
 * Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 
 ## How does it look?
