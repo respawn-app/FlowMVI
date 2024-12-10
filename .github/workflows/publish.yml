@@ -22,17 +22,18 @@ jobs:
     uses: ./.github/workflows/desktop-linux.yml
   debugger-win:
     uses: ./.github/workflows/desktop-win.yml
-
   publish:
+#    needs: [ debugger-macos, debugger-linux, debugger-win ]
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
-      - name: set up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'

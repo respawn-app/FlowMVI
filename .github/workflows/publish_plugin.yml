@@ -1,0 +1,38 @@
+name: Publish IDE Plugin Manually
+
+on:
+  workflow_dispatch:
+
+
+concurrency:
+  group: "build"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          check-latest: true
+          java-version: 22
+          cache: 'gradle'
+
+      - name: Validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Create local properties
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
+        run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
+
+      - name: Publish new plugin version
+        run: ./gradlew debugger:ideplugin:publishPlugin
