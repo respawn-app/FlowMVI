@@ -41,7 +41,7 @@ intellijPlatform {
     pluginVerification {
         ides {
             props["plugin.local.ide.path"]?.toString()?.let(::local) ?: ide(
-                IntelliJPlatformType.AndroidStudio,
+                IntelliJPlatformType.IntellijIdeaCommunity,
                 libs.versions.intellij.idea.get()
             )
         }
