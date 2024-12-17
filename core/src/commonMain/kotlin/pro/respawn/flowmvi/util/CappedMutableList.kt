@@ -35,8 +35,7 @@ internal class CappedMutableList<T>(
     }
 
     private fun removeOverflowing() {
-        while (size > maxSize) {
-            removeFirst()
-        }
+        // do not use removeFirst because of https://jakewharton.com/kotlins-jdk-release-compatibility-flag/
+        while (size > maxSize) removeAt(0)
     }
 }

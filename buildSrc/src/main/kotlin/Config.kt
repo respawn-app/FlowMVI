@@ -21,8 +21,8 @@ object Config {
     const val minorRelease = 1
     const val patch = 0
     const val postfix = "-beta05" // include dash (-)
-
     const val versionCode = 8
+
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
     const val url = "https://github.com/respawn-app/FlowMVI"
@@ -39,7 +39,8 @@ object Config {
     const val vendorId = "respawn-app"
     const val name = "FlowMVI"
 
-    // endregion
+    val jvmTarget = JvmTarget.JVM_11
+    val javaVersion = JavaVersion.VERSION_11
     val optIns = listOf(
         "kotlinx.coroutines.ExperimentalCoroutinesApi",
         "kotlinx.coroutines.FlowPreview",
@@ -64,16 +65,14 @@ object Config {
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
+        add("-Xjdk-release=${jvmTarget.target}")
     }
 
-    val jvmTarget = JvmTarget.JVM_11
-    val javaVersion = JavaVersion.VERSION_11
+    // android
     const val compileSdk = 35
     const val targetSdk = compileSdk
     const val minSdk = 21
     const val appMinSdk = 26
-
-    // android
     const val namespace = artifactId
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
     const val isMinifyEnabledRelease = false
@@ -140,4 +139,6 @@ Note - the plugin's version (latest is $versionName) is synced with the version 
 If you are using a severely outdated version of either library or the plugin, you may run into issues.
 """
     }
+
+    // endregion
 }
