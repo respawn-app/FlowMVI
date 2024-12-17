@@ -1,5 +1,15 @@
 # Getting started with plugins
 
+FlowMVI is built entirely based on Plugins!
+Plugins form a chain of responsibility (called _Pipeline_) and 
+execute _in the order they were installed_ into the Store.
+This allows you to assemble business logic like a lego by placing the "bricks" in the order you want, and transparently
+inject some logic into any store at any point.
+
+Here's how the Plugin chain works:
+
+![](../images/chart.png)
+
 ## Plugin Ordering
 
 !> The order of plugins matters! Changing the order of plugins may completely change how your store works.

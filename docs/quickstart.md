@@ -14,8 +14,6 @@ First of all, here's how the library works:
 
 ----
 
-![](images/chart.png)
-
 ## Step 1: Configure the library
 
 ### 1.1: Add dependencies
