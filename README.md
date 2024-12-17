@@ -15,7 +15,7 @@ FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines.
 It enables you to extend your business logic with reusable plugins, handle errors,
 achieve thread-safety, and more. It takes about 10 minutes and 50 lines of code to get started.
 
-## Quickstart:
+## ⚡️ Quickstart:
 
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
@@ -81,7 +81,7 @@ dependencies {
 
 </details>
 
-## Why FlowMVI?
+## 🚀 Why FlowMVI?
 
 Usually architecture frameworks mean boilerplate and support difficulty for marginal benefits of "clean code".
 FlowMVI does not dictate what your code should do or look like.
@@ -112,11 +112,11 @@ Here's what you get:
 * **Test any business logic** using clean, declarative DSL.
 * Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 
-## How does it look?
+## 👀 What does it look like?
 
-It is insanely **easy to get started**. All you have to do is:
+To get started, all you have to do is:
 
-### 1. Define a contract:
+### 1. Define a Contract:
 
 ```kotlin
 data class State(
@@ -127,9 +127,6 @@ sealed interface Intent : MVIIntent {
     data object ClickedCounter : Intent
 }
 
-// or use mvvm+ style
-typealias IntentIntent = LambdaIntent<State, Action>
-
 sealed interface Action : MVIAction {
     data class ShowMessage(val message: String) : Action
 }
@@ -138,12 +135,12 @@ sealed interface Action : MVIAction {
 ### 2. Declare your business logic:
 
 ```kotlin
-val store = store<_, _>(initial = State(), scope = coroutineScope) {
-
-    reduce { intent ->
+val counterStore = store(initial = State(), scope = coroutineScope) {
+    
+    reduce { intent: Intent ->
         when (intent) {
             is ClickedCounter -> updateState {
-                action(ShowMessage("Added to counter!"))
+                action(ShowMessage("Incremented!"))
 
                 copy(counter = counter + 1)
             }
@@ -152,10 +149,12 @@ val store = store<_, _>(initial = State(), scope = coroutineScope) {
 }
 
 store.intent(ClickedCounter)
-
 ```
 
-Want to have advanced configuration with tons of features, persistent state, or interceptors?
+That's it!
+
+> But my app is really complex! I want state persistence, error-handling, analytics, threading etc...
+
 No problem, your logic's complexity now scales **linearly**. Adding a new feature is as simple as calling a function.
 
 <details>
@@ -168,24 +167,29 @@ class CounterContainer(
     val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
 
         configure {
-            actionShareBehavior = ActionShareBehavior.Distribute()
+            // use various side-effect strategies
+            actionShareBehavior = Distribute()
+            
+            // checks and verifies your business logic for you
             debuggable = true
 
             // make the store fully async, parallel and thread-safe
             parallelIntents = true
             coroutineContext = Dispatchers.Default
-            atomicStateUpdates = true
+            stateStrategy = Atomic()
         }
 
-        // out of the box logging and IDE debugging
+        // out of the box logging
         enableLogging()
+        
+        // debug using the IDE plugin
         enableRemoteDebugging()
 
         // undo / redo any operation
         val undoRedo = undoRedo()
 
         // manage long-running jobs
-        val jobManager = manageJobs()
+        val jobManager = manageJobs<CounterJob>()
 
         // save and restore the state automatically
         serializeState(
@@ -204,7 +208,7 @@ class CounterContainer(
             null
         }
 
-        // observe streams and save resources when there are no subscribers
+        // save resources when there are no subscribers
         whileSubscribed {
             repo.timer.collect {
                 updateState<DisplayingCounter, _> {
@@ -228,19 +232,19 @@ class CounterContainer(
             }
         }
 
-        // build custom plugins on the fly
-        install {
-            onStop { repo.stopTimer() }
+        // cleanup resources
+        deinit {
+            repo.stopTimer()
         }
 
-        // and 50+ more options to choose from...
+        // and 30+ more options to choose from...
     }
 }
 ```
 
 </details>
 
-### 3. Extend your logic with plugins!
+## Extend your logic with Plugins
 
 Powerful DSL allows you to hook into various events and amend any part of your logic:
 
@@ -263,7 +267,7 @@ fun analyticsPlugin(analytics: Analytics) = plugin<MVIState, MVIIntent, MVIActio
 
 Never write analytics, debugging, or state persistence code again.
 
-### 4. Build UI using Compose:
+## Compose Multiplatform Support
 
 ![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm] ![badge][badge-wasm] ![badge][badge-js]
 
@@ -272,7 +276,7 @@ Using FlowMVI with Compose is a matter of one line of code:
 ```kotlin
 @Composable
 fun CounterScreen() {
-    val store = inject<CounterContainer>().store
+    val store = counterStore
 
     // subscribe to store based on system lifecycle - on any platform
     val state by store.subscribe { action ->
@@ -291,14 +295,14 @@ fun CounterScreen() {
 }
 ```
 
-Enjoy testable UI and free `@Previews`.
+Enjoy testable UI and free `@Preview`s.
 
-### 5. Android support:
+### Android Support
 
-No more subclassing `ViewModel`. Use `StoreViewModel` instead and make your business logic multiplatform.
+No more subclassing `ViewModel`. Use generic `StoreViewModel` instead and make your business logic multiplatform.
 
 ```kotlin
-val module = module {
+val module = module { // Koin example
     factoryOf(::CounterContainer)
     viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
 }
@@ -329,14 +333,14 @@ Finally stop writing UI tests and replace them with unit tests:
 ### Test Stores
 
 ```kotlin
-counterStore().subscribeAndTest {
+store.subscribeAndTest {
     // turbine + kotest example
     ClickedCounter resultsIn {
         states.test {
-            awaitItem() shouldBe DisplayingCounter(counter = 1, timer = 0)
+            awaitItem() shouldBe State(counter = 1)
         }
         actions.test {
-            awaitItem().shouldBeTypeOf<ShowMessage>()
+            awaitItem() shouldBe ShowMessage
         }
     }
 }
@@ -365,7 +369,7 @@ timerPlugin(timer).test(Loading) {
 
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
-IDE plugin generates entire features in 4 keystrokes and lets you debug and control your app remotely:
+IDE plugin generates features in 4 keystrokes and lets you debug and control your app remotely:
 
 https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
 
