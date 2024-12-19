@@ -13,7 +13,7 @@
 
 FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines.
 It enables you to extend your business logic with reusable plugins, handle errors,
-achieve thread-safety, and more. It takes about 10 minutes and 50 lines of code to get started.
+achieve thread-safety, and more. It takes about 10 minutes to get started.
 
 ## ⚡️ Quickstart:
 
@@ -90,6 +90,8 @@ Instead, this library focuses on building a supporting infrastructure to enable 
 Here's what you get:
 
 * Powerful Plug-In system to automate processes and **reuse any business logic** you desire
+    * Create automatic analytics handlers, websocket connections, error handling mechanisms, or anything else **once**
+      and reuse them throughout your whole project automatically
 * Automatically **recover from any errors** and report them to analytics.
 * Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
 * Create **multiplatform business logic** components with pluggable UI
@@ -112,16 +114,19 @@ Here's what you get:
 * **Test any business logic** using clean, declarative DSL.
 * Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 
-## 👀 What does it look like?
+## 👀 How to get started?
 
-To get started, all you have to do is:
+All you have to do is:
 
 ### 1. Define a Contract:
 
 ```kotlin
-data class State(
-    val counter: Int = 0,
-) : MVIState
+sealed interface State : MVIState {
+    data object Loading : State
+    data class Error(val e: Exception) : State
+    data class Content(val counter: Int = 0) : State
+}
+
 
 sealed interface Intent : MVIIntent {
     data object ClickedCounter : Intent
@@ -135,11 +140,28 @@ sealed interface Action : MVIAction {
 ### 2. Declare your business logic:
 
 ```kotlin
-val counterStore = store(initial = State(), scope = coroutineScope) {
-    
+val counterStore = store(initial = State.Loading, scope = coroutineScope) {
+
+    // install plugins you need
+    install(analyticsPlugin)
+
+    // recover from errors
+    recover { e: Exception ->
+        updateState { State.Error(e) }
+        null
+    }
+
+    // load data
+    init {
+        updateState {
+            State.Content(counter = repository.loadCounter())
+        }
+    }
+
+    // respond to events
     reduce { intent: Intent ->
         when (intent) {
-            is ClickedCounter -> updateState {
+            is ClickedCounter -> updateState<State.Content, _> {
                 action(ShowMessage("Incremented!"))
 
                 copy(counter = counter + 1)
@@ -151,14 +173,13 @@ val counterStore = store(initial = State(), scope = coroutineScope) {
 store.intent(ClickedCounter)
 ```
 
-That's it!
+### 3. Scale your app
 
-> But my app is really complex! I want state persistence, error-handling, analytics, threading etc...
-
-No problem, your logic's complexity now scales **linearly**. Adding a new feature is as simple as calling a function.
+With FlowMVI, complexity **does not grow** no matter how many features you add.
+Adding a new feature is as simple as calling a function.
 
 <details>
-<summary>Example advanced configuration</summary>
+<summary>Advanced configuration example</summary>
 
 ```kotlin
 class CounterContainer(
@@ -200,12 +221,6 @@ class CounterContainer(
         // perform long-running tasks on startup
         init {
             repo.startTimer()
-        }
-
-        // handle any errors
-        recover { e: Exception ->
-            action(ShowMessage(e.message))
-            null
         }
 
         // save resources when there are no subscribers
@@ -258,6 +273,12 @@ fun analyticsPlugin(analytics: Analytics) = plugin<MVIState, MVIIntent, MVIActio
     }
     onException { e ->
         analytics.logError(e)
+    }
+    onSubscribe {
+        analytics.logEngagementStart()
+    }
+    onUnsubscribe {
+        analytics.logEngagementEnd()
     }
     onStop {
         analytics.logScreenLeave()
@@ -367,9 +388,8 @@ timerPlugin(timer).test(Loading) {
 
 ## Debugger IDE Plugin + App
 
+IDE plugin generates code and lets you debug and control your app remotely:
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
-
-IDE plugin generates features in 4 keystrokes and lets you debug and control your app remotely:
 
 https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
 
@@ -385,8 +405,7 @@ https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
 
 ## Ready to try?
 
-It takes 10 minutes to get started. Begin by reading
-the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
+Begin by reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
 
 ----
 
