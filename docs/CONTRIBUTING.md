@@ -12,7 +12,7 @@
     release=false
     ```
 * Make sure you have these installed:
-    * Android Studio latest Canary or Beta, depending on the current project's AGP (yes, we're on the edge).
+    * Android Studio latest Stable or Beta, depending on the current project's AGP.
     * Kotlin Multiplatform suite (run `kdoctor` to verify proper setup)
     * Detekt plugin
     * Kotest plugin
