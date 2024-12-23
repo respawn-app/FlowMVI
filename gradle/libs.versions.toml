@@ -1,38 +1,38 @@
 [versions]
-activity = "1.10.0-beta01"
+activity = "1.10.0-rc01"
 # @pin
 #noinspection GradleDependency - must match jb-lifecycle
 androidx-lifecycle = "2.8.7"
-compose = "1.7.1"
+compose = "1.7.3"
 composeDetektPlugin = "1.4.0"
 core-ktx = "1.13.1"
-coroutines = "1.9.0"
+coroutines = "1.10.1"
 datetime = "0.6.1"
-dependencyAnalysisPlugin = "2.5.0"
+dependencyAnalysisPlugin = "2.6.1"
 detekt = "1.23.7"
-dokka = "2.0.0-Beta"
-essenty = "2.3.0"
+dokka = "2.0.0"
+essenty = "2.4.0"
 fragment = "1.8.5"
-gradleAndroid = "8.8.0-rc01"
+gradleAndroid = "8.8.0-rc02"
 gradleDoctorPlugin = "0.10.0"
-intellij-ide-plugin = "2.1.0"
+intellij-ide-plugin = "2.2.1"
 intellij-idea = "2024.1"
+jmh = "1.37"
 junit = "4.13.2"
 kotest = "6.0.0.M1"
-jmh = "1.37"
 # @pin
 kotlin = "2.1.0"
-kotlin-collections = "0.3.8"
+kotlin-benchmark = "0.4.13"
 kotlin-browser = "0.3"
+kotlin-collections = "0.3.8"
 kotlin-io = "0.6.0"
 kotlinx-atomicfu = "0.26.1"
-ktor = "3.0.2"
+ktor = "3.0.3"
 lifecycle = "2.8.4"
 maven-publish-plugin = "0.30.0"
-serialization = "1.7.3"
+serialization = "1.8.0-RC"
 turbine = "1.2.0"
 versionCatalogUpdatePlugin = "0.8.5"
-kotlin-benchmark = "0.4.13"
 
 [libraries]
 android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradleAndroid" }
@@ -55,6 +55,7 @@ kotest-framework = { module = "io.kotest:kotest-framework-engine", version.ref =
 kotest-junit = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 kotlin-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
+kotlin-benchmark = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlin-benchmark" }
 kotlin-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlin-browser" }
 kotlin-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlin-collections" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
@@ -69,7 +70,6 @@ kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-c
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test-common", version.ref = "kotlin" }
-kotlin-benchmark = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlin-benchmark" }
 ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor-client-contentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -145,9 +145,9 @@ dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 gradleDoctor = { id = "com.osacky.doctor", version.ref = "gradleDoctorPlugin" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
 kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
 kotlin-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlin-benchmark" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish-plugin" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "versionCatalogUpdatePlugin" }
