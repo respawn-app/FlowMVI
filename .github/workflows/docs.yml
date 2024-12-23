@@ -58,7 +58,7 @@ jobs:
         run: mkdir -p ./docs/javadocs
 
       - name: Move docs to the parent docs dir
-        run: cp -r ./build/dokka/html ./docs/javadocs/
+        run: cp -r ./build/dokka/html/ ./docs/javadocs/
 
       - name: Create sample app distributable
         run: ./gradlew wasmJsBrowserDistribution --no-configuration-cache
