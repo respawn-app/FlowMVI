@@ -58,7 +58,7 @@ jobs:
 
       - name: Upload debugger
         id: upload-debugger
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: Debugger_Windows
           path: ./debugger/app/build/compose/binaries/main/exe/*
@@ -68,7 +68,7 @@ jobs:
 
       - name: Upload sample
         id: upload-sample
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: Sample_Windows
           path: ./sample/build/compose/binaries/main/exe/*
