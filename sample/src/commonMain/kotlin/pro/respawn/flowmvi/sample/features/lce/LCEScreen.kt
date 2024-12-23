@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
@@ -110,13 +111,14 @@ private fun IntentReceiver<LCEIntent>.LCEScreenContent(
         is LCEState.Content -> Box {
             LazyColumn(
                 contentPadding = WindowInsets.verticalListPaddings(),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .fillMaxWidth()
             ) {
                 item {
                     Column(modifier = Modifier) {
-                        Text(Description.formatAsMultiline())
+                        Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
                         Spacer(Modifier.height(12.dp))
                         CodeText(Code)
                         Spacer(Modifier.height(12.dp))

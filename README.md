@@ -5,7 +5,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/respawn-app/FlowMVI)
 ![Issues](https://img.shields.io/github/issues/respawn-app/FlowMVI)
 ![GitHub top language](https://img.shields.io/github/languages/top/respawn-app/flowMVI)
-[![CodeFactor](https://www.codefactor.io/repository/github/respawn-app/flowMVI/badge)](https://www.codefactor.io/repository/github/respawn-app/flowMVI)
 [![AndroidWeekly #563](https://androidweekly.net/issues/issue-563/badge)](https://androidweekly.net/issues/issue-563/)
 [![Slack channel](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 
@@ -122,11 +121,11 @@ All you have to do is:
 
 ```kotlin
 sealed interface State : MVIState {
+    
     data object Loading : State
     data class Error(val e: Exception) : State
     data class Content(val counter: Int = 0) : State
 }
-
 
 sealed interface Intent : MVIIntent {
     data object ClickedCounter : Intent
@@ -141,25 +140,19 @@ sealed interface Action : MVIAction {
 
 ```kotlin
 val counterStore = store(initial = State.Loading, scope = coroutineScope) {
+    
+    install(analyticsPlugin) // install plugins you need
 
-    // install plugins you need
-    install(analyticsPlugin)
-
-    // recover from errors
-    recover { e: Exception ->
+    recover { e: Exception -> // recover from errors
         updateState { State.Error(e) }
         null
     }
-
-    // load data
-    init {
+    init { // load data
         updateState {
             State.Content(counter = repository.loadCounter())
         }
     }
-
-    // respond to events
-    reduce { intent: Intent ->
+    reduce { intent: Intent -> // respond to events
         when (intent) {
             is ClickedCounter -> updateState<State.Content, _> {
                 action(ShowMessage("Incremented!"))
@@ -320,7 +313,7 @@ Enjoy testable UI and free `@Preview`s.
 
 ### Android Support
 
-No more subclassing `ViewModel`. Use generic `StoreViewModel` instead and make your business logic multiplatform.
+No more subclassing `ViewModel`. Use `StoreViewModel` instead and make your business logic multiplatform.
 
 ```kotlin
 val module = module { // Koin example
@@ -412,7 +405,7 @@ Begin by reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#
 ## License
 
 ```
-   Copyright 2022-2024 Respawn Team and contributors
+   Copyright 2022-2025 Respawn Team and contributors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

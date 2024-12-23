@@ -53,14 +53,12 @@ jobs:
 
       - name: Generate docs
         run: ./gradlew dokkaGenerate
-        continue-on-error: true
 
       - name: Make javadoc dir
         run: mkdir -p ./docs/javadocs
 
       - name: Move docs to the parent docs dir
         run: cp -r ./build/dokka/html ./docs/javadocs/
-        continue-on-error: true
 
       - name: Create sample app distributable
         run: ./gradlew wasmJsBrowserDistribution --no-configuration-cache

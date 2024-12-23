@@ -3,7 +3,6 @@ package pro.respawn.flowmvi.dsl
 import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
-import pro.respawn.flowmvi.api.ImmutableStore
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -107,6 +106,3 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> lazyStore(
     mode: LazyThreadSafetyMode = LazyThreadSafetyMode.SYNCHRONIZED,
     @BuilderInference crossinline configure: BuildStore<S, I, A>,
 ): Lazy<Store<S, I, A>> = lazy(mode) { store(initial, configure).apply { start(scope) } }
-
-public inline val <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.immutable: ImmutableStore<S, I, A>
-    get() = this

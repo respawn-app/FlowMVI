@@ -5,6 +5,7 @@ import kotlinx.serialization.KSerializer
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.StateStrategy.Immediate
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.savedstate.api.Saver
@@ -20,7 +21,7 @@ object TestConfigurationFactory : ConfigurationFactory {
             this.name = name
             debuggable = true
             parallelIntents = false
-            atomicStateUpdates = false
+            stateStrategy = Immediate
             onOverflow = SUSPEND
         }
         enableLogging()

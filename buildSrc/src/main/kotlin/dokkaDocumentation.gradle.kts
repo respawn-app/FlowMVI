@@ -8,7 +8,6 @@ plugins {
 val libs by versionCatalog
 
 dokka {
-    dokkaEngineVersion.set("1.9.20")
     dokkaGeneratorIsolation = ClassLoaderIsolation()
     moduleName = project.name
     moduleVersion = project.version.toString()

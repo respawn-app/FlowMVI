@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -84,7 +84,7 @@ private fun IntentReceiver<SimpleIntent>.SimpleScreenContent(
 ) = Column(
     modifier = Modifier
         .fillMaxHeight()
-        .fillMaxWidth()
+        .widthIn(max = 600.dp)
         .padding(horizontal = 12.dp)
         .verticalScroll(rememberScrollState()),
     verticalArrangement = Arrangement.Center,

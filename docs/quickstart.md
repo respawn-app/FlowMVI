@@ -20,7 +20,7 @@ First of all, here's how the library works:
 
 ![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)
 
-<details open>
+<details>
 <summary>Version catalogs</summary>
 
 ```toml
@@ -308,7 +308,7 @@ configure {
     actionShareBehavior = ActionShareBehavior.Distribute()
     onOverflow = BufferOverflow.DROP_OLDEST
     intentCapacity = Channel.UNLIMITED
-    atomicStateUpdates = true
+    stateStrategy = StateStrategy.Atomic(reentrant = true)
     allowIdleSubscriptions = false
     logger = if (debuggable) PlatformStoreLogger else NoOpStoreLogger
     verifyPlugins = debuggable
@@ -343,12 +343,16 @@ configure {
     * `Channel.CONFLATED` - A buffer of 1
     * `Channel.RENDEZVOUS` - Zero buffer (all events not ready to be processed are dropped)
     * `Channel.BUFFERED` - Default system buffer capacity
-* `atomicStateUpdates` - Enables transaction serialization for state updates, making state updates atomic and
-  suspendable. Synchronizes state updates, allowing only **one** client to read and/or update the state at a time. All
-  other clients that attempt to get the state will wait in a FIFO queue and suspend the parent coroutine. For one-time
-  usage of non-atomic updates, see `updateStateImmediate`. Learn
-  more [here](https://proandroiddev.com/how-to-safely-update-state-in-your-kotlin-apps-bf51ccebe2ef).
-  Has a small performance impact because of coroutine context switching and mutex usage when enabled.
+* `stateStrategy` - Strategy for serializing state transactions. Choose one of the following:
+    * `Atomic(reentrant = false)` - Enables transaction serialization for state updates, making state updates atomic and
+      suspendable. Synchronizes state updates, allowing only **one** client to read and/or update the state at a time.
+      All other clients that attempt to get the state will wait in a FIFO queue and suspend the parent coroutine. For
+      one-time usage of non-atomic updates, see `updateStateImmediate`. Recommended for most cases.
+    * `Atomic(reentrant = true)` - Same as above, but allows nested state updates
+      without causing a deadlock, like this: `updateState { updateState { } }`. This strategy is 15x slower than other
+      options, but still negligible for managing UI and other non-performance-critical tasks. This is the default.
+    * `Immediate` - 2 times faster than atomic with no reentrancy, but provides no state consistency guarantees
+      and no thread-safety. Equivalent to always using `updateStateImmediate`.
 * `allowIdleSubscriptions` - A flag to indicate that clients may subscribe to this store even while it is not started.
   If you intend to stop and restart your store while the subscribers are present, set this to `true`. By default, will
   use the opposite value of the `debuggable` parameter (`true` on production).

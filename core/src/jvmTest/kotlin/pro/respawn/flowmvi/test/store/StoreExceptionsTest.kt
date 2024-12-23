@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeSingleton
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
@@ -46,6 +47,7 @@ class StoreExceptionsTest : FreeSpec({
                     idle()
                     plugin.starts shouldBe 1
                     plugin.exceptions.shouldContainExactly(e)
+                    isActive shouldBe true
                 }
             }
 
@@ -118,6 +120,9 @@ class StoreExceptionsTest : FreeSpec({
         }
         "and store that handles exceptions" - {
             val store = testStore(plugin) {
+                init {
+                    currentCoroutineContext()[RecoverModule].shouldBeNull()
+                }
                 recover {
                     currentCoroutineContext()[RecoverModule].shouldNotBeNull()
                     null
