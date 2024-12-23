@@ -5,8 +5,8 @@ plugins {
     id(libs.plugins.kotlin.multiplatform.id)
     id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.atomicfu)
-    alias(libs.plugins.maven.publish)
-    dokkaDocumentation
+    // alias(libs.plugins.maven.publish)
+    // dokkaDocumentation
 }
 
 kotlin {
