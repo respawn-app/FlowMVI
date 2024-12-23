@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,7 +101,7 @@ private fun DiConfigScreenContent(state: PersistedCounterState) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
 ) {
-    Text(Description.formatAsMultiline())
+    Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
     Spacer(Modifier.height(12.dp))
     Text("Persisted counter state: ${state.counter}")
     Spacer(Modifier.height(12.dp))

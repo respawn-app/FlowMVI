@@ -4,6 +4,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Text
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.BoldHighlight
@@ -31,6 +33,7 @@ import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import pro.respawn.flowmvi.sample.ui.theme.Monaspace
 
 val Highlights.annotatedString
     get() = buildAnnotatedString {
@@ -82,13 +85,14 @@ fun CodeText(
         SelectionContainer {
             Text(
                 text = string,
-                fontSize = 13.sp,
-                fontFamily = FontFamily.Monospace, // TODO: Monaspace appears to be unsupported by compose?
+                fontSize = 14.sp,
+                fontFamily = FontFamily.Monaspace,
                 textAlign = TextAlign.Start,
                 overflow = TextOverflow.Visible,
+                fontWeight = FontWeight.W500,
                 softWrap = false,
-                lineHeight = 16.sp,
-                modifier = Modifier.fillMaxWidth(),
+                lineHeight = 20.sp,
+                modifier = Modifier.widthIn(min = 400.dp).fillMaxWidth(),
             )
         }
     }

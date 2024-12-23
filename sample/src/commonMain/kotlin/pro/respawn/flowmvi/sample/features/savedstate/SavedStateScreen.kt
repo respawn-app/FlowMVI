@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,7 +101,7 @@ private fun IntentReceiver<SavedStateIntent>.SavedStateScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Text(Description.formatAsMultiline())
+            Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
             Spacer(Modifier.height(24.dp))
             RTextInput(
                 input = input,

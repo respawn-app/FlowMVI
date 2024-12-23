@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -120,7 +121,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(horizontal = 12.dp),
                 ) {
-                    Text(Description.formatAsMultiline())
+                    Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
                     Spacer(Modifier.height(12.dp))
                     CodeText(Code)
                     Spacer(Modifier.height(12.dp))
@@ -136,7 +137,7 @@ private fun IntentReceiver<LoggingIntent>.LoggingScreenContent(
                     text = it,
                     modifier = Modifier
                         .padding(horizontal = 12.dp, vertical = 4.dp)
-                        .fillMaxWidth(),
+                        .widthIn(max = 600.dp),
                     fontSize = 13.sp,
                     fontFamily = FontFamily.Monospace,
                 )

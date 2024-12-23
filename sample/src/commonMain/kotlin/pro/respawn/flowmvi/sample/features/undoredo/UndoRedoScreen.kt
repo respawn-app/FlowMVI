@@ -120,10 +120,10 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
 ) {
-    Text(Description.formatAsMultiline())
+    Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
     Spacer(Modifier.height(12.dp))
     Row(
-        modifier = Modifier.widthIn(min = 400.dp),
+        modifier = Modifier.widthIn(min = 400.dp, max = 600.dp),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -143,7 +143,7 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
     RTextInput(
         input = state.input,
         onTextChange = { intent(ChangedInput(it)) },
-        modifier = Modifier.fillMaxWidth().widthIn(max = 400.dp),
+        modifier = Modifier.widthIn(max = 600.dp),
         label = "Type and undo",
     )
     Spacer(Modifier.height(12.dp))
