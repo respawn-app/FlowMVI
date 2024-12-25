@@ -1,4 +1,8 @@
-# Learn how to persist and restore State
+---
+sidebar_position: 4
+---
+
+# Persist and Restore State
 
 The `savedstate` artifact contains plugins and API necessary to save and restore the state of a store to a place
 that outlives its lifespan. This is useful in many cases and provides an unparalleled UX. For example, a person may
@@ -13,12 +17,12 @@ flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = 
 
 The artifact depends on:
 
-* `kotlinx-io`, and as a consequence, on `okio`
-* `kotlinx-serialization`, including Json
-* `androidx-lifecycle-savedstate` on Android to parcelize the state.
+-   `kotlinx-io`, and as a consequence, on `okio`
+-   `kotlinx-serialization`, including Json
+-   `androidx-lifecycle-savedstate` on Android to parcelize the state.
 
 The artifact depends on quite a few things, so it would be best to avoid adding it to all of your modules.
-Instead, you can inject the plugin or savers using DI in [this guide](/plugins/Debugging.md).
+Instead, you can inject the plugin or savers using DI in [this guide](/plugins/debugging.md).
 
 ## 2. Defining `Saver`s
 
@@ -26,12 +30,12 @@ The basic building block of the module is the `Saver` interface/function. Saver 
 Use the `Saver` function to build a saver or implement the
 interface to write your custom saving logic, or use one of the prebuilt ones:
 
-* `MapSaver` for saving partial data.
-* `TypedSaver` for saving a state of a particular subtype.
-* `JsonSaver` for saving the state as a JSON.
-* `FileSaver` for saving the state to a file. See `DefaultFileSaver` for custom file writing logic.
-* `CompressedFileSaver` for saving the state to a file and compressing it.
-* `NoOpSaver` for testing.
+-   `MapSaver` for saving partial data.
+-   `TypedSaver` for saving a state of a particular subtype.
+-   `JsonSaver` for saving the state as a JSON.
+-   `FileSaver` for saving the state to a file. See `DefaultFileSaver` for custom file writing logic.
+-   `CompressedFileSaver` for saving the state to a file and compressing it.
+-   `NoOpSaver` for testing.
 
 `Saver`s can be decorated and extended. For example, you can build a saver chain to store a particular type of the state
 in a compressed Json file:
@@ -67,8 +71,17 @@ This behavior will persist the state when a subscriber is removed and the store 
 This will happen, for example, when the app goes into the background.
 Don't use multiple instances of this behavior, as only the maximum number of subscribers will be respected.
 
-?> By default, both of these are used - on each change, with a sensible delay, and when all subscribers leave.
+### `Periodic`
+
+Save the state periodically after the specified `delay` regardless of whether the state was updated.
+This is useful when you are updating the state with `updateStateImmediate`, e.g. text fields.
+
+:::info
+
+By default, `OnChange` and `OnUnsubscribe` are used - on each change, with a sensible delay, and when all subscribers leave.
 You can customize this via the `behaviors` parameter of the plugin.
+
+:::
 
 ## 4. Installing the plugin
 
@@ -100,10 +113,10 @@ serializeState(
 ```
 
 1. Provide a path where the state will be saved.
-    * It's best to use a subdirectory of your cache dir to prevent it from being fiddled with by other code.
-    * On web platforms, the state will be saved to local storage.
+    - It's best to use a subdirectory of your cache dir to prevent it from being fiddled with by other code.
+    - On web platforms, the state will be saved to local storage.
 2. Mark your state class as `@Serializable` to generate a serializer for it.
-    * It's best to store only a particular subset of states of the Store because you don't want to restore the user
+    - It's best to store only a particular subset of states of the Store because you don't want to restore the user
       to an error / loading state, do you?
 3. Provide a way for the plugin to recover from errors when parsing, saving or reading the state. The bare minimum
    is to ignore all errors and not restore or save anything, but a better solution like logging the errors can be used
@@ -120,14 +133,22 @@ parcelizeState<DisplayingCounter, _, _, _>(
 )
 ```
 
-* The `key` parameter will be derived from the Store / class name if you don't specify it, but watch out for conflicts!
-* This plugin uses the `ParcelableSaver` by default, which you can use too.
+-   The `key` parameter will be derived from the Store / class name if you don't specify it, but watch out for conflicts!
+-   This plugin uses the `ParcelableSaver` by default, which you can use too.
 
-!> Watch out for parcel size overflow exceptions! The library will not check the resulting parcel size for you.
+:::warning
 
-?> According to the documentation, any writes to your saved state will only be restored if the app
+Watch out for parcel size overflow exceptions! The library will not check the resulting parcel size for you.
+
+:::
+
+:::info
+
+According to the documentation, any writes to your saved state will only be restored if the app
 was killed by the OS. This means you will not see any state restoration results unless the OS kills the activity
 itself (i.e. exiting the app will not result in the state being restored).
+
+:::
 
 ## 5. Caveats
 

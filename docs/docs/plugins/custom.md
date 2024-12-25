@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Creating custom plugins
 
 Plugin is a unit that can extend the business logic of the Store.
@@ -69,7 +73,7 @@ val resetStatePlugin = lazyPlugin<MVIState, MVIIntent, MVIAction> {
 }
 ```
 
-* You can generate a lazy plugin using the `fmvilp` 
+* You can generate a lazy plugin using the `fmvilp`
   [IDE Plugin](https://plugins.jetbrains.com/plugin/25766-flowmvi) shortcut.
 * You may not need to use a lazy plugin because `PipelineContext` has the `config` property too. If you miss `config` in
   the builder body itself, then use a lazy plugin.
@@ -90,8 +94,12 @@ Name is optional, when it is missing, the plugins will be compared **by referenc
 If you need to have the same plugin installed multiple times, consider giving plugins different names.
 Plugins that have no name can be installed multiple times, assuming they are different instances of a plugin.
 
-?> If you attempt to install the same plugin multiple times, or different plugins
+:::warning
+
+If you attempt to install the same plugin multiple times, or different plugins
 with the same name, **an exception will be thrown**.
+
+:::
 
 Consider the following examples:
 
@@ -184,7 +192,7 @@ parent coroutine that wanted to send the action.
 suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? = e
 ```
 
-A callback that is invoked when Store catches an exception. It is invoked when either a coroutine launched inside the  
+A callback that is invoked when Store catches an exception. It is invoked when either a coroutine launched inside the
 store throws, or when an exception occurs in any other plugin.
 
 * If none of the plugins handles the exception (returns `null`), **the exception is rethrown and the store fails**.
@@ -264,7 +272,7 @@ Invoked when the store is closed.
 * Will not be invoked when an `Error` is thrown. You should not handle `Error`s.
 * `e` is the exception the store is closed with. Will be `null` for normal completions.
 * You can update the state in the `ShutdownContext`, but generally avoid relying on thread safety here, as this callback
-  is invoked synchronously on a **random thread** and in a **random context** 
+  is invoked synchronously on a **random thread** and in a **random context**
 * This function should always be fast and non-blocking, and **not** throw exceptions, or the entire coroutine
   machinery will fall apart.
 
@@ -282,10 +290,14 @@ This can happen, according to the `Channel`'s documentation:
 * When the store is stopped and there were intents in the buffer, in which case, `onUndeliveredIntent` will
 be called on all of them.
 
-!> This function is called in an undefined coroutine context on a random thread,
+:::warning
+
+This function is called in an undefined coroutine context on a random thread,
 while the store is running or already stopped. It should be fast, non-blocking,
 and must **not throw exceptions**, or the entire coroutine machinery will fall apart.
 The `onException` block will **not** handle exceptions in this function.
+
+:::
 
 ### onUndeliveredAction
 
@@ -302,6 +314,11 @@ In this case, depending on the configuration, the queue of actions may have a li
 * When the store is stopped and there were actions in the buffer, in which case, `onUndeliveredAction` will
 be called on all of them.
 
-!> This function is called in an undefined coroutine context on a random thread,
+:::warning
+
+This function is called in an undefined coroutine context on a random thread,
 while the store is running or already stopped. It should be fast, non-blocking,
 and must **not throw exceptions**, or the entire coroutine machinery will fall apart.
+The `onException` block will **not** handle exceptions in this function.
+
+:::

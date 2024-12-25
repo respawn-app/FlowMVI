@@ -1,8 +1,17 @@
+---
+sidebar_position: 3
+sidebar_label: Decorators
+---
+
 # Decorators = Plugins for Plugins
 
-!> Decorators are currently experimental because their DSL is limited by Kotlin features and they
+:::warning[Experimental Feature]
+
+Decorators are currently experimental because their DSL is limited by Kotlin features and they
 are less safe/performant to use. There will be a breaking change with them within a few updates.
 They are also not tested enough as of 3.1 Beta releases.
+
+:::
 
 Decorators are very similar to plugins, so the way they work may seem confusing at first.
 
@@ -44,13 +53,21 @@ As you can see, there is an additional parameter `chain` in the decorator callba
 wrap. Decorators can be applied to any plugin, so you can't know which exact plugin you are wrapping except by querying
 its `name`.
 
-?> The `chain` parameter is temporary and will become a receiver with a future Kotlin release. Right now,
+:::info
+
+The `chain` parameter is temporary and will become a receiver with a future Kotlin release. Right now,
 calling the chain is awkward because you have to always wrap it in a `run` block to bring the `PipelineContext` into
 the scope.
 
-!> If you don't call the corresponding plugin method, it will be skipped entirely! This can result in very dangerous
+:::
+
+:::warning
+
+If you don't call the corresponding plugin method, it will be skipped entirely! This can result in very dangerous
 behaviors if, for example, plugins initialize some resources in `onStart` and expect to have them elsewhere.
 Always auto-complete and use the `chain` parameter in some way.
+
+:::
 
 * The value you return from the decorator callback will behave in the opposite way to plugins. You should consider it
   the "final" value, not the "next" or intermediate value that will go further down the chain.
@@ -173,6 +190,10 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> retryIntentsDecorator(
       for up to `retries` times.
     * `RetryStrategy.Infinite` - retry indefinitely and immediately until store is closed or succeeded. Very dangerous.
 
----- 
+----
 
-?> The word "Decorator" has been said 60 times in this document. Uhm, I meant, 61.
+:::info[ ]
+
+The word "Decorator" has been said 60 times in this document. Uhm, I meant, 61.
+
+:::

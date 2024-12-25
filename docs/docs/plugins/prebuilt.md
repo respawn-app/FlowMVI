@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Getting started with plugins
 
 FlowMVI is built entirely based on Plugins!
@@ -12,9 +16,13 @@ Here's how the Plugin chain works:
 
 ## Plugin Ordering
 
-!> The order of plugins matters! Changing the order of plugins may completely change how your store works.
+:::danger[The order of plugins matters! ]
+
+Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume, or otherwise change anything in the store.
 They can close the store or swallow exceptions!
+
+:::
 
 Consider the following:
 
@@ -98,14 +106,16 @@ Here's a full list:
   testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
 * **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order. Install with
   `consumeIntents()`.
+* **Deinit Plugin** - run actions when the store is stopped.
+* **Reset State Plugin** - reset the state of the store when it is stopped.
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
-  See [saved state](/plugins/Saved_State.md) for details.
+  See [saved state](/plugins/savedstate.md) for details.
 * **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
-  the [documentation](/plugins/Debugging.md) to learn how to set up the environment.
+  the [documentation](/plugins/debugging.md) to learn how to set up the environment.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 All plugins are based on the essential callbacks that FlowMVI allows them to intercept.
-The callbacks are explained on the [custom plugins](/plugins/Custom.md) page.
+The callbacks are explained on the [custom plugins](/plugins/custom.md) page.
 
 Here's an explanation of how each default plugin works:
 
@@ -168,10 +178,14 @@ Here are some interesting properties that apply to all plugins that use `onStart
   other actions**
 * They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
 
-!> Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
+:::warning[Do not suspend forever]
+
+Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
 but also operates in the lifecycle of the store, which is active even if there are no subscribers (UI is not visible).
 It does not respect system lifecycle and navigation backstack logic.
 Consider using `whileSubscribed` if you need lifecycle awareness.
+
+:::
 
 This plugin can be useful when you want to do something **before** the store is fully started.
 
@@ -355,7 +369,7 @@ or provide the value externally:
 ```kotlin
 // do not access outside the store lifecycle
 // need to specify type parameters - ambiguous
-val value by cached<_, State, Intent, Action> { produceTimer() }
+val value = cached<_, State, Intent, Action> { produceTimer() }
 
 val store = store(Loading) {
 
@@ -437,31 +451,7 @@ fun awaitSubscribersPlugin(
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
 ) = plugin {
-    this.name = name
-    onStart {
-        startWaiting(timeout)
-    }
-    onState { _, new ->
-        if (suspendStore) manager.await()
-        new
-    }
-    onAction {
-        if (suspendStore) manager.await()
-        it
-    }
-    onIntent {
-        if (suspendStore) manager.await()
-        it
-    }
-    onStop {
-        manager.complete()
-    }
-    onSubscribe { currentSubs ->
-        if (currentSubs >= minSubs) manager.completeAndWait()
-    }
-    onUnsubscribe { subs ->
-        if (allowResubscription && subs < minSubs) manager.reset()
-    }
+    /* ... */
 }
 ```
 
@@ -538,14 +528,7 @@ fun timeTravelPlugin(
     name: String = TimeTravel.Name,
 ) = plugin {
     this.name = name
-    onState { _: S, new: S -> new.also { timeTravel.states.add(new) } }
-    onIntent { intent: I -> intent.also { timeTravel.intents.add(it) } }
-    onAction { action: A -> action.also { timeTravel.actions.add(it) } }
-    onException { e: Exception -> e.also { timeTravel.exceptions.add(it) } }
-    onStart { timeTravel.starts += 1 }
-    onSubscribe { timeTravel.subscriptions += 1 }
-    onUnsubscribe { timeTravel.unsubscriptions += 1 }
-    onStop { stops += 1 }
+    /* ... */
 }
 ```
 
@@ -578,8 +561,22 @@ The exception will be `null` on normal shutdowns, and non-null when there was an
 
 Install it by simply calling `deinit { }`.
 
+### Reset State Plugin
+
+```kotlin
+public fun resetStatePlugin() = plugin {
+    this.name = "ResetStatePlugin"
+    onStop {
+        updateStateImmediate { config.initial }
+    }
+}
+```
+
+This plugin simply resets state back to `initial` once the store is stopped.
+The moment when this happens is determined by the plugin installation order. Install with `resetStateOnStop()`
+
 ### Or Create Your Own
 
 As if having so many plugins was not great in itself, the true power of the library is in creating custom plugins.
 
-Learn how to do that in the [next guide](/plugins/Custom.md)
+Learn how to do that in the [next guide](/plugins/custom.md)

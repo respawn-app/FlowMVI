@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+sidebar_label: Android
+---
+
 # Learn how to use FlowMVI with Android
 
 There are multiple options on how to organize your code when working with Android.
@@ -47,10 +52,14 @@ class CounterViewModel(
 Prefer to extend `ImmutableContainer` as that will hide the `intent` function from outside code, otherwise you'll leak
 the `PipelineContext` of the store to subscribers.
 
-?> The upside of this approach is that it's easier to implement and use some platform-specific features
+:::info
+
+The upside of this approach is that it's easier to implement and use some platform-specific features
 like `savedState` (you can still use them for KMP though)
-The downside is that you completely lose KMP compatibility. If you have plans to make your ViewModels multiplatform,
+The downside is that you lose KMP compatibility. If you have plans to make your ViewModels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
+
+:::
 
 ### Delegated ViewModels
 
@@ -62,7 +71,7 @@ First, wrap your store in a simple class. You don't have to implement `Container
 class CounterContainer(
     private val repo: CounterRepo,
 ) : Container<CounterState, CounterIntent, CounterAction> {
-    
+
     override val store = store(Loading) {
         /* ... as before ... */
     }
@@ -93,10 +102,14 @@ val appModule = module {
 }
 ```
 
-!> Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type of the container. Due to
+:::warning[On type-safety]
+
+Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type of the container. Due to
 type erasure, you must inject the VM by specifying a fully-qualified type
 e.g. `StoreViewModel<CounterState, CounterIntent, CounterAction>`, or it will be replaced with `Store<*, *, *>` and the
 DI framework will fail, likely in runtime.
+
+:::
 
 This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
 to subclass ViewModels. This example is also demonstrated in the sample app.
