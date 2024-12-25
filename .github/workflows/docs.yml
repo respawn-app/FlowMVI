@@ -57,6 +57,9 @@ jobs:
       - name: Update docs/README.md
         run: cp ./README.md ./docs/docs/README.md
 
+      - name: Install docs deps
+        run: cd docs && npm ci
+
       - name: Build website
         run: cd docs && npm run build
 
