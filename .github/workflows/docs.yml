@@ -3,7 +3,7 @@ on:
     branches: [ master ]
 
 concurrency:
-  group: "docs"
+  group: "docs-legacy"
   cancel-in-progress: true
 
 permissions:
@@ -48,23 +48,23 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
-      - name: Update docs/README.md
-        run: cp ./README.md ./docs/README.md
+      - name: Update docs-legacy/README.md
+        run: cp ./README.md ./docs-legacy/README.md
 
-      - name: Generate docs
+      - name: Generate docs-legacy
         run: ./gradlew dokkaGenerate
 
       - name: Make javadoc dir
-        run: mkdir -p ./docs/javadocs
+        run: mkdir -p ./docs-legacy/javadocs
 
-      - name: Move docs to the parent docs dir
-        run: cp -r ./build/dokka/html/ ./docs/javadocs/
+      - name: Move docs-legacy to the parent docs-legacy dir
+        run: cp -r ./build/dokka/html/ ./docs-legacy/javadocs/
 
       - name: Create sample app distributable
         run: ./gradlew wasmJsBrowserDistribution --no-configuration-cache
 
-      - name: Move assembled sample app to docs folder
-        run: cp -r ./sample/build/dist/wasmJs/productionExecutable/ ./docs/sample/
+      - name: Move assembled sample app to docs-legacy folder
+        run: cp -r ./sample/build/dist/wasmJs/productionExecutable/ ./docs-legacy/sample/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -72,7 +72,7 @@ jobs:
       - name: Upload pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs/'
+          path: './docs-legacy/'
 
       - name: Deploy to GitHub Pages
         id: deployment

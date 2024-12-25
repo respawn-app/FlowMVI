@@ -166,7 +166,7 @@ hs_err_pid*
 /.idea/artifacts/**
 !gradle/gradle-wrapper.jar
 # built and copied by dokka plugin
-./docs/javadocs/**
+docs-legacy/javadocs/**
 # yarn.lock location & other
 /kotlin-js-store/**
 /.idea/appInsightsSettings.xml
