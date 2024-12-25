@@ -400,7 +400,7 @@ its state after itself.
 
 :::
 
-### Step 8: Subscribe to your Store
+## Step 8: Subscribe to your Store
 
 The way you do this varies a lot based on what you will use the Store for and your app's UI framework, if any.
 In this example, we'll subscribe using Compose to a Store made for managing UI state.
