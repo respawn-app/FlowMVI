@@ -1,3 +1,44 @@
+# FAQ
+
+### "Cannot inline bytecode" error
+
+The library's minimum JVM target is set to 11 (sadly still not the default in Gradle).
+If you encounter an error:
+
+```
+Cannot inline bytecode built with JVM target 11 into bytecode that
+is being built with JVM target 1.8. Please specify proper '-jvm-target' option
+```
+
+Then configure your kotlin multiplatform compilation to target JVM 11 in your subproject's `build.gradle.kts`:
+
+```kotlin
+kotlin {
+    androidTarget { // do the same for JVM/desktop target as well
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+}
+
+
+```
+
+And in your android gradle files, set:
+
+```kotlin
+android {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+```
+
+If you support Android API \<26, you will also need to
+enable [desugaring](https://developer.android.com/studio/write/java8-support).
+
+
 ### Tips:
 
 * Avoid using `sealed class`es and use `sealed interface`s whenever possible. Not only this reduces object allocations,
@@ -20,7 +61,7 @@
   if you follow this rule, your **Business logic can be multiplatform**! This is also very good for the architecture.
 * There is an ongoing discussion about whether to name your intents starting with the verb or with the noun.
     * Case 1: `ClickedCounter`
-    * Case 2: `CounterClicked`  
+    * Case 2: `CounterClicked`
       In general, this is up to your personal preference, just make sure you use a single style across all of your
       Contracts. I personally like to name intents starting with the verb (Case 1) for easier autosuggestions from the
       IDE.
@@ -156,7 +197,7 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
 
 ### What if I have sub-states or multiple Loading states for different parts of the screen?
 
-Create nested classes and host them in your parent state.  
+Create nested classes and host them in your parent state.
 Example:
 
 ```kotlin

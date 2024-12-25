@@ -1,3 +1,7 @@
+---
+sidebar_position: 3
+---
+
 # Essenty Integration
 
 The library integrates with Essenty (Decompose) to support lifecycle and retaining store instances across configuration
@@ -7,7 +11,7 @@ changes. The integration supports all the artifacts that Essenty supports.
 # Includes retained stores and coroutine scopes
 flowmvi-essenty = { module = "pro.respawn.flowmvi:essenty", version.ref = "flowmvi" }
 # Includes lifecycle support for store subscription
-flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" } 
+flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" }
 ```
 
 ## Retaining Stores
@@ -58,7 +62,9 @@ retainedStore(
 
 Pass `null` to the scope to not start the store upon creation. In this case, you'll have to start the store yourself.
 
-!> Caveat: If you do not use the factory DSL and instead build a store that is retained, it will capture everything you
+:::warning [Caveat:]
+
+If you do not use the factory DSL and instead build a store that is retained, it will capture everything you
 pass into the `builder` closure. This means that any parameters or outside properties you use in the builder will be
 captured **and retained** as well. This is the same caveat that you have to be aware of when
 using [Retained Components](https://arkivanov.github.io/Decompose/component/instance-retaining/#retained-components-since-v210-alpha-03).
@@ -66,6 +72,8 @@ If you don't want to retain your stores to prevent this from happening, just bui
 normally using a `store` builder. However, the store will be recreated and relaunched on configuration changes.
 If you are using retained components already, you can opt-in to the warning annotation issues by the library using a
 compiler flag or just not use retained stores.
+
+:::
 
 ## Retaining Coroutine Scopes
 
@@ -117,8 +125,12 @@ By default, the store will unsubscribe when:
 * The composable goes out of the composition
 * The lifecycle reaches the `STOPPED` state, such as when the UI is no longer visible, but is still composed.
 
-?> The requirements for setting up lifecycle correctly are the same as in
+:::tip
+
+ The requirements for setting up lifecycle correctly are the same as in
 the [Decompose docs](https://arkivanov.github.io/Decompose/component/lifecycle/).
+
+:::
 
 If you want another approach, you can provide the lifecycle via a `CompositionLocal`:
 

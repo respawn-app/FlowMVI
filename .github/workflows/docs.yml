@@ -48,23 +48,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 23
+          cache: npm
+          cache-dependency-path: './docs/package-lock.json'
+
       - name: Update docs/README.md
-        run: cp ./README.md ./docs/README.md
+        run: cp ./README.md ./docs/docs/README.md
+
+      - name: Build website
+        run: cd docs && npm run build
 
       - name: Generate docs
         run: ./gradlew dokkaGenerate
 
       - name: Make javadoc dir
-        run: mkdir -p ./docs/javadocs
+        run: mkdir -p ./docs/build/javadocs
 
       - name: Move docs to the parent docs dir
-        run: cp -r ./build/dokka/html/ ./docs/javadocs/
+        run: cp -r ./build/dokka/html/ ./docs/build/javadocs/
 
       - name: Create sample app distributable
         run: ./gradlew wasmJsBrowserDistribution --no-configuration-cache
 
       - name: Move assembled sample app to docs folder
-        run: cp -r ./sample/build/dist/wasmJs/productionExecutable/ ./docs/sample/
+        run: cp -r ./sample/build/dist/wasmJs/productionExecutable/ ./docs/build/sample/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -72,7 +81,7 @@ jobs:
       - name: Upload pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './docs/'
+          path: './docs/build/'
 
       - name: Deploy to GitHub Pages
         id: deployment

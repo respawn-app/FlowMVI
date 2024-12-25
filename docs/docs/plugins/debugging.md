@@ -1,15 +1,24 @@
+---
+sidebar_position: 5
+---
+
+
 # Remote Debugger Setup
 
 FlowMVI comes with a remote debugging setup with a dedicated Jetbrains IDEs / Android Studio plugin and a desktop app
 for Windows, Linux, and MacOS.
 
-[Embed](https://plugins.jetbrains.com/embeddable/card/25766 ':include :type=iframe width=400px height=300px style="border: none; !important; background-color: transparent;"')
+<iframe width="384px" height="319px" src="https://plugins.jetbrains.com/embeddable/card/25766"></iframe>
 
 ## Step 1: Install the plugin on **debug builds only**
 
-!> Don't install the debugger on prod builds! It pollutes your app with unnecessary code, introduces serious security
+:::danger[Don't install the debugger on prod builds!]
+
+It pollutes your app with unnecessary code, introduces serious security
 risks and degrades performance. If possible on your platform, don't include the debugging code in the release build or
 use minification/obfuscation to remove the debugging code.
+
+:::
 
 ### 1.1 Set up a module for store configurations
 
@@ -19,7 +28,7 @@ inject configurations using DI.
 First, create a separate module where you'll keep the Store configuration.
 
 ```
-project_root/
+<project_root>/
 ├─ common-arch/
 │  ├─ src/
 │  │  ├─ androidDebug/
@@ -33,8 +42,7 @@ project_root/
 |  ├─ build.gradle.kts
 ```
 
-```kotlin
-// common-arch/build.gradle.kts. 
+```kotlin title="common-arch/build.gradle.kts"
 dependencies {
     debugImplementation(libs.flowmvi.debugger) // android Debug (name is incorrect on the kotlin plugin side)
     nativeMainImplementation(libs.flowmvi.debugger) // other platforms
@@ -61,19 +69,27 @@ actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
 // androidRelease -> InstallDebugger.kt
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() = Unit
 
-// conditional installation for other platforms: 
+// conditional installation for other platforms:
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() {
     enableRemoteDebugging()
 }
 ```
 
-?> As of the date of writing, the Android Studio will not index the `androidRelease` source set correctly, but it _will_
+:::info[About Indexing]
+
+As of the date of writing, the Android Studio will not index the `androidRelease` source set correctly, but it _will_
 be picked up by the compiler. We'll have to resort to "notepad-style coding" for that set unfortunately.
+
+:::
 
 ### 1.3 Set up store configuration injection
 
-?> If you're building a small pet project, you may omit this complicated setup and just use a simple extension
+:::tip
+
+If you're building a small pet project, you may omit this complicated setup and just use a simple extension
 if you know the risks you are taking.
+
+:::
 
 Set up config injection using a factory pattern using your DI framework:
 
@@ -91,7 +107,11 @@ inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, 
 }
 ```
 
-?> You can also use this to inject other plugins, such as the Saved State plugin or your custom plugins.
+:::tip
+
+You can also use this to inject other plugins, such as the Saved State plugin or your custom plugins.
+
+:::
 
 Now we'll create a configuration factory.
 You can create more based on your needs, such as for testing stores and other source sets.
@@ -140,7 +160,11 @@ internal class CounterContainer(
 
 ## Step 2: Connect the client on Android
 
-?> You can skip this step if you don't target Android
+:::info
+
+You can skip this step if you don't target Android
+
+:::
 
 On all platforms except Android, we can just use the default host and port for debugging (localhost). But if you
 use an external device or an emulator on Android, you need to configure the host yourself.
@@ -151,10 +175,7 @@ that host and our local network hosts
 In your `common-arch` module we created earlier, or in the `app` module, create a network security configuration
 **for debug builds only**.
 
-In your `app/src/debug/AndroidManifest.xml`:
-
-```xml
-
+```xml title="app/src/debug/AndroidManifest.xml"
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
@@ -166,9 +187,7 @@ In your `app/src/debug/AndroidManifest.xml`:
 </manifest>
 ```
 
-In your `app/src/debug/res/xml/network_security_config.xml`:
-
-```xml
+```xml title="app/src/debug/res/xml/network_security_config.xml"
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
@@ -178,7 +197,11 @@ In your `app/src/debug/res/xml/network_security_config.xml`:
 </network-security-config>
 ```
 
-!> Please don't do this for release builds.
+:::warning
+
+Please don't do this for release builds.
+
+:::
 
 ## Step 3.1: Install and run the debugger app for a single device
 
@@ -186,10 +209,10 @@ Either install the IDE plugin by clicking the card on top, or install a desktop 
 repository.
 You can find the latest archive on the [releases](https://github.com/respawn-app/FlowMVI/releases) page on GitHub.
 
-Run the debugger app. The app will ask you to configure host and port. Unless you are using a physical external device,
+Run the debugger. The panel will ask you to configure host and port. Unless you are using a physical external device,
 you can just use the defaults. Your devices must be on the same network to connect successfully.
 
-![setup.png](../images/debugger_setup_1.png)
+![setup.png](/debugger_setup_1.png)
 
 Run the server and the client, or click the panel icon in the IDE.
 After a few seconds, your devices should connect and you can start debugging.
@@ -201,17 +224,7 @@ that.
 The setup is a little bit more complicated, but in short, it involves:
 
 1. Assign a static IP address to both your PC and development device on your Wi-Fi network for convenience.
-2. Use the IP address of your PC as the host address when running the debugger app.
-3. Provide the IP address of the PC to the debugger plugin to let it know to which address to connect to using the
+2. Use the IP address of your PC as the host address when running the debugger plugin.
+3. Provide the IP address of the PC to the debugger store plugin (in the code) to let it know to which address to connect to using the
    plugin parameters.
 4. Make sure the debugging port you are using is open on both devices.
-
-## Next Steps
-
-Right now the debugging setup includes only the essentials.
-
-Feel free to create an issue for a feature you want to be added.
-
-You can also check out the sample app
-app [implementation](https://github.com/respawn-app/FlowMVI/tree/master/sample)
-to see how FlowMVI can be used to build a multiplatform app with DI.

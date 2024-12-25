@@ -1,27 +1,35 @@
+---
+sidebar_position: 1
+---
+
 # Getting started with plugins
 
 FlowMVI is built entirely based on Plugins!
-Plugins form a chain of responsibility (called _Pipeline_) and 
+Plugins form a chain of responsibility (called _Pipeline_) and
 execute _in the order they were installed_ into the Store.
 This allows you to assemble business logic like a lego by placing the "bricks" in the order you want, and transparently
 inject some logic into any store at any point.
 
 Here's how the Plugin chain works:
 
-![](../images/chart.png)
+![](/chart.png)
 
 ## Plugin Ordering
 
-!> The order of plugins matters! Changing the order of plugins may completely change how your store works.
+:::danger[The order of plugins matters! ]
+
+Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume, or otherwise change anything in the store.
 They can close the store or swallow exceptions!
+
+:::
 
 Consider the following:
 
 ```kotlin
 val broken = store(Loading) {
     reduce {
-        
+
     }
     // ❌ - logging plugin will not log any intents
     // because they have been consumed by the reduce plugin
@@ -86,7 +94,7 @@ Here's a full list:
 * **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
 * **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { }`
-* **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not 
+* **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not
   delay the store's startup sequence.
 * **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
 * **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
@@ -94,18 +102,20 @@ Here's a full list:
 * **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
 * **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
   Install with `disallowRestart()`.
-* **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for  
+* **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for
   testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
 * **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order. Install with
   `consumeIntents()`.
+* **Deinit Plugin** - run actions when the store is stopped.
+* **Reset State Plugin** - reset the state of the store when it is stopped.
 * **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
-  See [saved state](savedstate.md) for details.
+  See [saved state](/plugins/savedstate.md) for details.
 * **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
-  the [documentation](debugging.md) to learn how to set up the environment.
+  the [documentation](/plugins/debugging.md) to learn how to set up the environment.
 * **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 All plugins are based on the essential callbacks that FlowMVI allows them to intercept.
-The callbacks are explained on the [custom plugins](./custom.md) page.
+The callbacks are explained on the [custom plugins](/plugins/custom.md) page.
 
 Here's an explanation of how each default plugin works:
 
@@ -168,10 +178,14 @@ Here are some interesting properties that apply to all plugins that use `onStart
   other actions**
 * They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
 
-!> Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
-but also operates in the lifecycle of the store, which is active even if there are no subscribers (UI is not visible). 
-It does not respect system lifecycle and navigation backstack logic. 
+:::warning[Do not suspend forever]
+
+Do not collect long-running flows or suspend forever in this plugin as it not only prevents the store from starting,
+but also operates in the lifecycle of the store, which is active even if there are no subscribers (UI is not visible).
+It does not respect system lifecycle and navigation backstack logic.
 Consider using `whileSubscribed` if you need lifecycle awareness.
+
+:::
 
 This plugin can be useful when you want to do something **before** the store is fully started.
 
@@ -214,7 +228,7 @@ Install this plugin by using:
 val store = store(Loading) {
 
     recover { e: Exception ->
-        
+
         null
     }
 }
@@ -325,7 +339,7 @@ there is a second version of this plugin called `asyncCache` that returns a `Def
 be very useful to initialize a lot of heavy stuff in parallel.
 
 * You can create a `CachedValue` outside of the store if you need to access it outside of the store builder scope,
-  but you **must** install the plugin using the value, and you must **not** try to access the value outside of the 
+  but you **must** install the plugin using the value, and you must **not** try to access the value outside of the
   store's lifecycle, or the attempt will throw. To create it, use the `cached { }` delegate.
 * You can access the value returned by `cache` in the `onStop` callback because the `onStop` is called in reverse plugin
   installation order.
@@ -355,7 +369,7 @@ or provide the value externally:
 ```kotlin
 // do not access outside the store lifecycle
 // need to specify type parameters - ambiguous
-val value by cached<_, State, Intent, Action> { produceTimer() }
+val value = cached<_, State, Intent, Action> { produceTimer() }
 
 val store = store(Loading) {
 
@@ -437,38 +451,14 @@ fun awaitSubscribersPlugin(
     timeout: Duration = Duration.INFINITE,
     name: String = SubscriberManager.Name,
 ) = plugin {
-    this.name = name
-    onStart {
-        startWaiting(timeout)
-    }
-    onState { _, new ->
-        if (suspendStore) manager.await()
-        new
-    }
-    onAction {
-        if (suspendStore) manager.await()
-        it
-    }
-    onIntent {
-        if (suspendStore) manager.await()
-        it
-    }
-    onStop {
-        manager.complete()
-    }
-    onSubscribe { currentSubs ->
-        if (currentSubs >= minSubs) manager.completeAndWait()
-    }
-    onUnsubscribe { subs ->
-        if (allowResubscription && subs < minSubs) manager.reset()
-    }
+    /* ... */
 }
 ```
 
 * Specify `minSubs` to determine the minimum number of subscribers to reach.
 * Choose `suspendStore` to block all store operations until the condition is met. If you pass `false`, only the code
   that explicitly calls `await()` will suspend.
-* If you pass the `allowResubscription` parameter, then after they leave, the state will reset and you 
+* If you pass the `allowResubscription` parameter, then after they leave, the state will reset and you
   can call `await()` again.
 * Specify a `timeout` duration or `complete()` the job manually if you want to finish early.
 
@@ -522,7 +512,7 @@ val store = store(Loading) {
 }
 ```
 
-This plugin can be useful whenever you are implementing an "editor" type functionality, but currently not fully 
+This plugin can be useful whenever you are implementing an "editor" type functionality, but currently not fully
 implemented to handle all edge cases.
 
 ### Time Travel plugin
@@ -538,14 +528,7 @@ fun timeTravelPlugin(
     name: String = TimeTravel.Name,
 ) = plugin {
     this.name = name
-    onState { _: S, new: S -> new.also { timeTravel.states.add(new) } }
-    onIntent { intent: I -> intent.also { timeTravel.intents.add(it) } }
-    onAction { action: A -> action.also { timeTravel.actions.add(it) } }
-    onException { e: Exception -> e.also { timeTravel.exceptions.add(it) } }
-    onStart { timeTravel.starts += 1 }
-    onSubscribe { timeTravel.subscriptions += 1 }
-    onUnsubscribe { timeTravel.unsubscriptions += 1 }
-    onStop { stops += 1 }
+    /* ... */
 }
 ```
 
@@ -564,22 +547,36 @@ val store = store(Loading) {
 ### Deinit plugin
 
 This one is a simple DSL for calling `onStop`:
- 
+
 ```kotlin
 fun deinitPlugin(
     block: ShutdownContext.(e: Exception?) -> Unit
 ) = plugin { onStop { block(it) } }
 ```
 
-It is useful in combination with `cache` plugin, or if you need to clean up some external resource or set the state 
+It is useful in combination with `cache` plugin, or if you need to clean up some external resource or set the state
 as the store stops. It is called reliably (but synchronously) on store shutdown.
 
 The exception will be `null` on normal shutdowns, and non-null when there was an error, just before the store throws.
 
 Install it by simply calling `deinit { }`.
 
+### Reset State Plugin
+
+```kotlin
+public fun resetStatePlugin() = plugin {
+    this.name = "ResetStatePlugin"
+    onStop {
+        updateStateImmediate { config.initial }
+    }
+}
+```
+
+This plugin simply resets state back to `initial` once the store is stopped.
+The moment when this happens is determined by the plugin installation order. Install with `resetStateOnStop()`
+
 ### Or Create Your Own
 
 As if having so many plugins was not great in itself, the true power of the library is in creating custom plugins.
 
-Learn how to do that in the [next guide](custom.md)
+Learn how to do that in the [next guide](/plugins/custom.md)

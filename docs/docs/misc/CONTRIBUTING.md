@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+sidebar_label: Contribution guide
+---
+
 # Contributing
 
 * To build the project, you will need the following in your local.properties:
