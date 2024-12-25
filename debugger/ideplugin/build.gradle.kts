@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import kotlin.text.replace
 
 plugins {
     kotlin("jvm")
@@ -60,7 +61,7 @@ intellijPlatform {
         description = Config.Plugin.description
         name = Config.Plugin.name
         version = Config.versionName
-        changeNotes = System.getenv("CHANGELOG")
+        changeNotes = System.getenv("CHANGELOG").replace("\n", "<br>")
     }
 }
 
@@ -117,7 +118,6 @@ dependencies {
         intellijIdeaCommunity(libs.versions.intellij.idea)
         pluginVerifier()
         zipSigner()
-        instrumentationTools()
         bundledPlugin(libs.kotlin.stdlib.map(Dependency::getGroup))
     }
 }

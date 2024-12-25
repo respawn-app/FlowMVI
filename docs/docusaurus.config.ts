@@ -2,7 +2,7 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+const description = "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features."
 
 const config: Config = {
 
@@ -10,7 +10,7 @@ const config: Config = {
     tagline: 'Simplify Complexity.',
     favicon: '/favicon.ico',
     url: 'https://opensource.respawn.pro',
-    baseUrl: '/flowmvi/',
+    baseUrl: '/FlowMVI/',
     organizationName: 'respawn-app',
     projectName: 'FlowMVI',
     onBrokenLinks: 'throw',
@@ -54,11 +54,11 @@ const config: Config = {
             { name: "theme-color", content: "#00d46a" },
             { name: "og:type", content: "website" },
             { name: "og:site_name", content: "FlowMVI" },
-            { name: "twitter:card", content: "https://opensource.respawn.pro/FlowMVI/banner.png" },
+            { name: "twitter:card", content: "https://opensource.respawn.pro/flowmvi/banner.png" },
             { name: "twitter:title", content: "FlowMVI" },
-            { name: "twitter:description", content: "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features." },
-            { name: "og:description", content: "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features." },
-            { name: "description", content: "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features." },
+            { name: "twitter:description", content: description },
+            { name: "og:description", content: description },
+            { name: "description", content: description },
         ],
         image: 'static/banner.png',
         docs: {
@@ -82,7 +82,7 @@ const config: Config = {
                     position: 'right',
                 },
                 {
-                    href: 'https://opensource.respawn.pro/FlowMVI/javadocs/index.html',
+                    href: 'https://opensource.respawn.pro/flowmvi/javadocs/index.html',
                     label: 'API Docs',
                     position: 'right',
                 },
