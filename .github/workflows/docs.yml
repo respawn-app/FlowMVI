@@ -51,16 +51,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 23
-          cache: yarn
-
-      - name: Install dependencies
-        run: cd docs && yarn install --frozen-lockfile
+          cache: npm
+          cache-dependency-path: './docs/package-lock.json'
 
       - name: Update docs/README.md
         run: cp ./README.md ./docs/docs/README.md
 
       - name: Build website
-        run: cd docs && yarn build
+        run: cd docs && npm run build
 
       - name: Generate docs
         run: ./gradlew dokkaGenerate
