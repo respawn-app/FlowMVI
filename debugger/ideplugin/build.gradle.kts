@@ -61,7 +61,7 @@ intellijPlatform {
         description = Config.Plugin.description
         name = Config.Plugin.name
         version = Config.versionName
-        changeNotes = System.getenv("CHANGELOG").replace("\n", "<br>")
+        changeNotes = System.getenv("CHANGELOG")?.replace("\n", "<br>")
     }
 }
 
