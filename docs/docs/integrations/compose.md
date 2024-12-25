@@ -57,7 +57,7 @@ how to set compose compiler configuration globally and/or in gradle conventions.
 
 ## Step 3: Subscribe to Stores
 
-:::warn 
+:::warning
 
 Compose does not play well with MVVM+ style because of the instability of the `LambdaIntent` and `ViewModel` classes.
 It is discouraged to use Lambda intents with Compose as that will not only leak the context of the store but
