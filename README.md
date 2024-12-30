@@ -1,3 +1,12 @@
+---
+title: FlowMVI
+title_meta: FlowMVI - Kotlin Architecture Framework
+sidebar_label: Home
+sidebar_position: 0
+hide_title: true
+description: undefined
+slug: /
+---
 ![](https://opensource.respawn.pro/FlowMVI/banner.png)
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
@@ -384,7 +393,7 @@ timerPlugin(timer).test(Loading) {
 IDE plugin generates code and lets you debug and control your app remotely:
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
-https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f
+<video src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'></video>
 
 ## People love the library:
 
