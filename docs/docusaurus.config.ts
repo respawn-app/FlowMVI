@@ -29,6 +29,7 @@ const config: Config = {
             'classic',
             {
                 docs: {
+                    breadcrumbs: false,
                     sidebarCollapsed: false,
                     sidebarPath: './sidebars.ts',
                     routeBasePath: '/',

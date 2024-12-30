@@ -4,10 +4,10 @@ title_meta: FlowMVI - Kotlin Architecture Framework
 sidebar_label: Home
 sidebar_position: 0
 hide_title: true
-description: undefined
+description: Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features.
 slug: /
 ---
-![](https://opensource.respawn.pro/FlowMVI/banner.png)
+![](https://opensource.respawn.pro/FlowMVI/banner.webp)
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
