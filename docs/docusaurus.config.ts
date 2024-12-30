@@ -129,6 +129,48 @@ const config: Config = {
                 },
             ],
         },
+        headTags: [
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preconnect',
+                    href: 'https://fonts.googleapis.com',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preconnect',
+                    href: 'https://fonts.gstatic.com',
+                    crossorigin: 'anonymous',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preload',
+                    href: 'https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.000/fonts/webfonts/MonaspaceNeon-Regular.woff2',
+                    as: 'font',
+                    type: 'font/woff2',
+                    crossorigin: 'anonymous',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preload',
+                    href: 'https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@500;600;700&display=swap',
+                    as: 'style',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'stylesheet',
+                    href: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap',
+                },
+            }
+        ],
     } satisfies Preset.ThemeConfig,
     plugins: [
         [

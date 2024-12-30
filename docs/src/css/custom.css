@@ -15,7 +15,7 @@
 }
 
 @font-face {
-    font-family: "Monrrat Alternates";
+    font-family: "Montserrat Alternates";
     src: url("https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@500;600;700&display=swap");
     font-display: swap;
 }
@@ -134,4 +134,18 @@ h4,
 h5,
 h6 {
     font-weight: 500;
+}
+
+[class*="admonitionHeading"] {
+    font-family: var(--ifm-font-family-base) !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.01em;
+    font-weight: 600;
+    text-transform: capitalize !important;
+}
+
+/* First letter styling for headings */
+h1::first-letter,
+h2::first-letter {
+    color: var(--ifm-color-primary);
 }
