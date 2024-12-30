@@ -18,10 +18,15 @@
       "sizes": "512x512"
     }
   ],
-  "id": "/?source=pwa",
-  "start_url": "/?source=pwa",
+  "start_url": "./index.html",
   "background_color": "#0B090A",
   "display": "standalone",
-  "scope": "/",
-  "theme_color": "#00d46a"
+  "theme_color": "#00d46a",
+  "scope": "./",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://opensource.respawn.pro/FlowMVI/manifest.json"
+    }
+  ]
 }

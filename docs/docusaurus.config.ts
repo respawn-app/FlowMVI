@@ -54,13 +54,13 @@ const config: Config = {
             { name: "theme-color", content: "#00d46a" },
             { name: "og:type", content: "website" },
             { name: "og:site_name", content: "FlowMVI" },
-            { name: "twitter:card", content: "https://opensource.respawn.pro/flowmvi/banner.png" },
+            { name: "twitter:card", content: "https://opensource.respawn.pro/FlowMVI/banner.png" },
             { name: "twitter:title", content: "FlowMVI" },
             { name: "twitter:description", content: description },
             { name: "og:description", content: description },
             { name: "description", content: description },
         ],
-        image: 'static/banner.png',
+        image: '/banner.png',
         algolia: {
             contextualSearch: true,
             appId: "YFIMJHUME7",
@@ -138,17 +138,18 @@ const config: Config = {
                     'appInstalled',
                     'standalone',
                     'queryString',
+                    'saveData',
                 ],
                 pwaHead: [
                     {
                         tagName: 'link',
                         rel: 'icon',
-                        href: '/img/icon.svg',
+                        href: 'icon.svg',
                     },
                     {
                         tagName: 'link',
                         rel: 'manifest',
-                        href: '/manifest.json',
+                        href: 'manifest.json',
                     },
                     {
                         tagName: 'meta',
@@ -158,7 +159,12 @@ const config: Config = {
                     {
                         tagName: 'link',
                         rel: 'apple-touch-icon',
-                        href: '/img/apple-touch-icon.png',
+                        href: 'apple-touch-icon.png',
+                    },
+                    {
+                        tagName: 'meta',
+                        name: 'apple-mobile-web-app-capable',
+                        content: 'yes',
                     },
                 ],
             },
