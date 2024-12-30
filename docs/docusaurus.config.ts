@@ -5,7 +5,6 @@ import type * as Preset from '@docusaurus/preset-classic';
 const description = "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features."
 
 const config: Config = {
-
     title: 'FlowMVI',
     tagline: 'Simplify Complexity.',
     favicon: '/favicon.ico',
@@ -63,7 +62,7 @@ const config: Config = {
         ],
         image: '/banner.png',
         algolia: {
-            contextualSearch: true,
+            contextualSearch: false,
             appId: "YFIMJHUME7",
             apiKey: "bf01c9fd49e108a1c013f0cfadff1322",
             indexName: "opensource-respawn",
