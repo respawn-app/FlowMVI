@@ -384,7 +384,13 @@ timerPlugin(timer).test(Loading) {
 IDE plugin generates code and lets you debug and control your app remotely:
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
-<video src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'></video>
+<video 
+  src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'
+  controls
+  width="100%"
+  alt="FlowMVI IDE Plugin Demo">
+  Your browser does not support the video element. You can view the demo at our website.
+</video>
 
 ## People love the library:
 
