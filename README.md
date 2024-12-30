@@ -1,4 +1,4 @@
-![](https://opensource.respawn.pro/FlowMVI/banner.webp)
+![FlowMVI Framework Banner](https://opensource.respawn.pro/FlowMVI/banner.webp)
 
 [![CI](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml/badge.svg)](https://github.com/respawn-app/FlowMVI/actions/workflows/ci.yml)
 ![License](https://img.shields.io/github/license/respawn-app/flowMVI)
