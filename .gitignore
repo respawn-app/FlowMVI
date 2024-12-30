@@ -162,6 +162,7 @@ hs_err_pid*
 /.idea/other.xml
 
 ### Custom rules
+.kotlin
 .firebase-service-account.json
 /.idea/artifacts/**
 !gradle/gradle-wrapper.jar

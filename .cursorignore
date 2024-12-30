@@ -1,0 +1,9 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+**/.kotlin/
+**/.gradle/
+**/.idea/
+**/build
+.idea
+.kotlin
+.build
+.gradle
