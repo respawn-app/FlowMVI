@@ -41,7 +41,7 @@ const config: Config = {
                 },
                 gtag: {
                     trackingID: "G-NRB9ZFKNGN",
-                }
+                },
             } satisfies Preset.Options,
         ],
     ],
@@ -61,6 +61,13 @@ const config: Config = {
             { name: "description", content: description },
         ],
         image: 'static/banner.png',
+        algolia: {
+            contextualSearch: true,
+            appId: "YFIMJHUME7",
+            apiKey: "bf01c9fd49e108a1c013f0cfadff1322",
+            indexName: "opensource-respawn",
+            insights: true,
+        },
         docs: {
             sidebar: {
                 hideable: true,
