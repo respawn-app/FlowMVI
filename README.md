@@ -19,7 +19,7 @@ achieve thread-safety, and more. It takes about 10 minutes to get started.
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 * Documentation:
-  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/#/quickstart)
+  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/quickstart)
 * KDoc:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
 * Sample App (See features) ![badge-wasm]:
@@ -49,7 +49,7 @@ flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = 
 flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
 # Essenty (Decompose) integration
 flowmvi-essenty = { module = "pro.respawn.flowmvi:essenty", version.ref = "flowmvi" }
-flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" } 
+flowmvi-essenty-compose = { module = "pro.respawn.flowmvi:essenty-compose", version.ref = "flowmvi" }
 ```
 
 </details>
@@ -121,7 +121,7 @@ All you have to do is:
 
 ```kotlin
 sealed interface State : MVIState {
-    
+
     data object Loading : State
     data class Error(val e: Exception) : State
     data class Content(val counter: Int = 0) : State
@@ -140,7 +140,7 @@ sealed interface Action : MVIAction {
 
 ```kotlin
 val counterStore = store(initial = State.Loading, scope = coroutineScope) {
-    
+
     install(analyticsPlugin) // install plugins you need
 
     recover { e: Exception -> // recover from errors
@@ -183,7 +183,7 @@ class CounterContainer(
         configure {
             // use various side-effect strategies
             actionShareBehavior = Distribute()
-            
+
             // checks and verifies your business logic for you
             debuggable = true
 
@@ -195,7 +195,7 @@ class CounterContainer(
 
         // out of the box logging
         enableLogging()
-        
+
         // debug using the IDE plugin
         enableRemoteDebugging()
 
@@ -369,7 +369,7 @@ timerPlugin(timer).test(Loading) {
     onStart()
 
     // time travel keeps track of all plugin operations for you
-    assert(timeTravel.starts == 1) 
+    assert(timeTravel.starts == 1)
     assert(state is DisplayingCounter)
     assert(timer.isStarted)
 
@@ -384,7 +384,7 @@ timerPlugin(timer).test(Loading) {
 IDE plugin generates code and lets you debug and control your app remotely:
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
-<video 
+<video
   src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'
   controls
   width="100%"
@@ -404,7 +404,7 @@ IDE plugin generates code and lets you debug and control your app remotely:
 
 ## Ready to try?
 
-Begin by reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/#/quickstart).
+Begin by reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/quickstart).
 
 ----
 

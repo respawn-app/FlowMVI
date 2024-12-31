@@ -31,7 +31,7 @@ object Config {
     const val licenseName = "The Apache Software License, Version 2.0"
     const val licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt"
     const val scmUrl = "https://github.com/respawn-app/FlowMVI.git"
-    const val docsUrl = "https://opensource.respawn.pro/FlowMVI/#/"
+    const val docsUrl = "https://opensource.respawn.pro/FlowMVI/"
     const val description =
         """A Kotlin Multiplatform architecture framework based on coroutines with a powerful plugin system."""
     const val supportEmail = "hello@respawn.pro"
