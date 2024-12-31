@@ -37,6 +37,12 @@ otherwise your state updates will **not be reflected**.
 
 :::
 
+:::tip[Empty state]
+
+If your store does not have a `State`, you can use an `EmptyState` object provided by the library.
+
+:::
+
 ## State Families
 
 The state in the example above can be used by itself, but most apps can be in more than one state at a time. The best example is LCE (loading-content-error) state family.
