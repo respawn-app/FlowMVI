@@ -89,7 +89,7 @@ const config: Config = {
                     position: 'right',
                 },
                 {
-                    href: 'https://opensource.respawn.pro/flowmvi/javadocs/index.html',
+                    href: 'https://opensource.respawn.pro/FlowMVI/javadocs/index.html',
                     label: 'API Docs',
                     position: 'right',
                 },
