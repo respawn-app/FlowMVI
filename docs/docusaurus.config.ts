@@ -63,7 +63,7 @@ const config: Config = {
                     sidebarCollapsed: false,
                     sidebarPath: "./sidebars.ts",
                     routeBasePath: "/",
-                    editUrl: "https://github.com/respawn-app/flowmvi/tree/main/docs",
+                    editUrl: "https://github.com/respawn-app/FlowMVI/blob/master/docs/",
                 },
                 blog: false,
                 pages: false,
