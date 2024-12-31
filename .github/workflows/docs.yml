@@ -55,7 +55,9 @@ jobs:
           cache-dependency-path: './docs/package-lock.json'
 
       - name: Update docs/README.md
-        run: cp ./README.md ./docs/docs/README.md
+        run: |
+          chmod -R +x ./scripts
+          ./scripts/update_readme.sh
 
       - name: Install docs deps
         run: cd docs && npm ci

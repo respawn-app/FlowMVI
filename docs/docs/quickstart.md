@@ -443,8 +443,8 @@ Continue learning by reading these articles:
 
 1. Learn how to [install](/plugins/prebuilt.md) and [create](/plugins/custom.md) Plugins.
 2. Learn how to use FlowMVI with [compose](/integrations/compose.md)
-3. Learn how to [persist and restore state](/plugins/savedstate.md)
-4. Set up [remote debugging](/plugins/debugging.md) and DI.
+3. Learn how to [persist and restore state](/state/savedstate.md)
+4. Set up [remote debugging](/misc/debugging.md) and DI.
 5. Learn how to use FlowMVI on [Android](/integrations/android.md)
 6. Get answers to common [questions](/misc/FAQ.md)
 7. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/) for code examples

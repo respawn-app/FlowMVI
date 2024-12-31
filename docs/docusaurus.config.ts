@@ -5,7 +5,6 @@ import type * as Preset from '@docusaurus/preset-classic';
 const description = "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features."
 
 const config: Config = {
-
     title: 'FlowMVI',
     tagline: 'Simplify Complexity.',
     favicon: '/favicon.ico',
@@ -29,6 +28,7 @@ const config: Config = {
             'classic',
             {
                 docs: {
+                    breadcrumbs: false,
                     sidebarCollapsed: false,
                     sidebarPath: './sidebars.ts',
                     routeBasePath: '/',
@@ -62,7 +62,7 @@ const config: Config = {
         ],
         image: '/banner.png',
         algolia: {
-            contextualSearch: true,
+            contextualSearch: false,
             appId: "YFIMJHUME7",
             apiKey: "bf01c9fd49e108a1c013f0cfadff1322",
             indexName: "opensource-respawn",
@@ -129,6 +129,48 @@ const config: Config = {
                 },
             ],
         },
+        headTags: [
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preconnect',
+                    href: 'https://fonts.googleapis.com',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preconnect',
+                    href: 'https://fonts.gstatic.com',
+                    crossorigin: 'anonymous',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preload',
+                    href: 'https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.000/fonts/webfonts/MonaspaceNeon-Regular.woff2',
+                    as: 'font',
+                    type: 'font/woff2',
+                    crossorigin: 'anonymous',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'preload',
+                    href: 'https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@500;600;700&display=swap',
+                    as: 'style',
+                },
+            },
+            {
+                tagName: 'link',
+                attributes: {
+                    rel: 'stylesheet',
+                    href: 'https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap',
+                },
+            }
+        ],
     } satisfies Preset.ThemeConfig,
     plugins: [
         [
