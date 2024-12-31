@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+sidebar_label: Making Custom Plugins
 ---
 
 # Creating custom plugins
