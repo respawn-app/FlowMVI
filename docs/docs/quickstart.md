@@ -5,6 +5,8 @@ sidebar_position: 1
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import ThemedImage from '@theme/ThemedImage';
 
 # Get Started with FlowMVI
 
@@ -19,6 +21,19 @@ First of all, here's how the library works:
 -   You _add functionality_ to Stores using **Plugins**, which form a **Pipeline**.
 -   Clients _subscribe_ to Stores to _render_ their **State** and _consume_ side-effects, called **Actions**.
 -   States, Intents, and Actions together form a **Contract**.
+
+<details>
+<summary>Show the diagram</summary>
+
+<ThemedImage
+  alt="Chart depicting FlowMVI Plugin Chain"
+  sources={{
+    light: useBaseUrl('/diagram-light.webp'),
+    dark: useBaseUrl('/diagram-dark.webp'),
+  }}
+/>
+
+</details>
 
 ## Step 1: Configure the library
 
@@ -166,8 +181,6 @@ sealed interface CounterAction : MVIAction {
 }
 ```
 
--   All Contract classes _must_ be **immutable** and **comparable**. If you don't define `equals`, your IDE will
-    complain.
 -   If your store does not have a `State`, you can use an `EmptyState` object provided by the library.
 -   If your store does not have side effects, use `Nothing` in place of the side-effect type.
 
