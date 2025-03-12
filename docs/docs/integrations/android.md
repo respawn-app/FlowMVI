@@ -3,7 +3,7 @@ sidebar_position: 2
 sidebar_label: Android
 ---
 
-# Learn how to use FlowMVI with Android
+# Use FlowMVI with Android
 
 There are multiple options on how to organize your code when working with Android.
 The choice depends on your project's specific needs and each option has certain tradeoffs.
@@ -54,7 +54,7 @@ the `PipelineContext` of the store to subscribers.
 
 :::info
 
-The upside of this approach is that it's easier to implement and use some platform-specific features
+The upside of this approach is that it's easier to implement and use some navigation-specific features
 like `savedState` (you can still use them for KMP though)
 The downside is that you lose KMP compatibility. If you have plans to make your ViewModels multiplatform,
 it is advised to use the delegated approach instead, which is only slightly more verbose.
@@ -63,56 +63,15 @@ it is advised to use the delegated approach instead, which is only slightly more
 
 ### Delegated ViewModels
 
-A slightly more advanced approach would be to avoid subclassing ViewModels altogether.
+A slightly more advanced approach would be to avoid subclassing ViewModels altogether and using `ContainerViewModel`
+that delegates to the Store.
 
-First, wrap your store in a simple class. You don't have to implement `Container` if you don't want to.
+This is a more robust and multiplatform-friendly approach that is slightly more boilerplatish, but does not require you
+to subclass ViewModels.
 
-```kotlin
-class CounterContainer(
-    private val repo: CounterRepo,
-) : Container<CounterState, CounterIntent, CounterAction> {
-
-    override val store = store(Loading) {
-        /* ... as before ... */
-    }
-}
-```
-
-From here, the only things left are to inject your `Container` into an instance of `StoreViewModel`, and then inject the
-`StoreViewModel` correctly. The implementation varies based on which DI framework you will be using and how you want to
-specify your qualifiers. The most basic setup for Koin will look like this:
-
-```kotlin
-// declare
-inline fun <reified T : Container<*, *, *>> Module.storeViewModel() {
-    viewModel(qualifier<T>()) { params -> StoreViewModel(get<T> { params }) }
-}
-
-// inject
-@Composable
-inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> storeViewModel(
-    noinline parameters: ParametersDefinition? = null,
-): StoreViewModel<S, I, A> = getViewModel(qualifier = qualifier<T>(), parameters = parameters)
-
-// use
-val appModule = module {
-    singleOf(::CounterRepository)
-    factoryOf(::CounterContainer)
-    storeViewModel<CounterContainer>()
-}
-```
-
-:::warning[On type-safety]
-
-Qualifiers are needed because you'll have many `StoreViewModels` that differ only by type of the container. Due to
-type erasure, you must inject the VM by specifying a fully-qualified type
-e.g. `StoreViewModel<CounterState, CounterIntent, CounterAction>`, or it will be replaced with `Store<*, *, *>` and the
-DI framework will fail, likely in runtime.
-
-:::
-
-This is a more robust and multiplatform friendly approach that is slightly more boilerplatish but does not require you
-to subclass ViewModels. This example is also demonstrated in the sample app.
+The only caveat is injecting your `Container` into an instance of `StoreViewModel`, and then injecting the
+`StoreViewModel` correctly. The implementation varies based on which DI framework you will be using, with some examples
+are provided in the [DI Guide](/integrations/di.md)
 
 ## View Integration
 
@@ -120,7 +79,7 @@ For a View-based project, subscribe in an appropriate lifecycle callback and cre
 and consume actions.
 
 * Subscribe in `Fragment.onViewCreated` or `Activity.onCreate`. The library will handle the lifecycle for you.
-* Make sure your `render` function is pure, and `consume` function does not loop itself with intents.
+* Make sure your `render` function is idempotent, and `consume` function does not loop itself with intents.
 * Always update **all views** in `render`, for **any state change**, to circumvent the problems of old-school stateful
   view-based Android API.
 
@@ -128,7 +87,7 @@ and consume actions.
 class CounterFragment : Fragment() {
 
     private val binding by viewBinding<CounterFragmentBinding>()
-    private val store by storeViewModel<CounterContainer, _, _, _>()
+    private val store: CounterContainer by container() // see DI guide for implementation
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

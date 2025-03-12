@@ -63,7 +63,7 @@ retainedStore(
 
 Pass `null` to the scope to not start the store upon creation. In this case, you'll have to start the store yourself.
 
-:::warning [Caveat:]
+:::warning Caveat:
 
 If you do not use the factory DSL and instead build a store that is retained, it will capture everything you
 pass into the `builder` closure. This means that any parameters or outside properties you use in the builder will be
