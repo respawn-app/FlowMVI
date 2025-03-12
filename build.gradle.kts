@@ -139,6 +139,12 @@ versionCatalogUpdate {
         keepUnusedLibraries = true
         keepUnusedPlugins = true
     }
+
+    versionCatalogs {
+        create("sample") {
+            catalogFile = file("sample/libs.versions.toml")
+        }
+    }
 }
 
 tasks {

@@ -6,3 +6,4 @@
 ./gradlew wrapper --gradle-version=latest
 
 ./gradlew versionCatalogUpdate --no-configuration-cache
+./gradlew versionCatalogUpdateSample --no-configuration-cache
