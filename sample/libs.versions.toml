@@ -1,12 +1,12 @@
 [versions]
 apiresult = "2.1.0"
 codehighlights = "1.0.0"
-decompose = "3.3.0-beta01"
+decompose = "3.3.0"
 kmputils = "1.5.0"
 koin = "4.1.0-Beta5"
 material = "1.12.0"
 splashscreen = "1.1.0-rc01"
-xml-constraintlayout = "2.2.0"
+xml-constraintlayout = "2.2.1"
 
 [libraries]
 androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
