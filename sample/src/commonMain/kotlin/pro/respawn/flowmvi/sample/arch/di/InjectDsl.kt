@@ -31,5 +31,10 @@ inline fun <reified T : Container<*, *, *>> Module.container(noinline definition
 @FlowMVIDSL
 @Composable
 inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> container(
-    noinline params: ParametersDefinition? = null,
+    noinline params: ParametersDefinition,
 ) = koinInject<T>(scope = LocalDestinationScope.current.scope, parameters = params).store
+
+@FlowMVIDSL
+@Composable
+inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> container(
+) = koinInject<T>(scope = LocalDestinationScope.current.scope).store
