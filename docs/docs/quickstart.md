@@ -454,10 +454,10 @@ Now you can start using the features of the library to write scalable business l
 
 Continue learning by reading these articles:
 
-1. Learn how to [install](/plugins/prebuilt.md) and [create](/plugins/custom.md) Plugins.
-2. Learn how to use FlowMVI with [compose](/integrations/compose.md)
-3. Learn how to [persist and restore state](/state/savedstate.md)
-4. Set up [remote debugging](/misc/debugging.md) and [DI](/integrations/di.md).
+1. Learn how to [install](/plugins/prebuilt.md) and [create](/plugins/custom.md) Plugins
+2. Learn how to [manage](/state/statemanagement.md) and [persist](/state/savedstate.md) application State.
+3. Learn how to use FlowMVI with [compose](/integrations/compose.md)
+4. Set up [remote debugging](/misc/debugging.md) and [Dependency Injection](/integrations/di.md)
 5. Learn how to use FlowMVI on [Android](/integrations/android.md)
 6. Get answers to common [questions](/misc/FAQ.md)
-7. Explore the [sample app](https://github.com/respawn-app/FlowMVI/tree/master/sample/) for code examples
+7. Explore the [Resources](/misc/resources.md) for code examples, articles, videos & more.
