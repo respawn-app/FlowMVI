@@ -36,7 +36,9 @@ class StoreEventsTest : FreeSpec({
         "and reducer that changes states" - {
             val newState = TestState.SomeData(1)
             val store = testStore(plugin) {
-                parallelIntents = true // smoke-test parallel intents as well
+                configure {
+                    parallelIntents = true
+                }
             }
             "then intents result in state change" {
                 store.subscribeAndTest {

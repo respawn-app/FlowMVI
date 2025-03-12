@@ -105,14 +105,3 @@ public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>
 ) = updateState {
     typed<T>()?.transform() ?: throw InvalidStateException(T::class.simpleName, this::class.simpleName)
 }
-
-// region deprecated
-
-@FlowMVIDSL
-@Suppress("UndocumentedPublicFunction")
-@Deprecated("renamed to updateStateImmediate()", ReplaceWith("updateStateImmediate(block)"))
-public inline fun <reified T : S, S : MVIState> StateReceiver<S>.useState(
-    @BuilderInference crossinline transform: T.() -> S
-): Unit = updateStateImmediate { withType<T, _> { transform() } }
-
-// endregion
