@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.dsl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.api.ActionConsumer
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -24,9 +25,7 @@ import kotlin.jvm.JvmName
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableStore<S, I, A>.collect(
     @BuilderInference crossinline consume: suspend Provider<S, I, A>.() -> Unit,
 ): Unit = coroutineScope {
-    subscribe {
-        consume()
-    }.join()
+    subscribe { consume() }.join()
 }
 
 /**
@@ -58,12 +57,8 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
 ): Job = with(store) {
     subscribe outer@{
         coroutineScope inner@{
-            launch {
-                actions.collect { consume(it) }
-            }
-            launch {
-                states.collect { render(it) }
-            }
+            launch { actions.collect { consume(it) } }
+            launch { states.collectLatest { render(it) } }
         }
     }
 }
@@ -83,7 +78,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> CoroutineScope.su
     crossinline render: suspend (state: S) -> Unit,
 ): Job = with(store) {
     subscribe {
-        states.collect { render(it) }
+        states.collectLatest { render(it) }
     }
 }
 
