@@ -3,6 +3,7 @@
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
+import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.ImmutableContainer
 import pro.respawn.flowmvi.api.MVIAction
@@ -51,3 +52,21 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
     initial: S,
     @BuilderInference crossinline configure: BuildStore<S, I, A>
 ): Store<S, I, A> = pro.respawn.flowmvi.dsl.store(initial, configure)
+
+/**
+ * Alias for [Store.intent]
+ */
+@Suppress("NOTHING_TO_INLINE")
+public inline fun <I : MVIIntent> Container<*, I, *>.intent(
+    first: I,
+    vararg other: I
+) = store.intent(first, other = other)
+
+/**
+ * Alias for [Store.emit]
+ */
+@Suppress("NOTHING_TO_INLINE")
+public suspend inline fun <I : MVIIntent> Container<*, I, *>.emit(
+    first: I,
+    vararg other: I
+) = store.emit(first, other = other)
