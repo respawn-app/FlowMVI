@@ -7,7 +7,7 @@ import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
@@ -16,7 +16,7 @@ import pro.respawn.flowmvi.util.testStore
 
 @OptIn(DelicateStoreApi::class)
 class UndeliveredIntentTest : FreeSpec({
-    asUnconfined()
+    configure()
     "Given a store that processes intents slowly" - {
         var undelivered = 0
         val callback = CompletableDeferred<Unit>()

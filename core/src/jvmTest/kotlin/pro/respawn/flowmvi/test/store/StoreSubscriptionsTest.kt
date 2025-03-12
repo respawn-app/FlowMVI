@@ -5,13 +5,13 @@ import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.dsl.subscribe
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreSubscriptionsTest : FreeSpec({
-    asUnconfined()
+    configure()
 
     val tt = testTimeTravel()
 

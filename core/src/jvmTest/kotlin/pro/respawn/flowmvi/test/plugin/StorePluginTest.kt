@@ -13,7 +13,7 @@ import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
@@ -25,7 +25,7 @@ import pro.respawn.flowmvi.util.testStore
 //   await subscribers
 //   job manager
 class StorePluginTest : FreeSpec({
-    asUnconfined()
+    configure()
     "given test store" - {
         "and recover plugin that throws".config(
 

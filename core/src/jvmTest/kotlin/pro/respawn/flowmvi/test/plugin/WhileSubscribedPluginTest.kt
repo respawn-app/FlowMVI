@@ -11,11 +11,11 @@ import pro.respawn.flowmvi.plugins.whileSubscribedPlugin
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 
 class WhileSubscribedPluginTest : FreeSpec({
-    asUnconfined()
+    configure()
 
     "Given a whileSubscribed plugin" - {
         val running = MutableSharedFlow<Boolean>()
