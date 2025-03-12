@@ -91,7 +91,7 @@ internal class SharedModule<A : MVIAction>(
 
 internal class ThrowingModule<A : MVIAction> : ActionModule<A> {
 
-    override val actions get() = throw ActionsDisabledException()
+    override val actions get() = throw ActionsDisabledException(null)
 
     @DelicateStoreApi
     override fun send(action: A) = actions

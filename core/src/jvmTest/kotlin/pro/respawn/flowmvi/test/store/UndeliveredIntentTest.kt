@@ -4,7 +4,6 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import pro.respawn.flowmvi.api.DelicateStoreApi
-import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.configure
@@ -34,9 +33,9 @@ class UndeliveredIntentTest : FreeSpec({
         "then if a lot of intents are sent, some will be undelivered" {
             val total = 100
             store.test {
-                intent(
-                    intents = Array(total) { TestIntent { callback.join() } }
-                )
+                repeat(total) {
+                    intent(TestIntent { callback.join() })
+                }
             }
             idle()
             undelivered shouldBe total - 1
