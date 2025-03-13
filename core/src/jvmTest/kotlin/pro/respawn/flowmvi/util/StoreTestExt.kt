@@ -11,7 +11,6 @@ import kotlin.time.Duration.Companion.seconds
 fun TestScope.idle() = testCoroutineScheduler.advanceUntilIdle()
 
 fun Spec.configure() {
-
     coroutineTestScope = true
     isolationMode = IsolationMode.SingleInstance
     timeout = 3.seconds.inWholeMilliseconds

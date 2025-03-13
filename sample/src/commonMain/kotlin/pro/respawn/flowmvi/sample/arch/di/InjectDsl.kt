@@ -36,5 +36,6 @@ inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVI
 
 @FlowMVIDSL
 @Composable
-inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> container(
-) = koinInject<T>(scope = LocalDestinationScope.current.scope).store
+inline fun <reified T : Container<S, I, A>, S : MVIState, I : MVIIntent, A : MVIAction> container() = koinInject<T>(
+    scope = LocalDestinationScope.current.scope
+).store
