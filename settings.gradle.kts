@@ -17,9 +17,9 @@ dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
         // mavenLocal()
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         google()
         mavenCentral()
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
 
     versionCatalogs {

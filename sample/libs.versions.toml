@@ -1,45 +1,44 @@
 [versions]
-decompose = "3.2.2"
-apiresult = "2.0.0"
-koin = "4.0.0"
-kmputils = "1.4.4"
-material = "1.12.0"
-okio = "3.9.0"
-splashscreen = "1.1.0-rc01"
-xml-constraintlayout = "2.2.0"
+apiresult = "2.1.0"
 codehighlights = "1.0.0"
+decompose = "3.3.0"
+kmputils = "1.5.0"
+koin = "4.1.0-Beta5"
+material = "1.12.0"
+splashscreen = "1.1.0-rc01"
+xml-constraintlayout = "2.2.1"
+kodein = "7.25.0"
 
 [libraries]
+androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
+apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
+compose-codehighlighting = { module = "dev.snipme:highlights", version.ref = "codehighlights" }
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
 decompose-compose = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
-
 kmputils-common = { module = "pro.respawn.kmmutils:common", version.ref = "kmputils" }
 kmputils-compose = { module = "pro.respawn.kmmutils:compose", version.ref = "kmputils" }
 kmputils-coroutines = { module = "pro.respawn.kmmutils:coroutines", version.ref = "kmputils" }
 kmputils-datetime = { module = "pro.respawn.kmmutils:datetime", version.ref = "kmputils" }
 kmputils-inputforms = { module = "pro.respawn.kmmutils:inputforms", version.ref = "kmputils" }
-
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-apiresult = { module = "pro.respawn.apiresult:core", version.ref = "apiresult" }
-androidx-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
-view-material = { module = "com.google.android.material:material", version.ref = "material" }
 view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "xml-constraintlayout" }
-compose-codehighlighting = { module = "dev.snipme:highlights", version.ref = "codehighlights" }
+view-material = { module = "com.google.android.material:material", version.ref = "material" }
+kodein-compose = { module = "org.kodein.di:kodein-di-framework-compose", version.ref = "kodein" }
 
 [bundles]
-koin = [
-    "koin-compose",
-    "koin-core",
-]
 kmputils = [
     "kmputils-common",
+    "kmputils-compose",
     "kmputils-coroutines",
     "kmputils-datetime",
     "kmputils-inputforms",
-    "kmputils-compose",
+]
+koin = [
+    "koin-compose",
+    "koin-core",
 ]
 
 [plugins]

@@ -15,14 +15,14 @@ import pro.respawn.flowmvi.exceptions.RecursiveStateTransactionException
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestState
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreStatesTest : FreeSpec({
 
-    asUnconfined()
+    configure()
 
     val timeTravel = testTimeTravel()
     beforeEach { timeTravel.reset() }

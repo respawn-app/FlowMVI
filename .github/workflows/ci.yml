@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: 'zulu'
           check-latest: true
-          java-version: 22
+          java-version: 23
           cache: 'gradle'
 
       - uses: actions/setup-node@v4

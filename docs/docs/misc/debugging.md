@@ -94,7 +94,7 @@ if you know the risks you are taking.
 Set up config injection using a factory pattern using your DI framework:
 
 ```kotlin
-interface StoreConfiguration {
+interface ConfigurationFactory {
 
     operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(name: String)
 }
@@ -114,12 +114,12 @@ You can also use this to inject other plugins, such as the Saved State plugin or
 :::
 
 Now we'll create a configuration factory.
-You can create more based on your needs, such as for testing stores and other source sets.
+You can create more based on your needs, such as for testing stores or app flavors.
 
 ```kotlin
-internal class DefaultStoreConfiguration(
+internal class DefaultConfigurationFactory(
     analytics: Analytics,
-) : StoreConfiguration {
+) : ConfigurationFactory {
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,
@@ -140,16 +140,11 @@ internal class DefaultStoreConfiguration(
 }
 ```
 
-Finally, inject your config (example with Koin):
+Finally, inject your config:
 
 ```kotlin
-val commonArchModule = module {
-    singleOf(::DefaultStoreConfiguration) bind StoreConfiguration::class
-}
-
-// feature module
 internal class CounterContainer(
-    configuration: StoreConfiguration,
+    configuration: ConfigurationFactory,
 ) : Container<State, Intent, Action> {
 
     override val store = store(Loading) {
@@ -157,6 +152,8 @@ internal class CounterContainer(
     }
 }
 ```
+
+Setting up injection is covered in the [DI Guide](/integrations/di.md)
 
 ## Step 2: Connect the client on Android
 
@@ -205,7 +202,7 @@ Please don't do this for release builds.
 
 ## Step 3.1: Install and run the debugger app for a single device
 
-Either install the IDE plugin by clicking the card on top, or install a desktop from the Artifacts section of the
+Either install the IDE plugin by clicking the card on top, or install the desktop app from the Artifacts section of the
 repository.
 You can find the latest archive on the [releases](https://github.com/respawn-app/FlowMVI/releases) page on GitHub.
 

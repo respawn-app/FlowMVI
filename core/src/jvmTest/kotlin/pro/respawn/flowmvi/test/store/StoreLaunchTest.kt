@@ -15,13 +15,13 @@ import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreLaunchTest : FreeSpec({
-    asUnconfined()
+    configure()
     val timeTravel = testTimeTravel()
     afterEach { timeTravel.reset() }
     "Given store" - {
@@ -32,15 +32,15 @@ class StoreLaunchTest : FreeSpec({
         }
         "then can be launched and stopped" {
             coroutineScope {
-                val job = shouldNotThrowAny {
-                    store.start(this)
+                shouldNotThrowAny {
+                    val job = store.start(this)
+                    job.isActive shouldBe true
+                    idle()
+                    store.close()
+                    idle()
+                    job.isActive shouldBe false
+                    job.awaitUntilClosed()
                 }
-                job.isActive shouldBe true
-                idle()
-                store.close()
-                idle()
-                job.isActive shouldBe false
-                job.awaitUntilClosed()
             }
         }
         "then can be launched twice" {

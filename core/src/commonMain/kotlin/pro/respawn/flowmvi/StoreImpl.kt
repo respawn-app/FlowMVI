@@ -101,10 +101,10 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
     override fun CoroutineScope.subscribe(
         block: suspend Provider<S, I, A>.() -> Unit
     ): Job = launch {
-        if (!isActive && !config.allowIdleSubscriptions) throw SubscribeBeforeStartException()
+        if (!isActive && !config.allowIdleSubscriptions) throw SubscribeBeforeStartException(config.name)
         launch { awaitUnsubscription() }
         block(this@StoreImpl)
-        if (!config.allowTransientSubscriptions) throw NonSuspendingSubscriberException()
+        if (!config.allowTransientSubscriptions) throw NonSuspendingSubscriberException(config.name)
         cancel()
     }
 

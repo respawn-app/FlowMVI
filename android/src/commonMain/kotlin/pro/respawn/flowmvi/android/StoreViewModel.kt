@@ -25,6 +25,7 @@ public open class StoreViewModel<S : MVIState, I : MVIIntent, A : MVIAction>(
     start: Boolean = true,
 ) : ViewModel(), Store<S, I, A> by store, Container<S, I, A> {
 
+    @Deprecated("If you want to use Containers, prefer a more flexible \"ContainerViewModel\" instead")
     public constructor(container: Container<S, I, A>, start: Boolean = true) : this(container.store, start)
 
     final override val store: Store<S, I, A> get() = this

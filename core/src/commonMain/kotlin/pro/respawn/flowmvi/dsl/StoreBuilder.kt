@@ -1,9 +1,7 @@
 package pro.respawn.flowmvi.dsl
 
-import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.StoreImpl
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
-import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
@@ -18,21 +16,10 @@ import pro.respawn.flowmvi.decorator.decoratedWith
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.impl.plugin.asInstance
 import pro.respawn.flowmvi.impl.plugin.compose
-import pro.respawn.flowmvi.logging.NoOpStoreLogger
-import pro.respawn.flowmvi.logging.PlatformStoreLogger
-import pro.respawn.flowmvi.logging.StoreLogger
 import pro.respawn.flowmvi.plugins.compositePlugin
-import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.JvmName
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
-
-private const val ConfigDeprecation = """
-Please use a `configure { }` block instead to set up store configuration properties and place all the setup logic there.
-This is needed to prevent store body internals from accessing the builder above, especially when using lazy plugins.
-Accessing these properties outside of `configure` block can lead to scoping and mutability issues.
-Removal cycle: 2 releases.
-"""
 
 private fun duplicatePluginMessage(type: String, name: String) {
     val title = type.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
@@ -70,59 +57,6 @@ public class StoreBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Published
      */
     @FlowMVIDSL
     public inline fun configure(block: StoreConfigurationBuilder.() -> Unit): Unit = config.run(block)
-
-    // region Deprecated props
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var logger: StoreLogger
-        get() = config.logger ?: if (config.debuggable) PlatformStoreLogger else NoOpStoreLogger
-        set(value) {
-            config.logger = value
-        }
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var coroutineContext: CoroutineContext by config::coroutineContext
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var debuggable: Boolean by config::debuggable
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var name: String? by config::name
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var parallelIntents: Boolean by config::parallelIntents
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var actionShareBehavior: ActionShareBehavior by config::actionShareBehavior
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var onOverflow: BufferOverflow by config::onOverflow
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var intentCapacity: Int by config::intentCapacity
-
-    @FlowMVIDSL
-    @Deprecated(ConfigDeprecation)
-    @Suppress("UndocumentedPublicProperty")
-    public var atomicStateUpdates: Boolean by config::atomicStateUpdates
-
-    // endregion
 
     // region Plugins
     /**

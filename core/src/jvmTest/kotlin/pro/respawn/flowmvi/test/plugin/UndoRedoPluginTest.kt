@@ -10,7 +10,7 @@ import pro.respawn.flowmvi.plugins.undoRedoPlugin
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 
 private fun UndoRedo.shouldBeEmpty() {
@@ -21,7 +21,7 @@ private fun UndoRedo.shouldBeEmpty() {
 }
 
 class UndoRedoPluginTest : FreeSpec({
-    asUnconfined()
+    configure()
     "Given undo/redo" - {
         val plugin = UndoRedo(10)
         var counter = 0

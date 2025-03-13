@@ -5,12 +5,12 @@ import io.kotest.matchers.shouldBe
 import pro.respawn.flowmvi.plugins.cache
 import pro.respawn.flowmvi.plugins.deinit
 import pro.respawn.flowmvi.test.subscribeAndTest
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 
 class DeinitOrderTest : FreeSpec({
-    asUnconfined()
+    configure()
     "given store with cache plugin" - {
         var deinits = 0
         val store = testStore {

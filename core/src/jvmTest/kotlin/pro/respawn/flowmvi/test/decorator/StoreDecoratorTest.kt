@@ -12,12 +12,12 @@ import pro.respawn.flowmvi.test.plugin.test
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.testDecorator
 import pro.respawn.flowmvi.util.testTimeTravel
 
 class StoreDecoratorTest : FreeSpec({
-    asUnconfined()
+    configure()
 
     val timeTravel = testTimeTravel()
     val timeTravelPlugin = timeTravelPlugin(timeTravel)

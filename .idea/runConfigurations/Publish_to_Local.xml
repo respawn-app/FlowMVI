@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Web Sample App" type="GradleRunConfiguration" factoryName="Gradle">
+  <configuration default="false" name="Publish to Local" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$/sample" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="--no-configuration-cache" />
       <option name="taskDescriptions">
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":sample:wasmJsBrowserRun" />
+          <option value="publishToMavenLocal" />
         </list>
       </option>
       <option name="vmOptions" />

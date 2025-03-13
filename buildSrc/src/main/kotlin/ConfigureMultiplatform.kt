@@ -31,6 +31,9 @@ fun Project.configureMultiplatform(
     withSourcesJar(true)
     compilerOptions {
         extraWarnings.set(true)
+        freeCompilerArgs.addAll(Config.compilerArgs)
+        optIn.addAll(Config.optIns)
+        progressiveMode.set(true)
     }
 
     if (linux) {
@@ -107,18 +110,6 @@ fun Project.configureMultiplatform(
             languageSettings {
                 progressiveMode = true
                 Config.optIns.forEach { optIn(it) }
-            }
-        }
-    }
-
-    targets.all {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    freeCompilerArgs.addAll(Config.compilerArgs)
-                    optIn.addAll(Config.optIns)
-                    progressiveMode.set(true)
-                }
             }
         }
     }

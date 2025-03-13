@@ -17,13 +17,13 @@ import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
 import pro.respawn.flowmvi.util.testTimeTravel
 
 class ActionShareBehaviorTest : FreeSpec({
-    asUnconfined()
+    configure()
     val timeTravel = testTimeTravel()
     beforeEach { timeTravel.reset() }
 

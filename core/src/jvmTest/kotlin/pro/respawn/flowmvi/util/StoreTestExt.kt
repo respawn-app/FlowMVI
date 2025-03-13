@@ -2,28 +2,18 @@
 
 package pro.respawn.flowmvi.util
 
-import io.kotest.common.ExperimentalKotest
-import io.kotest.core.concurrency.CoroutineDispatcherFactory
+import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.Spec
-import io.kotest.core.spec.style.scopes.FreeSpecContainerScope
-import io.kotest.core.spec.style.scopes.FreeSpecTerminalScope
-import io.kotest.core.test.TestCase
+import io.kotest.core.test.TestScope
 import io.kotest.core.test.testCoroutineScheduler
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalKotest::class)
-fun Spec.asUnconfined() {
-    dispatcherAffinity = true
+fun TestScope.idle() = testCoroutineScheduler.advanceUntilIdle()
+
+fun Spec.configure() {
     coroutineTestScope = true
-    coroutineDebugProbes = false
-    coroutineDispatcherFactory = object : CoroutineDispatcherFactory {
-        override suspend fun <T> withDispatcher(testCase: TestCase, f: suspend () -> T): T =
-            withContext(currentCoroutineContext() + UnconfinedTestDispatcher()) { f() }
-    }
+    isolationMode = IsolationMode.SingleInstance
+    timeout = 3.seconds.inWholeMilliseconds
+    coroutineDebugProbes = true
+    invocationTimeout = 5000L
 }
-
-fun FreeSpecContainerScope.idle() = testCoroutineScheduler.advanceUntilIdle()
-
-fun FreeSpecTerminalScope.idle() = testCoroutineScheduler.advanceUntilIdle()

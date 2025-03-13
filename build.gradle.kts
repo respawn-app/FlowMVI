@@ -27,7 +27,6 @@ plugins {
     // alias(libs.plugins.androidApplication) apply false
     // alias(libs.plugins.androidLibrary) apply false
     // alias(libs.plugins.kotlin.multiplatform) apply false
-    // alias(libs.plugins.kotlinMultiplatform) apply false
     dokkaDocumentation
 }
 
@@ -139,6 +138,12 @@ versionCatalogUpdate {
         keepUnusedVersions = true
         keepUnusedLibraries = true
         keepUnusedPlugins = true
+    }
+
+    versionCatalogs {
+        create("sample") {
+            catalogFile = file("sample/libs.versions.toml")
+        }
     }
 }
 

@@ -27,8 +27,8 @@ internal class RecoverModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     val hasHandler = handler != null
 
     suspend fun PipelineContext<S, I, A>.handle(e: Exception) {
-        if (handler == null) throw UnhandledStoreException(e)
-        handler.invoke(this@handle, e)?.let { throw UnhandledStoreException(it) }
+        if (handler == null) throw UnhandledStoreException(config.name, e)
+        handler.invoke(this@handle, e)?.let { throw UnhandledStoreException(config.name, it) }
     }
 
     companion object : CoroutineContext.Key<RecoverModule<*, *, *>>
@@ -58,8 +58,8 @@ internal suspend inline fun <R, S : MVIState, I : MVIIntent, A : MVIAction> Pipe
 } catch (expected: Exception) {
     when {
         expected is CancellationException || expected is UnrecoverableException -> throw expected
-        !recover.hasHandler -> throw UnhandledStoreException(expected)
-        alreadyRecovered() -> throw RecursiveRecoverException(expected)
+        !recover.hasHandler -> throw UnhandledStoreException(config.name, expected)
+        alreadyRecovered() -> throw RecursiveRecoverException(config.name, expected)
         else -> withContext(recover) {
             recover.run { handle(expected) }
             null
@@ -72,7 +72,7 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> PipelineContext<S, I, 
 ) = CoroutineExceptionHandler { ctx, e ->
     when {
         e !is Exception || e is CancellationException -> throw e
-        !recover.hasHandler -> throw UnhandledStoreException(e)
+        !recover.hasHandler -> throw UnhandledStoreException(config.name, e)
         e is UnrecoverableException -> throw e.unwrapRecursion()
         ctx.alreadyRecovered -> throw e
         // add Recoverable to the coroutine context

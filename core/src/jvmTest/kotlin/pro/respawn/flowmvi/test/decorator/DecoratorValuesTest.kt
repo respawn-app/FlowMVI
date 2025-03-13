@@ -13,13 +13,13 @@ import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.TestState.SomeData
-import pro.respawn.flowmvi.util.asUnconfined
+import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.testDecorator
 import pro.respawn.flowmvi.util.testTimeTravel
 import pro.respawn.flowmvi.util.withType
 
 class DecoratorValuesTest : FreeSpec({
-    asUnconfined()
+    configure()
     val timeTravel = testTimeTravel()
     beforeEach {
         timeTravel.reset()
