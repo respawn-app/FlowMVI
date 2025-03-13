@@ -18,10 +18,10 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 3
-    const val minorRelease = 1
+    const val minorRelease = 2
     const val patch = 0
-    const val postfix = "" // include dash (-)
-    const val versionCode = 9
+    const val postfix = "-alpha01" // include dash (-)
+    const val versionCode = 10
 
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
