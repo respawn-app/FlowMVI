@@ -27,7 +27,7 @@ sidebar_label: Contribution guide
 * To debug the project, use the tasks provided as IDEA run configurations
     * All tests to run tests
     * All benchmark to benchmark the library
-    * Sample <Web | Desktop | Android> to test the sample app manually
+    * Sample \<Web | Desktop | Android\> to test the sample app manually
     * Publish to Local to upload a maven local build to test in your project
 * Before pushing, make sure the following tasks pass:
     * `gradle detektFormat`
