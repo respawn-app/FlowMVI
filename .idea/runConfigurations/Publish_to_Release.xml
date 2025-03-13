@@ -1,16 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FlowMVI [debugger:app:desktopRun]" type="GradleRunConfiguration" factoryName="Gradle" singleton="false" nameIsGenerated="true">
+  <configuration default="false" name="Publish to Release" type="GradleRunConfiguration" factoryName="Gradle">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-DmainClass=pro.respawn.flowmvi.debugger.app.MainKt --quiet" />
+      <option name="scriptParameters" value="--no-configuration-cache" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
-          <option value="debugger:app:desktopRun" />
+          <option value="publishAllPublicationsToSonatypeRepository" />
         </list>
       </option>
       <option name="vmOptions" />

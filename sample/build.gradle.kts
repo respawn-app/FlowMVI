@@ -37,7 +37,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "app"
+        outputModuleName = "app"
         binaries.executable()
         browser {
             commonWebpackConfig {
