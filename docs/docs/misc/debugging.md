@@ -119,7 +119,7 @@ You can create more based on your needs, such as for testing stores or app flavo
 ```kotlin
 internal class DefaultConfigurationFactory(
     analytics: Analytics,
-) : StoreConfiguration {
+) : ConfigurationFactory {
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,
