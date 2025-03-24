@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload debugger
         id: upload-debugger
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Debugger_Linux
           path: ./debugger/app/build/compose/binaries/main/deb/*
@@ -67,7 +67,7 @@ jobs:
 
       - name: Upload sample
         id: upload-sample
-        uses: actions/upload-artifact@v4.6.1
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: Sample_Linux
           path: ./sample/build/compose/binaries/main/deb/*
