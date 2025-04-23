@@ -7,11 +7,12 @@ sidebar_label: Contribution guide
 
 * To build the project, you will need the following in your local.properties:
     ```properties
-    # only required for publishing
+    # only required for publishing (maintainers)
     sonatypeUsername=...
     sonatypePassword=...
     signing.key=...
     signing.password=...
+    keystore.password=...
     # always required
     sdk.dir=...
     release=false
@@ -23,7 +24,7 @@ sidebar_label: Contribution guide
     * Detekt plugin
     * Kotest plugin
     * Compose plugin
-    * JDK 21+ (for both building and running gradle)
+    * JDK 22+ (for both building and running gradle)
 * To debug the project, use the tasks provided as IDEA run configurations
     * All tests to run tests
     * All benchmark to benchmark the library

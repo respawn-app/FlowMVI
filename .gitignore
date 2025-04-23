@@ -176,3 +176,4 @@ docs/javadocs/**
 **/plugin_rsa_private_key.pem
 **/.cache
 /.intellijPlatform/
+**/*.jks
