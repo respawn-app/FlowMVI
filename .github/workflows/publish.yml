@@ -33,6 +33,15 @@ jobs:
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
+      - name: Decode Keystore
+        id: decode_keystore
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PATH: ./certificates/keystore.jks
+        run: |
+          echo $SIGNING_KEYSTORE_BASE64 | base64 --decode > $KEYSTORE_PATH
+          echo "keystore_path=$KEYSTORE_PATH" >> $GITHUB_OUTPUT
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
