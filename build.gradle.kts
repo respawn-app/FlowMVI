@@ -14,9 +14,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 plugins {
     alias(libs.plugins.detekt)
-    // alias(libs.plugins.gradleDoctor)
     alias(libs.plugins.version.catalog.update)
-    // alias(libs.plugins.dependencyAnalysis)
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.compose) apply false
     alias(libs.plugins.maven.publish) apply false
@@ -38,7 +36,7 @@ allprojects {
 subprojects {
     plugins.withType<ComposeCompilerGradleSubplugin>().configureEach {
         the<ComposeCompilerGradlePluginExtension>().apply {
-            featureFlags.addAll(ComposeFeatureFlag.OptimizeNonSkippingGroups)
+            featureFlags.addAll(ComposeFeatureFlag.OptimizeNonSkippingGroups, ComposeFeatureFlag.PausableComposition)
             stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("stability_definitions.txt"))
             if (properties["enableComposeCompilerReports"] == "true") {
                 val metricsDir = layout.buildDirectory.dir("compose_metrics")
@@ -94,22 +92,6 @@ subprojects {
     }
 }
 
-// TODO: Incompatible with gradle isolated projects
-// doctor {
-//     warnWhenJetifierEnabled = true
-//     warnWhenNotUsingParallelGC = true
-//     disallowMultipleDaemons = false
-//     javaHome {
-//         ensureJavaHomeMatches.set(false)
-//     }
-// }
-//
-// dependencyAnalysis {
-//     structure {
-//         ignoreKtx(true)
-//     }
-// }
-
 dependencies {
     detektPlugins(rootProject.libs.detekt.formatting)
     detektPlugins(rootProject.libs.detekt.compose)
@@ -125,6 +107,7 @@ dependencies {
             test,
             debugger.debuggerClient,
             debugger.debuggerPlugin,
+            metrics,
         ).forEach { dokka(it) }
     }
 }
@@ -136,8 +119,6 @@ versionCatalogUpdate {
 
     keep {
         keepUnusedVersions = true
-        keepUnusedLibraries = true
-        keepUnusedPlugins = true
     }
 
     versionCatalogs {

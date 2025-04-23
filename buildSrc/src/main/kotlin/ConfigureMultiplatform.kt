@@ -50,7 +50,7 @@ fun Project.configureMultiplatform(
     }
 
     if (wasmJs) wasmJs {
-        moduleName = this@configureMultiplatform.name
+        outputModuleName.set(this@configureMultiplatform.name)
         nodejs()
         browser()
         binaries.library()
