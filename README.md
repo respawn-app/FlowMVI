@@ -16,13 +16,13 @@ achieve thread-safety, and more. It takes about 10 minutes to get started.
 
 ## ⚡️ Quickstart:
 
+* Get Started in 10 minutes:
+  [![Quickstart](https://img.shields.io/website?down_color=red&down_message=Offline&label=Quickstart&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI)](https://opensource.respawn.pro/FlowMVI/quickstart)
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
-* Documentation:
-  [![Docs](https://img.shields.io/website?down_color=red&down_message=Offline&label=Docs&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI%2F%23%2F)](https://opensource.respawn.pro/FlowMVI/quickstart)
-* KDoc:
+* API Docs:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
-* Sample App (See features) ![badge-wasm]:
+* Sample App in your browser:
   [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample/)
 * Ask questions on
   [![Slack](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
@@ -105,17 +105,17 @@ Here's what you get:
 * Use both **MVVM+** (functional) or **MVI** (model-driven) style of programming
 * Share, distribute, disable, **manage side-effects** based on your team's needs
 * Dedicated **IDE Plugin for debugging and codegen** and app for Windows, Linux, MacOS
-* **Integration with popular libraries**, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose)
+* **Integration with popular libraries**, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose), Koin, Kodein, androidx.navigation, and more.
 * The core **library has no dependencies** except kotlin coroutines.
 * Core library is fully covered by **hundreds of tests**
 * **Minimal performance overhead**, equal to using a simple Channel, with regular benchmarking
-* Collect, monitor and report **performance metrics** automatically (upcoming).
 * **Test any business logic** using clean, declarative DSL.
-* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
+* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser 
+* 10 minutes to try by following the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/quickstart).
 
-## 👀 How to get started?
+## 👀 Show me the code!
 
-All you have to do is:
+Here is an example of your new workflow:
 
 ### 1. Define a Contract:
 
@@ -141,7 +141,7 @@ sealed interface Action : MVIAction {
 ```kotlin
 val counterStore = store(initial = State.Loading, scope = coroutineScope) {
 
-    install(analyticsPlugin) // install plugins you need
+    install(analyticsPlugin) // install custom plugins
 
     recover { e: Exception -> // recover from errors
         updateState { State.Error(e) }
@@ -168,7 +168,7 @@ store.intent(ClickedCounter)
 
 ### 3. Scale your app
 
-With FlowMVI, complexity **does not grow** no matter how many features you add.
+FlowMVI lets you scale your app in a way that does not increase complexity.
 Adding a new feature is as simple as calling a function.
 
 <details>
@@ -244,8 +244,6 @@ class CounterContainer(
         deinit {
             repo.stopTimer()
         }
-
-        // and 30+ more options to choose from...
     }
 }
 ```
@@ -318,7 +316,7 @@ No more subclassing `ViewModel`. Use `StoreViewModel` instead and make your busi
 ```kotlin
 val module = module { // Koin example
     factoryOf(::CounterContainer)
-    viewModel(qualifier<CounterContainer>()) { StoreViewModel(get<CounterContainer>()) }
+    viewModel(qualifier<CounterContainer>()) { ContainerViewModel(get<CounterContainer>()) }
 }
 
 class ScreenFragment : Fragment() {
