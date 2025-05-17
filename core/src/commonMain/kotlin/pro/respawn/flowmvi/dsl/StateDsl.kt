@@ -27,6 +27,7 @@ import kotlin.jvm.JvmName
  *
  * Consider accessing state via [StateReceiver.withState] or [StateReceiver.updateState] instead.
  */
+@DelicateStoreApi
 public inline val <S : MVIState> StateProvider<S>.state get() = states.value
 
 /**
