@@ -45,7 +45,7 @@ internal class StateModule<S : MVIState, I : MVIIntent, A : MVIAction>(
         else -> mutexElement.key.mutex.withLock { block() }
     }
 
-    override fun compareAndSet(expect: S, new: S) = _states.compareAndSet(expect, new)
+    override fun compareAndSet(old: S, new: S) = _states.compareAndSet(old, new)
 
     suspend inline fun withState(
         crossinline block: suspend S.() -> Unit

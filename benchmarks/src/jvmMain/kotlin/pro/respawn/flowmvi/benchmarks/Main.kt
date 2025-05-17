@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.benchmarks.setup.atomic.atomicStore
 /**
  * run an infinite process for profiling
  */
-fun main() = runBlocking {
+fun main(): Unit = runBlocking {
     println(ProcessHandle.current().pid())
     val store = atomicStore(this)
     launch {
@@ -21,5 +21,4 @@ fun main() = runBlocking {
         }
     }
     awaitCancellation()
-    Unit
 }

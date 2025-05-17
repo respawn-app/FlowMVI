@@ -54,6 +54,9 @@ fun Project.configureMultiplatform(
         nodejs()
         browser()
         binaries.library()
+        compilerOptions {
+            freeCompilerArgs.addAll(Config.wasmCompilerArgs)
+        }
     }
 
     if (wasmWasi) wasmWasi {

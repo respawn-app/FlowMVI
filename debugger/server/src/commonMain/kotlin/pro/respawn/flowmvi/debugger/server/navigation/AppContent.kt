@@ -9,8 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
-import org.koin.compose.KoinContext
-import pro.respawn.flowmvi.debugger.server.di.koin
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
 import pro.respawn.flowmvi.debugger.server.navigation.destination.Destinations
 import pro.respawn.flowmvi.debugger.server.navigation.util.defaultNavAnimation
@@ -20,7 +18,7 @@ import pro.respawn.kmmutils.compose.windowsize.isWideScreen
 @Composable
 fun AppContent(
     root: RootComponent
-) = KoinContext(koin) {
+) {
     val navigator = rememberAppNavigator(isWideScreen, root)
     val details by root.details.details.subscribeAsState()
     DynamicTwoPaneLayout(

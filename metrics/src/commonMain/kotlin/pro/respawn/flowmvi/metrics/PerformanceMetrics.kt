@@ -23,17 +23,10 @@ internal class PerformanceMetrics : SynchronizedObject() {
     private val bucketDurationMillis = 1.seconds // 1 second per bucket
     private var lastBucketTime = Clock.System.now()
 
-    // Call this method when an operation is measured
     fun recordOperation(durationMillis: Long) = synchronized(this) {
         totalOperations++
-
-        // Update EMA
         ema = if (ema == 0.0) durationMillis.toDouble() else alpha * durationMillis + (1 - alpha) * ema
-
-        // Update Median Estimate
         p2.add(durationMillis.toDouble())
-
-        // Update Frequency Counter
         updateFrequencyCounter()
     }
 
@@ -42,7 +35,6 @@ internal class PerformanceMetrics : SynchronizedObject() {
         val elapsedBuckets = ((currentTime - lastBucketTime) / bucketDurationMillis).toInt()
 
         if (elapsedBuckets > 0) {
-            // Shift the buckets
             val shift = min(elapsedBuckets, numberOfBuckets)
             frequencyBuckets.copyInto(frequencyBuckets, shift, 0, numberOfBuckets - shift)
             for (i in numberOfBuckets - shift until numberOfBuckets) {
@@ -51,7 +43,6 @@ internal class PerformanceMetrics : SynchronizedObject() {
             lastBucketTime += bucketDurationMillis * elapsedBuckets
         }
 
-        // Increment the current bucket
         frequencyBuckets[numberOfBuckets - 1]++
     }
 

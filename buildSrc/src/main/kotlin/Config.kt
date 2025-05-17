@@ -42,22 +42,16 @@ object Config {
     val jvmTarget = JvmTarget.JVM_11
     val javaVersion = JavaVersion.VERSION_11
     val optIns = listOf(
-        "kotlinx.coroutines.ExperimentalCoroutinesApi",
-        "kotlinx.coroutines.FlowPreview",
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
         "kotlin.uuid.ExperimentalUuidApi",
         "kotlin.contracts.ExperimentalContracts",
-        "org.jetbrains.compose.resources.ExperimentalResourceApi"
     )
     val compilerArgs = listOf(
-        "-Xbackend-threads=0", // parallel IR compilation
         "-Xexpect-actual-classes",
-        "-Xwasm-use-new-exception-proposal",
         "-Xconsistent-data-class-copy-visibility",
         "-Xsuppress-warning=NOTHING_TO_INLINE",
         "-Xsuppress-warning=UNUSED_ANONYMOUS_PARAMETER",
-        "-Xwasm-debugger-custom-formatters"
     )
     val jvmCompilerArgs = buildList {
         addAll(compilerArgs)
@@ -66,6 +60,12 @@ object Config {
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
         add("-Xjdk-release=${jvmTarget.target}")
+    }
+
+    val wasmCompilerArgs = buildList {
+        addAll(compilerArgs)
+        add("-Xwasm-use-new-exception-proposal")
+        add("-Xwasm-debugger-custom-formatters")
     }
 
     // android

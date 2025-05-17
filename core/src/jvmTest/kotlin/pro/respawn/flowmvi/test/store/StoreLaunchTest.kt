@@ -93,7 +93,7 @@ class StoreLaunchTest : FreeSpec({
                 }
                 idle()
                 "then intents should not be handled anymore" {
-                    store.send(intent)
+                    store.emit(intent)
                 }
             }
         }
