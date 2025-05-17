@@ -18,8 +18,9 @@ import kotlin.coroutines.EmptyCoroutineContext
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.init(
+    name: String? = null,
     @BuilderInference block: suspend PipelineContext<S, I, A>.() -> Unit
-): Unit = install(initPlugin(block))
+): Unit = install(initPlugin(name, block))
 
 /**
  * Creates a plugin that invokes [block] after [pro.respawn.flowmvi.api.Store.start] is called.
@@ -27,8 +28,12 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.in
  */
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> initPlugin(
+    name: String? = null,
     @BuilderInference block: suspend PipelineContext<S, I, A>.() -> Unit,
-): StorePlugin<S, I, A> = plugin { onStart(block) }
+): StorePlugin<S, I, A> = plugin {
+    this.name = name
+    onStart(block)
+}
 
 /**
  * [initPlugin] overload that launches a new coroutine instead of preventing store startup sequence.
@@ -38,5 +43,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> initPlugin(
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.asyncInit(
     context: CoroutineContext = EmptyCoroutineContext,
+    name: String? = null,
     crossinline block: suspend PipelineContext<S, I, A>.() -> Unit
-): Unit = init { launch(context) { block() } }
+): Unit = init(name) { launch(context) { block() } }
