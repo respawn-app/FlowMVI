@@ -1,0 +1,8 @@
+**/build/**
+certificates/**
+.idea
+.intellijPlatform
+.gradle
+.kotlin
+kotlin-js-store
+keystore.jks

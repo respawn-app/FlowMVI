@@ -177,3 +177,4 @@ docs/javadocs/**
 **/.cache
 /.intellijPlatform/
 **/*.jks
+.junie
