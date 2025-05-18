@@ -82,7 +82,7 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         onAction = { action -> onAction(action)?.let { _actions.action(it) } },
         onStop = { e -> close().also { plugin.onStop?.invoke(this, e) } },
         onStart = pipeline@{ lifecycle ->
-            beginStartup(lifecycle)
+            beginStartup(lifecycle, config)
             launch {
                 catch(recover) { onStart() }
                 if (plugin.observesSubscribers) launch {

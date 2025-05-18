@@ -7,7 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
+import pro.respawn.flowmvi.exceptions.StoreAlreadyStartedException
 
 internal interface StoreLifecycleModule : StoreLifecycle {
 
@@ -16,7 +18,7 @@ internal interface StoreLifecycleModule : StoreLifecycle {
 
 internal interface RestartableLifecycle : StoreLifecycle {
 
-    fun beginStartup(lifecycle: StoreLifecycle)
+    fun beginStartup(lifecycle: StoreLifecycle, config: StoreConfiguration<*>)
 }
 
 internal fun storeLifecycle(parent: Job) = object : StoreLifecycleModule {
@@ -47,8 +49,8 @@ internal fun restartableLifecycle() = object : RestartableLifecycle {
         null
     }
 
-    override fun beginStartup(lifecycle: StoreLifecycle) = delegate.update {
-        check(it == null) { "Store is already running" }
+    override fun beginStartup(lifecycle: StoreLifecycle, config: StoreConfiguration<*>) = delegate.update {
+        if (it != null) throw StoreAlreadyStartedException(config.name)
         lifecycle
     }
 
