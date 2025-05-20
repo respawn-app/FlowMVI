@@ -19,7 +19,7 @@ public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, 
     crossinline block: suspend Store<S, I, A>.() -> Unit
 ): Unit = coroutineScope {
     try {
-        start(this)
+        start(this).awaitStartup()
         block()
     } finally {
         closeAndWait()
