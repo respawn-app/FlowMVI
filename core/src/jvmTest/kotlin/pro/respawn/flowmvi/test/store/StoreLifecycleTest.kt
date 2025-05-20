@@ -84,7 +84,7 @@ class StoreLifecycleTest : FreeSpec({
                 // Second lifecycle
                 val lc2 = newStore.start(this)
                 lc2.isActive shouldBe true
-                lc1.isActive shouldBe false  // Previous lifecycle remains closed
+                lc1.isActive shouldBe false // Previous lifecycle remains closed
                 lc2.close()
                 lc2.isActive shouldBe false
             }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeout
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.dsl.send
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
