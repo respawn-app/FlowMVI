@@ -33,7 +33,7 @@ internal class SubscriptionHolder {
 }
 
 /**
- * Create and install a new [whileSubscribed] plugin. See the parent's function docs for more info.
+ * Create and install a new [whileSubscribedPlugin]. See the parent's function docs for more info.
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(

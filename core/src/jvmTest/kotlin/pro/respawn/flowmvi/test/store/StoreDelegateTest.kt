@@ -12,6 +12,7 @@ import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.plugins.asyncInit
 import pro.respawn.flowmvi.plugins.delegate.DelegationMode
 import pro.respawn.flowmvi.plugins.delegate.delegate
+import pro.respawn.flowmvi.plugins.delegate.StoreDelegate
 import pro.respawn.flowmvi.plugins.delegate.storeDelegatePlugin
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestState
@@ -103,7 +104,7 @@ class StoreDelegateTest : FreeSpec({
         }
 
         "when delegate is configured not to start automatically" - {
-            val delegatePlugin = delegate(delegateStore)
+            val delegatePlugin = StoreDelegate(delegateStore)
 
             "then it is not started when parent store is started" {
                 val store = testStore {

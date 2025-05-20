@@ -21,17 +21,54 @@ import pro.respawn.flowmvi.plugins.whileSubscribedPlugin
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
+/**
+ * An object that provides access to the state of the [delegate] store.
+ * Can be used with the [pro.respawn.flowmvi.plugins.delegate.delegate] Store dsl to obtain the state projection:
+ *
+ * ```kotlin
+ * val store = store {
+ *     val feedState by delegate(feedStore) {
+ *         // handle actions
+ *     }
+ *     whileSubscribed {
+ *         feedState.collect { state ->
+ *             // use projection.
+ *         }
+ *     }
+ * }
+ * ```
+ *
+ * The StoreDelegate is responsible for projecting the state of the delegate store to the principal store
+ * and optionally handling actions from the delegate store.
+ *
+ * Warning: [stateProjection] is not guaranteed to be up-to-date. See [DelegationMode] for more details.
+ *
+ * @property delegate The store that will be delegated to
+ * @property mode The delegation mode that determines when and how the delegate's state is projected
+ *
+ * @see pro.respawn.flowmvi.plugins.delegate.delegate
+ */
 @OptIn(InternalFlowMVIAPI::class, DelicateStoreApi::class)
-public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
+public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @InternalFlowMVIAPI constructor(
     internal val delegate: Store<S, I, A>,
-    private val mode: DelegationMode,
+    private val mode: DelegationMode = DelegationMode.Default,
 ) : ReadOnlyProperty<Any?, Flow<S>> {
 
+    /**
+     * The name of this delegate, derived from the delegate store's name.
+     */
     public val name: String = "${delegate.name.orEmpty()}StoreDelegate"
 
     // lazy to init with the most recent state on first invocation (or never, based on mode)
     private val _state by lazy { MutableStateFlow(delegate.state) }
 
+    /**
+     * A flow that projects the state of the delegate store based on the delegation mode.
+     *
+     * - In [DelegationMode.Immediate] mode, this directly exposes the delegate store's states flow.
+     * - In [DelegationMode.WhileSubscribed] mode, this exposes a state flow that is updated only when
+     *   the principal store has subscribers.
+     */
     public val stateProjection: Flow<S> by lazy {
         when (mode) {
             is DelegationMode.Immediate -> delegate.states
@@ -39,6 +76,11 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal 
         }
     }
 
+    /**
+     * Subscribes to the delegate store and handles its state and actions.
+     *
+     * @param consume Optional collector for actions emitted by the delegate store
+     */
     private inline fun CoroutineScope.subscribeChild(consume: FlowCollector<A>?) = with(delegate) {
         subscribe {
             coroutineScope {
@@ -64,6 +106,7 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal 
     }
 
     // region junk
+    override fun getValue(thisRef: Any?, property: KProperty<*>): Flow<S> = stateProjection
     override fun toString(): String = name
     override fun hashCode(): Int = delegate.hashCode()
     override fun equals(other: Any?): Boolean {
@@ -72,6 +115,4 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal 
         if (delegate != other.delegate) return false
         return true
     }
-
-    override fun getValue(thisRef: Any?, property: KProperty<*>): Flow<S> = stateProjection
 }
