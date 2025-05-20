@@ -16,13 +16,13 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
 // - child store
 // - required store
 
-private suspend fun PipelineContext<*, *, *>.installChildren(
+private suspend fun PipelineContext<*, *, *>.installChild(
     stores: Iterable<Store<*, *, *>>,
     force: Boolean = config.debuggable,
     blocking: Boolean = false,
 ) = stores.forEach {
-    val store = if (force || !it.isActive) it.start(this) else null
-    if (blocking) store?.awaitStartup()
+    val lifecycle = if (force || !it.isActive) it.start(this) else null
+    if (blocking) lifecycle?.awaitStartup()
 }
 
 @FlowMVIDSL
@@ -31,18 +31,18 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> childStorePlugin(
     force: Boolean? = null,
     blocking: Boolean = false,
     name: String? = null,
-): StorePlugin<S, I, A> = initPlugin(name) { installChildren(children, force ?: config.debuggable, blocking) }
+): StorePlugin<S, I, A> = initPlugin(name) { installChild(children, force ?: config.debuggable, blocking) }
 
 @FlowMVIDSL
-public fun StoreBuilder<*, *, *>.installChildren(
+public fun StoreBuilder<*, *, *>.installChild(
     children: Iterable<Store<*, *, *>>,
     force: Boolean? = null,
     blocking: Boolean = false,
     name: String? = null,
-) = init(name) { installChildren(children, force ?: config.debuggable, blocking) }
+) = init(name) { installChild(children, force ?: config.debuggable, blocking) }
 
 @FlowMVIDSL
-public fun StoreBuilder<*, *, *>.installChildren(
+public fun StoreBuilder<*, *, *>.installChild(
     first: Store<*, *, *>,
     vararg other: Store<*, *, *>,
     force: Boolean? = null,
@@ -51,10 +51,7 @@ public fun StoreBuilder<*, *, *>.installChildren(
 ) = buildSet {
     add(first)
     addAll(elements = other)
-}.let { installChildren(it, force, blocking, name) }
+}.let { installChild(it, force, blocking, name) }
 
 @FlowMVIDSL
-public infix fun StoreBuilder<*, *, *>.installChild(other: Store<*, *, *>) = installChildren(setOf(other))
-
-@FlowMVIDSL
-public infix fun Store<*, *, *>.launchIn(builder: StoreBuilder<*, *, *>) = builder installChild this
+public infix fun StoreBuilder<*, *, *>.hasChild(other: Store<*, *, *>) = installChild(setOf(other))

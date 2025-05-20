@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -17,23 +18,34 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.plugins.initPlugin
 import pro.respawn.flowmvi.plugins.whileSubscribedPlugin
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
+@OptIn(InternalFlowMVIAPI::class, DelicateStoreApi::class)
 public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
-    private val mode: DelegationMode,
     internal val delegate: Store<S, I, A>,
-) {
+    private val mode: DelegationMode,
+) : ReadOnlyProperty<Any?, Flow<S>> {
 
     public val name: String = "${delegate.name.orEmpty()}StoreDelegate"
 
-    // lazy to  init with the most recent state on first invocation
-    @OptIn(DelicateStoreApi::class)
+    // lazy to init with the most recent state on first invocation (or never, based on mode)
     private val _state by lazy { MutableStateFlow(delegate.state) }
-    public val state: Flow<S> by lazy { _state.asStateFlow() }
+
+    public val stateProjection: Flow<S> by lazy {
+        when (mode) {
+            is DelegationMode.Immediate -> delegate.states
+            is DelegationMode.WhileSubscribed -> _state.asStateFlow()
+        }
+    }
 
     private inline fun CoroutineScope.subscribeChild(consume: FlowCollector<A>?) = with(delegate) {
         subscribe {
             coroutineScope {
-                launch { states.collect(_state) }
+                when (mode) {
+                    is DelegationMode.Immediate -> Unit // state is already always up-to-date
+                    is DelegationMode.WhileSubscribed -> launch { states.collect(_state) }
+                }
                 consume?.let { launch { actions.collect(it) } }
                 awaitCancellation()
             }
@@ -60,5 +72,6 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> internal 
         if (delegate != other.delegate) return false
         return true
     }
-    // endregion
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): Flow<S> = stateProjection
 }

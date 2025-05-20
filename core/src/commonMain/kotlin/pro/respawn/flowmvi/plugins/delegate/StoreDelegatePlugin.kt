@@ -21,13 +21,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> delegate(
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        CS : MVIState,
-        CI : MVIIntent,
-        CA : MVIAction
-        > storeDelegatePlugin(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    CS : MVIState,
+    CI : MVIIntent,
+    CA : MVIAction
+    > storeDelegatePlugin(
     delegate: StoreDelegate<CS, CI, CA>,
     name: String? = delegate.name,
     start: Boolean = true,
@@ -37,26 +37,26 @@ public fun <
     if (!start) return@let it
     compositePlugin(
         name = name,
-        plugins = listOf(childStorePlugin(setOf(delegate.delegate), false, blocking), it),
+        plugins = listOf(childStorePlugin(setOf(delegate.delegate), null, blocking), it),
     )
 }
 
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <
-        S : MVIState,
-        I : MVIIntent,
-        A : MVIAction,
-        CS : MVIState,
-        CI : MVIIntent,
-        CA : MVIAction
-        > StoreBuilder<S, I, A>.delegate(
+    S : MVIState,
+    I : MVIIntent,
+    A : MVIAction,
+    CS : MVIState,
+    CI : MVIIntent,
+    CA : MVIAction
+    > StoreBuilder<S, I, A>.delegate(
     store: Store<CS, CI, CA>,
     mode: DelegationMode = DelegationMode.Default,
     name: String? = "${store.name.orEmpty()}DelegatePlugin",
     start: Boolean = true,
     blocking: Boolean = false,
     consume: (suspend (CA) -> Unit)? = null,
-): StoreDelegate<CS, CI, CA> = delegate(store, mode).also {
+): StoreDelegate<CS, CI, CA> = StoreDelegate(store, mode).also {
     install(storeDelegatePlugin(it, name, start, blocking, consume))
 }
