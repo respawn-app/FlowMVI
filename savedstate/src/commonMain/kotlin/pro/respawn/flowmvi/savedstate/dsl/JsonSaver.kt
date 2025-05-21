@@ -13,11 +13,7 @@ public fun <T> JsonSaver(
     json: Json,
     serializer: KSerializer<T>,
     delegate: Saver<String>,
-    @BuilderInference recover: suspend (Exception) -> T? = { e -> // TODO: Compiler bug does not permit inlining this
-        delegate.recover(e)?.let { json.decodeFromString(serializer, it) }
-    },
 ): Saver<T> = Saver(
-    recover = recover,
     save = { state -> delegate.save(state?.let { json.encodeToString(serializer, it) }) },
     restore = { delegate.restore()?.let { json.decodeFromString(serializer, it) } }
 )

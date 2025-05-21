@@ -18,6 +18,7 @@ import pro.respawn.flowmvi.savedstate.platform.writeCompressed
  * * If `null` is passed to [Saver.save], it will delete the file, but not the directory.
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
+@Deprecated("Please use an overload that uses a path instead")
 public inline fun <T> DefaultFileSaver(
     dir: String,
     fileName: String,
@@ -41,6 +42,7 @@ public inline fun <T> DefaultFileSaver(
  * @see JsonSaver
  * @see Saver
  */
+@Deprecated("Please use an overload that uses a path instead")
 public fun FileSaver(
     dir: String,
     fileName: String,
@@ -66,6 +68,7 @@ public fun FileSaver(
  * @see JsonSaver
  * @see Saver
  */
+@Deprecated("Please use an overload that uses a path instead")
 public fun CompressedFileSaver(
     dir: String,
     fileName: String,

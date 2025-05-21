@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.savedstate.api.Saver
 /**
  * A [Saver] that writes to [logger] during save restoration, saving and errors.
  */
+@Suppress("DEPRECATION") // recover
 public fun <T> LoggingSaver(
     delegate: Saver<T>,
     logger: StoreLogger,

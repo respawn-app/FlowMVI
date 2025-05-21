@@ -1,0 +1,31 @@
+package pro.respawn.flowmvi.savedstate.dsl
+
+import kotlinx.coroutines.CancellationException
+import pro.respawn.flowmvi.savedstate.api.Saver
+
+public inline fun <T> RecoveringSaver(
+    delegate: Saver<T>,
+    crossinline recover: suspend (Exception) -> T?,
+): Saver<T> = Saver(
+    save = { delegate.saveCatching(it, recover) },
+    restore = { delegate.restoreCatching(recover) },
+)
+
+@PublishedApi
+internal suspend inline fun <S> Saver<S>.saveCatching(state: S?, recover: suspend (Exception) -> S?): Unit = try {
+    save(state)
+} catch (e: CancellationException) {
+    throw e
+} catch (expected: Exception) {
+    recover.invoke(expected) ?: this.recover(expected)
+    Unit
+}
+
+@PublishedApi
+internal suspend inline fun <S> Saver<S>.restoreCatching(recover: suspend (Exception) -> S?): S? = try {
+    restore()
+} catch (e: CancellationException) {
+    throw e
+} catch (expected: Exception) {
+    recover.invoke(expected) ?: this.recover(expected)
+}

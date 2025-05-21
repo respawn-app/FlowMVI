@@ -1,19 +1,7 @@
 package pro.respawn.flowmvi.savedstate.api
 
+import pro.respawn.flowmvi.savedstate.dsl.RecoverDeprecationMessage
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
-
-/**
- * A [Saver] recovery function that will simply return `null` value and no state will be saved/restored.
- * Existing state will be cleared.
- */
-public val NullRecover: suspend (Exception) -> Nothing? = { null }
-
-/**
- * A [Saver] recovery function that will throw on any exception when saving and restoring state.
- *
- * Usually, this is the default.
- */
-public val ThrowRecover: suspend (e: Exception) -> Nothing? = { throw it }
 
 /**
  * A Saver is an object that specifies **how** to save the state of the [saveStatePlugin].
@@ -40,5 +28,6 @@ public interface Saver<T> {
      *  caught while the saver was working. By default, it just throws the exception and the parent store will decide
      *  how to handle it.
      **/
+    @Deprecated(RecoverDeprecationMessage)
     public suspend fun recover(e: Exception): T? = throw e
 }
