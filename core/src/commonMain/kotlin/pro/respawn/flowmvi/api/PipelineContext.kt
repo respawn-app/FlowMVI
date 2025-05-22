@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
+import pro.respawn.flowmvi.api.context.SubscriptionAware
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
@@ -33,6 +34,7 @@ public interface PipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> :
     ActionReceiver<A>,
     CoroutineScope,
     StoreLifecycle,
+    SubscriptionAware,
     CoroutineContext.Element {
 
     /**

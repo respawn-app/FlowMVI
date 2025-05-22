@@ -10,7 +10,6 @@ import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.plugins.TimeTravel
-import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 
@@ -32,22 +31,23 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
     ShutdownContext<S, I, A>,
     StorePlugin<S, I, A> by ctx.plugin {
 
-    public constructor(
+    @PublishedApi
+    internal constructor(
         configuration: StoreConfiguration<S>,
         plugin: LazyPlugin<S, I, A>,
         timeTravel: TimeTravel<S, I, A>,
     ) : this(
         timeTravel = timeTravel,
-        ctx = TestPipelineContext(
-            config = configuration,
-            plugin = compositePlugin(
-                sequenceOf(
-                    plugin,
-                    loggingPlugin(),
-                    timeTravelPlugin(timeTravel),
-                ).map { it(configuration) }.toList(),
+        ctx = with(configuration) {
+            val plugin = plugin(this)
+            val log = loggingPlugin<S, I, A>()(this)
+            val tt = timeTravelPlugin(timeTravel)
+            TestPipelineContext(
+                config = configuration,
+                name = plugin.name,
+                plugins = listOf(plugin, log, tt)
             )
-        )
+        }
     )
 
     // compiler bug which crashes compilation because both context and plugin declare equals
