@@ -10,10 +10,11 @@ import pro.respawn.flowmvi.impl.plugin.compose
 
 /**
  * A plugin that delegates to [plugins] in the iteration order.
- * This is an implementation of the "Composite" pattern and the "Chain or Responsibility" pattern.
  *
- * This plugin is mostly not intended for usage in general code as there are no real use cases for it so far.
- * It can be useful in testing and custom store implementations.
+ * This can be used to make several plugins appear as a single one for consumers, for example, when a plugin
+ * requires another plugin to be installed.
+ *
+ * This is an implementation of the "Composite" pattern and the "Chain or Responsibility" pattern.
  *
  * The [plugins] list must support random element access in order to be performant
  */
@@ -22,3 +23,18 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
     plugins: List<StorePlugin<S, I, A>>,
     name: String? = null,
 ): StorePlugin<S, I, A> = plugins.map(StorePlugin<S, I, A>::asInstance).compose(name)
+
+/**
+ * A plugin that delegates to [first] and [other] in the declaration order.
+ *
+ * This can be used to make several plugins appear as a single one for consumers, for example, when a plugin
+ * requires another plugin to be installed.
+ *
+ * This is an implementation of the "Composite" pattern and the "Chain or Responsibility" pattern.
+ */
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> compositePlugin(
+    first: StorePlugin<S, I, A>,
+    vararg other: StorePlugin<S, I, A>,
+    name: String? = null,
+): StorePlugin<S, I, A> = sequenceOf(first).plus(other).map(StorePlugin<S, I, A>::asInstance).toList().compose(name)
