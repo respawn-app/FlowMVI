@@ -28,7 +28,7 @@ import kotlin.jvm.JvmName
  * Consider accessing state via [StateReceiver.withState] or [StateReceiver.updateState] instead.
  */
 @DelicateStoreApi
-public inline val <S : MVIState> StateProvider<S>.state get() = states.value
+public inline val <S : MVIState> StateProvider<S>.state: S get() = states.value
 
 /**
  * A function that obtains current state and updates it atomically (in the thread context), and non-atomically in
@@ -61,7 +61,7 @@ public inline fun <S : MVIState> ImmediateStateReceiver<S>.updateStateImmediate(
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withState(
     @BuilderInference crossinline block: suspend T.() -> Unit
-) = withState { typed<T>()?.block() }
+): Unit = withState { typed<T>()?.block() }
 
 /**
  * A typed overload of [StateReceiver.updateState].
@@ -69,7 +69,7 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.withSta
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateState(
     @BuilderInference crossinline transform: suspend T.() -> S
-) = updateState { withType<T, _> { transform() } }
+): Unit = updateState { withType<T, _> { transform() } }
 
 /**
  * A typed overload of [updateStateImmediate].
@@ -81,7 +81,7 @@ public suspend inline fun <reified T : S, S : MVIState> StateReceiver<S>.updateS
 @JvmName("updateStateImmediateTyped")
 public inline fun <reified T : S, S : MVIState> ImmediateStateReceiver<S>.updateStateImmediate(
     @BuilderInference transform: T.() -> S
-) = updateStateImmediate { withType<T, _> { transform() } }
+): Unit = updateStateImmediate { withType<T, _> { transform() } }
 
 /**
  * Use the state if it is of type [T], otherwise, throw [InvalidStateException].
@@ -91,7 +91,7 @@ public inline fun <reified T : S, S : MVIState> ImmediateStateReceiver<S>.update
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.withStateOrThrow(
     @BuilderInference crossinline block: suspend T.() -> Unit
-) = withState {
+): Unit = withState {
     typed<T>()?.block() ?: throw InvalidStateException(T::class.simpleName, this::class.simpleName)
 }
 
@@ -103,6 +103,6 @@ public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>
 @FlowMVIDSL
 public suspend inline fun <reified T : S, S : MVIState> PipelineContext<S, *, *>.updateStateOrThrow(
     @BuilderInference crossinline transform: suspend T.() -> S
-) = updateState {
+): Unit = updateState {
     typed<T>()?.transform() ?: throw InvalidStateException(T::class.simpleName, this::class.simpleName)
 }

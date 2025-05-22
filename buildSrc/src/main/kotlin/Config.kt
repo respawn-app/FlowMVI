@@ -50,11 +50,10 @@ object Config {
     val compilerArgs = listOf(
         "-Xexpect-actual-classes",
         "-Xconsistent-data-class-copy-visibility",
-        "-Xsuppress-warning=NOTHING_TO_INLINE",
-        "-Xsuppress-warning=UNUSED_ANONYMOUS_PARAMETER",
+        "-Xwarning-level=NOTHING_TO_INLINE:disabled",
+        "-Xwarning-level=UNUSED_ANONYMOUS_PARAMETER:disabled",
     )
     val jvmCompilerArgs = buildList {
-        addAll(compilerArgs)
         add("-Xjvm-default=all") // enable all jvm optimizations
         add("-Xcontext-receivers")
         add("-Xstring-concat=inline")

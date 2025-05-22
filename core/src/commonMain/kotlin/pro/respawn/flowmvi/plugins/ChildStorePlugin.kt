@@ -47,7 +47,7 @@ public fun StoreBuilder<*, *, *>.installChild(
     force: Boolean? = null,
     blocking: Boolean = false,
     name: String? = null,
-) = install(childStorePlugin(children, force, blocking, name))
+): Unit = install(childStorePlugin(children, force, blocking, name))
 
 /**
  * Create and install a new [childStorePlugin]
@@ -60,7 +60,7 @@ public fun StoreBuilder<*, *, *>.installChild(
     force: Boolean? = null,
     blocking: Boolean = false,
     name: String? = null,
-) = buildSet {
+): Unit = buildSet {
     add(first)
     addAll(elements = other)
 }.let { installChild(it, force, blocking, name) }
@@ -82,4 +82,4 @@ public fun StoreBuilder<*, *, *>.installChild(
  * @param other The store to install as a child
  */
 @FlowMVIDSL
-public infix fun StoreBuilder<*, *, *>.hasChild(other: Store<*, *, *>) = installChild(setOf(other))
+public infix fun StoreBuilder<*, *, *>.hasChild(other: Store<*, *, *>): Unit = installChild(setOf(other))
