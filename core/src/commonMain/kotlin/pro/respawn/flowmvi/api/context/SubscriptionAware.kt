@@ -3,8 +3,19 @@ package pro.respawn.flowmvi.api.context
 import kotlinx.coroutines.flow.StateFlow
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 
+/**
+ * An entity that is aware of the number of its subscribers. Usually [pro.respawn.flowmvi.api.PipelineContext]
+ */
 public interface SubscriptionAware {
 
+    /**
+     * The current number of subscribers of this entity.
+     *
+     * This flow is an input
+     * to [pro.respawn.flowmvi.util.whileSubscribed] or [pro.respawn.flowmvi.plugins.whileSubscribedPlugin].
+     *
+     * This flow is usually not collected directly, but rather used by the store's plugins.
+     */
     @ExperimentalFlowMVIAPI
     public val subscriberCount: StateFlow<Int>
 }

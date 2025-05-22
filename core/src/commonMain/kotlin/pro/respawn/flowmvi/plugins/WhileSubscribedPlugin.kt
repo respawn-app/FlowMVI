@@ -1,5 +1,7 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
@@ -44,7 +46,11 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     require(minSubscriptions > 0) { "Minimum number of subscribers must be greater than 0, got: $minSubscriptions" }
     require(stopDelay.isFinite() && !stopDelay.isNegative()) { "stopDelay must be non-negative, got: $stopDelay" }
     this.name = name
-    onStart { whileSubscribed(stopDelay, minSubscriptions) { block() } }
+    onStart {
+        launch(start = CoroutineStart.UNDISPATCHED) {
+            whileSubscribed(stopDelay, minSubscriptions) { block() }
+        }
+    }
 }
 
 /**
