@@ -22,11 +22,11 @@ import pro.respawn.flowmvi.plugins.TimeTravel
  * environment for the test.
  */
 @FlowMVIDSL
-public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> LazyPlugin<S, I, A>.test(
+public suspend fun <S : MVIState, I : MVIIntent, A : MVIAction> LazyPlugin<S, I, A>.test(
     initial: S,
     timeTravel: TimeTravel<S, I, A> = TimeTravel(),
-    crossinline configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
-    crossinline block: suspend PluginTestScope<S, I, A>.() -> Unit,
+    configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
+    block: suspend PluginTestScope<S, I, A>.() -> Unit,
 ): Unit = coroutineScope {
     val config = configuration(initial, configuration)
     PluginTestScope(config, this@test, timeTravel).run { block() }

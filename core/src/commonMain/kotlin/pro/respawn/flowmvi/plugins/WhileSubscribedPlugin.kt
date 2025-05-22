@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
-import pro.respawn.flowmvi.util.whileSubscribed
+import pro.respawn.flowmvi.util.doWhileSubscribed
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,7 +48,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
     this.name = name
     onStart {
         launch(start = CoroutineStart.UNDISPATCHED) {
-            whileSubscribed(stopDelay, minSubscriptions) { block() }
+            doWhileSubscribed(stopDelay, minSubscriptions) { block() }
         }
     }
 }

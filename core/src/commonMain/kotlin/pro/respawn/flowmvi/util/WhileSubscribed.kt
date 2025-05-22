@@ -28,7 +28,7 @@ import kotlin.time.Duration.Companion.seconds
  */
 @OptIn(FlowPreview::class)
 @ExperimentalFlowMVIAPI
-public suspend inline fun SubscriptionAware.whileSubscribed(
+public suspend inline fun SubscriptionAware.doWhileSubscribed(
     stopDelay: Duration = 1.seconds,
     minSubscribers: Int = 1,
     crossinline action: suspend () -> Unit
