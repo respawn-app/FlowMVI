@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.savedstate.platform
 
+import kotlinx.coroutines.runInterruptible
 import java.io.File
 import java.io.InputStream
 import java.util.zip.GZIPInputStream
@@ -19,13 +20,15 @@ internal actual suspend fun writeCompressed(data: String?, path: String) {
         file.delete()
         return
     }
-    return file.outputStreamOrEmpty().let(::GZIPOutputStream).bufferedWriter().use { it.write(data) }
+    return runInterruptible {
+        file.outputStreamOrEmpty().let(::GZIPOutputStream).bufferedWriter().use { it.write(data) }
+    }
 }
 
 internal actual suspend fun readCompressed(path: String): String? {
     val file = File(path)
     if (!file.exists()) return null
-    return file.inputStream().let(::GZIPInputStream).readOrNull()
+    return runInterruptible { file.inputStream().let(::GZIPInputStream).readOrNull() }
 }
 
 internal actual suspend fun write(data: String?, path: String) {
@@ -34,11 +37,11 @@ internal actual suspend fun write(data: String?, path: String) {
         file.delete()
         return
     }
-    return file.outputStreamOrEmpty().bufferedWriter().use { it.write(data) }
+    return runInterruptible { file.outputStreamOrEmpty().bufferedWriter().use { it.write(data) } }
 }
 
 internal actual suspend fun read(path: String): String? {
     val file = File(path)
     if (!file.exists()) return null
-    return file.inputStream().readOrNull()
+    return runInterruptible { file.inputStream().readOrNull() }
 }
