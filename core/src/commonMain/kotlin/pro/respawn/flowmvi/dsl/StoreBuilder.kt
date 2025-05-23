@@ -21,9 +21,9 @@ import kotlin.jvm.JvmName
 
 public typealias BuildStore<S, I, A> = StoreBuilder<S, I, A>.() -> Unit
 
-private fun duplicatePluginMessage(type: String, name: String) {
+private fun duplicatePluginMessage(type: String, name: String): String {
     val title = type.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-    """
+    return """
         You have attempted to install $type $name which was already installed.
         $title can be repeatable if they have different names or are different instances of the target class.
         You either have installed the same $type instance twice or have installed two ${type}s with the same name.
