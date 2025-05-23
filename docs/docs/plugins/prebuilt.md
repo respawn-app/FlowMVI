@@ -13,7 +13,7 @@ inject some logic into any store at any point.
 
 ## Plugin Ordering
 
-:::danger[The order of plugins matters! ]
+:::danger[The order of plugins matters!]
 
 Changing the order of plugins may completely change how your store works.
 Plugins can replace, veto, consume, or otherwise change anything in the store.
@@ -83,33 +83,37 @@ FlowMVI comes with a whole suite of prebuilt plugins to cover the most common de
 
 Here's a full list:
 
--   **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
--   **Init Plugin** - do something when the store is launched. Install with `init { }`.
--   **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
--   **While Subscribed Plugin** - run jobs when the `N`th subscriber of a store appears. Install
-    with `whileSubscribed { }`.
--   **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
--   **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
-    lifecycle. Install with `val value by cache { }`
--   **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not
-    delay the store's startup sequence.
--   **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
--   **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
-    work. Install with `awaitSubscribers()`.
--   **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
--   **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
-    Install with `disallowRestart()`.
--   **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for
-    testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
--   **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order. Install with
-    `consumeIntents()`.
--   **Deinit Plugin** - run actions when the store is stopped.
--   **Reset State Plugin** - reset the state of the store when it is stopped.
--   **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
-    See [saved state](/state/savedstate.md) for details.
--   **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
-    the [documentation](/misc/debugging.md) to learn how to set up the environment.
--   **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
+- **Reduce Plugin** - process incoming intents. Install with `reduce { }`.
+- **Init Plugin** - do something when the store is launched. Install with `init { }`.
+- **Recover Plugin** - handle exceptions, works for both plugins and jobs. Install with `recover { }`.
+- **While Subscribed Plugin** - run jobs when the `N`th subscriber of a store appears. Install
+  with `whileSubscribed { }`.
+- **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
+- **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
+  lifecycle. Install with `val value by cache { }`
+- **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not
+  delay the store's startup sequence.
+- **Job Manager Plugin** - keep track of long-running tasks, cancel and schedule them. Install with `manageJobs()`.
+- **Await Subscribers Plugin** - let the store wait for a specified number of subscribers to appear before starting its
+  work. Install with `awaitSubscribers()`.
+- **Undo/Redo Plugin** - undo and redo any action happening in the store. Install with `undoRedo()`.
+- **Disallow Restart Plugin** - disallow restarting the store if you do not plan to reuse it.
+  Install with `disallowRestart()`.
+- **Time Travel Plugin** - keep track of state changes, intents and actions happening in the store. Mostly used for
+  testing, debugging and when building other plugins. Install with `val timeTravel = timeTravel()`
+- **Consume Intents Plugin** - permanently consume intents that reach this plugin's execution order. Install with
+  `consumeIntents()`.
+- **Deinit Plugin** - run actions when the store is stopped.
+- **Reset State Plugin** - reset the state of the store when it is stopped.
+- **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
+  See [saved state](/state/savedstate.md) for details.
+- **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
+  the [documentation](/misc/debugging.md) to learn how to set up the environment.
+- **Child Store Plugin** - attach other stores to the lifecycle of a parent. Learn more in
+  the [dedicated doc](/plugins/delegates.md)
+- **Store Delegate Plugin** - delegate State and Actions of your store to another one. More
+  in [Composing Stores](/plugins/delegates.md)
+- **Literally any plugin** - just call `install { }` and use the plugin's scope to hook up to store events.
 
 All plugins are based on the essential callbacks that FlowMVI allows them to intercept.
 The callbacks are explained on the [custom plugins](/plugins/custom.md) page.
@@ -135,10 +139,10 @@ fun reducePlugin(
 }
 ```
 
--   This plugin simply executes `reduce` when it receives an intent.
--   If you set `consume = true`, the plugin will **not** let other plugins installed after this one receive the intent.
-    Set `consume = false` to install more than one reduce plugin.
--   By default, you can see above that this plugin must be unique. Provide a custom name if you want to have multiple.
+- This plugin simply executes `reduce` when it receives an intent.
+- If you set `consume = true`, the plugin will **not** let other plugins installed after this one receive the intent.
+  Set `consume = false` to install more than one reduce plugin.
+- By default, you can see above that this plugin must be unique. Provide a custom name if you want to have multiple.
 
 Install this plugin in your stores by using
 
@@ -157,7 +161,7 @@ You don't need "Reducers" with FlowMVI. Reducer is nothing more than a function.
 
 This plugin invokes a given (suspending) action **before** the Store starts, each time it starts.
 
-Here's the full code (simplified a bit):
+Here's the full code (simplified):
 
 ```kotlin
 fun initPlugin(
@@ -170,10 +174,10 @@ fun initPlugin(
 
 Here are some interesting properties that apply to all plugins that use `onStart`:
 
--   They are executed **each time** the store starts.
--   They can suspend, and until **all** of them return, the store will **not handle any subscriptions, intents or any
-    other actions**
--   They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
+- They are executed **each time** the store starts.
+- They can suspend, and until **all** of them return, the store will **not handle any subscriptions, intents or any
+  other actions**
+- They have a `PipelineContext` receiver which allows you to send intents, side effects and launch jobs
 
 :::warning[Do not suspend forever]
 
@@ -239,42 +243,43 @@ and automatically cancels it when that number drops below the minimum.
 ```kotlin
 fun whileSubscribedPlugin(
     minSubscriptions: Int = 1,
+    stopDelay: Duration = 1.seconds,
+    name: String? = null,
     block: suspend PipelineContext.() -> Unit,
 ) = plugin {
-    val job = SubscriptionHolder()
-    onSubscribe { current ->
-        when {
-            current < minSubscriptions -> job.cancelAndJoin()
-            job.isActive -> Unit // condition was already satisfied
-            current >= minSubscriptions -> job.start(this) { block() } // new async job
+    onStart {
+        launch {
+            doWhileSubscribed(block)
         }
     }
-    onUnsubscribe { current ->
-        if (current < minSubscriptions) job.cancelAndJoin()
-    }
-    onStop { job.cancel() }
 }
 ```
-
--   This plugin is designed to suspend inside its `block` because it already launches a background job.
-    You can safely collect flows and suspend forever in the `block`.
--   After the store is started, this plugin will begin receiving subscription events from the store.
--   The **first time** the number of plugins reaches the minimum, the block that you provided will be run.
--   The job will stay active until it either ends by itself or the number of subscriptions drops below the minimum.
--   If the job has ended by itself, it will only be launched **after** the count of subscriptions has dropped below the
-    minimum. I.e. it will not be relaunched each time an additional subscriber appears,
-    but only when the condition is satisfied the next time again.
 
 This plugin is useful for starting and stopping observation of some external data sources when the user can interact
 with the app. For example, you may want to collect some flows and call `updateState` on each emission to update
 the state you display to the user.
+
+1. After the store is started, this plugin will begin receiving subscription events from the store.
+2. The **first time** the number of plugins reaches the minimum, the block that you provided will be run.
+3. The job will stay active until it either ends by itself or the number of subscriptions drops below the minimum.
+4. Once there are less than `minSubscriptions` subscribers, the plugin will wait `stopDelay` and then cancel `block`.
+5. If the job has ended by itself, it will only be launched **after** the count of subscriptions has dropped below the
+   minimum. I.e. it will not be relaunched each time an additional subscriber appears,
+   but only when the condition is satisfied the next time again.
+
+:::info[Suspend in the body]
+
+This plugin expects you to suspend inside `block` because it already launches a background job.
+You can safely collect flows and suspend forever in the `block`, and the job will follow the subscription count.
+
+:::
 
 Install the plugin with:
 
 ```kotlin
 val store = store(Loading) {
 
-    whileSubscribed { // optionally provide the number of subs
+    whileSubscribed {
 
     }
 }
@@ -287,18 +292,18 @@ store.
 
 The default `PlatformStoreLogger` will print to:
 
--   Logcat on Android
--   NSLog on Apple platforms
--   Console on Wasm and JS
--   Stdout / Stderr on JVM
--   Stdout on other platforms
+- Logcat on Android
+- NSLog on Apple platforms
+- Console on Wasm and JS
+- Stdout / Stderr on JVM
+- Stdout on other platforms
 
 ---
 
--   Tags are only used on Android, so on other platforms they will be appended as a part of the message.
--   On platforms that do not support levels, an emoji will be printed instead
--   Don't worry about heavy operations inside your `log { }` statements, the lambda is skipped if there is no logger.
--   Use `NoOpStoreLogger` if you want to prevent any kind of logging, for example on production.
+- Tags are only used on Android, so on other platforms they will be appended as a part of the message.
+- On platforms that do not support levels, an emoji will be printed instead
+- Don't worry about heavy operations inside your `log { }` statements, the lambda is skipped if there is no logger.
+- Use `NoOpStoreLogger` if you want to prevent any kind of logging, for example on production.
 
 Install this plugin with:
 
@@ -335,18 +340,18 @@ By default, the entire store startup sequence will suspend until all values are 
 there is a second version of this plugin called `asyncCache` that returns a `Deferred` you can await. This one can
 be very useful to initialize a lot of heavy stuff in parallel.
 
--   You can create a `CachedValue` outside of the store if you need to access it outside of the store builder scope,
-    but you **must** install the plugin using the value, and you must **not** try to access the value outside of the
-    store's lifecycle, or the attempt will throw. To create it, use the `cached { }` delegate.
--   You can access the value returned by `cache` in the `onStop` callback because the `onStop` is called in reverse plugin
-    installation order.
+- You can create a `CachedValue` outside of the store if you need to access it outside of the store builder scope,
+  but you **must** install the plugin using the value, and you must **not** try to access the value outside of the
+  store's lifecycle, or the attempt will throw. To create it, use the `cached { }` delegate.
+- You can access the value returned by `cache` in the `onStop` callback because the `onStop` is called in reverse plugin
+  installation order.
 
 This plugin is most useful:
 
--   When you want to either suspend in the initializer (like a suspending `lazy`), in which case it will function
-    similarly to `init` plugin
--   When you want to use the `PipelineContext` (and its `CoroutineScope`) when initializing a value, for example with
-    pagination or shared flows
+- When you want to either suspend in the initializer (like a suspending `lazy`), in which case it will function
+  similarly to `init` plugin
+- When you want to use the `PipelineContext` (and its `CoroutineScope`) when initializing a value, for example with
+  pagination or shared flows
 
 Install this plugin using:
 
@@ -452,12 +457,12 @@ fun awaitSubscribersPlugin(
 }
 ```
 
--   Specify `minSubs` to determine the minimum number of subscribers to reach.
--   Choose `suspendStore` to block all store operations until the condition is met. If you pass `false`, only the code
-    that explicitly calls `await()` will suspend.
--   If you pass the `allowResubscription` parameter, then after they leave, the state will reset and you
-    can call `await()` again.
--   Specify a `timeout` duration or `complete()` the job manually if you want to finish early.
+- Specify `minSubs` to determine the minimum number of subscribers to reach.
+- Choose `suspendStore` to block all store operations until the condition is met. If you pass `false`, only the code
+  that explicitly calls `await()` will suspend.
+- If you pass the `allowResubscription` parameter, then after they leave, the state will reset and you
+  can call `await()` again.
+- Specify a `timeout` duration or `complete()` the job manually if you want to finish early.
 
 ### Undo/Redo Plugin
 
@@ -561,7 +566,7 @@ Install it by simply calling `deinit { }`.
 ### Reset State Plugin
 
 ```kotlin
-public fun resetStatePlugin() = plugin {
+fun resetStatePlugin() = plugin {
     this.name = "ResetStatePlugin"
     onStop {
         updateStateImmediate { config.initial }

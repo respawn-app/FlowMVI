@@ -177,3 +177,5 @@ docs/javadocs/**
 **/.cache
 /.intellijPlatform/
 **/*.jks
+.junie
+/.idea/ChatHistory_schema_v2.xml

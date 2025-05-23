@@ -18,6 +18,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
+import pro.respawn.flowmvi.api.context.SubscriptionAware
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
 /**
@@ -39,7 +40,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     crossinline onStop: (e: Exception?) -> Unit,
     crossinline onAction: suspend PipelineContext<S, I, A>.(action: A) -> Unit,
     onStart: PipelineContext<S, I, A>.(lifecycle: StoreLifecycleModule) -> Unit,
-): StoreLifecycle where T : IntentReceiver<I> {
+): StoreLifecycle where T : IntentReceiver<I>, T : SubscriptionAware {
     val job = SupervisorJob(parent.coroutineContext[Job]).apply {
         invokeOnCompletion {
             when (it) {
@@ -51,6 +52,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
     }
     return object :
         IntentReceiver<I> by this,
+        SubscriptionAware by this,
         ImmediateStateReceiver<S> by states,
         PipelineContext<S, I, A>,
         StoreLifecycleModule by storeLifecycle(job),
@@ -81,6 +83,7 @@ internal inline fun <S : MVIState, I : MVIIntent, A : MVIAction, T> T.launchPipe
         override suspend fun action(action: A) {
             catch(recover) { onAction(action) }
         }
+
         override fun send(action: A) {
             launch { action(action) }
         }

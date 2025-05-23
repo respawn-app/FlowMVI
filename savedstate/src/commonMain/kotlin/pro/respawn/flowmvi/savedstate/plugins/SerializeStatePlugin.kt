@@ -14,6 +14,7 @@ import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.RecoveringSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.DefaultJson
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
@@ -48,9 +49,10 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
     saver = JsonSaver(
         json = json,
         serializer = serializer,
-        delegate = CompressedFileSaver(path, ThrowRecover),
-        recover = recover
-    ).let { TypedSaver<T, S>(it) },
+        delegate = CompressedFileSaver(path),
+    )
+        .let { RecoveringSaver(it, recover) }
+        .let { TypedSaver<T, S>(it) },
     behaviors = behaviors,
     context = context,
     name = name,

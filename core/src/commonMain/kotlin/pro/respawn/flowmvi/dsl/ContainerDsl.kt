@@ -14,7 +14,7 @@ import pro.respawn.flowmvi.api.Store
 // these extensions are needed to auto-resolve types to the Container class.
 
 /**
- * Alias for [pro.respawn.flowmvi.dsl.lazyStore] (with a scope)
+ * Alias for [lazyStore] (with a scope)
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
@@ -25,7 +25,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 ): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial, scope, mode, configure)
 
 /**
- * Alias for [pro.respawn.flowmvi.dsl.lazyStore]
+ * Alias for [lazyStore]
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.lazyStore(
@@ -35,7 +35,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 ): Lazy<Store<S, I, A>> = pro.respawn.flowmvi.dsl.lazyStore(initial = initial, mode = mode, configure = configure)
 
 /**
- * Alias for [pro.respawn.flowmvi.dsl.store]
+ * Alias for [store]
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.store(
@@ -45,7 +45,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 ): Store<S, I, A> = pro.respawn.flowmvi.dsl.store(initial, scope, configure)
 
 /**
- * Alias for [pro.respawn.flowmvi.dsl.store]
+ * Alias for [store]
  */
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContainer<S, I, A>.store(
@@ -56,17 +56,15 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 /**
  * Alias for [Store.intent]
  */
-@Suppress("NOTHING_TO_INLINE")
 public inline fun <I : MVIIntent> Container<*, I, *>.intent(
     first: I,
     vararg other: I
-) = store.intent(first, other = other)
+): Unit = store.intent(first, other = other)
 
 /**
  * Alias for [Store.emit]
  */
-@Suppress("NOTHING_TO_INLINE")
 public suspend inline fun <I : MVIIntent> Container<*, I, *>.emit(
     first: I,
     vararg other: I
-) = store.emit(first, other = other)
+): Unit = store.emit(first, other = other)

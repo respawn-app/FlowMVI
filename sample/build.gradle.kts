@@ -46,6 +46,9 @@ kotlin {
             }
             testTask { enabled = false }
         }
+        compilerOptions {
+            freeCompilerArgs.addAll(Config.wasmCompilerArgs)
+        }
     }
     jvm("desktop")
 

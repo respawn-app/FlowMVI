@@ -12,5 +12,5 @@ This API may be removed, changed or change behavior without prior notice at any 
  */
 @RequiresOptIn(message = Message)
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY, AnnotationTarget.CONSTRUCTOR)
 public annotation class InternalFlowMVIAPI

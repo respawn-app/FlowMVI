@@ -132,7 +132,8 @@ h6 {
 
 /* First letter styling for headings */
 h1::first-letter,
-h2::first-letter {
+h2::first-letter,
+h3::first-letter {
     color: var(--ifm-color-primary);
 }
 

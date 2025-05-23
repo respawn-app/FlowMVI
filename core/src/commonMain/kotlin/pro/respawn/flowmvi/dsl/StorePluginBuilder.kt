@@ -80,7 +80,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     ): Unit = setOnce(::subscribe, block)
 
     /**
-     * See StorePlugin.onUnsubscribe
+     * See [StorePlugin.onUnsubscribe]
      */
     @FlowMVIDSL
     public fun onUnsubscribe(

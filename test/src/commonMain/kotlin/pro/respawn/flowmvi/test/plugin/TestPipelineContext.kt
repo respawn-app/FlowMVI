@@ -18,18 +18,24 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
+import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.dsl.updateStateImmediate
+import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.test.TestStoreLifecycle
 import pro.respawn.flowmvi.test.ensureStarted
 
 @OptIn(ExperimentalFlowMVIAPI::class, NotIntendedForInheritance::class, InternalFlowMVIAPI::class)
 internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     override val config: StoreConfiguration<S>,
-    val plugin: StorePlugin<S, I, A>,
+    plugins: List<StorePlugin<S, I, A>>,
+    name: String?,
 ) : PipelineContext<S, I, A>, StoreLifecycle by TestStoreLifecycle(config.coroutineContext[Job]) {
 
+    private val _subs = MutableStateFlow(0)
+    override val subscriberCount = _subs.asStateFlow()
     override val coroutineContext by config::coroutineContext
+    val plugin = SubscriptionHookedPlugin(plugins, name, _subs::value::set)
 
     private val _state = MutableStateFlow(config.initial)
     override val states: StateFlow<S> = _state.asStateFlow()
@@ -50,6 +56,7 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
         ensureStarted()
         onIntent(intent)
     }
+
     override fun intent(intent: I) {
         ensureStarted()
         launch { emit(intent) }
@@ -65,3 +72,15 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
         block(state)
     }
 }
+
+private inline fun <S : MVIState, I : MVIIntent, A : MVIAction> SubscriptionHookedPlugin(
+    delegates: List<StorePlugin<S, I, A>>,
+    name: String?,
+    crossinline onChange: (newValue: Int) -> Unit,
+): StorePlugin<S, I, A> = compositePlugin(
+    name = name,
+    plugins = delegates + plugin {
+        onSubscribe { onChange(it) }
+        onUnsubscribe { onChange(it) }
+    },
+)

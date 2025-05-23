@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.util.typed
  *
  * It will not map `null` values.
  */
+@Suppress("DEPRECATION") // TODO: remove recover
 public inline fun <reified T, R> MapSaver(
     delegate: Saver<R>,
     @BuilderInference crossinline from: suspend (R) -> T?,

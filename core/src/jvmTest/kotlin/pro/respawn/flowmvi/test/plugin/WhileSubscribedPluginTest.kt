@@ -1,61 +1,60 @@
 package pro.respawn.flowmvi.test.plugin
 
 import app.cash.turbine.test
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.FreeSpec
-import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.core.test.testCoroutineScheduler
+import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.plugins.whileSubscribedPlugin
 import pro.respawn.flowmvi.util.TestAction
 import pro.respawn.flowmvi.util.TestIntent
 import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
+import kotlin.time.Duration.Companion.seconds
 
+@OptIn(ExperimentalFlowMVIAPI::class)
 class WhileSubscribedPluginTest : FreeSpec({
     configure()
+    "Given WhileSubscribed plugin" - {
+        val subscribed = MutableStateFlow(false)
+        val plugin = whileSubscribedPlugin<TestState, TestIntent, TestAction> {
+            try {
+                subscribed.value = true
+                awaitCancellation()
+            } finally {
+                subscribed.value = false
+            }
+        }
 
-    "Given a whileSubscribed plugin" - {
-        val running = MutableSharedFlow<Boolean>()
-        val minSubs = 2
-        fun plugin(
-            subs: Int = minSubs
-        ) = whileSubscribedPlugin<TestState, TestIntent, TestAction>(minSubscriptions = subs) {
-            coroutineScope {
-                running.emit(true)
-                try {
-                    awaitCancellation()
-                } finally {
-                    running.emit(false)
+        afterEach { subscribed.value = false }
+
+        "and subscription happens" - {
+            "then subscription count changes" {
+                plugin.test(TestState.Some) {
+                    onStart()
+                    onSubscribe(1)
+                    subscriberCount.value shouldBe 1
+                    onUnsubscribe(0)
+                    subscriberCount.value shouldBe 0
+                    idle()
                 }
             }
-            // TODO: Since this is launched in a separate coroutine that uses who-knows-which scope that
-            //   kotest makes impossible to understand, going "awaitCancellation" does not work as well as using
-            //   invokeOnCompletion.
-            //   the context has no job to use either, the scope has an incorrect job passed from the parent scope
-            //   child jobs are not cancelled on time and there are multiple races
-        }
-        "and when sub count is <= 0" - {
-            "then builder throws" {
-                shouldThrowExactly<IllegalArgumentException> {
-                    plugin(0)
-                }
-            }
-        }
-        "and when subs > $minSubs" - {
-            "then job is started" {
-                running.test {
-                    plugin().test(TestState.Some) {
-                        idle()
-                        onSubscribe(minSubs + 1) // previous value
-                        idle()
-                        awaitItem().shouldBeTrue()
-                        onStop(null)
-                        // idle()
-                        // awaitItem().shouldBeFalse()
-                        // idle()
+
+            "then subscription is registered and cancelled after timeout" {
+                val scheduler = testCoroutineScheduler
+                plugin.test(TestState.Some) {
+                    subscribed.test {
+                        onStart()
+                        awaitItem() shouldBe false
+                        onSubscribe(1)
+                        awaitItem() shouldBe true
+                        onUnsubscribe(0)
+                        expectNoEvents()
+                        scheduler.advanceTimeBy(1.seconds)
+                        awaitItem() shouldBe false
                     }
                 }
             }

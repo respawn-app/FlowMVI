@@ -11,7 +11,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeout
 import pro.respawn.flowmvi.dsl.intent
-import pro.respawn.flowmvi.dsl.send
+import pro.respawn.flowmvi.exceptions.StoreAlreadyStartedException
 import pro.respawn.flowmvi.test.subscribeAndTest
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestIntent
@@ -51,7 +51,7 @@ class StoreLaunchTest : FreeSpec({
             }
         }
         "then cannot be launched when already launched" {
-            shouldThrowExactly<IllegalStateException> {
+            shouldThrowExactly<StoreAlreadyStartedException> {
                 supervisorScope {
                     val job1 = store.start(this)
                     val job2 = store.start(this)
@@ -93,7 +93,7 @@ class StoreLaunchTest : FreeSpec({
                 }
                 idle()
                 "then intents should not be handled anymore" {
-                    store.send(intent)
+                    store.emit(intent)
                 }
             }
         }

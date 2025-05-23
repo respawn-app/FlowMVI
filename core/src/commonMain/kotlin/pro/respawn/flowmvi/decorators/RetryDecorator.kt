@@ -182,7 +182,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
     strategy: RetryStrategy = RetryStrategy.Default,
     name: String? = null,
     crossinline selector: (intent: I, e: Exception) -> Boolean = { _, _ -> true },
-) = install(retryIntentsDecorator(strategy, name, selector))
+): Unit = install(retryIntentsDecorator(strategy, name, selector))
 
 /**
  * Install a [retryActionsDecorator] over this Store.
@@ -198,7 +198,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
     strategy: RetryStrategy = RetryStrategy.Default,
     name: String? = null,
     crossinline selector: (action: A, e: Exception) -> Boolean = { _, _ -> true },
-) = install(retryActionsDecorator(strategy, name, selector))
+): Unit = install(retryActionsDecorator(strategy, name, selector))
 
 @PublishedApi
 internal suspend fun <R> CoroutineScope.retryRecursive(

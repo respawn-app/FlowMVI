@@ -5,7 +5,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.savedstate.api.Saver
-import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.platform.read
 import pro.respawn.flowmvi.savedstate.platform.readCompressed
 import pro.respawn.flowmvi.savedstate.platform.write
@@ -26,13 +25,10 @@ public inline fun <T> DefaultFileSaver(
     path: String,
     crossinline write: suspend (data: T?, toPath: String) -> Unit,
     crossinline read: suspend (fromPath: String) -> T?,
-    crossinline recover: suspend (Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
 
     // prevent concurrent file access
     private val mutex = Mutex()
-
-    override suspend fun recover(e: Exception): T? = recover.invoke(e)
 
     // prevent partial writes
     override suspend fun save(state: T?) = withContext(NonCancellable) {
@@ -55,10 +51,8 @@ public inline fun <T> DefaultFileSaver(
  */
 public fun FileSaver(
     path: String,
-    recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
     path = path,
-    recover = recover,
     write = ::write,
     read = ::read,
 )
@@ -78,10 +72,8 @@ public fun FileSaver(
  */
 public fun CompressedFileSaver(
     path: String,
-    recover: suspend (Exception) -> String? = ThrowRecover,
 ): Saver<String> = DefaultFileSaver(
     path = path,
-    recover = recover,
     write = ::writeCompressed,
     read = ::readCompressed,
 )

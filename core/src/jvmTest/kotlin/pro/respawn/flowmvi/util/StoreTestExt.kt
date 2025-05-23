@@ -14,6 +14,6 @@ fun Spec.configure() {
     coroutineTestScope = true
     isolationMode = IsolationMode.SingleInstance
     timeout = 3.seconds.inWholeMilliseconds
-    coroutineDebugProbes = true
-    invocationTimeout = 5000L
+    coroutineDebugProbes = false
+    invocationTimeout = 3000L
 }

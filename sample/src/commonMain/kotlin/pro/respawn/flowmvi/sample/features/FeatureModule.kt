@@ -11,12 +11,17 @@ import pro.respawn.flowmvi.sample.features.home.HomeContainer
 import pro.respawn.flowmvi.sample.features.lce.LCEContainer
 import pro.respawn.flowmvi.sample.features.lce.LCERepository
 import pro.respawn.flowmvi.sample.features.logging.LoggingContainer
+import pro.respawn.flowmvi.sample.features.progressive.ProgressiveContainer
+import pro.respawn.flowmvi.sample.features.progressive.ProgressiveRepository
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateContainer
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoContainer
 
 val featureModule = module {
     singleOf(::LCERepository)
+    singleOf(::ProgressiveRepository)
+
     container { new(::HomeContainer) }
+    container { new(::ProgressiveContainer) }
     container { new(::LCEContainer) }
     container { new(::SavedStateContainer) }
     container { new(::DiConfigContainer) }

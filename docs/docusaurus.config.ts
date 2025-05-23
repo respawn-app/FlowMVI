@@ -76,6 +76,7 @@ const config: Config = {
             } satisfies Preset.Options,
         ],
     ],
+    themes: ['@docusaurus/theme-mermaid'],
     themeConfig: {
         colorMode: {
             defaultMode: "dark",

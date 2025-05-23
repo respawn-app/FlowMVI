@@ -126,4 +126,4 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.batchIntents(
     mode: BatchingMode,
     name: String? = "BatchIntentsDecorator",
-) = BatchQueue<I>().also { install(batchIntentsDecorator(mode, it, name)) }
+): BatchQueue<I> = BatchQueue<I>().also { install(batchIntentsDecorator(mode, it, name)) }

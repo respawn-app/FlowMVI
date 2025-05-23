@@ -7,8 +7,14 @@
     <string name="savedstate_feature_title">Saved State</string>
     <string name="di_feature_title">Dependency Injection</string>
     <string name="logging_feature_title">Logging</string>
+    <string name="progressive_feature_title">Child stores</string>
     <string name="xml_feature_title">Android XML Support</string>
     <string name="undoredo_feature_title">Undo/Redo</string>
     <string name="decompose_feature_title">Decompose | Essenty Integration</string>
     <string name="platform_feature_unavailable_label">Run the app on another platform to experience this feature</string>
+    <string name="suggestions_loading">Suggestions loading</string>
+    <string name="feed_loading">Feed loading</string>
+    <string name="progressive_suggestions_title">Suggestions</string>
+    <string name="progressive_feed_title">Feed</string>
+    <string name="progressive_feed_loaded_message">Hello from a child store!</string>
 </resources>

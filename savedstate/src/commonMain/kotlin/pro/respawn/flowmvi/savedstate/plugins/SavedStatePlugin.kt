@@ -30,8 +30,6 @@ import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.util.EmptyBehaviorsMessage
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
-import pro.respawn.flowmvi.savedstate.util.restoreCatching
-import pro.respawn.flowmvi.savedstate.util.saveCatching
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -72,7 +70,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     require(behaviors.isNotEmpty()) { EmptyBehaviorsMessage }
     this.name = name
     var job: Job? by atomic(null)
-    val loggingSaver = LoggingSaver(saver, config.logger, tag = config.name)
+    val saver = LoggingSaver(saver, config.logger, tag = config.name)
 
     val saveDelay = behaviors
         .asSequence()
@@ -82,19 +80,19 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
 
     onStart {
         withContext(this + context) {
-            updateState { loggingSaver.restoreCatching() ?: this }
+            updateState { saver.restore() ?: this }
         }
 
         if (saveDelay != null) launch(this + context) {
             while (isActive) {
                 delay(saveDelay)
-                withState { loggingSaver.saveCatching(this) }
+                withState { saver.save(this) }
             }
         }
     }
 
     if (resetOnException) onException {
-        withContext(this + context) { loggingSaver.saveCatching(null) }
+        withContext(this + context) { saver.save(null) }
         it
     }
 
@@ -107,7 +105,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
     if (maxSubscribers != null) onUnsubscribe { remainingSubs ->
         if (remainingSubs > maxSubscribers) return@onUnsubscribe
         job?.cancelAndJoin()
-        job = launch(context) { withState { loggingSaver.saveCatching(this) } }
+        job = launch(context) { withState { saver.save(this) } }
     }
 
     val saveTimeout = behaviors
@@ -121,7 +119,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
         job = launch(context) {
             delay(saveTimeout)
             // defer state read until delay has passed
-            withState { loggingSaver.saveCatching(this) }
+            withState { saver.save(this) }
         }
         new
     }

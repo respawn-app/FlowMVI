@@ -20,7 +20,7 @@ private const val Name = "ResetStatePlugin"
  *
  * **This plugin can only be installed ONCE**.
  **/
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> resetStatePlugin(): StorePlugin<S, I, A> = plugin<S, I, A> {
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> resetStatePlugin(): StorePlugin<S, I, A> = plugin {
     this.name = Name
     onStop { e ->
         updateStateImmediate { config.initial }
@@ -30,6 +30,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> resetStatePlugin(): Stor
 /**
  * Install a new [resetStatePlugin].
  **/
-public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.resetStateOnStop() = install(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.resetStateOnStop(): Unit = install(
     resetStatePlugin()
 )

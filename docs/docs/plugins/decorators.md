@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 sidebar_label: Decorators
 ---
 
@@ -9,7 +9,7 @@ sidebar_label: Decorators
 
 Decorators are currently experimental because their DSL is limited by Kotlin features and they
 are less safe/performant to use. There will be a breaking change with them within a few updates.
-They are also not tested enough as of 3.1 Beta releases.
+They are also not tested enough as of 3.2 releases.
 
 :::
 

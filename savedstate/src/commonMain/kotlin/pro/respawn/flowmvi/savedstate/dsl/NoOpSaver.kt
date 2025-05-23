@@ -6,7 +6,6 @@ private object NoOpSaver : Saver<Nothing> {
 
     override suspend fun save(state: Nothing?): Unit = Unit
     override suspend fun restore(): Nothing? = null
-    override suspend fun recover(e: Exception): Nothing? = null
 }
 
 /**
@@ -14,5 +13,5 @@ private object NoOpSaver : Saver<Nothing> {
  *
  * Useful for testing.
  */
-@Suppress("UNCHECKED_CAST", "FunctionName")
+@Suppress("UNCHECKED_CAST")
 public fun <S> NoOpSaver(): Saver<S> = NoOpSaver as Saver<S>
