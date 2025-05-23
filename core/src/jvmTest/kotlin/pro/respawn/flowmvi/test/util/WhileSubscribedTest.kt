@@ -139,7 +139,6 @@ class WhileSubscribedTest : FreeSpec({
         "when subscriber count drops below minSubscribers and then reaches it again" - {
             "then action is executed again" {
                 var executionCount = 0
-                val actionCancelled = MutableStateFlow(false)
                 val job = launch {
                     aware.doWhileSubscribed(
                         stopDelay = 100.milliseconds,

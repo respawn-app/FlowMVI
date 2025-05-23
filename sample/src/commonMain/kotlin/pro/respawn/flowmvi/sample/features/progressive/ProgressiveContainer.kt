@@ -29,7 +29,7 @@ internal class ProgressiveContainer(
         FeedState.Content(feed)
     }
     private val suggestionStore by progressiveStore<SuggestionsState, Nothing>(SuggestionsState.Loading) {
-        SuggestionsState.Content(repository.getFeed())
+        SuggestionsState.Content(repository.getSuggestions())
     }
 
     override val store by lazyStore(initial = ProgressiveState()) {

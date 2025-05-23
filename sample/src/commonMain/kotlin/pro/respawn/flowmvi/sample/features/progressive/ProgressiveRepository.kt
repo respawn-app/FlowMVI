@@ -7,7 +7,7 @@ import kotlin.random.nextLong
 
 internal class ProgressiveRepository {
 
-    suspend fun getRecommendations(): List<Item> {
+    suspend fun getSuggestions(): List<Item> {
         delay(Random.nextLong(2000L..5000L))
         return List(Random.nextInt(10..20)) { Item(it, "Recommendation $it") }.shuffled()
     }

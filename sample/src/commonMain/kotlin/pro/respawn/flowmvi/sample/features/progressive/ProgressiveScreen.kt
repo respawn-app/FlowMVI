@@ -109,39 +109,49 @@ fun ProgressiveScreen(
 @Composable
 private fun IntentReceiver<ProgressiveIntent>.ProgressiveScreenContent(
     state: ProgressiveState,
-) = Column(Modifier.verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) {
+) = LazyColumn(
+    contentPadding = WindowInsets.verticalListPaddings(),
+    modifier = Modifier.fillMaxWidth(),
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
     // Description and Code section
-    Column(modifier = Modifier.padding(horizontal = 12.dp).widthIn(max = 600.dp)) {
-        Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
-        Spacer(Modifier.height(12.dp))
-        CodeText(Code)
-        Spacer(Modifier.height(12.dp))
+    item {
+        Column(modifier = Modifier.padding(horizontal = 12.dp).widthIn(max = 600.dp)) {
+            Text(Description.formatAsMultiline(), modifier = Modifier.widthIn(max = 600.dp))
+            Spacer(Modifier.height(12.dp))
+            CodeText(Code)
+            Spacer(Modifier.height(12.dp))
+        }
     }
 
     // Suggestions section
     when (val suggestions = state.suggestions) {
         is SuggestionsState.Content -> {
-            Text(
-                text = stringResource(Res.string.progressive_suggestions_title).branded(),
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            LazyRow(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-            ) {
-                items(suggestions.items) { item ->
-                    Card(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = item.title,
-                            modifier = Modifier.padding(16.dp)
-                        )
+            item {
+                Text(
+                    text = stringResource(Res.string.progressive_suggestions_title).branded(),
+                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+            }
+            item {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                ) {
+                    items(suggestions.items) { item ->
+                        Card(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = item.title,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
                     }
                 }
             }
         }
-        is SuggestionsState.Loading -> {
+        is SuggestionsState.Loading -> item {
             Box(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 contentAlignment = Alignment.Center
@@ -157,7 +167,7 @@ private fun IntentReceiver<ProgressiveIntent>.ProgressiveScreenContent(
 
     // Feed section
     when (val feed = state.feed) {
-        is FeedState.Loading -> {
+        is FeedState.Loading -> item {
             Box(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 contentAlignment = Alignment.Center
@@ -170,21 +180,18 @@ private fun IntentReceiver<ProgressiveIntent>.ProgressiveScreenContent(
             }
         }
         is FeedState.Content -> {
-            Text(
-                text = stringResource(Res.string.progressive_feed_title).branded(),
-                modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                style = MaterialTheme.typography.headlineMedium,
-            )
-            LazyColumn(
-                contentPadding = WindowInsets.verticalListPaddings(),
-                modifier = Modifier.fillMaxWidth().height(400.dp)
-            ) {
-                items(feed.items) { item ->
-                    RMenuItem(
-                        title = item.title,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+            item {
+                Text(
+                    text = stringResource(Res.string.progressive_feed_title).branded(),
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+            }
+            items(feed.items) { item ->
+                RMenuItem(
+                    title = item.title,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }

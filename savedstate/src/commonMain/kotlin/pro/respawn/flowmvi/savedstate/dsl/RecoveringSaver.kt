@@ -7,6 +7,9 @@ import pro.respawn.flowmvi.savedstate.api.Saver
  * [Saver] that also catches exceptions during [delegate]'s [Saver.save] and [Saver.restore]
  * and handles them using [recover].
  *
+ * This will fallback to the deprecated [Saver.recover] if [recover] returns `null`. Library-provided savers do not use
+ * the deprecated method.
+ *
  * Return `null` from [recover] to not restore / save the state, or a fallback value.
  */
 public fun <T> RecoveringSaver(
