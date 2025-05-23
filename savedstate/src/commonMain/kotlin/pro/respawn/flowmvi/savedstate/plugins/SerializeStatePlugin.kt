@@ -50,7 +50,6 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
         json = json,
         serializer = serializer,
         delegate = CompressedFileSaver(path),
-        recover = recover
     )
         .let { RecoveringSaver(it, recover) }
         .let { TypedSaver<T, S>(it) },

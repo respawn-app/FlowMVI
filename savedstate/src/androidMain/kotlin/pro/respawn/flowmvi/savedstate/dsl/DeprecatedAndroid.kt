@@ -6,7 +6,6 @@ import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.savedstate.api.Saver
-import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.platform.key
 
 /**
@@ -18,7 +17,7 @@ import pro.respawn.flowmvi.savedstate.platform.key
 public fun <T> SavedStateHandleSaver(
     handle: SavedStateHandle,
     key: String,
-    recover: suspend (e: Exception) -> T? = ThrowRecover,
+    recover: suspend (e: Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
     override suspend fun recover(e: Exception): T? = recover.invoke(e)
     override suspend fun restore(): T? = handle[key]
@@ -36,5 +35,5 @@ public fun <T> SavedStateHandleSaver(
 public inline fun <reified T> ParcelableSaver(
     handle: SavedStateHandle,
     key: String = key<T>(),
-    noinline recover: suspend (e: Exception) -> T? = ThrowRecover,
+    noinline recover: suspend (e: Exception) -> T?,
 ): Saver<T> where T : Parcelable, T : MVIState = SavedStateHandleSaver(handle, key, recover)

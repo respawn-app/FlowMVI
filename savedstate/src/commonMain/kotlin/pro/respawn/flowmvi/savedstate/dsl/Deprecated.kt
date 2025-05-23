@@ -7,7 +7,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.savedstate.api.Saver
-import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.platform.read
 import pro.respawn.flowmvi.savedstate.platform.readCompressed
 import pro.respawn.flowmvi.savedstate.platform.write
@@ -27,7 +26,7 @@ public inline fun <T> CallbackSaver(
     delegate: Saver<T>,
     crossinline onSave: suspend (T?) -> Unit = {},
     crossinline onRestore: suspend (T?) -> Unit = {},
-    crossinline onException: suspend (e: Exception) -> Unit = {},
+    crossinline onException: suspend (e: Exception) -> Unit,
 ): Saver<T> = object : Saver<T> by delegate {
     override suspend fun save(state: T?) {
         onSave(state)
@@ -42,7 +41,6 @@ public inline fun <T> CallbackSaver(
     }
 }
 
-
 /**
  * A [Saver] implementation that saves the given state to a file in a specified [path]
  *
@@ -55,11 +53,11 @@ public inline fun <T> CallbackSaver(
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
 @Deprecated(RecoverDeprecationMessage)
-public inline fun <T> DefaultFileSaver(
+public fun <T> DefaultFileSaver(
     path: String,
-    crossinline write: suspend (data: T?, toPath: String) -> Unit,
-    crossinline read: suspend (fromPath: String) -> T?,
-    crossinline recover: suspend (Exception) -> T?,
+    write: suspend (data: T?, toPath: String) -> Unit,
+    read: suspend (fromPath: String) -> T?,
+    recover: suspend (Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
 
     // prevent concurrent file access
@@ -89,7 +87,7 @@ public inline fun <T> DefaultFileSaver(
 @Deprecated(RecoverDeprecationMessage)
 public fun FileSaver(
     path: String,
-    recover: suspend (Exception) -> String? = ThrowRecover,
+    recover: suspend (Exception) -> String?,
 ): Saver<String> = DefaultFileSaver(
     path = path,
     recover = recover,
@@ -113,7 +111,7 @@ public fun FileSaver(
 @Deprecated(RecoverDeprecationMessage)
 public fun CompressedFileSaver(
     path: String,
-    recover: suspend (Exception) -> String? = ThrowRecover,
+    recover: suspend (Exception) -> String?,
 ): Saver<String> = DefaultFileSaver(
     path = path,
     recover = recover,
@@ -130,9 +128,7 @@ public fun <T> JsonSaver(
     json: Json,
     serializer: KSerializer<T>,
     delegate: Saver<String>,
-    @BuilderInference recover: suspend (Exception) -> T? = { e -> // TODO: Compiler bug does not permit inlining this
-        delegate.recover(e)?.let { json.decodeFromString(serializer, it) }
-    },
+    recover: suspend (Exception) -> T?,
 ): Saver<T> = Saver(
     recover = recover,
     save = { state -> delegate.save(state?.let { json.encodeToString(serializer, it) }) },
@@ -145,7 +141,7 @@ public fun <T> JsonSaver(
 public inline fun <T> Saver(
     crossinline save: suspend (T?) -> Unit,
     crossinline restore: suspend () -> T?,
-    crossinline recover: suspend (e: Exception) -> T? = { throw it },
+    crossinline recover: suspend (e: Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
     override suspend fun save(state: T?) = save.invoke(state)
     override suspend fun restore(): T? = restore.invoke()

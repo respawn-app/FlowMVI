@@ -24,7 +24,7 @@ public inline fun <T> DefaultFileSaver(
     fileName: String,
     crossinline write: suspend (data: T?, to: Path) -> Unit,
     crossinline read: suspend (from: Path) -> T?,
-    crossinline recover: suspend (Exception) -> T?,
+    noinline recover: suspend (Exception) -> T?,
 ): Saver<T> = DefaultFileSaver(
     path = Path(dir, fileName).name,
     write = { data: T?, path: String -> write(data, Path(path)) },
