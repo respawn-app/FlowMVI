@@ -159,12 +159,26 @@ subscribers are not present. More details on this limitation are in the ASB docs
 
 With two ways to split logic, how do you choose now whether you should make a store or a plugin?
 
+Here's a table to help you decide:
+
+| Consideration                      | Prefer Plugins                                   | Prefer Child Stores                                                 |
+|------------------------------------|--------------------------------------------------|---------------------------------------------------------------------|
+| **State Complexity**               | Small to medium, tightly coupled                 | High complexity or loosely coupled, can be split into parts         |
+| **Intent Processing**              | Act on the same set of intents in different ways | Intents modify distinct pieces of state and send subsets of Actions |
+| **Subscriber Timing & Data Needs** | Mostly same between all of subscribers           | Subscribers need the store state at differing times                 |
+| **Component Lifecycles**           | Same lifecycle as the parent                     | Can sometimes differ                                                |
+| **Performance**                    | When performance is critical                     | When the overhead of async processing per child store is acceptable |
+
+In more detail:
+
 - Prefer plugins when you want to act on mostly **the same set** of intents in different ways.
   If you want to split intent handling logic into pieces (with their own side effects and states), stores may be a
-  better fit
+  better fit.
 - If performance is of critical importance, prefer plugins. They are lightweight, in contrast,
-  child stores introduce a layer of coroutines and async processing for **each** new child store
+  child stores introduce a layer of coroutines and async processing for **each** new child store.
 - If your **state has grown** increasingly complex, with many intents mutating parts of that state that can mostly be
   isolated, prefer child stores. You may have different blocks on a page that load progressively, or a settings drawer
   on several pages that you may want to isolate from your main feature code.
 - If you have differing lifecycles for some components of your logic, stores + composing via DI may be a good option.
+- If your subscribers (e.g. UI) appear at different times and need different pieces of the state (e.g. progressive
+  content loading blocks), child stores allow you to subscribe to each one separately from the parent.
