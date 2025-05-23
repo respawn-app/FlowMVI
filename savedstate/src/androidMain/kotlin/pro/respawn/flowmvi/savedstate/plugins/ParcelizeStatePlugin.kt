@@ -13,6 +13,7 @@ import pro.respawn.flowmvi.savedstate.api.SaveBehavior
 import pro.respawn.flowmvi.savedstate.api.ThrowRecover
 import pro.respawn.flowmvi.savedstate.dsl.MapSaver
 import pro.respawn.flowmvi.savedstate.dsl.ParcelableSaver
+import pro.respawn.flowmvi.savedstate.dsl.RecoveringSaver
 import pro.respawn.flowmvi.savedstate.dsl.TypedSaver
 import pro.respawn.flowmvi.savedstate.platform.key
 import pro.respawn.flowmvi.savedstate.util.PluginNameSuffix
@@ -42,11 +43,11 @@ public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction
     name: String? = "$key$PluginNameSuffix",
     noinline recover: suspend (Exception) -> T? = ThrowRecover,
 ): LazyPlugin<S, I, A> where T : Parcelable, T : S = saveStatePlugin(
-    saver = TypedSaver<T, S>(ParcelableSaver(handle, key, recover)),
+    saver = TypedSaver<T, S>(RecoveringSaver(ParcelableSaver(handle, key), recover)),
     context = context,
     name = name,
     behaviors = behaviors,
-    resetOnException = resetOnException
+    resetOnException = resetOnException,
 )
 
 /**
