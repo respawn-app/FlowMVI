@@ -3,6 +3,12 @@ package pro.respawn.flowmvi.savedstate.dsl
 import kotlinx.coroutines.CancellationException
 import pro.respawn.flowmvi.savedstate.api.Saver
 
+/**
+ * [Saver] that also catches exceptions during [delegate]'s [Saver.save] and [Saver.restore]
+ * and handles them using [recover].
+ *
+ * Return `null` from [recover] to not restore / save the state, or a fallback value.
+ */
 public fun <T> RecoveringSaver(
     delegate: Saver<T>,
     recover: suspend (Exception) -> T?,

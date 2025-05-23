@@ -10,8 +10,8 @@ import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.util.MockSubscriptionAware
 import pro.respawn.flowmvi.util.configure
-import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.doWhileSubscribed
+import pro.respawn.flowmvi.util.idle
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)

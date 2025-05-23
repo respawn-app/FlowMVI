@@ -42,11 +42,7 @@ internal data class ProgressiveState(
 ) : MVIState
 
 @Immutable
-internal sealed interface ProgressiveIntent : MVIIntent {
-
-}
+internal sealed interface ProgressiveIntent : MVIIntent
 
 @Immutable
-internal sealed interface ProgressiveAction : MVIAction {
-
-}
+internal sealed interface ProgressiveAction : MVIAction

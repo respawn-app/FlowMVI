@@ -11,8 +11,8 @@ import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.plugins.asyncInit
 import pro.respawn.flowmvi.plugins.delegate.DelegationMode
-import pro.respawn.flowmvi.plugins.delegate.delegate
 import pro.respawn.flowmvi.plugins.delegate.StoreDelegate
+import pro.respawn.flowmvi.plugins.delegate.delegate
 import pro.respawn.flowmvi.plugins.delegate.storeDelegatePlugin
 import pro.respawn.flowmvi.test.test
 import pro.respawn.flowmvi.util.TestState
