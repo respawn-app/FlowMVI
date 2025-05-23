@@ -99,7 +99,7 @@ public fun <
     > StoreBuilder<S, I, A>.delegate(
     store: Store<CS, CI, CA>,
     mode: DelegationMode = DelegationMode.Default,
-    name: String? = "${store.name.orEmpty()}DelegatePlugin",
+    name: String? = store.name?.let { "${it}DelegatePlugin" },
     start: Boolean = true,
     blocking: Boolean = false,
     consume: ChildConsume<S, I, A, CA>? = null,

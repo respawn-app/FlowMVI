@@ -56,7 +56,7 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
     /**
      * The name of this delegate, derived from the delegate store's name.
      */
-    public val name: String = "${delegate.name.orEmpty()}StoreDelegate"
+    public val name: String? = delegate.name?.let { "${it}StoreDelegate" }
 
     // lazy to init with the most recent state on first invocation (or never, based on mode)
     private val _state by lazy { MutableStateFlow(delegate.state) }
@@ -108,7 +108,7 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
 
     // region junk
     override fun getValue(thisRef: Any?, property: KProperty<*>): Flow<S> = stateProjection
-    override fun toString(): String = name
+    override fun toString(): String = name ?: "StoreDelegate"
     override fun hashCode(): Int = delegate.hashCode()
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
