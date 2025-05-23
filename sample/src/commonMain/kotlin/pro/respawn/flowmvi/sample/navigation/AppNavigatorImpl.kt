@@ -44,6 +44,8 @@ private class AppNavigatorImpl(
     override fun loggingFeature() = navigate(Destination.Logging)
     override fun xmlActivity() = launcher.xmlActivity()
     override fun undoRedoFeature() = navigate(Destination.UndoRedo)
+    override fun progressiveFeature() = navigate(Destination.Progressive)
+
     override fun decomposeFeature() = navigate(Destination.Decompose)
 
     @Composable

@@ -6,6 +6,7 @@ import pro.respawn.flowmvi.sample.features.diconfig.DiConfigScreen
 import pro.respawn.flowmvi.sample.features.home.HomeScreen
 import pro.respawn.flowmvi.sample.features.lce.LCEScreen
 import pro.respawn.flowmvi.sample.features.logging.LoggingScreen
+import pro.respawn.flowmvi.sample.features.progressive.ProgressiveScreen
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateScreen
 import pro.respawn.flowmvi.sample.features.simple.SimpleScreen
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoScreen
@@ -28,5 +29,6 @@ fun Destinations(
         Destination.Logging -> LoggingScreen(navigator)
         Destination.UndoRedo -> UndoRedoScreen(navigator)
         Destination.Decompose -> DecomposeScreen(component, navigator)
+        Destination.Progressive -> ProgressiveScreen(navigator)
     }
 }

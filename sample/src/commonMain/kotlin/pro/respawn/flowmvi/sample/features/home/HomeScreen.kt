@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.AccountTree
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,6 +49,7 @@ import pro.respawn.flowmvi.sample.features.home.HomeFeature.Decompose
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.DiConfig
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.LCE
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Logging
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.Progressive
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.SavedState
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Simple
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.UndoRedo
@@ -60,6 +62,7 @@ import pro.respawn.flowmvi.sample.logging_feature_title
 import pro.respawn.flowmvi.sample.navigation.AppNavigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.platform_feature_unavailable_label
+import pro.respawn.flowmvi.sample.progressive_feature_title
 import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
@@ -77,7 +80,8 @@ import pro.respawn.kmmutils.compose.resources.string
 fun HomeScreen(
     navigator: AppNavigator,
 ) = with(container<HomeContainer, _, _, _>()) {
-    val state by subscribe(DefaultLifecycle) { action ->
+
+    val state by subscribe { action ->
         when (action) {
             is GoToFeature -> when (action.feature) {
                 Simple -> navigator.simpleFeature()
@@ -88,6 +92,7 @@ fun HomeScreen(
                 XmlViews -> navigator.xmlActivity()
                 UndoRedo -> navigator.undoRedoFeature()
                 Decompose -> navigator.decomposeFeature()
+                Progressive -> navigator.progressiveFeature()
             }
         }
     }
@@ -148,6 +153,7 @@ private val HomeFeature.title
         XmlViews -> Res.string.xml_feature_title
         UndoRedo -> Res.string.undoredo_feature_title
         Decompose -> Res.string.decompose_feature_title
+        Progressive -> Res.string.progressive_feature_title
     }
 
 private val HomeFeature.icon
@@ -160,6 +166,7 @@ private val HomeFeature.icon
         XmlViews -> Icons.Rounded.Code
         UndoRedo -> Icons.AutoMirrored.Rounded.Undo
         Decompose -> Icons.Rounded.AccountTree
+        Progressive -> Icons.Rounded.Layers
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform
