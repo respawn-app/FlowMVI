@@ -24,7 +24,7 @@ class ChildStoreTest : FreeSpec({
                     installChild(childStore)
                 }
 
-                "then parent store is started but child store needs to be started manually" {
+                "then parent store is started and child store is automatically activated" {
                     // Start the parent store
                     val parentLc = store.start(this).apply { awaitStartup() }
 
