@@ -1,10 +1,8 @@
 package pro.respawn.flowmvi.plugins.delegate
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -13,6 +11,7 @@ import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.state
@@ -81,22 +80,24 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
      *
      * @param consume Optional collector for actions emitted by the delegate store
      */
-    private inline fun CoroutineScope.subscribeChild(consume: FlowCollector<A>?) = with(delegate) {
+    private inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> PipelineContext<DS, DI, DA>.subscribeChild(
+        noinline consume: ChildConsume<DS, DI, DA, A>?,
+    ) = with(delegate) {
         subscribe {
             coroutineScope {
                 when (mode) {
                     is DelegationMode.Immediate -> Unit // state is already always up-to-date
                     is DelegationMode.WhileSubscribed -> launch { states.collect(_state) }
                 }
-                consume?.let { launch { actions.collect(it) } }
+                consume?.let { block -> launch { actions.collect { block(it) } } }
                 awaitCancellation()
             }
         }
     }
 
-    internal fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> asPlugin(
+    internal inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> asPlugin(
         name: String? = this.name,
-        consume: (suspend (A) -> Unit)?,
+        noinline consume: ChildConsume<DS, DI, DA, A>?
     ): StorePlugin<DS, DI, DA> = when (mode) {
         is DelegationMode.Immediate -> initPlugin(name) { subscribeChild(consume) }
         is DelegationMode.WhileSubscribed -> whileSubscribedPlugin(
@@ -116,3 +117,5 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
         return true
     }
 }
+
+internal typealias ChildConsume <S, I, A, CA> = (suspend PipelineContext<S, I, A>.(CA) -> Unit)

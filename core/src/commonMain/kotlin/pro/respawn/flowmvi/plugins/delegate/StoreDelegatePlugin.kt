@@ -46,8 +46,8 @@ public fun <
     name: String? = delegate.name,
     start: Boolean = true,
     blocking: Boolean = false,
-    consume: (suspend (CA) -> Unit)? = null,
-): StorePlugin<S, I, A> = delegate.asPlugin<S, I, A>(name, consume).let {
+    consume: ChildConsume<S, I, A, CA>? = null,
+): StorePlugin<S, I, A> = delegate.asPlugin(name, consume).let {
     if (!start) return@let it
     compositePlugin(
         name = name,
@@ -102,7 +102,7 @@ public fun <
     name: String? = "${store.name.orEmpty()}DelegatePlugin",
     start: Boolean = true,
     blocking: Boolean = false,
-    consume: (suspend (CA) -> Unit)? = null,
+    consume: ChildConsume<S, I, A, CA>? = null,
 ): StoreDelegate<CS, CI, CA> = StoreDelegate(store, mode).also {
     install(storeDelegatePlugin(it, name, start, blocking, consume))
 }
