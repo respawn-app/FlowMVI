@@ -62,7 +62,6 @@ object Config {
     }
 
     val wasmCompilerArgs = buildList {
-        addAll(compilerArgs)
         add("-Xwasm-use-new-exception-proposal")
         add("-Xwasm-debugger-custom-formatters")
     }
