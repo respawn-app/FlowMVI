@@ -14,6 +14,8 @@ import kotlinx.browser.document
 import kotlinx.browser.localStorage
 import kotlinx.browser.window
 import org.w3c.dom.Document
+import pro.respawn.apiresult.or
+import pro.respawn.apiresult.runResulting
 import pro.respawn.flowmvi.sample.di.startKoin
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
@@ -21,8 +23,9 @@ import pro.respawn.flowmvi.sample.util.Json
 
 private const val KEY_SAVED_STATE = "saved_state"
 
-internal fun SerializableContainer.encodeToString(): String =
+internal fun SerializableContainer.encodeToString(): String = runResulting {
     Json.encodeToString(SerializableContainer.serializer(), this)
+} or ""
 
 internal fun String.decodeSerializableContainer(): SerializableContainer? = try {
     Json.decodeFromString(SerializableContainer.serializer(), this)
