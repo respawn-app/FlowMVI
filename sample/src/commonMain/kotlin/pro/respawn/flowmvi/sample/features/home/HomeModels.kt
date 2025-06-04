@@ -24,10 +24,13 @@ internal sealed interface HomeIntent : MVIIntent {
 
     @JvmInline
     value class ClickedFeature(val value: HomeFeature) : HomeIntent
+
+    data object ClickedInfo: HomeIntent
 }
 
 @Immutable
 internal sealed interface HomeAction : MVIAction {
 
     data class GoToFeature(val feature: HomeFeature) : HomeAction
+    data object GoToInfo : HomeAction
 }

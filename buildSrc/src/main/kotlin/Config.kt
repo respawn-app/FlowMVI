@@ -21,7 +21,7 @@ object Config {
     const val minorRelease = 2
     const val patch = 0
     const val postfix = "-alpha03" // include dash (-)
-    const val versionCode = 10
+    const val versionCode = 11
 
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
@@ -100,8 +100,9 @@ object Config {
 
     object Sample {
 
+        const val privacyUrl = "https://respawn.pro/privacy"
         const val namespace = "${Config.namespace}.sample"
-        const val appDescription = "Sample app for FlowMVI - $description"
+        const val appDescription = "This app is a guide to FlowMVI - $description\n\nIt demonstrates the usage of the library in a real-world application."
         const val name = "FlowMVI Sample"
         const val appId = "a7f6783f-2bb5-433d-9e5c-9f608ddd42d5"
     }

@@ -8,7 +8,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.retainedComponent
 import org.koin.android.scope.AndroidScopeComponent
-import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.scope.activityRetainedScope
 import org.koin.core.annotation.KoinExperimentalAPI
 import pro.respawn.flowmvi.sample.navigation.AppContent
@@ -27,6 +26,6 @@ internal class MainActivity : ComponentActivity(), AndroidScopeComponent {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { KoinAndroidContext { AppContent(root) } }
+        setContent { AppContent(root) }
     }
 }

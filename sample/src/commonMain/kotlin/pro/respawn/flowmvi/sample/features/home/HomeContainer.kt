@@ -26,6 +26,7 @@ internal class HomeContainer(
         reduce { intent ->
             when (intent) {
                 is ClickedFeature -> action(GoToFeature(intent.value))
+                is HomeIntent.ClickedInfo -> action(HomeAction.GoToInfo)
             }
         }
     }

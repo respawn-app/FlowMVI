@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.savedstate.api.NullRecover
 import pro.respawn.flowmvi.savedstate.api.Saver
 import pro.respawn.flowmvi.savedstate.dsl.CompressedFileSaver
 import pro.respawn.flowmvi.savedstate.dsl.JsonSaver
+import pro.respawn.flowmvi.savedstate.dsl.RecoveringSaver
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 internal class DefaultConfigurationFactory(
@@ -29,8 +30,8 @@ internal class DefaultConfigurationFactory(
         fileName: String,
     ) = CompressedFileSaver(
         path = files.cacheFile(".cache", "$fileName.json"),
-        recover = NullRecover
     ).let { JsonSaver(json, serializer, it) }
+        .let { RecoveringSaver(it, NullRecover) }
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(
         name: String,

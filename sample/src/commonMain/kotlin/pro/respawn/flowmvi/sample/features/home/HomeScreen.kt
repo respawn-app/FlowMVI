@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material.icons.rounded.AccountTree
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Save
@@ -66,10 +67,12 @@ import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
+import pro.respawn.flowmvi.sample.ui.widgets.RIcon
 import pro.respawn.flowmvi.sample.ui.widgets.RMenuItem
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
 import pro.respawn.flowmvi.sample.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.sample.undoredo_feature_title
+import pro.respawn.flowmvi.sample.util.Platform
 import pro.respawn.flowmvi.sample.util.platform
 import pro.respawn.flowmvi.sample.xml_feature_title
 import pro.respawn.kmmutils.compose.resources.string
@@ -81,6 +84,7 @@ fun HomeScreen(
 ) = with(container<HomeContainer, _, _, _>()) {
     val state by subscribe { action ->
         when (action) {
+            is HomeAction.GoToInfo -> navigator.info()
             is GoToFeature -> when (action.feature) {
                 Simple -> navigator.simpleFeature()
                 LCE -> navigator.lceFeature()
@@ -95,7 +99,11 @@ fun HomeScreen(
         }
     }
 
-    RScaffold(title = stringResource(Res.string.app_name), onBack = navigator.backNavigator) {
+    RScaffold(
+        title = stringResource(Res.string.app_name),
+        onBack = navigator.backNavigator,
+        actions = { HomeActions() },
+    ) {
         HomeScreenContent(state)
     }
 }
@@ -139,6 +147,14 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
             Spacer(Modifier.navigationBarsPadding())
         }
     }
+}
+
+@Composable
+private fun IntentReceiver<HomeIntent>.HomeActions() {
+    if (BuildFlags.platform == Platform.Android || BuildFlags.platform == Platform.Apple) RIcon(
+        icon = Icons.Rounded.Info,
+        onClick = { intent(HomeIntent.ClickedInfo) }
+    )
 }
 
 private val HomeFeature.title

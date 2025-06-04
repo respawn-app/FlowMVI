@@ -18,7 +18,8 @@ val BuildConfig = """
 
     internal object BuildFlags {
         const val VersionName = "${Config.versionName}"
-        const val ProjectDescription = "${Config.Sample.appDescription}"
+        const val ProjectDescription = ${ "\"\"\"" + Config.Sample.appDescription + "\"\"\""}
+        const val PrivacyUrl = "${Config.Sample.privacyUrl}"
     }
 """.trimIndent()
 

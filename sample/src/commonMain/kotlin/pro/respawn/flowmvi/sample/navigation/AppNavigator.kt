@@ -14,4 +14,5 @@ interface AppNavigator : Navigator {
     fun undoRedoFeature()
     fun progressiveFeature()
     fun decomposeFeature()
+    fun info()
 }

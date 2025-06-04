@@ -20,7 +20,8 @@ enum class Destination(
     Progressive("progressive"),
     Logging("logging"),
     UndoRedo("undoredo", "undo"),
-    Decompose("decompose");
+    Decompose("decompose"),
+    Info;
 
     companion object {
 

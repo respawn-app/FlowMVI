@@ -7,7 +7,7 @@ import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.qualifier.qualifier
-import pro.respawn.flowmvi.android.StoreViewModel
+import pro.respawn.flowmvi.android.ContainerViewModel
 import pro.respawn.flowmvi.android.subscribe
 import pro.respawn.flowmvi.sample.R
 import pro.respawn.flowmvi.sample.databinding.ActivityXmlBinding
@@ -20,7 +20,8 @@ import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityState
 import pro.respawn.flowmvi.sample.features.xmlactivity.XmlActivityState.DisplayingCounter
 import pro.respawn.kmmutils.common.fastLazy
 
-private typealias ViewModel = StoreViewModel<XmlActivityState, XmlActivityIntent, XmlActivityAction>
+private typealias ViewModel =
+    ContainerViewModel<XmlActivityContainer, XmlActivityState, XmlActivityIntent, XmlActivityAction>
 
 internal class XmlActivity : ComponentActivity() {
 

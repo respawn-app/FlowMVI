@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import pro.respawn.flowmvi.sample.features.decompose.DecomposeScreen
 import pro.respawn.flowmvi.sample.features.diconfig.DiConfigScreen
 import pro.respawn.flowmvi.sample.features.home.HomeScreen
+import pro.respawn.flowmvi.sample.features.info.InfoScreen
 import pro.respawn.flowmvi.sample.features.lce.LCEScreen
 import pro.respawn.flowmvi.sample.features.logging.LoggingScreen
 import pro.respawn.flowmvi.sample.features.progressive.ProgressiveScreen
@@ -21,6 +22,7 @@ fun Destinations(
     component: DestinationComponent,
 ) = ProvideDestinationLocals(component) {
     when (destination) {
+        Destination.Info -> InfoScreen()
         Destination.Home -> HomeScreen(navigator)
         Destination.SimpleFeature -> SimpleScreen(navigator)
         Destination.LCEFeature -> LCEScreen(navigator)

@@ -36,6 +36,7 @@ private class AppNavigatorImpl(
         else -> details.navigate(destination)
     }
 
+    override fun info() = stack.navigate(Destination.Info)
     override fun home() = stack.navigate(Destination.Home)
     override fun simpleFeature() = navigate(Destination.SimpleFeature)
     override fun lceFeature() = navigate(Destination.LCEFeature)
