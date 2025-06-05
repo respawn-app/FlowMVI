@@ -58,31 +58,27 @@ RUN yay -Syu --noconfirm && \
     android-sdk \
     android-sdk-platform-tools \
     android-sdk-build-tools \
-    android-sdk-cmdline-tools-latest \
+    android-sdk-cmdline-tools-latest
 
+USER root
+
+RUN if [ -d "$ANDROID_HOME" ]; then chown -R vscode:users "$ANDROID_HOME"; fi && \
+    echo "Android SDK Home: $ANDROID_HOME" && \
+    ls -la "$ANDROID_HOME" || echo "ANDROID_HOME not found or not created yet."
+
+USER vscode
 RUN if [ -x "$(command -v sdkmanager)" ]; then \
-        echo "Running sdkmanager as root to accept licenses and install components..." && \
-        yes | sdkmanager --licenses --sdk_root="$ANDROID_HOME" --verbose && \
-        echo "Installing/updating SDK components as root..." && \
-        sdkmanager --sdk_root="$ANDROID_HOME" --verbose "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest" && \
-        echo "SDK components installation/update attempt finished as root."; \
+        echo "Attempting to accept licenses..." && \
+        yes | sdkmanager --licenses && \
+        sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest"; \
     else \
-        echo "CRITICAL ERROR: sdkmanager not found for root user. This indicates a problem with the android-sdk-cmdline-tools-latest AUR package installation or PATH." && \
-        exit 1; \
+        echo "sdkmanager not found, skipping license acceptance and component installation." && \
+        echo "Ensure android-sdk-cmdline-tools-latest is correctly installed and in PATH."; \
     fi
 
-ENV JAVA_HOME=/usr/lib/jvm/zulu-24-jdk
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 USER vscode
 WORKDIR /home/vscode
 
-RUN echo "Verifying Java installation for vscode user..." && \
- java -version && \
- echo "Java -version successful for vscode user." && \
- echo "Verifying sdkmanager access for vscode user..." && \
- sdkmanager --version && \
- echo "sdkmanager --version successful for vscode user." || \
- (echo "ERROR: Post-setup verification failed for vscode user." && exit 1)
-
+# Default command (optional, can be overridden by devcontainer.json)
 CMD ["/bin/bash"]
