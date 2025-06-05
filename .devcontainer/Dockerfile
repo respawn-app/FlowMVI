@@ -1,9 +1,6 @@
 # Arch Linux base image
 FROM archlinux:base
 
-# Set non-interactive frontend for package installations
-ENV DEBIAN_FRONTEND=noninteractive
-
 # Update system and install core dependencies, build tools, and your specified packages
 # Using --needed to avoid reinstalling packages that are already present
 RUN pacman -Syu --noconfirm && \
@@ -77,6 +74,18 @@ RUN if [ -x "$(command -v sdkmanager)" ]; then \
         echo "Ensure android-sdk-cmdline-tools-latest is correctly installed and in PATH."; \
     fi
 
+
+USER root
+
+# Create a directory for downloads and ensure proper permissions
+RUN mkdir -p /workspaces && \
+    chown -R vscode:users /workspaces && \
+    chmod -R 775 /workspaces
+
+# Create a directory for the junie runner and ensure proper permissions
+RUN mkdir -p /home/vscode/.junie && \
+    chown -R vscode:users /home/vscode/.junie && \
+    chmod -R 775 /home/vscode/.junie
 
 USER vscode
 WORKDIR /home/vscode

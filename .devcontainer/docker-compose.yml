@@ -4,3 +4,8 @@ services:
       dockerfile: ./Dockerfile
       context: .
     command: /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      - ..:/workspaces/FlowMVI:cached
+    working_dir: /workspaces/FlowMVI
+    environment:
+      - GRADLE_USER_HOME=/workspaces/FlowMVI/.gradle

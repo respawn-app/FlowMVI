@@ -1,9 +1,11 @@
 {
-  "dockerComposeFile" : [
+  "name": "FlowMVI Development",
+  "dockerComposeFile": [
     "./docker-compose.yml"
   ],
-  "service" : "workspace",
-  "remoteUser" : "vscode",
-  "postCreateCommand" : "echo \"[postCreateCommand] Value of containerWorkspaceFolder: [${containerWorkspaceFolder}]\"; if [[ \"${containerWorkspaceFolder}\" == /workspaces/* || \"${containerWorkspaceFolder}\" == /workspace ]] && [ -d \"${containerWorkspaceFolder}\" ]; then echo \"[postCreateCommand] Attempting to chown '${containerWorkspaceFolder}' to vscode:users...\"; sudo chown -R vscode:users \"${containerWorkspaceFolder}\"; echo \"[postCreateCommand] Chown completed on '${containerWorkspaceFolder}'\"; else echo \"[postCreateCommand] SKIPPING chown: containerWorkspaceFolder ('${containerWorkspaceFolder}') is not a typical workspace path (e.g., under /workspaces/ or /workspace) or does not exist.\"; fi",
-  "shutdownAction" : "stopCompose"
+  "service": "workspace",
+  "workspaceFolder": "/workspaces/FlowMVI",
+  "remoteUser": "vscode",
+  "postCreateCommand": "sudo chown -R vscode:users /workspaces/FlowMVI && chmod -R 775 /workspaces/FlowMVI && mkdir -p /home/vscode/.junie && chmod -R 775 /home/vscode/.junie",
+  "shutdownAction": "stopCompose"
 }
