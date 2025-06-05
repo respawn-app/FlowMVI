@@ -60,17 +60,9 @@ RUN yay -Syu --noconfirm && \
     android-sdk-build-tools \
     android-sdk-cmdline-tools-latest \
 
-USER root
-
-# sdkmanager needs to write to $ANDROID_HOME (e.g., to create $ANDROID_HOME/licenses).
 RUN if [ -x "$(command -v sdkmanager)" ]; then \
         echo "Running sdkmanager as root to accept licenses and install components..." && \
-        # Ensure the licenses directory can be created/written to by root, if sdkmanager doesn't.
-        # This is a common point of failure if the directory itself is missing or not writable.
-        mkdir -p "$ANDROID_HOME/licenses" && \
-        # Use yes to accept licenses; adding --verbose for more detailed output from sdkmanager
         yes | sdkmanager --licenses --sdk_root="$ANDROID_HOME" --verbose && \
-        echo "Finished license acceptance attempt by root." && \
         echo "Installing/updating SDK components as root..." && \
         sdkmanager --sdk_root="$ANDROID_HOME" --verbose "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest" && \
         echo "SDK components installation/update attempt finished as root."; \
@@ -79,26 +71,7 @@ RUN if [ -x "$(command -v sdkmanager)" ]; then \
         exit 1; \
     fi
 
-# After all SDK modifications by root, change ownership of the entire $ANDROID_HOME to the vscode user.
-# This is critical for the non-root user to be able to use the SDK tools and for file operations within $ANDROID_HOME.
-RUN if [ -d "$ANDROID_HOME" ]; then \
-        echo "Attempting to change ownership of $ANDROID_HOME to vscode:users..." && \
-        chown -R vscode:users "$ANDROID_HOME" && \
-        echo "Ownership of $ANDROID_HOME changed to vscode:users." && \
-        echo "Verifying ownership (as root, showing owner for $ANDROID_HOME itself):" && \
-        ls -ld "$ANDROID_HOME" && \
-        echo "Listing contents and permissions of $ANDROID_HOME/licenses (if it exists after root operations):" && \
-        (ls -lA "$ANDROID_HOME/licenses" || echo "Warning: $ANDROID_HOME/licenses directory not found or not listable after root operations.") ; \
-    else \
-        echo "CRITICAL ERROR: $ANDROID_HOME directory does not exist after SDK setup by root." && \
-        exit 1; \
-    fi
-
-# Set JAVA_HOME explicitly. Your main Dockerfile's yay command installs `zulu-24-bin`.
-# The typical installation path for Zulu OpenJDK packages from AUR might be /usr/lib/jvm/zulu-24-jdk
-# Ensure this path matches where zulu-24-bin actually installs.
 ENV JAVA_HOME=/usr/lib/jvm/zulu-24-jdk
-# Verify if this is the correct path for zulu-24-bin. If not, adjust.
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 USER vscode
