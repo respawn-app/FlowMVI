@@ -1,7 +1,9 @@
 {
-	"dockerComposeFile": [
-		"./docker-compose.yml"
-	],
-	"service": "workspace",
-	"shutdownAction": "stopCompose"
+  "dockerComposeFile" : [
+    "./docker-compose.yml"
+  ],
+  "service" : "workspace",
+  "remoteUser" : "vscode",
+  "postCreateCommand" : "sudo chown -R vscode:users \"${containerWorkspaceFolder}\"",
+  "shutdownAction" : "stopCompose"
 }

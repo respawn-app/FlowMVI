@@ -23,7 +23,8 @@ RUN pacman -Syu --noconfirm && \
     yarn \
     zip \
     nodejs \
-    python
+    python \
+    python-pip
 
 # Create a non-root user (e.g., vscode for devcontainers)
 # Add user to wheel group for sudo privileges
