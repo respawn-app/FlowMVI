@@ -25,7 +25,7 @@ internal sealed interface HomeIntent : MVIIntent {
     @JvmInline
     value class ClickedFeature(val value: HomeFeature) : HomeIntent
 
-    data object ClickedInfo: HomeIntent
+    data object ClickedInfo : HomeIntent
 }
 
 @Immutable
