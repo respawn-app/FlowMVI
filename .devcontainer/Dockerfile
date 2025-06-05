@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ENV ANDROID_HOME=/opt/android-sdk
 ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
-ENV JAVA_HOME=/usr/lib/jvm/zulu-23-amd64
+ENV JAVA_HOME=/usr/lib/jvm/zulu23
 ENV PATH="${JAVA_HOME}/bin:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator:${PATH}"
 ENV CMDLINE_TOOLS_VERSION="13114758"
 
