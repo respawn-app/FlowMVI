@@ -11,7 +11,6 @@ RUN pacman -Syu --noconfirm && \
     base-devel \
     git \
     sudo \
-    openjdk-21-jdk \
     libxcrypt-compat \
     wget \
     curl \
@@ -56,10 +55,11 @@ RUN git clone https://aur.archlinux.org/yay.git /tmp/yay && \
 # This is where your AUR-based dependencies are installed
 RUN yay -Syu --noconfirm && \
     yay -S --noconfirm \
+    zulu-24-bin \
     android-sdk \
     android-sdk-platform-tools \
     android-sdk-build-tools \
-    android-sdk-cmdline-tools-latest
+    android-sdk-cmdline-tools-latest \
 
 # Attempt to automatically accept Android SDK licenses
 # This needs to run after the SDK tools are installed and PATH is effective.
@@ -79,7 +79,7 @@ USER vscode
 RUN if [ -x "$(command -v sdkmanager)" ]; then \
         echo "Attempting to accept licenses..." && \
         yes | sdkmanager --licenses && \
-        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"; \
+        sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest"; \
     else \
         echo "sdkmanager not found, skipping license acceptance and component installation." && \
         echo "Ensure android-sdk-cmdline-tools-latest is correctly installed and in PATH."; \
