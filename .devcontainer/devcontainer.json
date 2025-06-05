@@ -4,6 +4,6 @@
   ],
   "service" : "workspace",
   "remoteUser" : "vscode",
-  "postCreateCommand" : "sudo chown -R vscode:users \"${containerWorkspaceFolder}\"",
+  "postCreateCommand" : "echo \"[postCreateCommand] Value of containerWorkspaceFolder: [${containerWorkspaceFolder}]\"; if [[ \"${containerWorkspaceFolder}\" == /workspaces/* || \"${containerWorkspaceFolder}\" == /workspace ]] && [ -d \"${containerWorkspaceFolder}\" ]; then echo \"[postCreateCommand] Attempting to chown '${containerWorkspaceFolder}' to vscode:users...\"; sudo chown -R vscode:users \"${containerWorkspaceFolder}\"; echo \"[postCreateCommand] Chown completed on '${containerWorkspaceFolder}'\"; else echo \"[postCreateCommand] SKIPPING chown: containerWorkspaceFolder ('${containerWorkspaceFolder}') is not a typical workspace path (e.g., under /workspaces/ or /workspace) or does not exist.\"; fi",
   "shutdownAction" : "stopCompose"
 }
