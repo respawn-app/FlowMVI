@@ -52,7 +52,6 @@ RUN git clone https://aur.archlinux.org/yay.git /tmp/yay && \
     rm -rf /tmp/yay
 
 # Update AUR packages database and install specified Android SDK components using yay
-# This is where your AUR-based dependencies are installed
 RUN yay -Syu --noconfirm && \
     yay -S --noconfirm \
     zulu-24-bin \
@@ -61,34 +60,49 @@ RUN yay -Syu --noconfirm && \
     android-sdk-build-tools \
     android-sdk-cmdline-tools-latest \
 
-# Attempt to automatically accept Android SDK licenses
-# This needs to run after the SDK tools are installed and PATH is effective.
-# Ensure sdkmanager is executable and in PATH. The AUR package should handle this.
-# This command might need to be run as root if it writes to $ANDROID_HOME owned by root,
-# or $ANDROID_HOME permissions need to be adjusted.
-# For now, running as vscode, assuming $ANDROID_HOME is writable by the user or sdkmanager handles it.
-# If $ANDROID_HOME is /opt/android-sdk (common for AUR), it's typically root-owned.
-# The `android-sdk` AUR package might set permissions, or this step might need adjustment.
-# A common practice is to chown $ANDROID_HOME to the user.
 USER root
-RUN if [ -d "$ANDROID_HOME" ]; then chown -R vscode:users "$ANDROID_HOME"; fi && \
-    echo "Android SDK Home: $ANDROID_HOME" && \
-    ls -la "$ANDROID_HOME" || echo "ANDROID_HOME not found or not created yet."
 
-USER vscode
+# Ensure ANDROID_HOME directory exists and is writable by root for sdkmanager.
+# The android-sdk AUR package should create this, but being explicit.
+RUN mkdir -p "$ANDROID_HOME" && chown -R root:root "$ANDROID_HOME"
+
+# Run sdkmanager commands as root
 RUN if [ -x "$(command -v sdkmanager)" ]; then \
-        echo "Attempting to accept licenses..." && \
-        yes | sdkmanager --licenses && \
-        sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest"; \
+        echo "Running sdkmanager as root to accept licenses and install components..." && \
+        echo "y" | sdkmanager --licenses --sdk_root="$ANDROID_HOME" && \
+        sdkmanager --sdk_root="$ANDROID_HOME" "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest" && \
+        echo "SDK components installation and license acceptance attempt finished as root."; \
     else \
-        echo "sdkmanager not found, skipping license acceptance and component installation." && \
-        echo "Ensure android-sdk-cmdline-tools-latest is correctly installed and in PATH."; \
+        echo "CRITICAL ERROR: sdkmanager not found for root user. This indicates a problem with the android-sdk-cmdline-tools-latest AUR package installation or PATH." && \
+        exit 1; \
     fi
 
+# After all SDK modifications by root, change ownership to the vscode user.
+RUN if [ -d "$ANDROID_HOME" ]; then \
+        echo "Attempting to change ownership of $ANDROID_HOME to vscode:users..." && \
+        chown -R vscode:users "$ANDROID_HOME" && \
+        echo "Ownership of $ANDROID_HOME changed to vscode:users." && \
+        echo "Verifying permissions (as root, showing owner):" && \
+        ls -ld "$ANDROID_HOME" && \
+        (ls -lA "$ANDROID_HOME/licenses" || echo "Warning: $ANDROID_HOME/licenses directory not found or not listable after operations.") ; \
+    else \
+        echo "CRITICAL ERROR: $ANDROID_HOME directory does not exist after SDK setup by root." && \
+        exit 1; \
+    fi
 
-# Switch back to the non-root user for the devcontainer environment
+# Set JAVA_HOME explicitly. zulu-24-bin AUR package typically installs to /usr/lib/jvm/zulu-24-jdk
+ENV JAVA_HOME=/usr/lib/jvm/zulu-24-jdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
 USER vscode
 WORKDIR /home/vscode
 
-# Default command (optional, can be overridden by devcontainer.json)
+RUN echo "Verifying Java installation for vscode user..." && \
+ java -version && \
+ echo "Java -version successful for vscode user." && \
+ echo "Verifying sdkmanager access for vscode user..." && \
+ sdkmanager --version && \
+ echo "sdkmanager --version successful for vscode user." || \
+ (echo "ERROR: Post-setup verification failed for vscode user." && exit 1)
+
 CMD ["/bin/bash"]
