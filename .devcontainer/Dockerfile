@@ -1,14 +1,16 @@
-# Arch Linux base image
-FROM archlinux:base
+FROM mcr.microsoft.com/devcontainers/base:debian-12
 
-# Update system and install core dependencies, build tools, and your specified packages
-# Using --needed to avoid reinstalling packages that are already present
-RUN pacman -Syu --noconfirm && \
-    pacman -S --noconfirm --needed \
-    base-devel \
+ENV DEBIAN_FRONTEND=noninteractive
+
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=${ANDROID_HOME}
+ENV JAVA_HOME=/usr/lib/jvm/java-24-openjdk-amd64
+ENV PATH="${PATH}:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator:${JAVA_HOME}/bin"
+ENV CMDLINE_TOOLS_VERSION="13114758"
+
+RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     git \
-    sudo \
-    libxcrypt-compat \
+    openjdk-24-jdk \
     wget \
     curl \
     ca-certificates \
@@ -17,78 +19,30 @@ RUN pacman -Syu --noconfirm && \
     less \
     lsof \
     unzip \
-    yarn \
     zip \
     nodejs \
-    python \
-    python-pip
+    npm \
+    python3 \
+    python3-pip \
+    libxtst6 \
+    && sudo rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user (e.g., vscode for devcontainers)
-# Add user to wheel group for sudo privileges
-# Configure passwordless sudo for this user
-RUN useradd --create-home --gid users --groups wheel --shell /bin/bash vscode && \
-    echo 'vscode ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/vscode
+# Install Yarn using corepack (recommended way with modern Node.js)
+RUN sudo corepack enable && sudo corepack prepare yarn@stable --activate
 
-# Set Android SDK environment variables
-ENV ANDROID_HOME /opt/android-sdk
-ENV ANDROID_SDK_ROOT /opt/android-sdk
-# Ensure cmdline-tools, platform-tools, and build-tools are in PATH
-# The exact paths might vary slightly based on AUR package specifics,
-# but AUR packages usually symlink tools to /usr/bin or the SDK structure is standard.
-ENV PATH $PATH:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/emulator
+RUN sudo mkdir -p "${ANDROID_HOME}/cmdline-tools" && \
+    sudo wget -q "https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS_VERSION}_latest.zip" -O /tmp/cmdline-tools.zip && \
+    sudo unzip -q /tmp/cmdline-tools.zip -d /tmp/android_cmdline_tools_temp && \
+    # The unzipped folder is 'cmdline-tools', move its contents to 'latest'
+    sudo mv /tmp/android_cmdline_tools_temp/cmdline-tools "${ANDROID_HOME}/cmdline-tools/latest" && \
+    sudo rm -rf /tmp/cmdline-tools.zip /tmp/android_cmdline_tools_temp
 
-# Switch to the non-root user for installing AUR helper and AUR packages
-USER vscode
-WORKDIR /home/vscode
-
-# Install yay (AUR helper)
-# makepkg must not be run as root
-RUN git clone https://aur.archlinux.org/yay.git /tmp/yay && \
-    cd /tmp/yay && \
-    makepkg -si --noconfirm && \
-    cd /home/vscode && \
-    rm -rf /tmp/yay
-
-# Update AUR packages database and install specified Android SDK components using yay
-RUN yay -Syu --noconfirm && \
-    yay -S --noconfirm \
-    zulu-24-bin \
-    android-sdk \
-    android-sdk-platform-tools \
-    android-sdk-build-tools \
-    android-sdk-cmdline-tools-latest
-
-USER root
-
-RUN if [ -d "$ANDROID_HOME" ]; then chown -R vscode:users "$ANDROID_HOME"; fi && \
-    echo "Android SDK Home: $ANDROID_HOME" && \
-    ls -la "$ANDROID_HOME" || echo "ANDROID_HOME not found or not created yet."
-
-USER vscode
-RUN if [ -x "$(command -v sdkmanager)" ]; then \
-        echo "Attempting to accept licenses..." && \
-        yes | sdkmanager --licenses && \
-        sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmdline-tools;latest"; \
-    else \
-        echo "sdkmanager not found, skipping license acceptance and component installation." && \
-        echo "Ensure android-sdk-cmdline-tools-latest is correctly installed and in PATH."; \
-    fi
-
-
-USER root
-
-# Create a directory for downloads and ensure proper permissions
-RUN mkdir -p /workspaces && \
-    chown -R vscode:users /workspaces && \
-    chmod -R 775 /workspaces
-
-# Create a directory for the junie runner and ensure proper permissions
-RUN mkdir -p /home/vscode/.junie && \
-    chown -R vscode:users /home/vscode/.junie && \
-    chmod -R 775 /home/vscode/.junie
-
-USER vscode
-WORKDIR /home/vscode
-
-# Default command (optional, can be overridden by devcontainer.json)
-CMD ["/bin/bash"]
+# Accept Android SDK licenses and install required components
+# Note: The user running sdkmanager needs write access to ANDROID_HOME
+# The base image often runs as 'vscode' or 'node' user who has passwordless sudo.
+# We ensure ANDROID_HOME is owned by the container user after creation if not already.
+RUN sudo mkdir -p "${ANDROID_HOME}" && \
+    sudo chown -R "$(whoami)":"$(whoami)" "${ANDROID_HOME}" && \
+    yes | sdkmanager --licenses --sdk_root="${ANDROID_HOME}" && \
+    sdkmanager --sdk_root="${ANDROID_HOME}" "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest" && \
+    echo "Android SDK setup complete."
