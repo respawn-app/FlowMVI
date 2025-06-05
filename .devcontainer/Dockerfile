@@ -37,9 +37,6 @@ RUN sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB19
     sudo apt-get install -y --no-install-recommends zulu23-jdk && \
     sudo rm -rf /var/lib/apt/lists/* # Clean up apt lists again after adding repo and installing
 
-# Install Yarn using corepack (recommended way with modern Node.js)
-RUN sudo corepack enable && sudo corepack prepare yarn@stable --activate
-
 RUN sudo mkdir -p "${ANDROID_HOME}/cmdline-tools" && \
     sudo wget -q "https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS_VERSION}_latest.zip" -O /tmp/cmdline-tools.zip && \
     sudo unzip -q /tmp/cmdline-tools.zip -d /tmp/android_cmdline_tools_temp && \
