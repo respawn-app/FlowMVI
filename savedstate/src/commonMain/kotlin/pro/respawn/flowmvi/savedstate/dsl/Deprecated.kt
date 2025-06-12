@@ -35,6 +35,7 @@ public inline fun <T> CallbackSaver(
 
     override suspend fun restore(): T? = delegate.restore().also { onRestore(it) }
 
+    @Suppress("Deprecation")
     override suspend fun recover(e: Exception): T? {
         onException(e)
         return delegate.recover(e)

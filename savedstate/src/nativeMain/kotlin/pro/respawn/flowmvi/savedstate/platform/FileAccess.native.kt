@@ -23,8 +23,10 @@ internal actual suspend fun write(data: String?, path: String) {
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-internal actual suspend fun read(path: String): String? = SystemFileSystem
-    .source(Path(path))
-    .buffered()
-    .use { it.readString() }
-    .takeIf { it.isNotBlank() }
+internal actual suspend fun read(path: String): String? = SystemFileSystem.run {
+    if (!exists(Path(path))) return@run null
+    source(Path(path))
+        .buffered()
+        .use { it.readString() }
+        .takeIf { it.isNotBlank() }
+}

@@ -30,7 +30,8 @@ internal class DefaultConfigurationFactory(
         fileName: String,
     ) = CompressedFileSaver(
         path = files.cacheFile(".cache", "$fileName.json"),
-    ).let { JsonSaver(json, serializer, it) }
+    )
+        .let { JsonSaver(json, serializer, it) }
         .let { RecoveringSaver(it, NullRecover) }
 
     override operator fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.invoke(

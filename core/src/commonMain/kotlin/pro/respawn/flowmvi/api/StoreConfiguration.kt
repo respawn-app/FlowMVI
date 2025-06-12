@@ -10,7 +10,6 @@ import kotlin.coroutines.CoroutineContext
  *
  * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
  */
-@ConsistentCopyVisibility
 @Suppress("UndocumentedPublicProperty")
 public data class StoreConfiguration<S : MVIState> internal constructor(
     val initial: S,
