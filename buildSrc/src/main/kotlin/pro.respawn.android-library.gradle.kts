@@ -9,8 +9,4 @@ kotlin {
 
 android {
     configureAndroidLibrary(this)
-
-    kotlinOptions {
-        jvmTarget = Config.jvmTarget.target
-    }
 }
