@@ -18,14 +18,16 @@ internal actual suspend fun write(data: String?, path: String) {
             delete(file, false)
             return@run
         }
+        file.parent?.let { createDirectories(it) }
         sink(file).buffered().use { it.writeString(data) }
     }
 }
 
 @OptIn(ExperimentalStdlibApi::class)
 internal actual suspend fun read(path: String): String? = SystemFileSystem.run {
-    if (!exists(Path(path))) return@run null
-    source(Path(path))
+    val file = Path(path)
+    if (!exists(file)) return@run null
+    source(file)
         .buffered()
         .use { it.readString() }
         .takeIf { it.isNotBlank() }
