@@ -6,12 +6,8 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readString
 import kotlinx.io.writeString
 
-internal actual suspend fun writeCompressed(data: String?, path: String) = write(data, path)
-
-internal actual suspend fun readCompressed(path: String): String? = read(path)
-
 @OptIn(ExperimentalStdlibApi::class)
-internal actual suspend fun write(data: String?, path: String) {
+internal actual suspend fun writeCompressed(data: String?, path: String) {
     SystemFileSystem.run {
         val file = Path(path)
         if (data == null) {
@@ -24,7 +20,7 @@ internal actual suspend fun write(data: String?, path: String) {
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-internal actual suspend fun read(path: String): String? = SystemFileSystem.run {
+internal actual suspend fun readCompressed(path: String): String? = SystemFileSystem.run {
     val file = Path(path)
     if (!exists(file)) return@run null
     source(file)
@@ -32,3 +28,7 @@ internal actual suspend fun read(path: String): String? = SystemFileSystem.run {
         .use { it.readString() }
         .takeIf { it.isNotBlank() }
 }
+
+internal actual suspend fun write(data: String?, path: String) = write(data, path, SystemFileSystem)
+
+internal actual suspend fun read(path: String): String? = read(path, SystemFileSystem)
