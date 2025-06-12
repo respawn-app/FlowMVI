@@ -36,8 +36,6 @@ kotlin {
             api(projects.core)
             api(libs.kotlin.serialization.json)
             implementation(libs.kotlin.atomicfu)
-        }
-        nonBrowserMain.dependencies {
             implementation(libs.kotlin.io)
         }
         wasmJsMain.dependencies {
