@@ -4,6 +4,12 @@ import pro.respawn.flowmvi.savedstate.dsl.RecoverDeprecationMessage
 import pro.respawn.flowmvi.savedstate.plugins.saveStatePlugin
 
 /**
+ * Internal exception thrown by the default deprecated recover implementation.
+ * This is used to distinguish between the default behavior and custom overrides.
+ */
+internal class UnrecoveredException(cause: Exception) : Exception(cause)
+
+/**
  * A Saver is an object that specifies **how** to save the state of the [saveStatePlugin].
  * See docs for specific functions to learn how to override them.
  */
@@ -29,5 +35,5 @@ public interface Saver<T> {
      *  how to handle it.
      **/
     @Deprecated(RecoverDeprecationMessage)
-    public suspend fun recover(e: Exception): T? = throw e
+    public suspend fun recover(e: Exception): T? = throw UnrecoveredException(e)
 }

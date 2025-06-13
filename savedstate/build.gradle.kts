@@ -25,7 +25,6 @@ kotlin {
     }
 
     sourceSets {
-        val nonBrowserMain by getting
         nativeMain.dependencies {
             implementation(libs.kotlin.io)
         }

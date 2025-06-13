@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.savedstate.dsl
 
 import kotlinx.coroutines.CancellationException
 import pro.respawn.flowmvi.savedstate.api.Saver
+import pro.respawn.flowmvi.savedstate.api.UnrecoveredException
 
 /**
  * [Saver] that also catches exceptions during [delegate]'s [Saver.save] and [Saver.restore]
@@ -26,7 +27,14 @@ internal suspend fun <S> Saver<S>.saveCatching(state: S?, recover: suspend (Exce
 } catch (e: CancellationException) {
     throw e
 } catch (expected: Exception) {
-    recover.invoke(expected) ?: this.recover(expected)
+    val recoveryResult = recover.invoke(expected)
+    // If recovery returns null, try deprecated recover but only catch the default implementation's exception
+    if (recoveryResult == null) try {
+        @Suppress("DEPRECATION")
+        this.recover(expected)
+    } catch (_: UnrecoveredException) {
+        // Ignore - this means the deprecated recover is using the default implementation
+    }
     Unit
 }
 
@@ -36,5 +44,13 @@ internal suspend fun <S> Saver<S>.restoreCatching(recover: suspend (Exception) -
 } catch (e: CancellationException) {
     throw e
 } catch (expected: Exception) {
-    recover.invoke(expected) ?: this.recover(expected)
+    val recoveryResult = recover.invoke(expected)
+    // If recovery returns null, try deprecated recover but only catch the default implementation's exception
+    recoveryResult ?: try {
+        @Suppress("DEPRECATION")
+        this.recover(expected)
+    } catch (_: UnrecoveredException) {
+        // Ignore - this means the deprecated recover is using the default implementation
+        null
+    }
 }
