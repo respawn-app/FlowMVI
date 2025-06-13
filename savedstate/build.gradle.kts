@@ -25,7 +25,6 @@ kotlin {
     }
 
     sourceSets {
-        val nonBrowserMain by getting
         nativeMain.dependencies {
             implementation(libs.kotlin.io)
         }
@@ -36,12 +35,14 @@ kotlin {
             api(projects.core)
             api(libs.kotlin.serialization.json)
             implementation(libs.kotlin.atomicfu)
-        }
-        nonBrowserMain.dependencies {
             implementation(libs.kotlin.io)
         }
         wasmJsMain.dependencies {
             implementation(libs.kotlin.browser)
+        }
+        jvmTest.dependencies {
+            implementation(libs.bundles.unittest)
+            implementation(projects.test)
         }
     }
 }
