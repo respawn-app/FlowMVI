@@ -2,10 +2,15 @@ package pro.respawn.flowmvi.savedstate.dsl
 
 import pro.respawn.flowmvi.savedstate.api.Saver
 
-private object NoOpSaver : Saver<Nothing> {
+/**
+ * A lightweight [Saver] implementation that will do nothing to save the state and will not [Saver.restore] to any state.
+ *
+ * Useful for testing.
+ */
+private class NoOpSaverImpl<T> : Saver<T> {
 
-    override suspend fun save(state: Nothing?): Unit = Unit
-    override suspend fun restore(): Nothing? = null
+    override suspend fun save(state: T?): Unit = Unit
+    override suspend fun restore(): T? = null
 }
 
 /**
@@ -13,5 +18,4 @@ private object NoOpSaver : Saver<Nothing> {
  *
  * Useful for testing.
  */
-@Suppress("UNCHECKED_CAST")
-public fun <S> NoOpSaver(): Saver<S> = NoOpSaver as Saver<S>
+public fun <S> NoOpSaver(): Saver<S> = NoOpSaverImpl()
