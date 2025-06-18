@@ -1,10 +1,8 @@
-package pro.respawn.flowmvi.test.platform
+package pro.respawn.flowmvi.savedstate.platform
 
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.io.files.SystemFileSystem
-import pro.respawn.flowmvi.savedstate.platform.read
-import pro.respawn.flowmvi.savedstate.platform.write
 import java.util.UUID
 
 class FileAccessTest : FreeSpec({

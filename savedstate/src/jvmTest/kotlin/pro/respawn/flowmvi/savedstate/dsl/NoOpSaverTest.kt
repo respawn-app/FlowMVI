@@ -1,9 +1,8 @@
-package pro.respawn.flowmvi.test.dsl
+package pro.respawn.flowmvi.savedstate.dsl
 
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import pro.respawn.flowmvi.savedstate.dsl.NoOpSaver
 
 class NoOpSaverTest : FreeSpec({
 

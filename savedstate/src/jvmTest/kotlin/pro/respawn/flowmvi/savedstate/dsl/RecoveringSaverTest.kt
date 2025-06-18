@@ -1,12 +1,10 @@
-package pro.respawn.flowmvi.test.dsl
+package pro.respawn.flowmvi.savedstate.dsl
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CancellationException
 import pro.respawn.flowmvi.savedstate.api.Saver
-import pro.respawn.flowmvi.savedstate.dsl.RecoveringSaver
-import pro.respawn.flowmvi.savedstate.dsl.Saver
 
 class RecoveringSaverTest : FreeSpec({
 
@@ -40,7 +38,7 @@ class RecoveringSaverTest : FreeSpec({
                     var lastRecoveryException: Exception? = null
                     val recoveryValue = "recovered-state"
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver(
                         save = { throw testException },
                         restore = { "restored" }
                     )
@@ -63,7 +61,7 @@ class RecoveringSaverTest : FreeSpec({
                     var recoveryCallCount = 0
                     var lastRecoveryException: Exception? = null
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver(
                         save = { throw testException },
                         restore = { "restored" }
                     )
@@ -89,7 +87,7 @@ class RecoveringSaverTest : FreeSpec({
                     var lastRecoveryException: Exception? = null
                     val recoveryValue = "recovered-state"
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { },
                         restore = { throw testException }
                     )
@@ -113,7 +111,7 @@ class RecoveringSaverTest : FreeSpec({
                     var recoveryCallCount = 0
                     var lastRecoveryException: Exception? = null
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { },
                         restore = { throw testException }
                     )
@@ -137,7 +135,7 @@ class RecoveringSaverTest : FreeSpec({
                 "then CancellationException should be re-thrown" {
                     val cancellationException = CancellationException("Cancelled")
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { throw cancellationException },
                         restore = { "restored" }
                     )
@@ -154,7 +152,7 @@ class RecoveringSaverTest : FreeSpec({
                 "then CancellationException should be re-thrown" {
                     val cancellationException = CancellationException("Cancelled")
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { },
                         restore = { throw cancellationException }
                     )
@@ -310,7 +308,7 @@ class RecoveringSaverTest : FreeSpec({
                 "then default deprecated recover exception should be ignored for save" {
                     val testException = RuntimeException("Save failed")
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { throw testException },
                         restore = { "restored" }
                     )
@@ -324,7 +322,7 @@ class RecoveringSaverTest : FreeSpec({
                 "then default deprecated recover exception should be ignored for restore" {
                     val testException = RuntimeException("Restore failed")
 
-                    val delegateSaver = pro.respawn.flowmvi.savedstate.dsl.Saver<String>(
+                    val delegateSaver = Saver<String>(
                         save = { },
                         restore = { throw testException }
                     )
