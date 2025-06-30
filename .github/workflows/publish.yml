@@ -96,7 +96,7 @@ jobs:
 
         # TODO: Use matrix strat and attach artifacts to the release
       - name: Create GH release
-        uses: ncipollo/release-action@v1.16.0
+        uses: ncipollo/release-action@v1.18.0
         id: create_release
         with:
           draft: true
