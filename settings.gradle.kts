@@ -32,8 +32,6 @@ dependencyResolutionManagement {
 rootProject.name = "FlowMVI"
 
 include(":sample")
-include(":sample:androidApp")
-include(":sample:wasmApp")
 include(":test")
 include(":core")
 include(":android")

@@ -76,15 +76,6 @@ fun Project.configureAndroidLibrary(variant: LibraryExtension) = variant.apply {
         consumerProguardFiles(file(Config.consumerProguardFile))
     }
 
-    buildTypes {
-        release {
-            setProperty(
-                "archivesBaseName",
-                project.name
-            )
-        }
-    }
-
     libraryVariants.all {
         sourceSets {
             getByName(name) {
