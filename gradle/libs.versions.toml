@@ -3,32 +3,32 @@ activity = "1.11.0-rc01"
 # @pin
 #noinspection GradleDependency - must match jb-lifecycle
 androidx-lifecycle = "2.9.0-alpha12"
-compose = "1.8.1"
+compose = "1.9.0-beta01"
 composeDetektPlugin = "1.4.0"
 core-ktx = "1.13.1"
 coroutines = "1.10.2"
-datetime = "0.6.2"
+datetime = "0.7.1-0.6.x-compat"
 detekt = "1.23.8"
 dokka = "2.0.0"
 essenty = "2.5.0"
 fragment = "1.8.8"
-gradleAndroid = "8.11.0-rc01"
-intellij-ide-plugin = "2.6.0"
+gradleAndroid = "8.12.0"
+intellij-ide-plugin = "2.7.1"
 intellij-idea = "2024.1"
 jmh = "1.37"
 junit = "4.13.2"
-kotest = "6.0.0.M4"
+kotest = "6.0.0.M15"
 # @pin
-kotlin = "2.2.0-RC2"
+kotlin = "2.2.0"
 kotlin-benchmark = "0.4.14"
-kotlin-browser = "0.3"
+kotlin-browser = "0.4"
 kotlin-collections = "0.4.0"
-kotlin-io = "0.7.0"
-kotlinx-atomicfu = "0.28.0"
-ktor = "3.1.3"
-lifecycle = "2.9.0"
-maven-publish-plugin = "0.32.0"
-serialization = "1.8.1"
+kotlin-io = "0.8.0"
+kotlinx-atomicfu = "0.29.0"
+ktor = "3.2.3"
+lifecycle = "2.9.1"
+maven-publish-plugin = "0.34.0"
+serialization = "1.9.0"
 turbine = "1.2.1"
 versionCatalogUpdatePlugin = "1.0.0"
 
@@ -140,7 +140,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
-kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
+kotest = "io.kotest.multiplatform:6.0.0.M4"
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlin-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlin-benchmark" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

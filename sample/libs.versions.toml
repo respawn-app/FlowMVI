@@ -2,11 +2,11 @@
 apiresult = "2.1.0"
 codehighlights = "1.0.0"
 decompose = "3.3.0"
-kmputils = "1.5.0"
+kmputils = "1.7.0"
 kodein = "7.26.1"
-koin = "4.1.0-RC1"
-material = "1.12.0"
-splashscreen = "1.2.0-beta02"
+koin = "4.1.1-Beta1"
+material = "1.13.0-rc01"
+splashscreen = "1.2.0-rc01"
 xml-constraintlayout = "2.2.1"
 
 [libraries]

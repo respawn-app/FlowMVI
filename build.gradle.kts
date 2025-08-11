@@ -2,7 +2,6 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinMultiplatform
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import com.vanniktech.maven.publish.MavenPublishBasePlugin
-import com.vanniktech.maven.publish.SonatypeHost
 import nl.littlerobots.vcu.plugin.versionCatalogUpdate
 import nl.littlerobots.vcu.plugin.versionSelector
 import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginExtension
@@ -53,7 +52,6 @@ subprojects {
                     androidVariantsToPublish = listOf("release"),
                 )
             )
-            publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, false)
             if (isReleaseBuild) signAllPublications()
             coordinates(Config.artifactId, name, Config.version(isReleaseBuild))
             pom {

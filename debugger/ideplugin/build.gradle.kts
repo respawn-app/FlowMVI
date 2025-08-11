@@ -41,7 +41,7 @@ intellijPlatform {
     }
     pluginVerification {
         ides {
-            props["plugin.local.ide.path"]?.toString()?.let(::local) ?: ide(
+            props["plugin.local.ide.path"]?.toString()?.let(::local) ?: create(
                 IntelliJPlatformType.IntellijIdeaCommunity,
                 libs.versions.intellij.idea.get()
             )
