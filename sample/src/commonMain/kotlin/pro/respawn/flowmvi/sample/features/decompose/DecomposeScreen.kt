@@ -33,7 +33,6 @@ import com.arkivanov.decompose.extensions.compose.pages.ChildPages
 import com.arkivanov.decompose.extensions.compose.pages.PagesScrollAnimation
 import com.arkivanov.essenty.instancekeeper.getOrCreateSimple
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.LocalKoinScope
 import org.koin.compose.currentKoinScope
 import pro.respawn.flowmvi.essenty.compose.subscribe
 import pro.respawn.flowmvi.sample.Res

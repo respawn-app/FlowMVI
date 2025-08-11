@@ -108,8 +108,9 @@ class CallbackSaverTest : FreeSpec({
                     restore = { savedState }
                 )
 
-                val callbackSaver = CallbackSaver(delegate = delegateSaver, onSave = {},
-                onRestore = {}
+                val callbackSaver = CallbackSaver(
+                    delegate = delegateSaver, onSave = {},
+                    onRestore = {}
                 )
 
                 callbackSaver.save(testState)
