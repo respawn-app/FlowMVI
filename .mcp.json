@@ -1,0 +1,22 @@
+{
+  "mcpServers" : {
+    "jetbrains" : {
+      "type" : "stdio",
+      "command" : "npx",
+      "args" : [
+        "-y",
+        "@jetbrains/mcp-proxy"
+      ]
+    },
+    "deepwiki" : {
+      "type" : "sse",
+      "url" : "https://mcp.deepwiki.com/sse"
+    },
+    "maven-deps-server" : {
+      "command" : "npx",
+      "args" : [
+        "mcp-maven-deps"
+      ]
+    }
+  }
+}
