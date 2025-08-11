@@ -34,6 +34,7 @@ import com.arkivanov.decompose.extensions.compose.pages.PagesScrollAnimation
 import com.arkivanov.essenty.instancekeeper.getOrCreateSimple
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.LocalKoinScope
+import org.koin.compose.currentKoinScope
 import pro.respawn.flowmvi.essenty.compose.subscribe
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.decompose_feature_title
@@ -121,7 +122,7 @@ fun DecomposeScreen(
     // due to interop between decompose navigation we built (using retained components)
     // and the need to showcase a decompose feature,
     // this is a little bit of a hack to force the component hierarchy to behave as if it's the root hierarchy
-    val koin = LocalKoinScope.current
+    val koin = currentKoinScope()
     val component = remember(parent) {
         parent.instanceKeeper.getOrCreateSimple {
             PagesComponent(parent.childContext("Pages"), koin::get)

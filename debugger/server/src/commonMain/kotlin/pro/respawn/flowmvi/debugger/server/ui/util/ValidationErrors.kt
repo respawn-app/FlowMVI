@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.debugger.server.ui.util
 
 import androidx.compose.runtime.Composable
 import pro.respawn.flowmvi.server.generated.resources.contains_digits_error_message
+import pro.respawn.flowmvi.server.generated.resources.contains_error_message
 import pro.respawn.flowmvi.server.generated.resources.contains_letters_error_message
 import pro.respawn.flowmvi.server.generated.resources.did_not_contain_error_template
 import pro.respawn.flowmvi.server.generated.resources.does_not_end_with_error_template
@@ -26,6 +27,7 @@ import pro.respawn.flowmvi.server.generated.resources.too_long_error_template
 import pro.respawn.flowmvi.server.generated.resources.too_short_error_template
 import pro.respawn.kmmutils.compose.resources.string
 import pro.respawn.kmmutils.inputforms.ValidationError
+import pro.respawn.kmmutils.inputforms.ValidationError.Contains
 import pro.respawn.kmmutils.inputforms.ValidationError.ContainsDigits
 import pro.respawn.kmmutils.inputforms.ValidationError.ContainsLetters
 import pro.respawn.kmmutils.inputforms.ValidationError.DoesNotContain
@@ -77,4 +79,5 @@ val ValidationError.message
         is TooShort -> R.string.too_short_error_template.string(minLength)
         is LengthIsNotExactly -> R.string.length_is_not_exactly_error_template.string(length)
         is NoUppercaseLetters -> R.string.no_uppercase_letters_error_message.string()
+        is Contains -> R.string.contains_error_message.string(needle)
     }

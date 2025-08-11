@@ -84,6 +84,7 @@ subprojects {
         withType<Test>().configureEach {
             useJUnitPlatform()
             filter { isFailOnNoMatchingTests = true }
+            failOnNoDiscoveredTests = false
             testLogging {
                 exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
                 showStandardStreams = true
