@@ -86,6 +86,7 @@ public fun <T> DefaultFileSaver(
  * @see Saver
  */
 @Deprecated(RecoverDeprecationMessage)
+@Suppress("Deprecation")
 public fun FileSaver(
     path: String,
     recover: suspend (Exception) -> String?,
@@ -110,6 +111,7 @@ public fun FileSaver(
  * @see Saver
  */
 @Deprecated(RecoverDeprecationMessage)
+@Suppress("Deprecation")
 public fun CompressedFileSaver(
     path: String,
     recover: suspend (Exception) -> String?,
