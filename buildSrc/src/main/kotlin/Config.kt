@@ -45,6 +45,7 @@ object Config {
         "kotlin.RequiresOptIn",
         "kotlin.experimental.ExperimentalTypeInference",
         "kotlin.uuid.ExperimentalUuidApi",
+        "kotlin.time.ExperimentalTime",
         "kotlin.contracts.ExperimentalContracts",
     )
     val compilerArgs = listOf(
@@ -55,7 +56,7 @@ object Config {
     )
     val jvmCompilerArgs = buildList {
         add("-Xjvm-default=all") // enable all jvm optimizations
-        add("-Xcontext-receivers")
+        add("-Xcontext-parameters")
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
         add("-Xjdk-release=${jvmTarget.target}")
