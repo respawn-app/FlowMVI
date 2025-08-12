@@ -2,12 +2,12 @@
 activity = "1.11.0-rc01"
 # @pin
 #noinspection GradleDependency - must match jb-lifecycle
-androidx-lifecycle = "2.9.0-alpha12"
+androidx-lifecycle = "2.9.1"
 compose = "1.9.0-beta01"
 composeDetektPlugin = "1.4.0"
 core-ktx = "1.13.1"
 coroutines = "1.10.2"
-datetime = "0.7.1-0.6.x-compat"
+datetime = "0.7.1"
 detekt = "1.23.8"
 dokka = "2.0.0"
 essenty = "2.5.0"
@@ -140,7 +140,7 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 intellij-ide = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-ide-plugin" }
-kotest = "io.kotest.multiplatform:6.0.0.M4"
+kotest = { id = "io.kotest.multiplatform", version.ref = "kotest" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 kotlin-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlin-benchmark" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
