@@ -1,3 +1,12 @@
+@file:Suppress(
+    "SpacingAroundColon",
+    "TooManyFunctions",
+    "UnusedImports",
+    "NoUnusedImports",
+    "Wrapping",
+    "UndocumentedPublicFunction",
+) // detekt context parameter support
+
 package pro.respawn.flowmvi.dsl
 
 import pro.respawn.flowmvi.api.ActionReceiver
