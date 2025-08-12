@@ -19,7 +19,7 @@ import pro.respawn.flowmvi.savedstate.platform.writeCompressed
  * * The writes to the file cannot be canceled to prevent saving partial data.
  */
 @Deprecated("Please use an overload that uses a path instead")
-@Suppress("Deprecation")
+@Suppress("DEPRECATION")
 public inline fun <T> DefaultFileSaver(
     dir: String,
     fileName: String,
@@ -44,7 +44,7 @@ public inline fun <T> DefaultFileSaver(
  * @see Saver
  */
 @Deprecated("Please use an overload that uses a path instead")
-@Suppress("Deprecation")
+@Suppress("DEPRECATION")
 public fun FileSaver(
     dir: String,
     fileName: String,
@@ -71,7 +71,7 @@ public fun FileSaver(
  * @see Saver
  */
 @Deprecated("Please use an overload that uses a path instead")
-@Suppress("Deprecation")
+@Suppress("DEPRECATION")
 public fun CompressedFileSaver(
     dir: String,
     fileName: String,
