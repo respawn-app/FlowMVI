@@ -9,27 +9,23 @@ import pro.respawn.flowmvi.api.MVIIntent
 /**
  * An alias for [IntentReceiver.send]
  */
-context(IntentReceiver<I>) @FlowMVIDSL
-@Deprecated("Context receivers are deprecated in Kotlin", ReplaceWith("intent(this)"))
-public fun <I : MVIIntent> I.send(): Unit = intent(this)
+context(receiver: IntentReceiver<I>) @FlowMVIDSL
+public fun <I : MVIIntent> I.send(): Unit = receiver.intent(this)
 
 /**
  * An alias for [ActionReceiver.action]
  */
-context(ActionReceiver<A>) @FlowMVIDSL
-@Deprecated("Context receivers are deprecated in Kotlin", ReplaceWith("action(this)"))
-public suspend fun <A : MVIAction> A.send(): Unit = action(this)
+context(receiver: ActionReceiver<A>) @FlowMVIDSL
+public suspend fun <A : MVIAction> A.send(): Unit = receiver.action(this)
 
 /**
  * An alias for [IntentReceiver.emit]
  */
-context(IntentReceiver<I>) @FlowMVIDSL
-@Deprecated("Context receivers are deprecated in Kotlin", ReplaceWith("emit(this)"))
-public suspend fun <I : MVIIntent> I.emit(): Unit = emit(this)
+context(receiver: IntentReceiver<I>) @FlowMVIDSL
+public suspend fun <I : MVIIntent> I.emit(): Unit = receiver.emit(this)
 
 /**
  * An alias for [ActionReceiver.action]
  */
-context(ActionReceiver<A>) @FlowMVIDSL
-@Deprecated("Context receivers are deprecated in Kotlin", ReplaceWith("emit(this)"))
-public suspend fun <A : MVIAction> A.emit(): Unit = emit(this)
+context(receiver: ActionReceiver<A>) @FlowMVIDSL
+public suspend fun <A : MVIAction> A.emit(): Unit = receiver.emit(this)

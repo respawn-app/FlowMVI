@@ -19,7 +19,7 @@ jmh = "1.37"
 junit = "4.13.2"
 kotest = "6.0.0.M15"
 # @pin
-kotlin = "2.2.0"
+kotlin = "2.2.20-Beta2"
 kotlin-benchmark = "0.4.14"
 kotlin-browser = "0.4"
 kotlin-collections = "0.4.0"

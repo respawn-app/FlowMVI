@@ -2,8 +2,8 @@ package pro.respawn.flowmvi.metrics
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
-import kotlinx.datetime.Clock
 import kotlin.math.min
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
 internal class PerformanceMetrics : SynchronizedObject() {

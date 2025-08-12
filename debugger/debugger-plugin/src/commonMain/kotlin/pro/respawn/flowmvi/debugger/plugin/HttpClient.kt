@@ -48,7 +48,6 @@ internal fun HttpClient(
         requestTimeoutMillis = 8000
         connectTimeoutMillis = 8000
     }
-    install(SaveBodyPlugin)
     install(DataConversion)
     install(ContentEncoding) {
         mode = ContentEncodingConfig.Mode.All // compress requests
