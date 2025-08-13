@@ -45,6 +45,7 @@ subprojects {
     plugins.withType<MavenPublishBasePlugin> {
         the<MavenPublishBaseExtension>().apply {
             val isReleaseBuild = properties["release"]?.toString().toBoolean()
+            publishToMavenCentral(false)
             configure(
                 KotlinMultiplatform(
                     javadocJar = JavadocJar.Empty(),
