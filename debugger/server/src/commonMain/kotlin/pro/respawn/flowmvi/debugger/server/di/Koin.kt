@@ -4,6 +4,6 @@ import org.koin.core.context.GlobalContext
 
 val koin by lazy {
     GlobalContext.startKoin {
-        modules(appModule)
+        modules(appModule, platformModule)
     }.koin
 }

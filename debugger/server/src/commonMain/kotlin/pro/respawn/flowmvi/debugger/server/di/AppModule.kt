@@ -11,7 +11,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineContainer
 
 val appModule = module {
     single { DefaultJson }
-    single<StoreConfiguration> { DefaultStoreConfiguration(get()) }
+    single<StoreConfiguration> { DefaultStoreConfiguration(get(), get()) }
     container { new(::ConnectContainer) }
     container { new(::TimelineContainer) }
     container { new(::StoreDetailsContainer) }
