@@ -6,7 +6,6 @@ import io.ktor.client.engine.cio.endpoint
 import io.ktor.client.plugins.DataConversion
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.SaveBodyPlugin
 import io.ktor.client.plugins.addDefaultResponseValidation
 import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.compression.ContentEncodingConfig
@@ -48,7 +47,6 @@ internal fun HttpClient(
         requestTimeoutMillis = 8000
         connectTimeoutMillis = 8000
     }
-    install(SaveBodyPlugin)
     install(DataConversion)
     install(ContentEncoding) {
         mode = ContentEncodingConfig.Mode.All // compress requests

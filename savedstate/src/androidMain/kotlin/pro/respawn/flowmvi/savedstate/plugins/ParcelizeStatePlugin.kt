@@ -1,3 +1,5 @@
+@file:Suppress("ERROR_SUPPRESSION")
+
 package pro.respawn.flowmvi.savedstate.plugins
 
 import android.os.Parcelable

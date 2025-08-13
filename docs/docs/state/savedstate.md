@@ -46,7 +46,7 @@ val saver = TypedSaver<DisplayingCounter, CounterState>(
     JsonSaver(
         json = Json,
         serializer = DisplayingCounter.serializer(),
-        delegate = CompressedFileSaver(path),
+        delegate = CompressedFileSaver { path },
     )
 )
 ```

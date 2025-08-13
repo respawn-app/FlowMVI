@@ -35,7 +35,7 @@ public inline fun <T> CallbackSaver(
 
     override suspend fun restore(): T? = delegate.restore().also { onRestore(it) }
 
-    @Suppress("Deprecation")
+    @Suppress("DEPRECATION")
     override suspend fun recover(e: Exception): T? {
         onException(e)
         return delegate.recover(e)
@@ -86,6 +86,7 @@ public fun <T> DefaultFileSaver(
  * @see Saver
  */
 @Deprecated(RecoverDeprecationMessage)
+@Suppress("DEPRECATION")
 public fun FileSaver(
     path: String,
     recover: suspend (Exception) -> String?,
@@ -110,6 +111,7 @@ public fun FileSaver(
  * @see Saver
  */
 @Deprecated(RecoverDeprecationMessage)
+@Suppress("DEPRECATION")
 public fun CompressedFileSaver(
     path: String,
     recover: suspend (Exception) -> String?,

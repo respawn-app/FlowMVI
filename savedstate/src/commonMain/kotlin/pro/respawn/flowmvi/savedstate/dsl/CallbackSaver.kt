@@ -8,10 +8,10 @@ import pro.respawn.flowmvi.savedstate.api.Saver
  *
  * @see Saver
  */
-public inline fun <T> CallbackSaver(
+public fun <T> CallbackSaver(
     delegate: Saver<T>,
-    crossinline onSave: suspend (T?) -> Unit = {},
-    crossinline onRestore: suspend (T?) -> Unit = {},
+    onSave: suspend (T?) -> Unit = {},
+    onRestore: suspend (T?) -> Unit = {},
 ): Saver<T> = object : Saver<T> by delegate {
     override suspend fun save(state: T?) = onSave(state).also { delegate.save(state) }
     override suspend fun restore(): T? = delegate.restore().also { onRestore(it) }

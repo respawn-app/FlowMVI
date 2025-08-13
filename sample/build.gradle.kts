@@ -153,7 +153,6 @@ android {
         versionName = Config.versionName
     }
     applicationVariants.all {
-        setProperty("archivesBaseName", Config.Sample.namespace)
         outputs
             .matching { "apk" in it.outputFile.extension }
             .all {

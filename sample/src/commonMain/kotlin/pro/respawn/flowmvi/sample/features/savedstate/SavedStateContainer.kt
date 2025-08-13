@@ -26,7 +26,7 @@ internal class SavedStateContainer(
         // can also be injected, defined here for illustration purposes
         // see "StoreConfiguration" for injection setup
         serializeState(
-            path = fileManager.cacheFile("saved_state", "state"),
+            path = { fileManager.cacheFile("saved_state", "state") },
             serializer = DisplayingInput.serializer(),
             recover = ThrowRecover,
         )

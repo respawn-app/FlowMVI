@@ -3,6 +3,7 @@
     <string name="app_name">FlowMVI</string>
 
     <!--  region Validation Errors  -->
+    <string name="contains_error_message">Input must not contain %1$s</string>
     <string name="did_not_contain_error_template">Input must contain %1$s</string>
     <string name="contains_digits_error_message">Please do not use digits</string>
     <string name="contains_letters_error_message">Please do not use letters</string>
