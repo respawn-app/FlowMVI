@@ -178,3 +178,4 @@ docs/javadocs/**
 /.intellijPlatform/
 **/*.jks
 /.idea/ChatHistory_schema_v2.xml
+**/tmp/**

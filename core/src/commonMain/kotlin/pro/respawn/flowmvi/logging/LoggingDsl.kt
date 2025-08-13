@@ -33,7 +33,7 @@ public val StoreLogLevel.asSymbol: String
     }
 
 /**
- * Write a message to [StoreLogger]. Tag is the [Store.name] by default.
+ * Write a message to [StoreLogger]. Tag is the [pro.respawn.flowmvi.api.Store.name] by default.
  */
 public fun PipelineContext<*, *, *>.log(
     level: StoreLogLevel = StoreLogLevel.Debug,
@@ -42,7 +42,7 @@ public fun PipelineContext<*, *, *>.log(
 ): Unit = config.logger(level, tag, message)
 
 /**
- * Write a message to [StoreLogger]. Tag is the [Store.name] by default.
+ * Write a message to [StoreLogger]. Tag is the [pro.respawn.flowmvi.api.Store.name] by default.
  */
 public fun PipelineContext<*, *, *>.log(
     e: Exception,
@@ -87,3 +87,59 @@ public fun StoreLogger.warn(tag: String? = null, message: () -> String): Unit =
  */
 public fun StoreLogger.error(tag: String? = null, message: () -> String): Unit =
     log(StoreLogLevel.Error, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Trace] as the log level.
+ */
+public fun PipelineContext<*, *, *>.logt(
+    tag: String? = config.name,
+    message: () -> String
+): Unit = log(StoreLogLevel.Trace, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Debug] as the log level.
+ */
+public fun PipelineContext<*, *, *>.logd(
+    tag: String? = config.name,
+    message: () -> String
+): Unit = log(StoreLogLevel.Debug, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Info] as the log level.
+ */
+public fun PipelineContext<*, *, *>.logi(
+    tag: String? = config.name,
+    message: () -> String
+): Unit = log(StoreLogLevel.Info, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Warn] as the log level.
+ */
+public fun PipelineContext<*, *, *>.logw(
+    tag: String? = config.name,
+    message: () -> String
+): Unit = log(StoreLogLevel.Warn, tag, message)
+
+/**
+ * Shorthand for [log] with [StoreLogLevel.Error] as the log level.
+ */
+public fun PipelineContext<*, *, *>.loge(
+    tag: String? = config.name,
+    message: () -> String
+): Unit = log(StoreLogLevel.Error, tag, message)
+
+/**
+ * Shorthand for logging an exception with [StoreLogLevel.Error] as the log level.
+ */
+public fun PipelineContext<*, *, *>.loge(
+    e: Exception,
+    tag: String? = config.name
+): Unit = log(e, StoreLogLevel.Error, tag)
+
+/**
+ * Shorthand for logging an exception with [StoreLogLevel.Warn] as the log level.
+ */
+public fun PipelineContext<*, *, *>.logw(
+    e: Exception,
+    tag: String? = config.name
+): Unit = log(e, StoreLogLevel.Warn, tag)
