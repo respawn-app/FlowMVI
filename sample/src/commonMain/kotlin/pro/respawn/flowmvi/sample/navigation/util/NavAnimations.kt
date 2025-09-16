@@ -26,6 +26,6 @@ internal fun <C : Destination, T : DestinationComponent> defaultNavAnimation(
         fallbackAnimation = stackAnimation { (destination, _) ->
             if (destination.topLevel) fade(NavAnimSpec) else DefaultNavAnimation
         },
-        selector = { initialEvent, _, _ -> androidPredictiveBackAnimatableV2(initialEvent) },
+        selector = { initialEvent, _, _ -> androidPredictiveBackAnimatableV1(initialEvent) },
     )
 }
