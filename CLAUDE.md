@@ -11,10 +11,21 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 ## Main Directories:
 
 - `core/src/commonMain/kotlin/pro/respawn/flowmvi` - core logic, main module
-  - ./plugins - default plugins and implementation samples.
   - ./StoreImpl.kt - core store implementation
-  - ./modules/ - various store components, like code on how plugins work,
-  - ./api/ - public API interfaces and contract.
+  - ./api/ - public API interfaces and contracts (Store, State, Intent, Action, etc.)
+  - ./dsl/ - DSL builders for stores, plugins, and configurations
+  - ./modules/ - internal store modules (intent, state, action, recovery, lifecycle)
+  - ./plugins/ - built-in plugins (logging, undo/redo, caching, job management, etc.)
+    - ./delegate/ - delegate plugins for composition
+  - ./decorators/ - public api intent decorators (retry, batch, conflate, timeout)
+  - ./decorator/ - decorator framework and builders
+  - ./impl/ - internal implementations
+    - ./plugin/ - plugin execution machinery
+    - ./store/ - store internals
+  - ./util/ - utility classes (locks, dispatchers, collections)
+  - ./exceptions/ - custom exceptions
+  - ./annotation/ - API annotations (@ExperimentalFlowMVIAPI, etc.)
+  - ./logging/ - logging framework and implementations
 - `android/` - Android ViewModel integration
 - `compose/` - Compose Multiplatform integration with lifecycle-aware subscriptions
 - `savedstate/` - Cross-platform state persistence
@@ -43,3 +54,12 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 - Document public code ONLY via kdocs.
 - Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
 - Avoid source breaking changes. Deprecate public api instead of removing it.
+
+## Commit Guidelines
+
+Format: `<type>[!]: [description]` where scope is optional, `!` = breaking change
+
+**Types:** `feat` (→🚀 Features), `fix` (→🐞 Fixes), `feat!`/`breaking`/`api` (→🧨 Breaking), `docs` (→📚 Docs), 
+`perf`, `refactor`, `test`, `chore`, `build`, `ci`, `style`, `revert`
+
+Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!: change Saver API`

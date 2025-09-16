@@ -1,4 +1,5 @@
 @file:Suppress("MissingPackageDeclaration", "Filename")
+@file:OptIn(ExperimentalWasmJsInterop::class)
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport

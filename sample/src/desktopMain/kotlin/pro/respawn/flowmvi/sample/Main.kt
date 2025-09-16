@@ -12,7 +12,6 @@ import com.arkivanov.decompose.extensions.compose.lifecycle.LifecycleController
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.KoinContext
 import pro.respawn.flowmvi.sample.di.startKoin
 import pro.respawn.flowmvi.sample.navigation.AppContent
 import pro.respawn.flowmvi.sample.navigation.component.RootComponent
@@ -39,6 +38,6 @@ fun main() = application {
         title = stringResource(Res.string.app_name),
         state = state,
     ) {
-        KoinContext { AppContent(component) }
+        AppContent(component)
     }
 }
