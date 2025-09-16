@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import kotlin.text.replace
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
     kotlin("jvm")
@@ -40,6 +41,12 @@ intellijPlatform {
     }
     pluginVerification {
         ides {
+            // TODO: https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1965
+            // props["plugin.local.ide.path"]?.toString()?.let(::local)
+            create(
+                IntelliJPlatformType.IntellijIdeaCommunity,
+                libs.versions.intellij.idea.get()
+            )
         }
     }
     pluginConfiguration {
