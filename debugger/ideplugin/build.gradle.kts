@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import kotlin.text.replace
 
 plugins {
