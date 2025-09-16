@@ -39,6 +39,6 @@ fun main() = application {
         title = stringResource(Res.string.app_name),
         state = state,
     ) {
-        KoinContext { AppContent(component) }
+         AppContent(component)
     }
 }

@@ -1,4 +1,6 @@
 @file:Suppress("UnusedParameter", "UNUSED_PARAMETER")
+@file:OptIn(ExperimentalWasmJsInterop::class)
+
 package pro.respawn.flowmvi.logging
 
 private fun log(message: String): Unit = js("""console.log(message)""")

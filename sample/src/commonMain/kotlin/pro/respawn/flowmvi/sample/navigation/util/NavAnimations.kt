@@ -5,6 +5,8 @@ import androidx.compose.runtime.remember
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatable
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatableV1
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.androidPredictiveBackAnimatableV2
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import pro.respawn.flowmvi.sample.navigation.component.DestinationComponent
@@ -24,6 +26,6 @@ internal fun <C : Destination, T : DestinationComponent> defaultNavAnimation(
         fallbackAnimation = stackAnimation { (destination, _) ->
             if (destination.topLevel) fade(NavAnimSpec) else DefaultNavAnimation
         },
-        selector = { initialEvent, _, _ -> androidPredictiveBackAnimatable(initialEvent) },
+        selector = { initialEvent, _, _ -> androidPredictiveBackAnimatableV2(initialEvent) },
     )
 }
