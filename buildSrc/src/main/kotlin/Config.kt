@@ -53,6 +53,11 @@ object Config {
         "-Xconsistent-data-class-copy-visibility",
         "-Xwarning-level=NOTHING_TO_INLINE:disabled",
         "-Xwarning-level=UNUSED_ANONYMOUS_PARAMETER:disabled",
+        "-Xcontext-sensitive-resolution",
+        "-Xcontext-parameters",
+        // "-Xwhen-guards",
+        "-Xallow-reified-type-in-catch",
+        "-Xdata-flow-based-exhaustiveness",
     )
     val jvmCompilerArgs = buildList {
         add("-Xjvm-default=all") // enable all jvm optimizations
