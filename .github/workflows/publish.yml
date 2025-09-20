@@ -43,7 +43,7 @@ jobs:
           echo "keystore_path=$KEYSTORE_PATH" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           check-latest: true
