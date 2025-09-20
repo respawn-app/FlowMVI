@@ -196,6 +196,47 @@ const config: Config = {
                 ],
             },
         ],
+        [
+            "docusaurus-plugin-llms",
+            {
+                generateLLMsTxt: true,
+                generateLLMsFullTxt: true,
+                generateMarkdownFiles: true,
+                docsDir: "docs",
+                title: "FlowMVI",
+                description: "Architecture Framework for Kotlin. Reuse every line of code. Handle all errors automatically. No boilerplate. Analytics, metrics, debugging in 3 lines. 50+ features.",
+                rootContent: `FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on coroutines.
+
+This documentation is optimized for AI assistants and LLMs.
+
+Quick navigation:
+- For getting started, see quickstart section
+- For platform integrations, see integrations section
+- For state management, see state section
+- For plugins system, see plugins section
+
+GitHub: https://github.com/respawn-app/FlowMVI`,
+                fullRootContent: `Complete offline documentation bundle for FlowMVI.
+
+This file contains all documentation content in a single document following the llmstxt.org standard.
+
+**Format**: Markdown with code examples
+**Languages**: Kotlin, Java
+**Platforms**: Android, iOS, Desktop, Web
+
+All code examples are Apache 2.0 licensed unless otherwise noted.`,
+                includeOrder: [
+                    "quickstart.*",
+                    "state/*",
+                    "plugins/*",
+                    "integrations/*",
+                    "misc/*"
+                ],
+                includeUnmatchedLast: true,
+                excludeImports: true,
+                removeDuplicateHeadings: false
+            },
+        ],
     ],
 };
 
