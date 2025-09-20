@@ -19,3 +19,6 @@
 
 .idea/* linguist-vendored
 scripts/* linguist-vendored
+.claude/* linguist-vendored
+.junie/* linguist-vendored
+.devcontainer/* linguist-vendored

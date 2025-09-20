@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
-import kotlin.text.replace
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import kotlin.text.replace
 
 plugins {
     kotlin("jvm")
