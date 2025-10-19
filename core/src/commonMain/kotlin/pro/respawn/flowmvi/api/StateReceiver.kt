@@ -15,6 +15,10 @@ public interface StateReceiver<S : MVIState> : ImmediateStateReceiver<S> {
      * [StoreConfiguration.atomicStateUpdates] are enabled.**
      * * **This function is reentrant, for more info, see [withState]**
      * * If you want to operate on a state of particular subtype, use the typed version of this function.
+     * ```kotlin
+     * updateState<State.Subtype, _> { }
+     * ```
+     *
      * * If you wish to ignore plugins and thread-safety of state updates in favor of greater performance,
      * see [ImmediateStateReceiver.updateStateImmediate].
      *
