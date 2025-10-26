@@ -80,7 +80,7 @@ fun RTopBar(
     navigationIcon = { BackIcon(onNavigationIconClick, navigationIcon) },
     actions = actions,
     scrollBehavior = scrollBehavior,
-    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+    colors = TopAppBarDefaults.topAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent,
     ),

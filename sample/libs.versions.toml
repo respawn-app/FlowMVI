@@ -1,9 +1,9 @@
 [versions]
 apiresult = "2.1.0"
 codehighlights = "1.1.0"
-decompose = "3.4.0-beta01"
+decompose = "3.4.0"
 kmputils = "1.7.0"
-kodein = "7.26.1"
+kodein = "7.28.0"
 koin = "4.1.0"
 material = "1.13.0"
 splashscreen = "1.2.0-rc01"
