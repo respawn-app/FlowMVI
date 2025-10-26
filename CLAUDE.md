@@ -1,5 +1,3 @@
-@docs/ai/tool-preferences.md
-
 FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on coroutines.
  
 ## Build Commands
