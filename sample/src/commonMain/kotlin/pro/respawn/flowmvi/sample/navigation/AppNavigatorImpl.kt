@@ -38,15 +38,15 @@ private class AppNavigatorImpl(
 
     override fun info() = stack.navigate(Destination.Info)
     override fun home() = stack.navigate(Destination.Home)
+    override fun xmlActivity() = launcher.xmlActivity()
     override fun simpleFeature() = navigate(Destination.SimpleFeature)
     override fun lceFeature() = navigate(Destination.LCEFeature)
     override fun savedStateFeature() = navigate(Destination.SavedState)
     override fun diConfigFeature() = navigate(Destination.DiConfig)
     override fun loggingFeature() = navigate(Destination.Logging)
-    override fun xmlActivity() = launcher.xmlActivity()
     override fun undoRedoFeature() = navigate(Destination.UndoRedo)
     override fun progressiveFeature() = navigate(Destination.Progressive)
-
+    override fun stateTransactionsFeature() = navigate(Destination.StateTransactions)
     override fun decomposeFeature() = navigate(Destination.Decompose)
 
     @Composable

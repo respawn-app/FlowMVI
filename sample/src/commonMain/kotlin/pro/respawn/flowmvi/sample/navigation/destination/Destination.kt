@@ -21,6 +21,7 @@ enum class Destination(
     Logging("logging"),
     UndoRedo("undoredo", "undo"),
     Decompose("decompose"),
+    StateTransactions("statetransactions"),
     Info;
 
     companion object {

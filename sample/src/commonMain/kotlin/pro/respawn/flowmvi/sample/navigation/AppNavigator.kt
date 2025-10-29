@@ -15,4 +15,5 @@ interface AppNavigator : Navigator {
     fun progressiveFeature()
     fun decomposeFeature()
     fun info()
+    fun stateTransactionsFeature()
 }
