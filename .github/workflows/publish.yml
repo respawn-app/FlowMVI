@@ -83,7 +83,7 @@ jobs:
         run: ./gradlew publishToMavenCentral --no-configuration-cache
 
       - name: Generate Changelog
-        uses: mikepenz/release-changelog-builder-action@v5
+        uses: mikepenz/release-changelog-builder-action@v6
         id: build_changelog
         with:
           commitMode: true
