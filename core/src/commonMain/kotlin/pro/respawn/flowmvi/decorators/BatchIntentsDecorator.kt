@@ -19,7 +19,6 @@ import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.logging.debug
-import pro.respawn.flowmvi.logging.info
 import kotlin.time.Duration
 
 /**
@@ -81,13 +80,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     if (mode is BatchingMode.Time) onStart { child ->
         with(child) {
             job = launch(start = CoroutineStart.LAZY) {
-                while (isActive) {
-                    delay(mode.duration)
-                    val intents = queue.flush()
-                    config.logger.debug(name) { "Flushing ${intents.size} after batching for ${mode.duration}" }
+            while (isActive) {
+                delay(mode.duration)
+                val intents = queue.flush()
+                config.logger.debug(name) { "Flushing ${intents.size} after batching for ${mode.duration}" }
                     intents.forEach { onIntent(it) }
-                }
             }
+        }
             onStart()
         }
     }
@@ -101,7 +100,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                 }
                 is BatchingMode.Amount -> {
                     queue.push(intent)
-                    if (queue.queue.value.size <= mode.size) return@onIntent null
+                    if (queue.queue.value.size < mode.size) return@onIntent null
                     val intents = queue.flush()
                     config.logger.debug(name) { "Flushing ${intents.size} after batching" }
                     // todo: onIntent invocation result ignored?
