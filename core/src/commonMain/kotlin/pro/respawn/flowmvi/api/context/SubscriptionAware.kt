@@ -16,6 +16,5 @@ public interface SubscriptionAware {
      *
      * This flow is usually not collected directly, but rather used by the store's plugins.
      */
-    @ExperimentalFlowMVIAPI
     public val subscriberCount: StateFlow<Int>
 }

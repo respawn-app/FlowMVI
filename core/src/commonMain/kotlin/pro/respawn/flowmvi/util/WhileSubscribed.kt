@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.map
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.context.SubscriptionAware
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -27,7 +26,6 @@ import kotlin.time.Duration.Companion.seconds
  *  @see pro.respawn.flowmvi.plugins.whileSubscribedPlugin
  */
 @OptIn(FlowPreview::class)
-@ExperimentalFlowMVIAPI
 public suspend inline fun SubscriptionAware.doWhileSubscribed(
     stopDelay: Duration = 1.seconds,
     minSubscribers: Int = 1,

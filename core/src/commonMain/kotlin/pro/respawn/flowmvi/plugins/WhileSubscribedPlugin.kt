@@ -35,7 +35,6 @@ import kotlin.time.Duration.Companion.seconds
  *
  * @see StorePlugin.onSubscribe
  */
-@OptIn(ExperimentalFlowMVIAPI::class)
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(
     name: String? = null,

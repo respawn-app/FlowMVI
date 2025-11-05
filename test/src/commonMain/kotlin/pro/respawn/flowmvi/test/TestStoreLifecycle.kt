@@ -2,10 +2,8 @@ package pro.respawn.flowmvi.test
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 
-@ExperimentalFlowMVIAPI
 public class TestStoreLifecycle(parent: Job?) : StoreLifecycle {
 
     private val closed = CompletableDeferred<Unit>(parent)
@@ -13,9 +11,7 @@ public class TestStoreLifecycle(parent: Job?) : StoreLifecycle {
     override val isStarted: Boolean get() = closed.isActive
 
     override suspend fun awaitStartup(): Unit = Unit
-    override suspend fun awaitUntilClosed() {
-        closed.await()
-    }
+    override suspend fun awaitUntilClosed(): Unit = closed.await()
 
     override fun close() {
         closed.complete(Unit)
