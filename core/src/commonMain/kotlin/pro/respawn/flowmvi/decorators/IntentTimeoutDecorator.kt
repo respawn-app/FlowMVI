@@ -31,10 +31,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
 ): PluginDecorator<S, I, A> = decorator {
     this.name = name
     onIntent { chain, intent ->
-        withTimeoutOrNull(timeout) {
-            // Return early if onIntent returns null to avoid confusing it with a timeout result
-            return@withTimeoutOrNull with(chain) { onIntent(intent) }
-        } ?: onTimeout(intent)
+        val outcome = withTimeoutOrNull(timeout) {
+            with(chain) { onIntent(intent) } to true
+        } ?: return@onIntent onTimeout(intent)
+        outcome.first
     }
 }
 

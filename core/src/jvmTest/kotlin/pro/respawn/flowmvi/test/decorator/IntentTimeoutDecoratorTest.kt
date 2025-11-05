@@ -28,11 +28,13 @@ class IntentTimeoutDecoratorTest : FreeSpec({
         val plugin = timeTravelPlugin(timeTravel)
         val decorator = intentTimeoutDecorator<TestState, TestIntent, TestAction>(timeout = 10.milliseconds)
 
-        "when intent completes within timeout" {
-            (decorator decorates plugin).test(TestState.Some, timeTravel) {
-                onStart()
+        "when intent completes within timeout" - {
+            "then decorator returns the child result" {
+                (decorator decorates plugin).test(TestState.Some, timeTravel) {
+                    onStart()
 
-                shouldNotThrowAny { onIntent(TestIntent { }) }
+                    shouldNotThrowAny { onIntent(TestIntent { }) }
+                }
             }
         }
     }
@@ -51,16 +53,18 @@ class IntentTimeoutDecoratorTest : FreeSpec({
             onTimeout = { fallback }
         )
 
-        "when timeout elapses" {
-            (decorator decorates plugin).test(TestState.Some) {
-                onStart()
-                val original = TestIntent { }
+        "when timeout elapses" - {
+            "then decorator invokes onTimeout" {
+                (decorator decorates plugin).test(TestState.Some) {
+                    onStart()
+                    val original = TestIntent { }
 
-                val result = async { onIntent(original) }
+                    val result = async { onIntent(original) }
 
-                advanceBy(timeout)
+                    advanceBy(timeout)
 
-                result.await() shouldBe fallback
+                    result.await() shouldBe fallback
+                }
             }
         }
     }
