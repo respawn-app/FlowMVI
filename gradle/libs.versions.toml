@@ -125,7 +125,7 @@ serialization = [
 unittest = [
     "kotest-assertions",
     "kotest-framework",
-    "kotest-property",
+#    "kotest-property",
     "kotlin-coroutines-test",
     "kotlin-reflect",
     "kotlin-test",
