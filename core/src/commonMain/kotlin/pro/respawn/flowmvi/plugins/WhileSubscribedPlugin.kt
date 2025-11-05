@@ -2,7 +2,6 @@ package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent

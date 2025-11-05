@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.api.context
 
 import kotlinx.coroutines.flow.StateFlow
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 
 /**
  * An entity that is aware of the number of its subscribers. Usually [pro.respawn.flowmvi.api.PipelineContext]

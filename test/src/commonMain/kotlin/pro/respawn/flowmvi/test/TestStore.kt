@@ -16,6 +16,7 @@ public interface TestStore<S : MVIState, I : MVIIntent, A : MVIAction> : Store<S
 @PublishedApi
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> TestStore(
     store: Store<S, I, A>,
-): TestStore<S, I, A> = object : TestStore<S, I, A>,
+): TestStore<S, I, A> = object :
+    TestStore<S, I, A>,
     Store<S, I, A> by store,
     SubscriptionAware by (store as SubscriptionAware) {}

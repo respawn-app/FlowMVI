@@ -56,7 +56,6 @@ public suspend fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, 
     @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
 ): Unit = emit(LambdaIntent(block))
 
-
 /**
  * Install a new [pro.respawn.flowmvi.plugins.reducePlugin] that is tailored for [LambdaIntent]s.
  */
