@@ -24,10 +24,10 @@ import kotlin.time.Duration
  */
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
     timeout: Duration,
     name: String? = "IntentTimeout",
-    crossinline onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
+    onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
 ): PluginDecorator<S, I, A> = decorator {
     this.name = name
     onIntent { chain, intent ->
@@ -43,8 +43,8 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDeco
  */
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeoutIntents(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeoutIntents(
     timeout: Duration,
     name: String? = "IntentTimeout",
-    crossinline onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
+    onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
 ): Unit = install(intentTimeoutDecorator(timeout, name, onTimeout))
