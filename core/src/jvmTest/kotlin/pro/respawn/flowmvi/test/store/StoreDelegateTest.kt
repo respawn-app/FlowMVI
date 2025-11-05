@@ -95,7 +95,6 @@ class StoreDelegateTest : FreeSpec({
                 val store = storeWithDelegate(delegateStore, mode)
                 store.test {
                     val child = delegateStore as SubscriptionAware
-                    val parent = store as SubscriptionAware
 
                     child.subscriberCount.value shouldBe 0
 
@@ -108,7 +107,68 @@ class StoreDelegateTest : FreeSpec({
                     sub.cancelAndJoin()
                     delay(1.seconds)
                     idle()
-                    parent.subscriberCount.value shouldBe 0
+                    subscriberCount.value shouldBe 0
+                    child.subscriberCount.value shouldBe 0
+                }
+            }
+        }
+
+        "when using WhileSubscribed delegation mode with higher threshold" - {
+            val mode = DelegationMode.WhileSubscribed(minSubs = 2)
+
+            "does not activate child until threshold reached" {
+                val store = storeWithDelegate(delegateStore, mode)
+                store.test {
+                    val child = delegateStore as SubscriptionAware
+
+                    child.subscriberCount.value shouldBe 0
+
+                    val sub1 = with(store) { subscribe { awaitCancellation() } }
+                    idle()
+                    subscriberCount.value shouldBe 1
+                    child.subscriberCount.value shouldBe 0
+
+                    val sub2 = with(store) { subscribe { awaitCancellation() } }
+                    idle()
+                    subscriberCount.value shouldBe 2
+                    child.subscriberCount.value shouldBe 1
+
+                    sub1.cancelAndJoin()
+                    sub2.cancelAndJoin()
+                    delay(1.seconds)
+                    idle()
+                    subscriberCount.value shouldBe 0
+                    child.subscriberCount.value shouldBe 0
+                }
+            }
+
+            "keeps child active while threshold satisfied" {
+                val store = storeWithDelegate(delegateStore, mode)
+                store.test {
+                    val child = delegateStore as SubscriptionAware
+
+                    val sub1 = with(store) { subscribe { awaitCancellation() } }
+                    val sub2 = with(store) { subscribe { awaitCancellation() } }
+                    val sub3 = with(store) { subscribe { awaitCancellation() } }
+                    idle()
+                    subscriberCount.value shouldBe 3
+                    child.subscriberCount.value shouldBe 1
+
+                    sub3.cancelAndJoin()
+                    idle()
+                    subscriberCount.value shouldBe 2
+                    child.subscriberCount.value shouldBe 1
+
+                    sub1.cancelAndJoin()
+                    delay(1.seconds)
+                    idle()
+                    subscriberCount.value shouldBe 1
+                    child.subscriberCount.value shouldBe 0
+
+                    sub2.cancelAndJoin()
+                    delay(1.seconds)
+                    idle()
+                    subscriberCount.value shouldBe 0
                     child.subscriberCount.value shouldBe 0
                 }
             }

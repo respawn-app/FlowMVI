@@ -16,11 +16,11 @@ import kotlin.test.assertTrue
  * Call [Store.start] and then execute [block], cancelling the store afterwards
  */
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> Store<S, I, A>.test(
-    crossinline block: suspend Store<S, I, A>.() -> Unit
+    crossinline block: suspend TestStore<S, I, A>.() -> Unit
 ): Unit = coroutineScope {
     try {
         start(this).awaitStartup()
-        block()
+        block(TestStore(this@test))
     } finally {
         closeAndWait()
     }
