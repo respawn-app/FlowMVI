@@ -5,9 +5,11 @@ import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.DelicateStoreApi
+import pro.respawn.flowmvi.api.context.SubscriptionAware
 import pro.respawn.flowmvi.dsl.LambdaIntent
 import pro.respawn.flowmvi.plugins.asyncInit
 import pro.respawn.flowmvi.plugins.delegate.DelegationMode
@@ -20,6 +22,7 @@ import pro.respawn.flowmvi.util.TestStore
 import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
 import pro.respawn.flowmvi.util.testStore
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalFlowMVIAPI::class)
 fun storeWithDelegate(delegate: TestStore, mode: DelegationMode) = testStore {
@@ -49,10 +52,15 @@ class StoreDelegateTest : FreeSpec({
 
                 store.test {
                     store.states.test {
+                        // verify our delegation is active
                         val newState = TestState.SomeData("updated delegate state")
                         awaitItem() shouldBe TestState.Some
                         delegateStore.emit(LambdaIntent { updateState { newState } }) // update child store
                         awaitItem() shouldBe newState
+                        // verify the parent store is also operating
+                        val parentState = TestState.SomeData("parent state")
+                        emit(LambdaIntent { updateState { parentState } })
+                        awaitItem() shouldBe parentState
                     }
                 }
             }
@@ -80,6 +88,28 @@ class StoreDelegateTest : FreeSpec({
                         awaitItem() shouldBe newState
                         job.cancelAndJoin()
                     }
+                }
+            }
+
+            "then the delegate unsubscribes when subscriptions drop below threshold" {
+                val store = storeWithDelegate(delegateStore, mode)
+                store.test {
+                    val child = delegateStore as SubscriptionAware
+                    val parent = store as SubscriptionAware
+
+                    child.subscriberCount.value shouldBe 0
+
+                    val sub = with(store) {
+                        subscribe { awaitCancellation() }
+                    }
+                    idle()
+                    child.subscriberCount.value shouldBe 1
+
+                    sub.cancelAndJoin()
+                    delay(1.seconds)
+                    idle()
+                    parent.subscriberCount.value shouldBe 0
+                    child.subscriberCount.value shouldBe 0
                 }
             }
         }

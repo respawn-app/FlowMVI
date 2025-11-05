@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.plugins.delegate
 
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,6 +13,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.state
 import pro.respawn.flowmvi.plugins.initPlugin
 import pro.respawn.flowmvi.plugins.whileSubscribedPlugin
@@ -80,26 +80,24 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
      *
      * @param consume Optional collector for actions emitted by the delegate store
      */
-    private inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> PipelineContext<DS, DI, DA>.subscribeChild(
+    private suspend inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> PipelineContext<DS, DI, DA>.subscribeChild(
         noinline consume: ChildConsume<DS, DI, DA, A>?,
-    ) = with(delegate) {
-        subscribe {
-            coroutineScope {
-                when (mode) {
-                    is DelegationMode.Immediate -> Unit // state is already always up-to-date
-                    is DelegationMode.WhileSubscribed -> launch { states.collect(_state) }
-                }
-                consume?.let { block -> launch { actions.collect { block(it) } } }
-                awaitCancellation()
-            }
+    ) = delegate.collect {
+        when (mode) {
+            is DelegationMode.Immediate -> Unit // state is already always up-to-date
+            is DelegationMode.WhileSubscribed -> launch { states.collect(_state) }
         }
+        consume?.let { block -> launch { actions.collect { block(it) } } }
+        awaitCancellation()
     }
 
     internal inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> asPlugin(
         name: String? = this.name,
         noinline consume: ChildConsume<DS, DI, DA, A>?
     ): StorePlugin<DS, DI, DA> = when (mode) {
-        is DelegationMode.Immediate -> initPlugin(name) { subscribeChild(consume) }
+        is DelegationMode.Immediate -> initPlugin(name) {
+            launch { subscribeChild(consume) }
+        }
         is DelegationMode.WhileSubscribed -> whileSubscribedPlugin(
             minSubscriptions = mode.minSubs,
             name = name,
