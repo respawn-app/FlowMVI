@@ -113,7 +113,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     onStop { child, e ->
         job?.cancel()
         job = null
-        queue.flush()
+        queue.flush().forEach { intent ->
+            with(child) { onUndeliveredIntent(intent) }
+        }
         child.run { onStop(e) }
     }
 }

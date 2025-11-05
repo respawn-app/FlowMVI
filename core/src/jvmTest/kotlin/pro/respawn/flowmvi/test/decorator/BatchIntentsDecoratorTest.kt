@@ -1,15 +1,18 @@
 package pro.respawn.flowmvi.test.decorator
 
+import app.cash.turbine.test
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
+import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.decorator.decorates
 import pro.respawn.flowmvi.decorators.BatchQueue
 import pro.respawn.flowmvi.decorators.BatchingMode
 import pro.respawn.flowmvi.decorators.batchIntentsDecorator
+import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.plugins.compositePlugin
 import pro.respawn.flowmvi.plugins.reducePlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
@@ -22,7 +25,7 @@ import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.testTimeTravel
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalFlowMVIAPI::class)
+@OptIn(ExperimentalFlowMVIAPI::class, DelicateStoreApi::class)
 class BatchIntentsDecoratorTest : FreeSpec({
     configure()
 
@@ -55,6 +58,7 @@ class BatchIntentsDecoratorTest : FreeSpec({
                 }
             }
         }
+
     }
 
     "given time-based batching mode" - {
@@ -95,5 +99,6 @@ class BatchIntentsDecoratorTest : FreeSpec({
                 }
             }
         }
+
     }
 })
