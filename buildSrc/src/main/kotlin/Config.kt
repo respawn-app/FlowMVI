@@ -75,7 +75,7 @@ object Config {
     // android
     const val compileSdk = 36
     const val targetSdk = compileSdk
-    const val minSdk = 21
+    const val minSdk = 23
     const val appMinSdk = 26
     const val namespace = artifactId
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"
