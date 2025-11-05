@@ -49,7 +49,7 @@ class ChildStoreTest : FreeSpec({
                 val store = testStore {
                     installChild(childStore, blocking = true, force = true)
                 }
-                "then prevent will not finish startup until child finishes" {
+                "then will not finish startup until child finishes" {
                     val lc = store.start(this)
                     idle()
                     store.isActive shouldBe true
