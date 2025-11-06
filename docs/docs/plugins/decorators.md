@@ -115,13 +115,20 @@ The power of decorators enables some awesome features. You can take them as an e
 fun batchIntentsDecorator(
     mode: BatchingMode,
     queue: BatchQueue<I> = BatchQueue(),
-    name: String? = "BatchIntentsDecorator"
+    name: String? = "BatchIntentsDecorator",
+    onUnhandledIntent: suspend PipelineContext<S, I, A>.(intent: I) -> Unit = {}
 ): PluginDecorator<S, I, A>
 ```
 
 This one intercepts the intents coming through it and puts them in a queue. Based on the `BatchingMode` it will either
 accumulate a given `Amount` of intents in the queue before flushing them as soon as the queue overflows, or
 intercept all intents and flush them every `Time` interval.
+
+When a child plugin returns an intent instead of consuming it the decorator calls `onUnhandledIntent`. In amount mode
+the callback fires for every unhandled item and the last one is also returned so the store can keep its default
+undelivered flow. In time mode flushing happens inside a background job, so each unhandled intent is just reported via
+the callback. The default callback does nothing, preserving the historical behaviour where unhandled intents were
+dropped.
 
 It is useful when you want to save some resources and want to do computations in bursts.
 

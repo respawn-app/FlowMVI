@@ -82,6 +82,13 @@ public class BatchQueue<I : MVIIntent> {
  *
  * Based on the mode, the intents will be batched either by time ("flush every N seconds") or amount.
  * See [BatchingMode] for details.
+ *
+ * @param onUnhandledIntent invoked for every intent that the child plugin returns instead of consuming.
+ * In [BatchingMode.Amount] the callback fires for each unhandled item in the batch and the last one is also
+ * returned from the decorator so the store can continue its regular undelivered flow.
+ * In [BatchingMode.Time] flushing happens on a background job, therefore every unhandled item is forwarded
+ * to this callback immediately and nothing is bubbled up.
+ * By default the callback is a no-op, preserving the previous behaviour where unhandled intents were dropped.
  */
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
@@ -141,6 +148,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
 
 /**
  * Installs a new [batchIntentsDecorator] for all plugins of this store.
+ *
+ * @param onUnhandledIntent see [batchIntentsDecorator] for semantics.
  */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
