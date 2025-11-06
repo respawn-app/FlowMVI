@@ -1,5 +1,7 @@
 @file:Suppress("UnusedReceiverParameter")
 
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.dsl
 
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +58,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> ImmutableContaine
 /**
  * Alias for [Store.intent]
  */
+@IgnorableReturnValue
 public inline fun <I : MVIIntent> Container<*, I, *>.intent(
     first: I,
     vararg other: I
@@ -64,6 +67,7 @@ public inline fun <I : MVIIntent> Container<*, I, *>.intent(
 /**
  * Alias for [Store.emit]
  */
+@IgnorableReturnValue
 public suspend inline fun <I : MVIIntent> Container<*, I, *>.emit(
     first: I,
     vararg other: I

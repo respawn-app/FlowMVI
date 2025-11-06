@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorators
 
 import kotlinx.coroutines.withTimeoutOrNull
@@ -24,27 +26,28 @@ import kotlin.time.Duration
  */
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
     timeout: Duration,
     name: String? = "IntentTimeout",
-    crossinline onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
+    onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
 ): PluginDecorator<S, I, A> = decorator {
     this.name = name
     onIntent { chain, intent ->
-        withTimeoutOrNull(timeout) {
-            // Return early if onIntent returns null to avoid confusing it with a timeout result
-            return@withTimeoutOrNull with(chain) { onIntent(intent) }
-        } ?: onTimeout(intent)
+        val outcome = withTimeoutOrNull(timeout) {
+            with(chain) { onIntent(intent) } to true
+        } ?: return@onIntent onTimeout(intent)
+        outcome.first
     }
 }
 
 /**
  * Installs a new [intentTimeoutDecorator] for all intents in this store.
  */
+@IgnorableReturnValue
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
-public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeoutIntents(
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeoutIntents(
     timeout: Duration,
     name: String? = "IntentTimeout",
-    crossinline onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
+    onTimeout: suspend PipelineContext<S, I, A>.(I) -> I? = { throw StoreTimeoutException(timeout) },
 ): Unit = install(intentTimeoutDecorator(timeout, name, onTimeout))

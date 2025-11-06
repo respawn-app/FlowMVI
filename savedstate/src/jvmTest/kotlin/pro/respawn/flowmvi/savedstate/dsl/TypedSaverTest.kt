@@ -105,6 +105,7 @@ class TypedSaverTest : FreeSpec({
 
                 val result = stringToIntSaver.restore()
                 result shouldBe null
+                savedInt shouldBe 42
             }
         }
 

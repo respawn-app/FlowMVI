@@ -44,10 +44,10 @@ class StoreDecoratorTest : FreeSpec({
                     ++invocations
                 }
             }
-            "then the decorator callback is skipped" {
+            "then the decorator callback should still be executed" {
                 (decorator decorates plugin).test(TestState.Some) {
                     onStart()
-                    invocations shouldBe 0
+                    invocations shouldBe 1
                 }
             }
         }

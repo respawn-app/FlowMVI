@@ -43,25 +43,25 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
      * See [StorePlugin.onStart]
      */
     @FlowMVIDSL
-    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = setOnce(::start, block)
+    public fun onStart(block: suspend PipelineContext<S, I, A>.() -> Unit): Unit = ::start.setOnce(block)
 
     /**
      * See [StorePlugin.onState]
      */
     @FlowMVIDSL
-    public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?): Unit = setOnce(::state, block)
+    public fun onState(block: suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?): Unit = ::state.setOnce(block)
 
     /**
      * See [StorePlugin.onIntent]
      */
     @FlowMVIDSL
-    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = setOnce(::intent, block)
+    public fun onIntent(block: suspend PipelineContext<S, I, A>.(intent: I) -> I?): Unit = ::intent.setOnce(block)
 
     /**
      * See [StorePlugin.onAction]
      */
     @FlowMVIDSL
-    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = setOnce(::action, block)
+    public fun onAction(block: suspend PipelineContext<S, I, A>.(action: A) -> A?): Unit = ::action.setOnce(block)
 
     /**
      * See [StorePlugin.onException]
@@ -69,7 +69,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onException(
         block: suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?
-    ): Unit = setOnce(::exception, block)
+    ): Unit = ::exception.setOnce(block)
 
     /**
      * See [StorePlugin.onSubscribe]
@@ -77,7 +77,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onSubscribe(
         block: suspend PipelineContext<S, I, A>.(newSubscriberCount: Int) -> Unit
-    ): Unit = setOnce(::subscribe, block)
+    ): Unit = ::subscribe.setOnce(block)
 
     /**
      * See [StorePlugin.onUnsubscribe]
@@ -85,13 +85,13 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @FlowMVIDSL
     public fun onUnsubscribe(
         block: suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit
-    ): Unit = setOnce(::unsubscribe, block)
+    ): Unit = ::unsubscribe.setOnce(block)
 
     /**
      * See [StorePlugin.onStop]
      */
     @FlowMVIDSL
-    public fun onStop(block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit): Unit = setOnce(::stop, block)
+    public fun onStop(block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit): Unit = ::stop.setOnce(block)
 
     /**
      * See [StorePlugin.onUndeliveredIntent]
@@ -100,7 +100,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @DelicateStoreApi
     public fun onUndeliveredIntent(
         block: ShutdownContext<S, I, A>.(intent: I) -> Unit
-    ): Unit = setOnce(::undeliveredIntent, block)
+    ): Unit = ::undeliveredIntent.setOnce(block)
 
     /**
      * See [StorePlugin.onUndeliveredAction]
@@ -109,7 +109,7 @@ public open class StorePluginBuilder<S : MVIState, I : MVIIntent, A : MVIAction>
     @DelicateStoreApi
     public fun onUndeliveredAction(
         block: ShutdownContext<S, I, A>.(action: A) -> Unit
-    ): Unit = setOnce(::undeliveredAction, block)
+    ): Unit = ::undeliveredAction.setOnce(block)
 
     @PublishedApi
     internal fun build(): PluginInstance<S, I, A> = PluginInstance(

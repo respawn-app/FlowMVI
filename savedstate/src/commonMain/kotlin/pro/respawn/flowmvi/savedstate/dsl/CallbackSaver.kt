@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.dsl
 
 import pro.respawn.flowmvi.savedstate.api.Saver

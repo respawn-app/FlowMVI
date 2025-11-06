@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -31,6 +33,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> consumeIntentsPlugin(
  * @see consumeIntents
  * @see reduce
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.consumeIntents(
     name: String = ConsumeIntentsPluginName,

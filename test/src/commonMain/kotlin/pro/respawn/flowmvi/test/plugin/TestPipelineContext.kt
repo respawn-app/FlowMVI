@@ -2,7 +2,7 @@
 
 package pro.respawn.flowmvi.test.plugin
 
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,13 +28,15 @@ import pro.respawn.flowmvi.test.ensureStarted
 @OptIn(ExperimentalFlowMVIAPI::class, NotIntendedForInheritance::class, InternalFlowMVIAPI::class)
 internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor(
     override val config: StoreConfiguration<S>,
+    scope: CoroutineScope,
     plugins: List<StorePlugin<S, I, A>>,
     name: String?,
-) : PipelineContext<S, I, A>, StoreLifecycle by TestStoreLifecycle(config.coroutineContext[Job]) {
+    lifecycle: TestStoreLifecycle = TestStoreLifecycle(scope),
+) : PipelineContext<S, I, A>, StoreLifecycle by lifecycle {
 
     private val _subs = MutableStateFlow(0)
     override val subscriberCount = _subs.asStateFlow()
-    override val coroutineContext by config::coroutineContext
+    override val coroutineContext = lifecycle.coroutineContext + config.coroutineContext
     val plugin = SubscriptionHookedPlugin(plugins, name, _subs::value::set)
 
     private val _state = MutableStateFlow(config.initial)
@@ -49,7 +51,7 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override suspend fun action(action: A) {
         ensureStarted()
-        with(plugin) { onAction(action) }
+        return plugin.run { onAction(action) }
     }
 
     override suspend fun emit(intent: I): Unit = with(plugin) {

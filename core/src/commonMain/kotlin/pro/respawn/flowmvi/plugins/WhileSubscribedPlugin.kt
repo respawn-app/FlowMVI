@@ -1,8 +1,9 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -35,7 +36,6 @@ import kotlin.time.Duration.Companion.seconds
  *
  * @see StorePlugin.onSubscribe
  */
-@OptIn(ExperimentalFlowMVIAPI::class)
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPlugin(
     name: String? = null,
@@ -56,6 +56,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
 /**
  * Create and install a new [whileSubscribedPlugin]. See the parent's function docs for more info.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
     name: String? = null,

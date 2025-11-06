@@ -1,6 +1,9 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.annotation.RememberInComposition
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -12,6 +15,7 @@ import pro.respawn.flowmvi.dsl.SubscriberLifecycle
  * Converts this Android [LifecycleOwner] to a [SubscriberLifecycle].
  */
 @Stable
+@get:RememberInComposition
 internal val Lifecycle.asSubscriberLifecycle: SubscriberLifecycle
     get() = SubscriberLifecycle(this) { mode, block ->
         repeatOnLifecycle(mode.asLifecycleState, block)

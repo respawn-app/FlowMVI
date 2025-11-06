@@ -1,4 +1,5 @@
 @file:Suppress("StringShouldBeRawString")
+@file:MustUseReturnValue
 
 package pro.respawn.flowmvi.plugins
 
@@ -28,6 +29,7 @@ import kotlin.math.log
  * @param tag tag to use, or the default tag will be used
  * [pro.respawn.flowmvi.api.Store.name] is used as a tag by default.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.enableLogging(
     tag: String? = null,

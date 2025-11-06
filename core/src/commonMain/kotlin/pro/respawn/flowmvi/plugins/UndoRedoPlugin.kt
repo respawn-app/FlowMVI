@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
@@ -104,6 +106,7 @@ public class UndoRedo(
      * Undo the event at current [_index].
      * **You cannot undo and redo while another undo/redo is running!**
      */
+    @IgnorableReturnValue
     public suspend fun undo(require: Boolean = false): Int = lock.withLock {
         if (!canUndo) {
             require(!require) { "Tried to undo action #${_index.value} but nothing was in the queue" }
@@ -119,6 +122,7 @@ public class UndoRedo(
      * Redo the event at current [_index].
      * **You cannot undo and redo while another undo/redo is running!**
      */
+    @IgnorableReturnValue
     public suspend fun redo(require: Boolean = false): Int = lock.withLock {
         if (!canRedo) {
             require(!require) { "Tried to redo but queue already at the last index of ${_queue.lastIndex}" }
@@ -133,6 +137,7 @@ public class UndoRedo(
     /**
      * Clear the queue of events and reset [_index] to -1
      */
+    @IgnorableReturnValue
     public fun reset(): Unit = _index.update {
         _queue.clear()
         -1

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.Job
@@ -38,6 +40,7 @@ public class JobManager<K : Any> {
     /**
      * Cancels all jobs without suspending
      */
+    @IgnorableReturnValue
     public fun cancelAll(): Unit = with(jobs) {
         forEach { (_, job) -> job.cancel() }
         clear()
@@ -46,6 +49,7 @@ public class JobManager<K : Any> {
     /**
      * Joins all jobs **sequentially**
      */
+    @IgnorableReturnValue
     public suspend fun joinAll(): Unit = try {
         jobs.values.joinAll()
     } finally {
@@ -55,6 +59,7 @@ public class JobManager<K : Any> {
     /**
      * Cancels all jobs **in parallel** and then joins them all **sequentially**
      */
+    @IgnorableReturnValue
     public suspend fun cancelAndJoinAll(): Unit = try {
         supervisorScope {
             jobs.values
@@ -71,6 +76,7 @@ public class JobManager<K : Any> {
      *
      * Does **not** start the job that was put.
      */
+    @IgnorableReturnValue
     public suspend fun putOrReplace(key: K, job: Job): Job? {
         // do not put the job until we join it to not trigger completion
         // handler after we put another job at the same spot
@@ -90,6 +96,7 @@ public class JobManager<K : Any> {
      *
      * Does **not** start the job that was put.
      */
+    @IgnorableReturnValue
     public fun put(key: K, job: Job) {
         require(jobs.put(key, job)?.takeIf { it.isActive } == null) { "Job with the same key $key is already running!" }
         job.invokeOnCompletion {
@@ -106,16 +113,19 @@ public class JobManager<K : Any> {
      * Alias for [put].
      * Will throw if a job with the same key already exists.
      */
+    @IgnorableReturnValue
     public operator fun set(key: K, value: Job): Unit = put(key, value)
 
     /**
      * Alias for [set] and [put].
      */
+    @IgnorableReturnValue
     public operator fun invoke(key: K, job: Job): Unit = put(key, job)
 
     /**
      * Put all [jobs] into the storage.
      */
+    @IgnorableReturnValue
     public fun putAll(vararg jobs: Pair<K, Job>) {
         jobs.forEach { put(it.first, it.second) }
     }
@@ -125,12 +135,14 @@ public class JobManager<K : Any> {
      *
      * @return the job that was cancelled, or null if not found.
      */
+    @IgnorableReturnValue
     public fun cancel(key: K): Job? = jobs[key]?.apply { cancel() }
 
     /**
      * Cancel and join a job for [key] if it is present
      * @return the job that was cancelled, or null if not found.
      */
+    @IgnorableReturnValue
     public suspend fun cancelAndJoin(key: K): Job? = jobs[key]?.apply { cancelAndJoin() }
 
     /**
@@ -138,29 +150,34 @@ public class JobManager<K : Any> {
      *
      * @return the completed job or null if not found
      */
+    @IgnorableReturnValue
     public suspend fun join(key: K): Job? = jobs[key]?.apply { join() }
 
     /**
      * Joins all jobs specified in [keys] in the declaration order
      */
+    @IgnorableReturnValue
     public suspend fun joinAll(vararg keys: K): Unit = keys.forEach { join(it) }
 
     /**
      * Start the job with [key] if it is present.
      * @return the job that was started or null if not found.
      */
+    @IgnorableReturnValue
     public fun start(key: K): Job? = jobs[key]?.apply { start() }
 }
 
 /**
  * Same as [JobManager.put].
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <K : Any> Job.register(manager: JobManager<K>, key: K): Job = apply { manager[key] = this }
 
 /**
  * Same as [JobManager.putOrReplace].
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public suspend fun <K : Any> Job.registerOrReplace(
     manager: JobManager<K>,

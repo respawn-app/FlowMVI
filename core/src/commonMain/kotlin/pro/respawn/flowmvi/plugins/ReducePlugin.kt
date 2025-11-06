@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -31,6 +33,7 @@ public typealias Reduce<S, I, A> = suspend PipelineContext<S, I, A>.(intent: I) 
  *
  * Events will be consumed (not passed along the chain of plugins) if [consume] is true (true by default).
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reduce(
     consume: Boolean = true,

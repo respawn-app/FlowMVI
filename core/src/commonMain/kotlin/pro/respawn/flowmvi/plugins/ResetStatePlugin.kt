@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.MVIAction
@@ -30,6 +32,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> resetStatePlugin(): Stor
 /**
  * Install a new [resetStatePlugin].
  **/
+@IgnorableReturnValue
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.resetStateOnStop(): Unit = install(
     resetStatePlugin()
 )

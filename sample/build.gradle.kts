@@ -91,6 +91,8 @@ kotlin {
                 implementation(compose.animationGraphics)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(compose.uiUtil)
 
                 implementation(libs.bundles.serialization)
                 implementation(libs.kotlin.datetime)
@@ -119,6 +121,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
         }
         androidMain.dependencies {
+            api(compose.preview)
             implementation(projects.android)
             implementation(applibs.view.constraintlayout)
             implementation(applibs.view.material)

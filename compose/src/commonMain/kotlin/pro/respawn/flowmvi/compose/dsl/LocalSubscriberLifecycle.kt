@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.compose.dsl
 
 import androidx.compose.runtime.Composable

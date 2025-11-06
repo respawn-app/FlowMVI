@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.plugins
 
 import kotlinx.coroutines.Dispatchers
@@ -113,6 +115,7 @@ public inline fun <reified T : S, reified S : MVIState, I : MVIIntent, A : MVIAc
  */
 @OptIn(ExperimentalSerializationApi::class)
 @Suppress("Indentation") // detekt <> IDE conflict
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <
     reified T : S,
@@ -156,6 +159,7 @@ public inline fun <
 )
 @OptIn(ExperimentalSerializationApi::class)
 @Suppress("Indentation") // detekt <> IDE conflict
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <
     reified T : S,

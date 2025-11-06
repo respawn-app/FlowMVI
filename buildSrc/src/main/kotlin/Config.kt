@@ -55,9 +55,10 @@ object Config {
         "-Xwarning-level=UNUSED_ANONYMOUS_PARAMETER:disabled",
         "-Xcontext-sensitive-resolution",
         "-Xcontext-parameters",
-        // "-Xwhen-guards",
         "-Xallow-reified-type-in-catch",
         "-Xdata-flow-based-exhaustiveness",
+        "-Xreturn-value-checker=check",
+        // "-Xwhen-guards",
     )
     val jvmCompilerArgs = buildList {
         add("-Xjvm-default=all") // enable all jvm optimizations
@@ -75,7 +76,7 @@ object Config {
     // android
     const val compileSdk = 36
     const val targetSdk = compileSdk
-    const val minSdk = 21
+    const val minSdk = 23
     const val appMinSdk = 26
     const val namespace = artifactId
     const val testRunner = "androidx.test.runner.AndroidJUnitRunner"

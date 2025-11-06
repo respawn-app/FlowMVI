@@ -25,6 +25,8 @@ class UndoRedoPluginTest : FreeSpec({
     "Given undo/redo" - {
         val plugin = UndoRedo(10)
         var counter = 0
+
+        @IgnorableReturnValue
         suspend fun run() = plugin.invoke(true, redo = { ++counter }, undo = { --counter })
         "and when queue is empty" - {
             "then undo throws" {
@@ -36,7 +38,7 @@ class UndoRedoPluginTest : FreeSpec({
         "and when redo is invoked" - {
             "then block is executed" {
                 with(plugin) {
-                    run()
+                    val _ = run()
                     counter shouldBe 1
                     isQueueEmpty shouldBe false
                     index.value shouldBe 0

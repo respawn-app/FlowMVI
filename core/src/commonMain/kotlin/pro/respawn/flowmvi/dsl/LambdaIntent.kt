@@ -49,6 +49,14 @@ public fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.inte
 ): Unit = send(block)
 
 /**
+ * An alias for [pro.respawn.flowmvi.api.IntentReceiver.emit] ([LambdaIntent] ([block]))
+ */
+@FlowMVIDSL
+public suspend fun <S : MVIState, A : MVIAction> IntentReceiver<LambdaIntent<S, A>>.emit(
+    @BuilderInference block: suspend PipelineContext<S, LambdaIntent<S, A>, A>.() -> Unit
+): Unit = emit(LambdaIntent(block))
+
+/**
  * Install a new [pro.respawn.flowmvi.plugins.reducePlugin] that is tailored for [LambdaIntent]s.
  */
 @FlowMVIDSL

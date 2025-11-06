@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -16,6 +18,7 @@ private fun duplicatePropMessage(name: String) = """
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
 @FlowMVIDSL
+@IgnorableReturnValue
 public inline fun <reified T : R, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)
@@ -37,7 +40,7 @@ public inline fun <reified T> Any?.typed(): T? = this as? T
 @Deprecated("Usage of this function leads to some unintended consequences when enabling code obfuscation")
 public inline fun <reified T : MVIState> nameByType(): String? = T::class.simpleName?.removeSuffix("State")
 
-internal fun <T> setOnce(property: KMutableProperty0<T?>, value: T) {
-    require(property.get() == null) { duplicatePropMessage(property.name) }
-    property.set(value)
+internal infix fun <T> KMutableProperty0<T?>.setOnce(value: T) {
+    require(get() == null) { duplicatePropMessage(name) }
+    set(value)
 }

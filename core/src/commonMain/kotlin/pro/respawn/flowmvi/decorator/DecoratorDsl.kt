@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorator
 
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
@@ -108,4 +110,4 @@ private inline fun <H, W> wrapNotNull(
     action: H?,
     wrapper: W?,
     transform: (block: W) -> H
-): H? = action?.let { h -> wrapper?.let { w -> transform(w) } } ?: action
+): H? = wrapper?.let(transform) ?: action

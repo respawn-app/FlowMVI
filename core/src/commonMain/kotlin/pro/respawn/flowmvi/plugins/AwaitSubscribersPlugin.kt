@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
@@ -35,6 +37,7 @@ public class SubscriberManager {
      * Start waiting for subscribers, suspending until the given number of subscribers arrive.
      * After the subscribers arrived, this call will return immediately
      */
+    @IgnorableReturnValue
     public suspend fun await() {
         subscriber.value?.join()
     }
@@ -42,6 +45,7 @@ public class SubscriberManager {
     /**
      * Complete the wait period, freeing the store and coroutines that called [await] to continue.
      */
+    @IgnorableReturnValue
     public fun complete() {
         subscriber.getAndSet(null)?.cancel()
     }
@@ -49,12 +53,14 @@ public class SubscriberManager {
     /**
      * Same as [complete], but suspends until completion
      */
+    @IgnorableReturnValue
     public suspend fun completeAndWait(): Unit? = subscriber.getAndSet(null)?.cancelAndJoin()
 
     /**
      * Starts waiting for the subscribers until either [this] [CoroutineScope] is cancelled or [complete] is called.
      * Usually not called manually but rather launched by the [awaitSubscribersPlugin].
      */
+    @IgnorableReturnValue
     private fun CoroutineScope.launch(timeout: Duration) {
         val previous = subscriber.value
         subscriber.getAndSet(

@@ -18,14 +18,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pro.respawn.flowmvi.debugger.server.DebuggerDefaults.ReportIssueUrl
-import pro.respawn.kmmutils.compose.annotate
+import pro.respawn.flowmvi.debugger.server.ui.util.setText
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -41,7 +41,7 @@ fun RErrorView(
     verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
     horizontalAlignment = Alignment.CenterHorizontally,
 ) {
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
     val handler = LocalUriHandler.current
     Text("An error has occurred", style = MaterialTheme.typography.headlineMedium)
     Text(text = "Message: ${e.message}")
@@ -50,7 +50,7 @@ fun RErrorView(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
     ) {
         OutlinedButton(
-            onClick = { clipboard.setText(e.stackTraceToString().annotate()) },
+            onClick = { clipboard.setText(e.stackTraceToString()) },
         ) { Text("Copy stack trace") }
         AnimatedVisibility(onRetry != null) {
             Button(

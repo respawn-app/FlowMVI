@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.essenty.dsl
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorators
 
 import kotlinx.coroutines.CoroutineScope
@@ -176,6 +178,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> retryActionsDecor
  *
  * @see retryActions
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.retryIntents(
@@ -192,6 +195,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
  *
  * @see retryIntents
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.retryActions(
@@ -201,6 +205,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 ): Unit = install(retryActionsDecorator(strategy, name, selector))
 
 @PublishedApi
+@IgnorableReturnValue
 internal suspend fun <R> CoroutineScope.retryRecursive(
     strategy: RetryStrategy,
     selector: (Exception) -> Boolean,

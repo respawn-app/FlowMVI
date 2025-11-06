@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Save
+import androidx.compose.material.icons.rounded.SyncLock
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ import pro.respawn.flowmvi.sample.features.home.HomeFeature.DiConfig
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.LCE
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Logging
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Progressive
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.SST
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.SavedState
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Simple
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.UndoRedo
@@ -65,6 +67,7 @@ import pro.respawn.flowmvi.sample.platform_feature_unavailable_label
 import pro.respawn.flowmvi.sample.progressive_feature_title
 import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
+import pro.respawn.flowmvi.sample.sst_feature_title
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RIcon
@@ -95,6 +98,7 @@ fun HomeScreen(
                 UndoRedo -> navigator.undoRedoFeature()
                 Decompose -> navigator.decomposeFeature()
                 Progressive -> navigator.progressiveFeature()
+                SST -> navigator.stateTransactionsFeature()
             }
         }
     }
@@ -168,6 +172,7 @@ private val HomeFeature.title
         UndoRedo -> Res.string.undoredo_feature_title
         Decompose -> Res.string.decompose_feature_title
         Progressive -> Res.string.progressive_feature_title
+        SST -> Res.string.sst_feature_title
     }
 
 private val HomeFeature.icon
@@ -181,6 +186,7 @@ private val HomeFeature.icon
         UndoRedo -> Icons.AutoMirrored.Rounded.Undo
         Decompose -> Icons.Rounded.AccountTree
         Progressive -> Icons.Rounded.Layers
+        SST -> Icons.Rounded.SyncLock
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform

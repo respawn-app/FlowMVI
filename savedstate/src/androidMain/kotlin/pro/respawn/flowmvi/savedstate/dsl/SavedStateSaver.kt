@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.dsl
 
 import android.os.Parcelable

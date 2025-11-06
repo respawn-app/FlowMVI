@@ -55,7 +55,7 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
                     is ResendLastIntent -> timeTravel.intents.lastOrNull()?.let { intent(it) }
                     is RethrowLastException -> timeTravel.exceptions.lastOrNull()?.let {
                         // throw it async to let the exception handler handle it
-                        runCatching { this@ctx.launch { throw it } }
+                        val _ = runCatching { this@ctx.launch { throw it } }
                     }
                     is RollbackState -> timeTravel.states.getOrNull(
                         timeTravel.states.lastIndex - 1

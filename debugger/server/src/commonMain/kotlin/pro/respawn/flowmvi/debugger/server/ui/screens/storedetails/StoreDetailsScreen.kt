@@ -18,9 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.parameter.parametersOf
@@ -40,13 +38,13 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsI
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
+import pro.respawn.flowmvi.debugger.server.ui.util.setText
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
 import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.kmmutils.common.copies
-import pro.respawn.kmmutils.compose.annotate
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,11 +53,11 @@ fun StoreDetailsScreen(
     storeId: Uuid,
     navigator: AppNavigator,
 ) = with(container<StoreDetailsContainer, _, _, _> { parametersOf(storeId) }) {
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     val state by subscribe(requireLifecycle()) {
         when (it) {
-            is CopyToClipboard -> clipboard.setText(it.text.annotate(SpanStyle(fontFamily = FontFamily.Monospace)))
+            is CopyToClipboard -> clipboard.setText(it.text)
         }
     }
 

@@ -19,6 +19,8 @@ public fun <T> SavedStateHandleSaver(
     key: String,
     recover: suspend (e: Exception) -> T?,
 ): Saver<T> = object : Saver<T> {
+
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override suspend fun recover(e: Exception): T? = recover.invoke(e)
     override suspend fun restore(): T? = handle[key]
     override suspend fun save(state: T?) {
@@ -32,6 +34,7 @@ public fun <T> SavedStateHandleSaver(
  * The [key] parameter is derived from the simple class name of the state by default.
  */
 @Deprecated(RecoverDeprecationMessage)
+@Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
 public inline fun <reified T> ParcelableSaver(
     handle: SavedStateHandle,
     key: String = key<T>(),

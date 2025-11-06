@@ -179,3 +179,5 @@ docs/javadocs/**
 **/*.jks
 /.idea/ChatHistory_schema_v2.xml
 **/tmp/**
+/docs/tmp/
+/docs/.npm-cache/

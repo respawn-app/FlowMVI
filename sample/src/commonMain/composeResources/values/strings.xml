@@ -17,4 +17,15 @@
     <string name="progressive_suggestions_title">Suggestions</string>
     <string name="progressive_feed_title">Feed</string>
     <string name="progressive_feed_loaded_message">Hello from a child store!</string>
+    <string name="sst_feature_title">Serialized State Transactions</string>
+    <string name="sst_invoice_label">Invoice %1$s</string>
+    <string name="sst_expires_in_label">Expires in</string>
+    <string name="sst_charge_button">Charge 9.99$</string>
+    <string name="sst_invoice_expired">Invoice expired</string>
+    <string name="sst_payment_complete">Payment complete</string>
+    <string name="sst_receipt_label">Receipt %1$s</string>
+    <string name="sst_charging_snackbar">Authorizing payment...</string>
+    <string name="sst_charged_snackbar">Payment succeeded</string>
+    <string name="sst_expired_snackbar">Invoice expired</string>
+    <string name="sst_start_over">Start over</string>
 </resources>

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.essenty.compose
 
 import androidx.compose.runtime.Composable

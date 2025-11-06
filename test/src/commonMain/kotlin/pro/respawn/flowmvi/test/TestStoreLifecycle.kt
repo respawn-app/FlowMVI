@@ -1,28 +1,20 @@
 package pro.respawn.flowmvi.test
 
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelAndJoin
 import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
+import kotlin.coroutines.CoroutineContext
 
-@ExperimentalFlowMVIAPI
-public class TestStoreLifecycle(parent: Job?) : StoreLifecycle {
+public class TestStoreLifecycle(parent: CoroutineScope) : StoreLifecycle, CoroutineScope {
 
-    private val closed = CompletableDeferred<Unit>(parent)
-    override val isActive: Boolean get() = closed.isActive
-    override val isStarted: Boolean get() = closed.isActive
-
+    private val lifecycleJob = SupervisorJob(parent.coroutineContext[Job])
+    override val isActive: Boolean get() = lifecycleJob.isActive
+    override val isStarted: Boolean get() = lifecycleJob.isActive
+    override val coroutineContext: CoroutineContext = parent.coroutineContext + lifecycleJob
     override suspend fun awaitStartup(): Unit = Unit
-    override suspend fun awaitUntilClosed() {
-        closed.await()
-    }
-
-    override fun close() {
-        closed.complete(Unit)
-    }
-
-    override suspend fun closeAndWait() {
-        closed.complete(Unit)
-        closed.await()
-    }
+    override suspend fun awaitUntilClosed(): Unit = lifecycleJob.join()
+    override fun close(): Unit = lifecycleJob.cancel()
+    override suspend fun closeAndWait(): Unit = lifecycleJob.cancelAndJoin()
 }

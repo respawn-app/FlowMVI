@@ -60,7 +60,8 @@ private abstract class ChannelIntentModule<S : MVIState, I : MVIIntent, A : MVIA
     override suspend fun emit(intent: I) = intents.send(intent)
 
     override fun intent(intent: I) {
-        intents.trySend(intent)
+        if (intents.trySend(intent).isSuccess) return
+        onUndeliveredIntent?.invoke(intent)
     }
 
     abstract suspend fun PipelineContext<S, I, A>.dispatch(intent: I)

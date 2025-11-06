@@ -14,11 +14,14 @@ import pro.respawn.flowmvi.sample.features.logging.LoggingContainer
 import pro.respawn.flowmvi.sample.features.progressive.ProgressiveContainer
 import pro.respawn.flowmvi.sample.features.progressive.ProgressiveRepository
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateContainer
+import pro.respawn.flowmvi.sample.features.sst.PurchaseRepository
+import pro.respawn.flowmvi.sample.features.sst.SSTContainer
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoContainer
 
 val featureModule = module {
     singleOf(::LCERepository)
     singleOf(::ProgressiveRepository)
+    singleOf(::PurchaseRepository) // for SST example
 
     container { new(::HomeContainer) }
     container { new(::ProgressiveContainer) }
@@ -27,6 +30,7 @@ val featureModule = module {
     container { new(::DiConfigContainer) }
     container { new(::LoggingContainer) }
     container { new(::UndoRedoContainer) }
+    container { new(::SSTContainer) }
 
     // decompose doesn't need to use scoped dsl
     factoryOf(::PagesContainer)
