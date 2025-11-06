@@ -26,8 +26,21 @@ class BatchQueueTest : FreeSpec({
             "then queue is emptied after flush" {
                 val queue = BatchQueue<TestIntent>()
                 queue.push(first)
-                queue.flush()
+                val _ = queue.flush()
 
+                queue.queue.value.shouldBeEmpty()
+            }
+
+            "then pushing below threshold keeps items" {
+                val queue = BatchQueue<TestIntent>()
+                queue.pushAndFlushIfReached(first, size = 2) shouldBe emptyList()
+                queue.queue.value shouldBe listOf(first)
+            }
+
+            "then pushing reaching threshold flushes" {
+                val queue = BatchQueue<TestIntent>()
+                queue.push(first)
+                queue.pushAndFlushIfReached(second, size = 2) shouldBe listOf(first, second)
                 queue.queue.value.shouldBeEmpty()
             }
         }

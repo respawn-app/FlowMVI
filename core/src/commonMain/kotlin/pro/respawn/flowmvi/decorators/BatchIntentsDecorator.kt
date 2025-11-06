@@ -57,6 +57,17 @@ public class BatchQueue<I : MVIIntent> {
     @IgnorableReturnValue
     internal fun push(intent: I) = _queue.update { it + intent }
 
+    internal fun pushAndFlushIfReached(intent: I, size: Int): List<I> {
+        var flushed = emptyList<I>()
+        _queue.update { current ->
+            if (current.size + 1 < size) current + intent else {
+                flushed = current + intent
+                emptyList()
+            }
+        }
+        return flushed
+    }
+
     /**
      * Forcibly clear the queue without sending any intents.
      *
@@ -102,9 +113,8 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                     null
                 }
                 is BatchingMode.Amount -> {
-                    queue.push(intent)
-                    if (queue.queue.value.size < mode.size) return@onIntent null
-                    val intents = queue.flush()
+                    val intents = queue.pushAndFlushIfReached(intent, mode.size)
+                    if (intents.isEmpty()) return@onIntent null
                     config.logger.debug(name) { "Flushing ${intents.size} after batching" }
                     // todo: onIntent invocation result ignored?
                     intents.forEach { onIntent(it) }
