@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import pro.respawn.flowmvi.debugger.server.DebuggerDefaults.ReportIssueUrl
 import pro.respawn.flowmvi.debugger.server.ui.util.setText
-import pro.respawn.kmmutils.compose.annotate
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -19,9 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.parameter.parametersOf
@@ -48,7 +45,6 @@ import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayou
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.util.typed
 import pro.respawn.kmmutils.common.copies
-import pro.respawn.kmmutils.compose.annotate
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
