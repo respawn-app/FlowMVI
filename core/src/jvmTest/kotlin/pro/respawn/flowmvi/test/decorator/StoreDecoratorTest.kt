@@ -47,7 +47,7 @@ class StoreDecoratorTest : FreeSpec({
             "then the decorator callback should still be executed" {
                 (decorator decorates plugin).test(TestState.Some) {
                     onStart()
-                    invocations shouldBe 0
+                    invocations shouldBe 1
                 }
             }
         }
