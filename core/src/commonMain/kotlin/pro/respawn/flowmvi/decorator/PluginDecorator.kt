@@ -18,7 +18,6 @@ import pro.respawn.flowmvi.api.StorePlugin
  *
  * @see DecoratorBuilder
  */
-@OptIn(NotIntendedForInheritance::class)
 public data class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     /** The name of the decorator. Must be unique or `null` */
     public val name: String?,

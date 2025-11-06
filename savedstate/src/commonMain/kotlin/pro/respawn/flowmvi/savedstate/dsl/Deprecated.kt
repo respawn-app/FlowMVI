@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.dsl
 
 import kotlinx.coroutines.NonCancellable
@@ -35,7 +37,7 @@ public inline fun <T> CallbackSaver(
 
     override suspend fun restore(): T? = delegate.restore().also { onRestore(it) }
 
-    @Suppress("DEPRECATION")
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override suspend fun recover(e: Exception): T? {
         onException(e)
         return delegate.recover(e)
@@ -64,6 +66,7 @@ public fun <T> DefaultFileSaver(
     // prevent concurrent file access
     private val mutex = Mutex()
 
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override suspend fun recover(e: Exception): T? = recover.invoke(e)
 
     // prevent partial writes
@@ -148,5 +151,7 @@ public inline fun <T> Saver(
 ): Saver<T> = object : Saver<T> {
     override suspend fun save(state: T?) = save.invoke(state)
     override suspend fun restore(): T? = restore.invoke()
+
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override suspend fun recover(e: Exception): T? = recover.invoke(e)
 }

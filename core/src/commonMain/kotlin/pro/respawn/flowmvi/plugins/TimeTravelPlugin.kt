@@ -1,4 +1,5 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
+@file:MustUseReturnValue
 
 package pro.respawn.flowmvi.plugins
 
@@ -94,6 +95,7 @@ public class TimeTravel<S : MVIState, I : MVIIntent, A : MVIAction>(
     /**
      * Reset all values of this plugin and start from scratch.
      */
+    @IgnorableReturnValue
     public fun reset(): Unit = lock.withLock {
         _states.clear()
         _intents.clear()
@@ -145,6 +147,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> timeTravelPlugin(
 /**
  * Create a new [TimeTravel] and installs it. Keep a reference to the object to use its properties.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeTravel(
     timeTravel: TimeTravel<S, I, A>,

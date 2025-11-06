@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorators
 
 import kotlinx.coroutines.CoroutineStart
@@ -52,6 +54,7 @@ public class BatchQueue<I : MVIIntent> {
     private val _queue = MutableStateFlow<List<I>>(emptyList())
     public val queue: StateFlow<List<I>> = _queue.asStateFlow()
 
+    @IgnorableReturnValue
     internal fun push(intent: I) = _queue.update { it + intent }
 
     /**

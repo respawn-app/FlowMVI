@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -9,6 +11,7 @@ import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 
+@IgnorableReturnValue
 private suspend fun PipelineContext<*, *, *>.children(
     stores: Iterable<Store<*, *, *>>,
     force: Boolean = config.debuggable,
@@ -41,6 +44,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> childStorePlugin(
  * Create and install a new [childStorePlugin].
  *
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun StoreBuilder<*, *, *>.installChild(
     children: Iterable<Store<*, *, *>>,
@@ -53,6 +57,7 @@ public fun StoreBuilder<*, *, *>.installChild(
  * Create and install a new [childStorePlugin]
  *
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun StoreBuilder<*, *, *>.installChild(
     first: Store<*, *, *>,
@@ -81,5 +86,6 @@ public fun StoreBuilder<*, *, *>.installChild(
  *
  * @param other The store to install as a child
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public infix fun StoreBuilder<*, *, *>.hasChild(other: Store<*, *, *>): Unit = installChild(setOf(other))

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -14,6 +16,7 @@ public typealias Recover<S, I, A> = suspend PipelineContext<S, I, A>.(e: Excepti
 /**
  * Create and install a [recoverPlugin].
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.recover(
     name: String? = null,

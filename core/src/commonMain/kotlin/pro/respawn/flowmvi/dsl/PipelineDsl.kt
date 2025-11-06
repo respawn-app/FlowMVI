@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.dsl
 import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -11,7 +12,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StorePlugin
-import kotlin.coroutines.coroutineContext
 
 /**
  * Obtain the pipeline context of the current coroutine, if present, and cast it to types [S], [I], and [A]
@@ -19,7 +19,7 @@ import kotlin.coroutines.coroutineContext
 @Suppress("UNCHECKED_CAST")
 @DelicateStoreApi
 public suspend inline fun <S : MVIState, I : MVIIntent, A : MVIAction> pipelineContext(): PipelineContext<S, I, A>? =
-    coroutineContext[PipelineContext] as? PipelineContext<S, I, A>?
+    currentCoroutineContext()[PipelineContext] as? PipelineContext<S, I, A>?
 
 /**
  * Invoke [handler] when the store stops.

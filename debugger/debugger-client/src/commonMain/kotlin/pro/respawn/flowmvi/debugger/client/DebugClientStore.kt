@@ -74,7 +74,7 @@ internal fun debugClientStore(
             },
         ) {
             log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$id" }
-            client.webSocketSession(
+            val _ = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
                 port = port,

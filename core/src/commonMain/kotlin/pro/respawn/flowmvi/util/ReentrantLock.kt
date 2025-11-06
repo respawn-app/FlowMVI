@@ -1,11 +1,11 @@
 package pro.respawn.flowmvi.util
 
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.exceptions.RecursiveStateTransactionException
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 import kotlin.jvm.JvmInline
 
 @PublishedApi
@@ -13,7 +13,7 @@ internal suspend inline fun <T> ReentrantMutexContextElement.withReentrantLock(
     crossinline block: suspend () -> T
 ): T = when {
     // call block directly when this mutex is already locked in the context
-    coroutineContext[key] != null -> block()
+    currentCoroutineContext()[key] != null -> block()
     // otherwise add it to the context and lock the mutex
     else -> withContext(this) { key.mutex.withLock { block() } }
 }
@@ -22,7 +22,7 @@ internal suspend inline fun <T> ReentrantMutexContextElement.withReentrantLock(
 internal suspend inline fun <T> ReentrantMutexContextElement.withValidatedLock(
     crossinline block: suspend () -> T
 ): T = when {
-    coroutineContext[key] != null -> throw RecursiveStateTransactionException(null)
+    currentCoroutineContext()[key] != null -> throw RecursiveStateTransactionException(null)
     else -> withContext(this) { key.mutex.withLock { block() } }
 }
 

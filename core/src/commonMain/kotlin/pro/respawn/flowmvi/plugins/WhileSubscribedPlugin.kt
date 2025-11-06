@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.CoroutineStart
@@ -54,6 +56,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> whileSubscribedPl
 /**
  * Create and install a new [whileSubscribedPlugin]. See the parent's function docs for more info.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.whileSubscribed(
     name: String? = null,

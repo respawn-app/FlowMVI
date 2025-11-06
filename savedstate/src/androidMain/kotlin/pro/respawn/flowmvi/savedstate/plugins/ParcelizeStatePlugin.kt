@@ -1,4 +1,5 @@
 @file:Suppress("ERROR_SUPPRESSION")
+@file:MustUseReturnValue
 
 package pro.respawn.flowmvi.savedstate.plugins
 
@@ -62,6 +63,7 @@ public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction
  * @see ParcelableSaver
  */
 @Suppress("BOUNDS_NOT_ALLOWED_IF_BOUNDED_BY_TYPE_PARAMETER")
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <reified T, reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.parcelizeState(
     handle: SavedStateHandle,

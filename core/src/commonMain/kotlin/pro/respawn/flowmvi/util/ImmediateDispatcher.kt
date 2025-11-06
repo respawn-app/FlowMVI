@@ -16,8 +16,8 @@ public val MainCoroutineDispatcher.immediateOrDefault: MainCoroutineDispatcher
         if (isImmediateSupported) {
             try {
                 return Dispatchers.Main.immediate
-            } catch (ignored: UnsupportedOperationException) {
-            } catch (ignored: NotImplementedError) {
+            } catch (_: UnsupportedOperationException) {
+            } catch (_: NotImplementedError) {
             }
 
             isImmediateSupported = false

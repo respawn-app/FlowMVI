@@ -87,7 +87,7 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
             is DelegationMode.Immediate -> Unit // state is already always up-to-date
             is DelegationMode.WhileSubscribed -> launch { states.collect(_state) }
         }
-        consume?.let { block -> launch { actions.collect { block(it) } } }
+        val _ = consume?.let { block -> launch { actions.collect { block(it) } } }
         awaitCancellation()
     }
 

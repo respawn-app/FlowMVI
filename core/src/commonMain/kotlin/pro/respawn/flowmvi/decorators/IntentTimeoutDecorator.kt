@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorators
 
 import kotlinx.coroutines.withTimeoutOrNull
@@ -41,6 +43,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> intentTimeoutDecorator(
 /**
  * Installs a new [intentTimeoutDecorator] for all intents in this store.
  */
+@IgnorableReturnValue
 @ExperimentalFlowMVIAPI
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.timeoutIntents(

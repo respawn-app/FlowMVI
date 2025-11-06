@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.essenty.plugins
 
 import com.arkivanov.essenty.statekeeper.StateKeeper
@@ -45,6 +47,7 @@ public inline fun <reified T : S, S : MVIState, I : MVIIntent, A : MVIAction> ke
  * Install a new [keepStatePlugin]
  */
 @OptIn(ExperimentalSerializationApi::class)
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <reified T : S, S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.keepState(
     keeper: StateKeeper,

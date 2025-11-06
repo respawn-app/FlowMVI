@@ -1,4 +1,5 @@
 @file:Suppress("Indentation") // conflict between detekt <> ide
+@file:MustUseReturnValue
 package pro.respawn.flowmvi.essenty.dsl
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper

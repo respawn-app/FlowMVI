@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.atomicfu.atomic
@@ -43,6 +45,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> disallowRestartPlugin():
  * Installs a new [disallowRestartPlugin]. Please consult the docs of the parent function to learn more.
  * This plugin can only be installed only once.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.disallowRestart(): Unit =
     install(disallowRestartPlugin())

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.dsl
 
 import kotlinx.coroutines.CancellationException
@@ -22,6 +24,7 @@ public fun <T> RecoveringSaver(
 )
 
 @PublishedApi
+@IgnorableReturnValue
 internal suspend fun <S> Saver<S>.saveCatching(state: S?, recover: suspend (Exception) -> S?): Unit = try {
     save(state)
 } catch (e: CancellationException) {

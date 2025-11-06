@@ -10,6 +10,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class TestData(val value: String, val number: Int)
 
+@Suppress("AssignedValueIsNeverRead")
 class JsonSaverTest : FreeSpec({
 
     "Given a JsonSaver" - {

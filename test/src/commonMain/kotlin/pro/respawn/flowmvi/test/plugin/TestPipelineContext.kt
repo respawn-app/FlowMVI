@@ -51,7 +51,7 @@ internal class TestPipelineContext<S : MVIState, I : MVIIntent, A : MVIAction> @
 
     override suspend fun action(action: A) {
         ensureStarted()
-        with(plugin) { onAction(action) }
+        return plugin.run { onAction(action) }
     }
 
     override suspend fun emit(intent: I): Unit = with(plugin) {

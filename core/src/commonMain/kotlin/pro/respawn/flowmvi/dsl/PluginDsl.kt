@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.dsl
 
 import pro.respawn.flowmvi.api.FlowMVIDSL

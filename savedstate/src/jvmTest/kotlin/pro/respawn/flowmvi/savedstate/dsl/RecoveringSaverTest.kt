@@ -177,10 +177,10 @@ class RecoveringSaverTest : FreeSpec({
                         override suspend fun save(state: String?) {
                             throw testException
                         }
-                        override suspend fun restore(): String? = "restored"
+                        override suspend fun restore(): String = "restored"
 
-                        @Suppress("DEPRECATION")
-                        override suspend fun recover(e: Exception): String? {
+                        @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+                        override suspend fun recover(e: Exception): String {
                             deprecatedRecoverCallCount++
                             return deprecatedRecoveryValue
                         }

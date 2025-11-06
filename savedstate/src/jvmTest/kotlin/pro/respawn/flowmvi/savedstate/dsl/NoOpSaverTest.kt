@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.savedstate.dsl
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
 
+@Suppress("RETURN_VALUE_NOT_USED")
 class NoOpSaverTest : FreeSpec({
 
     "Given a NoOpSaver" - {

@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorators
 
 import kotlinx.atomicfu.atomic
@@ -15,6 +17,7 @@ internal class Conflated<T : Any> {
 
     private val value = atomic<T?>(null)
 
+    @IgnorableReturnValue
     fun update(with: T?) = value.getAndSet(with)
 }
 
@@ -76,6 +79,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateActionsDe
 /**
  * Returns a new [conflateIntentsDecorator] for all intents in this store.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateIntents(
@@ -86,6 +90,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I
 /**
  * Installs a new [conflateActionsDecorator] for all actions in this store.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.conflateActions(

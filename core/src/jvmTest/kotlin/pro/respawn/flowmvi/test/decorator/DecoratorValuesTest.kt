@@ -55,7 +55,7 @@ class DecoratorValuesTest : FreeSpec({
             val replacement = SomeData(2)
             val decorator = testDecorator {
                 onState { chain, old, new ->
-                    chain.run { onState(old, new) }
+                    val _ = chain.run { onState(old, new) }
                     replacement
                 }
             }

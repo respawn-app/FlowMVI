@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.util
 
 import kotlinx.coroutines.flow.Flow

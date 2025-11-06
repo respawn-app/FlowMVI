@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import kotlinx.coroutines.launch
@@ -16,6 +18,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * Installs a plugin that invokes [block] when [pro.respawn.flowmvi.api.Store.start] is called.
  * @see StorePlugin.onStart
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.init(
     name: String? = null,
@@ -40,6 +43,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> initPlugin(
  *
  * The [block] is executed on every startup of the store in a separate coroutine.
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.asyncInit(
     context: CoroutineContext = EmptyCoroutineContext,

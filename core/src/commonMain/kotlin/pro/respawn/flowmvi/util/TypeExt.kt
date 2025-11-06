@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.util
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -16,6 +18,7 @@ private fun duplicatePropMessage(name: String) = """
  * Do the operation on [this] if the type of [this] is [T], and return [R], otherwise return [this]
  */
 @FlowMVIDSL
+@IgnorableReturnValue
 public inline fun <reified T : R, R> R.withType(@BuilderInference block: T.() -> R): R {
     contract {
         callsInPlace(block, InvocationKind.AT_MOST_ONCE)

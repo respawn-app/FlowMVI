@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.decorator
 
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI

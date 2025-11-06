@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.plugins
 
 import pro.respawn.flowmvi.api.FlowMVIDSL
@@ -22,6 +24,7 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> deinitPlugin(
 /**
  * Install a new [deinitPlugin].
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.deinit(
     crossinline block: ShutdownContext<S, I, A>.(e: Exception?) -> Unit

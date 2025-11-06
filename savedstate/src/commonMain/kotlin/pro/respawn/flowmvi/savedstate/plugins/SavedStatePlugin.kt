@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.plugins
 
 import kotlinx.atomicfu.atomic
@@ -132,6 +134,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> saveStatePlugin(
  *
  * @see saveStatePlugin
  */
+@IgnorableReturnValue
 @FlowMVIDSL
 public inline fun <reified S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.saveState(
     saver: Saver<S>,

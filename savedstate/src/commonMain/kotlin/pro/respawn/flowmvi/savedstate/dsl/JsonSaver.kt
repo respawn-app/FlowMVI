@@ -1,3 +1,5 @@
+@file:MustUseReturnValue
+
 package pro.respawn.flowmvi.savedstate.dsl
 
 import kotlinx.serialization.KSerializer
