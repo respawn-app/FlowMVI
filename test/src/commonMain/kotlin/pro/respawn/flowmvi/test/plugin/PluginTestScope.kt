@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.test.plugin
 
+import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.annotation.NotIntendedForInheritance
 import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
@@ -36,6 +37,7 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
         configuration: StoreConfiguration<S>,
         plugin: LazyPlugin<S, I, A>,
         timeTravel: TimeTravel<S, I, A>,
+        scope: CoroutineScope,
     ) : this(
         timeTravel = timeTravel,
         ctx = with(configuration) {
@@ -45,7 +47,8 @@ public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private
             TestPipelineContext(
                 config = configuration,
                 name = plugin.name,
-                plugins = listOf(plugin, log, tt)
+                plugins = listOf(plugin, log, tt),
+                scope = scope,
             )
         }
     )
