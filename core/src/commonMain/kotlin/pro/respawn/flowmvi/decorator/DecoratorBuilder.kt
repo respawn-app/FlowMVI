@@ -71,7 +71,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onStart(block: Decorate<S, I, A>): Unit = setOnce(::_onStart, block)
+    public fun onStart(block: Decorate<S, I, A>): Unit = ::_onStart.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onIntent] method of the child plugin passed in the [block] parameter.
@@ -87,7 +87,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onIntent(block: DecorateValue<S, I, A, I>): Unit = setOnce(::_onIntent, block)
+    public fun onIntent(block: DecorateValue<S, I, A, I>): Unit = ::_onIntent.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onState] method of the child plugin passed in the [block] parameter.
@@ -103,7 +103,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onState(block: DecorateState<S, I, A>): Unit = setOnce(::_onState, block)
+    public fun onState(block: DecorateState<S, I, A>): Unit = ::_onState.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onAction] method of the child plugin passed in the [block] parameter.
@@ -119,7 +119,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onAction(block: DecorateValue<S, I, A, A>): Unit = setOnce(::_onAction, block)
+    public fun onAction(block: DecorateValue<S, I, A, A>): Unit = ::_onAction.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onException] method of the child plugin passed in the [block] parameter.
@@ -135,7 +135,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onException(block: DecorateValue<S, I, A, Exception>): Unit = setOnce(::_onException, block)
+    public fun onException(block: DecorateValue<S, I, A, Exception>): Unit = ::_onException.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onSubscribe] method of the child plugin passed in the [block] parameter.
@@ -148,7 +148,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onSubscribe(block: DecorateArg<S, I, A, Int>): Unit = setOnce(::_onSubscribe, block)
+    public fun onSubscribe(block: DecorateArg<S, I, A, Int>): Unit = ::_onSubscribe.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onUnsubscribe] method of the child plugin passed in the [block] parameter.
@@ -161,7 +161,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onUnsubscribe(block: DecorateArg<S, I, A, Int>): Unit = setOnce(::_onUnsubscribe, block)
+    public fun onUnsubscribe(block: DecorateArg<S, I, A, Int>): Unit = ::_onUnsubscribe.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onStop] method of the child plugin passed in the [block] parameter.
@@ -175,7 +175,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onStop(block: DecorateShutdown<S, I, A, Exception?>): Unit = setOnce(::_onStop, block)
+    public fun onStop(block: DecorateShutdown<S, I, A, Exception?>): Unit = ::_onStop.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onUndeliveredIntent] method of the child plugin passed in the [block] parameter.
@@ -188,7 +188,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onUndeliveredIntent(block: DecorateShutdown<S, I, A, I>): Unit = setOnce(::_onUndeliveredIntent, block)
+    public fun onUndeliveredIntent(block: DecorateShutdown<S, I, A, I>): Unit = ::_onUndeliveredIntent.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onUndeliveredAction] method of the child plugin passed in the [block] parameter.
@@ -201,7 +201,7 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      * See the [DecoratorBuilder] documentation for details on how this function behaves.
      */
     @FlowMVIDSL
-    public fun onUndeliveredAction(block: DecorateShutdown<S, I, A, A>): Unit = setOnce(::_onUndeliveredAction, block)
+    public fun onUndeliveredAction(block: DecorateShutdown<S, I, A, A>): Unit = ::_onUndeliveredAction.setOnce(block)
 
     @PublishedApi
     internal fun build(): PluginDecorator<S, I, A> = PluginDecorator(

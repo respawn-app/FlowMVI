@@ -80,13 +80,13 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     if (mode is BatchingMode.Time) onStart { child ->
         with(child) {
             job = launch(start = CoroutineStart.LAZY) {
-            while (isActive) {
-                delay(mode.duration)
-                val intents = queue.flush()
-                config.logger.debug(name) { "Flushing ${intents.size} after batching for ${mode.duration}" }
+                while (isActive) {
+                    delay(mode.duration)
+                    val intents = queue.flush()
+                    config.logger.debug(name) { "Flushing ${intents.size} after batching for ${mode.duration}" }
                     intents.forEach { onIntent(it) }
+                }
             }
-        }
             onStart()
         }
     }
