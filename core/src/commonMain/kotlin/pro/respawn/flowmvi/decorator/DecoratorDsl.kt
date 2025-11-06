@@ -108,4 +108,4 @@ private inline fun <H, W> wrapNotNull(
     action: H?,
     wrapper: W?,
     transform: (block: W) -> H
-): H? = action?.let { h -> wrapper?.let { w -> transform(w) } } ?: action
+): H? = wrapper?.let(transform) ?: action

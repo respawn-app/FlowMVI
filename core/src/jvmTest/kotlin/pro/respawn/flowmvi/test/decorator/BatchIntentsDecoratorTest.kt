@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.test.decorator
 import app.cash.turbine.test
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.CompletableDeferred
@@ -59,6 +60,32 @@ class BatchIntentsDecoratorTest : FreeSpec({
             }
         }
 
+        "when store stops with pending intents" - {
+            "then undelivered callback receives them" {
+                val pendingQueue = BatchQueue<TestIntent>()
+                val pendingIntent = TestIntent { }
+                val captured = mutableListOf<TestIntent>()
+                val child = plugin<TestState, TestIntent, TestAction> {
+                    onUndeliveredIntent { intent -> captured += intent }
+                }
+                val amountDecorator = batchIntentsDecorator<TestState, TestIntent, TestAction>(
+                    mode = BatchingMode.Amount(size = 2),
+                    queue = pendingQueue
+                )
+
+                (amountDecorator decorates child).test(TestState.Some) {
+                    queue.queue.test {
+                        onStart()
+                        onIntent(pendingIntent)
+                        onStop(null)
+                        awaitItem().shouldBeEmpty()
+                    }
+                }
+
+                captured.shouldContainExactly(pendingIntent)
+                pendingQueue.queue.value.shouldBeEmpty()
+            }
+        }
     }
 
     "given time-based batching mode" - {
@@ -100,5 +127,28 @@ class BatchIntentsDecoratorTest : FreeSpec({
             }
         }
 
+        "when store stops before timed flush" - {
+            "then undelivered callback receives them" {
+                val pendingQueue = BatchQueue<TestIntent>()
+                val pendingIntent = TestIntent { }
+                val captured = mutableListOf<TestIntent>()
+                val child = plugin<TestState, TestIntent, TestAction> {
+                    onUndeliveredIntent { intent -> captured += intent }
+                }
+                val timeDecorator = batchIntentsDecorator<TestState, TestIntent, TestAction>(
+                    mode = BatchingMode.Time(duration = batchInterval),
+                    queue = pendingQueue
+                )
+
+                (timeDecorator decorates child).test(TestState.Some) {
+                    onStart()
+                    onIntent(pendingIntent)
+                    onStop(null)
+                }
+
+                captured.shouldContainExactly(pendingIntent)
+                pendingQueue.queue.value.shouldBeEmpty()
+            }
+        }
     }
 })
