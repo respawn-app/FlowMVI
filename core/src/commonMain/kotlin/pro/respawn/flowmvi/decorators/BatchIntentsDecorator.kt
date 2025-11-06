@@ -17,6 +17,7 @@ import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
@@ -87,38 +88,43 @@ public class BatchQueue<I : MVIIntent> {
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     mode: BatchingMode,
     queue: BatchQueue<I> = BatchQueue(),
-    name: String? = "BatchIntentsDecorator"
+    name: String? = "BatchIntentsDecorator",
+    onUnhandledIntent: suspend PipelineContext<S, I, A>.(intent: I) -> Unit = {}
 ): PluginDecorator<S, I, A> = decorator {
     this.name = name
     var job: Job? = null
     if (mode is BatchingMode.Time) onStart { child ->
-        with(child) {
-            job = launch(start = CoroutineStart.LAZY) {
-                while (isActive) {
-                    delay(mode.duration)
-                    val intents = queue.flush()
-                    config.logger.debug(name) { "Flushing ${intents.size} after batching for ${mode.duration}" }
-                    intents.forEach { onIntent(it) }
+        job = launch(start = CoroutineStart.LAZY) {
+            while (isActive) {
+                delay(mode.duration)
+                val intents = queue.flush().ifEmpty { continue }
+                config.logger.debug(name) {
+                    "Flushing ${intents.size} after batching for ${mode.duration}"
+                }
+                intents.fold<I, I?>(null) { _, next ->
+                    val result = child.run { onIntent(next) } ?: return@fold null
+                    onUnhandledIntent(result)
+                    result
                 }
             }
-            onStart()
         }
+        child.run { onStart() }
     }
     onIntent { child, intent ->
-        with(child) {
-            when (mode) {
-                is BatchingMode.Time -> {
-                    queue.push(intent)
-                    if (job?.isActive != true) job?.start()
-                    null
-                }
-                is BatchingMode.Amount -> {
-                    val intents = queue.pushAndFlushIfReached(intent, mode.size)
-                    if (intents.isEmpty()) return@onIntent null
-                    config.logger.debug(name) { "Flushing ${intents.size} after batching" }
-                    // todo: onIntent invocation result ignored?
-                    intents.forEach { onIntent(it) }
-                    null
+        when (mode) {
+            is BatchingMode.Time -> {
+                queue.push(intent)
+                if (job?.isActive != true) job?.start()
+                null
+            }
+            is BatchingMode.Amount -> {
+                val intents = queue.pushAndFlushIfReached(intent, mode.size)
+                if (intents.isEmpty()) return@onIntent null
+                config.logger.debug(name) { "Flushing ${intents.size} after batching" }
+                intents.fold(null) { _, next ->
+                    val result = child.run { onIntent(next) } ?: return@fold null
+                    onUnhandledIntent(result)
+                    result
                 }
             }
         }
@@ -126,10 +132,10 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
     onStop { child, e ->
         job?.cancel()
         job = null
-        queue.flush().forEach { intent ->
-            with(child) { onUndeliveredIntent(intent) }
+        child.run {
+            queue.flush().forEach { intent -> onUndeliveredIntent(intent) }
+            onStop(e)
         }
-        child.run { onStop(e) }
     }
 }
 
@@ -141,4 +147,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.batchIntents(
     mode: BatchingMode,
     name: String? = "BatchIntentsDecorator",
-): BatchQueue<I> = BatchQueue<I>().also { install(batchIntentsDecorator(mode, it, name)) }
+    onUnhandledIntent: suspend PipelineContext<S, I, A>.(intent: I) -> Unit = {}
+): BatchQueue<I> = BatchQueue<I>().also {
+    install(batchIntentsDecorator(mode, it, name, onUnhandledIntent))
+}

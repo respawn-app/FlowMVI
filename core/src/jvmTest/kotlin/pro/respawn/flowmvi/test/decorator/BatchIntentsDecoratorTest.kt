@@ -86,6 +86,31 @@ class BatchIntentsDecoratorTest : FreeSpec({
                 pendingQueue.queue.value.shouldBeEmpty()
             }
         }
+
+        "when child returns unhandled intents" - {
+            "then callback invoked for each and last value returned" {
+                val recorded = mutableListOf<TestIntent>()
+                val child = plugin<TestState, TestIntent, TestAction> {
+                    onIntent { intent -> intent }
+                }
+                val decorator = batchIntentsDecorator<TestState, TestIntent, TestAction>(
+                    mode = BatchingMode.Amount(size = 2),
+                    onUnhandledIntent = { intent -> recorded += intent }
+                )
+
+                (decorator decorates child).test(TestState.Some) {
+                    onStart()
+                    val first = TestIntent { }
+                    val second = TestIntent { }
+
+                    onIntent(first) shouldBe null
+                    val result = onIntent(second)
+
+                    result shouldBe second
+                    recorded.shouldContainExactly(first, second)
+                }
+            }
+        }
     }
 
     "given time-based batching mode" - {
@@ -148,6 +173,30 @@ class BatchIntentsDecoratorTest : FreeSpec({
 
                 captured.shouldContainExactly(pendingIntent)
                 pendingQueue.queue.value.shouldBeEmpty()
+            }
+        }
+
+        "when child returns unhandled intents" - {
+            "then callback invoked for each" {
+                val recorded = mutableListOf<TestIntent>()
+                val child = plugin<TestState, TestIntent, TestAction> {
+                    onIntent { intent -> intent }
+                }
+                val decorator = batchIntentsDecorator<TestState, TestIntent, TestAction>(
+                    mode = BatchingMode.Time(duration = batchInterval),
+                    onUnhandledIntent = { intent -> recorded += intent }
+                )
+
+                (decorator decorates child).test(TestState.Some) {
+                    onStart()
+                    val intent = TestIntent { }
+
+                    onIntent(intent)
+                    advanceBy(batchInterval)
+
+                    recorded.shouldContainExactly(intent)
+                    onStop(null)
+                }
             }
         }
     }

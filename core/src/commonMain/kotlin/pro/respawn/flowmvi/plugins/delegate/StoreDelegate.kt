@@ -80,7 +80,11 @@ public class StoreDelegate<S : MVIState, I : MVIIntent, A : MVIAction> @Internal
      *
      * @param consume Optional collector for actions emitted by the delegate store
      */
-    private suspend inline fun <DS : MVIState, DI : MVIIntent, DA : MVIAction> PipelineContext<DS, DI, DA>.subscribeChild(
+    private suspend inline fun <
+            DS : MVIState,
+            DI : MVIIntent,
+            DA : MVIAction
+            > PipelineContext<DS, DI, DA>.subscribeChild(
         noinline consume: ChildConsume<DS, DI, DA, A>?,
     ) = delegate.collect {
         when (mode) {
