@@ -55,9 +55,10 @@ object Config {
         "-Xwarning-level=UNUSED_ANONYMOUS_PARAMETER:disabled",
         "-Xcontext-sensitive-resolution",
         "-Xcontext-parameters",
-        // "-Xwhen-guards",
         "-Xallow-reified-type-in-catch",
         "-Xdata-flow-based-exhaustiveness",
+        "-Xreturn-value-checker=check",
+        // "-Xwhen-guards",
     )
     val jvmCompilerArgs = buildList {
         add("-Xjvm-default=all") // enable all jvm optimizations
