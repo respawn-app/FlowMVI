@@ -6,9 +6,7 @@
     },
     "maven-deps-server" : {
       "command" : "npx",
-      "args" : [
-        "mcp-maven-deps"
-      ]
+      "args" : [ "mcp-maven-deps" ]
     }
   }
 }
