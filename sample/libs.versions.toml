@@ -6,7 +6,7 @@ kmputils = "1.7.0"
 kodein = "7.28.0"
 koin = "4.1.0"
 material = "1.13.0"
-splashscreen = "1.2.0-rc01"
+splashscreen = "1.2.0"
 xml-constraintlayout = "2.2.1"
 
 [libraries]
