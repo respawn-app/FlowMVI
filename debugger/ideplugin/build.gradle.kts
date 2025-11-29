@@ -12,11 +12,12 @@ plugins {
 
 
 // TODO: Remove with https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/2062
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    }
-}
+//   this doesn't work, so just downgraded to 2.10.4 for now
+// buildscript {
+//     dependencies {
+//         classpath(libs.kotlin.serialization.json)
+//     }
+// }
 
 val props by localProperties()
 
