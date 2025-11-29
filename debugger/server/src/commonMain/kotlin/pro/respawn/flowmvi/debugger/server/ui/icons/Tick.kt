@@ -8,13 +8,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
 
-val Icons.Close: ImageVector
+val Icons.Tick: ImageVector
     get() {
-        if (_Close != null) {
-            return _Close!!
+        if (_Tick != null) {
+            return _Tick!!
         }
-        _Close = ImageVector.Builder(
-            name = "Close",
+        _Tick = ImageVector.Builder(
+            name = "Tick",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
             viewportWidth = 24f,
@@ -26,15 +26,15 @@ val Icons.Close: ImageVector
                 strokeLineCap = StrokeCap.Round,
                 strokeLineJoin = StrokeJoin.Round,
             ) {
-                moveTo(4.852f, 19.149f)
-                lineTo(19.15f, 4.851f)
-                moveTo(19.045f, 19.046f)
-                lineTo(4.954f, 4.955f)
+                moveTo(2.773f, 12f)
+                lineTo(7.507f, 16.734f)
+                curveTo(8.288f, 17.514f, 9.553f, 17.515f, 10.334f, 16.735f)
+                lineTo(21.235f, 5.853f)
             }
         }.build()
 
-        return _Close!!
+        return _Tick!!
     }
 
 @Suppress("ObjectPropertyName")
-private var _Close: ImageVector? = null
+private var _Tick: ImageVector? = null

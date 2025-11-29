@@ -7,8 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +24,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import pro.respawn.flowmvi.debugger.server.ui.icons.ChevronLeft
+import pro.respawn.flowmvi.debugger.server.ui.icons.Icons
 import pro.respawn.flowmvi.debugger.server.ui.theme.Montserrat
 import pro.respawn.flowmvi.debugger.server.ui.theme.Size
 import pro.respawn.flowmvi.server.generated.resources.Res
@@ -46,7 +46,7 @@ fun RTopBar(
     onNavigationIconClick: (() -> Unit)? = null,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     title: AnnotatedString? = Res.string.app_name.string().annotate(),
-    navigationIcon: ImageVector = Icons.Rounded.ArrowBackIosNew,
+    navigationIcon: ImageVector = Icons.ChevronLeft,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     style: TextStyle = TopBarTextStyle,
     actions: @Composable (RowScope.() -> Unit) = {},

@@ -7,34 +7,35 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.unit.dp
+import kotlin.Suppress
 
-val Icons.Close: ImageVector
+val Icons.ChevronLeft: ImageVector
     get() {
-        if (_Close != null) {
-            return _Close!!
+        if (_ChevronLeft != null) {
+            return _ChevronLeft!!
         }
-        _Close = ImageVector.Builder(
-            name = "Close",
+        _ChevronLeft = ImageVector.Builder(
+            name = "Linear.ChevronLeft",
             defaultWidth = 24.dp,
             defaultHeight = 24.dp,
             viewportWidth = 24f,
-            viewportHeight = 24f,
+            viewportHeight = 24f
         ).apply {
             path(
-                stroke = SolidColor(Color(0xFFFFFFFF)),
-                strokeLineWidth = 2f,
+                stroke = SolidColor(Color(0xFF292D32)),
+                strokeLineWidth = 1.5f,
                 strokeLineCap = StrokeCap.Round,
-                strokeLineJoin = StrokeJoin.Round,
+                strokeLineJoin = StrokeJoin.Round
             ) {
-                moveTo(4.852f, 19.149f)
-                lineTo(19.15f, 4.851f)
-                moveTo(19.045f, 19.046f)
-                lineTo(4.954f, 4.955f)
+                moveTo(15f, 19.92f)
+                lineTo(8.48f, 13.4f)
+                curveTo(7.71f, 12.63f, 7.71f, 11.37f, 8.48f, 10.6f)
+                lineTo(15f, 4.08f)
             }
         }.build()
 
-        return _Close!!
+        return _ChevronLeft!!
     }
 
 @Suppress("ObjectPropertyName")
-private var _Close: ImageVector? = null
+private var _ChevronLeft: ImageVector? = null

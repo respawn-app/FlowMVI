@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +30,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDateTime
+import pro.respawn.flowmvi.debugger.server.ui.icons.Close
+import pro.respawn.flowmvi.debugger.server.ui.icons.Copy
+import pro.respawn.flowmvi.debugger.server.ui.icons.Icons
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
 import pro.respawn.flowmvi.debugger.server.util.representation
@@ -79,12 +79,12 @@ internal fun FocusedEventLayout(
                         onClick = onCopy,
                         colors = colors,
                     ) {
-                        Icon(Icons.Rounded.ContentCopy, contentDescription = null)
+                        Icon(Icons.Copy, contentDescription = null)
                     }
                     IconButton(
                         onClick = onClose,
                         colors = colors,
-                    ) { Icon(Icons.Rounded.Close, contentDescription = null) }
+                    ) { Icon(Icons.Close, contentDescription = null) }
                 }
             }
             HorizontalDivider()
