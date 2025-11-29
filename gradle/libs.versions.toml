@@ -18,7 +18,7 @@ intellij-ide-plugin = "2.10.5"
 intellij-idea = "2025.2.1"
 jmh = "1.37"
 junit = "4.13.2"
-kotest = "6.0.5"
+kotest = "6.0.4"
 # @pin
 kotlin = "2.3.0-RC"
 kotlin-benchmark = "0.4.14"
