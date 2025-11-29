@@ -1,5 +1,5 @@
 @file:Suppress("StringShouldBeRawString")
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.plugins
 

@@ -1,6 +1,6 @@
 @file:Suppress("UnusedReceiverParameter")
 
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.dsl
 
