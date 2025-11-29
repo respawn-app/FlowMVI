@@ -12,19 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Help
-import androidx.compose.material.icons.automirrored.rounded.Subject
-import androidx.compose.material.icons.automirrored.rounded.Undo
-import androidx.compose.material.icons.rounded.AccountTree
-import androidx.compose.material.icons.rounded.Code
-import androidx.compose.material.icons.rounded.Download
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Layers
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Save
-import androidx.compose.material.icons.rounded.SyncLock
 import androidx.compose.material3.CircularProgressIndicator
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -68,6 +57,17 @@ import pro.respawn.flowmvi.sample.progressive_feature_title
 import pro.respawn.flowmvi.sample.savedstate_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.sst_feature_title
+import pro.respawn.flowmvi.sample.ui.icons.AccountTree
+import pro.respawn.flowmvi.sample.ui.icons.Code
+import pro.respawn.flowmvi.sample.ui.icons.Download
+import pro.respawn.flowmvi.sample.ui.icons.Help
+import pro.respawn.flowmvi.sample.ui.icons.Info
+import pro.respawn.flowmvi.sample.ui.icons.Layers
+import pro.respawn.flowmvi.sample.ui.icons.Refresh
+import pro.respawn.flowmvi.sample.ui.icons.Save
+import pro.respawn.flowmvi.sample.ui.icons.Subject
+import pro.respawn.flowmvi.sample.ui.icons.SyncLock
+import pro.respawn.flowmvi.sample.ui.icons.Undo
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
 import pro.respawn.flowmvi.sample.ui.widgets.RErrorView
 import pro.respawn.flowmvi.sample.ui.widgets.RIcon
@@ -156,7 +156,7 @@ private fun IntentReceiver<HomeIntent>.HomeScreenContent(
 @Composable
 private fun IntentReceiver<HomeIntent>.HomeActions() {
     if (BuildFlags.platform == Platform.Android || BuildFlags.platform == Platform.Apple) RIcon(
-        icon = Icons.Rounded.Info,
+        icon = Icons.Info,
         onClick = { intent(HomeIntent.ClickedInfo) }
     )
 }
@@ -177,16 +177,16 @@ private val HomeFeature.title
 
 private val HomeFeature.icon
     get() = when (this) {
-        Simple -> Icons.AutoMirrored.Rounded.Help
-        LCE -> Icons.Rounded.Refresh
-        SavedState -> Icons.Rounded.Save
-        DiConfig -> Icons.Rounded.Download
-        Logging -> Icons.AutoMirrored.Rounded.Subject
-        XmlViews -> Icons.Rounded.Code
-        UndoRedo -> Icons.AutoMirrored.Rounded.Undo
-        Decompose -> Icons.Rounded.AccountTree
-        Progressive -> Icons.Rounded.Layers
-        SST -> Icons.Rounded.SyncLock
+        Simple -> Icons.Help
+        LCE -> Icons.Refresh
+        SavedState -> Icons.Save
+        DiConfig -> Icons.Download
+        Logging -> Icons.Subject
+        XmlViews -> Icons.Code
+        UndoRedo -> Icons.Undo
+        Decompose -> Icons.AccountTree
+        Progressive -> Icons.Layers
+        SST -> Icons.SyncLock
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform

@@ -10,9 +10,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +31,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.app_name
+import pro.respawn.flowmvi.sample.ui.icons.ArrowBack
 import pro.respawn.flowmvi.sample.ui.theme.Montserrat
 import pro.respawn.flowmvi.sample.ui.theme.Size
 import pro.respawn.flowmvi.sample.util.branded
@@ -49,7 +49,7 @@ fun RTopBar(
     onNavigationIconClick: (() -> Unit)? = null,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     title: AnnotatedString? = stringResource(Res.string.app_name).branded(),
-    navigationIcon: ImageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+    navigationIcon: ImageVector = Icons.ArrowBack,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     style: TextStyle = TopBarTextStyle,
     actions: @Composable (RowScope.() -> Unit) = {},
@@ -69,7 +69,7 @@ fun RTopBar(
     modifier: Modifier = Modifier,
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     onNavigationIconClick: (() -> Unit)? = null,
-    navigationIcon: ImageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+    navigationIcon: ImageVector = Icons.ArrowBack,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     actions: @Composable (RowScope.() -> Unit) = {},
     title: @Composable () -> Unit,

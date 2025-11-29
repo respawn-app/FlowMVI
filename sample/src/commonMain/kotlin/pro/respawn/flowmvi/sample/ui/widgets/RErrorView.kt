@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Text
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +15,7 @@ import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.generic_error_message
 import pro.respawn.flowmvi.sample.retry
+import pro.respawn.flowmvi.sample.ui.icons.Warning
 
 @Composable
 fun RErrorView(
@@ -27,7 +27,7 @@ fun RErrorView(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
 ) {
-    RIcon(Icons.Rounded.Warning, size = 48.dp)
+    RIcon(Icons.Warning, size = 48.dp)
     Spacer(Modifier.height(48.dp))
     Text(
         text = e?.message ?: stringResource(Res.string.generic_error_message),

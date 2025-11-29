@@ -182,3 +182,4 @@ docs/javadocs/**
 /docs/tmp/
 /docs/.npm-cache/
 /.junie/guidelines.md
+/.idea/artifacts/
