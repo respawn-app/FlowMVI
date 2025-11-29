@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JunieProject">
+    <option name="guidelinesPath" value="AGENTS.md" />
+    <option name="semanticIndexingAllowed" value="true" />
+    <option name="semanticIndexingDone" value="true" />
+    <option name="semanticIndexingSuggested" value="true" />
+  </component>
+</project>
