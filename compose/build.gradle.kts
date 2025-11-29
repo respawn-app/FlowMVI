@@ -40,15 +40,15 @@ kotlin {
             api(libs.lifecycle.runtime)
             api(libs.lifecycle.compose)
 
-            implementation(compose.runtime)
-            implementation(compose.foundation)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
         }
         jvmMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
         androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(compose.uiTooling)
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.compose.ui.tooling)
         }
     }
 }

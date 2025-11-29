@@ -27,8 +27,8 @@ kotlin {
     )
     sourceSets {
         androidMain.dependencies {
-            implementation(compose.foundation)
-            implementation(compose.preview)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.ui.tooling.preview)
         }
         commonMain.dependencies {
             api(projects.core)
@@ -39,11 +39,11 @@ kotlin {
             api(libs.essenty.lifecycle.coroutines)
             api(libs.essenty.instancekeeper)
 
-            implementation(compose.runtime)
-            implementation(compose.foundation)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
         }
         jvmMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
     }
 }
