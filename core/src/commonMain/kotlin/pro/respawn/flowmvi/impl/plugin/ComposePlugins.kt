@@ -28,8 +28,20 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> List<PluginInstance<S,
     onIntent = compose(PluginInstance<S, I, A>::onIntent) {
         ctx@{ initial: I -> fold(initial) { next -> invoke(this@ctx, next) } }
     },
+    onIntentEnqueue = compose(PluginInstance<S, I, A>::onIntentEnqueue) {
+        {
+                initial: I ->
+            fold(initial) { next -> invoke(next) }
+        }
+    },
     onAction = compose(PluginInstance<S, I, A>::onAction) {
         ctx@{ initial: A -> fold(initial) { next -> invoke(this@ctx, next) } }
+    },
+    onActionDispatch = compose(PluginInstance<S, I, A>::onActionDispatch) {
+        {
+                initial: A ->
+            fold(initial) { next -> invoke(next) }
+        }
     },
     onException = compose(PluginInstance<S, I, A>::onException) {
         ctx@{ e: Exception -> fold(e) { next -> invoke(this@ctx, next) } }
@@ -49,8 +61,10 @@ internal fun <
     A : MVIAction
     > StorePlugin<S, I, A>.asInstance() = typed<PluginInstance<S, I, A>>() ?: PluginInstance(
     onState = { old: S, new: S -> onState(old, new) },
+    onIntentEnqueue = { intent: I -> onIntentEnqueue(intent) },
     onIntent = { intent: I -> onIntent(intent) },
     onAction = { action: A -> onAction(action) },
+    onActionDispatch = { action: A -> onActionDispatch(action) },
     onException = { e -> onException(e) },
     onStart = { onStart() },
     onSubscribe = { subscriberCount -> onSubscribe(subscriberCount) },

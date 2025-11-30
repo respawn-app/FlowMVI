@@ -10,6 +10,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.exceptions.UnhandledIntentException
+import pro.respawn.flowmvi.util.wrap
 
 internal interface IntentModule<S : MVIState, I : MVIIntent, A : MVIAction> : IntentReceiver<I> {
 
@@ -19,21 +20,24 @@ internal interface IntentModule<S : MVIState, I : MVIIntent, A : MVIAction> : In
 @Suppress("UNCHECKED_CAST")
 internal fun <S : MVIState, I : MVIIntent, A : MVIAction> intentModule(
     config: StoreConfiguration<S>,
-    onUndeliveredIntent: ((intent: I) -> Unit)?,
+    onUndelivered: ((intent: I) -> Unit)?,
+    onEnqueue: ((intent: I) -> I?)?,
     onIntent: (suspend PipelineContext<S, I, A>.(intent: I) -> I?)?,
 ): IntentModule<S, I, A> = when {
     onIntent == null -> NoOpIntentModule(config.debuggable)
     !config.parallelIntents -> SequentialChannelIntentModule(
         capacity = config.intentCapacity,
         overflow = config.onOverflow,
-        onUndeliveredIntent = onUndeliveredIntent,
+        onUndelivered = onUndelivered,
+        onEnqueue = onEnqueue,
         onIntent = onIntent,
         debuggable = config.debuggable
     )
     else -> ParallelChannelIntentModule(
         capacity = config.intentCapacity,
         overflow = config.onOverflow,
-        onUndeliveredIntent = onUndeliveredIntent,
+        onUndelivered = onUndelivered,
+        onEnqueue = onEnqueue,
         onIntent = onIntent,
         debuggable = config.debuggable
     )
@@ -51,24 +55,26 @@ private class NoOpIntentModule<S : MVIState, I : MVIIntent, A : MVIAction>(
 private abstract class ChannelIntentModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     capacity: Int,
     overflow: BufferOverflow,
-    private val onUndeliveredIntent: ((intent: I) -> Unit)?,
+    private val onUndelivered: ((intent: I) -> Unit)?,
+    private val onEnqueue: ((intent: I) -> I?)?,
     private val onIntent: suspend PipelineContext<S, I, A>.(intent: I) -> I?,
     private val debuggable: Boolean,
 ) : IntentModule<S, I, A> {
 
-    val intents = Channel(capacity, overflow, onUndeliveredIntent)
-    override suspend fun emit(intent: I) = intents.send(intent)
-
-    override fun intent(intent: I) {
-        if (intents.trySend(intent).isSuccess) return
-        onUndeliveredIntent?.invoke(intent)
-    }
+    val intents = Channel(capacity, overflow, onUndelivered)
 
     abstract suspend fun PipelineContext<S, I, A>.dispatch(intent: I)
 
-    suspend inline fun PipelineContext<S, I, A>.reduce(intent: I) {
+    protected suspend inline fun PipelineContext<S, I, A>.reduce(intent: I) {
         val unhandled = onIntent(intent) ?: return
-        onUndeliveredIntent?.invoke(unhandled) ?: unhandled(unhandled, debuggable)
+        onUndelivered?.invoke(unhandled) ?: unhandled(unhandled, debuggable)
+    }
+
+    override suspend fun emit(intent: I) = wrap(intent, onEnqueue) { intent -> intents.send(intent) }
+
+    override fun intent(intent: I): Unit = wrap(intent, onEnqueue) { intent ->
+        if (intents.trySend(intent).isSuccess) return
+        onUndelivered?.invoke(intent)
     }
 
     override suspend fun PipelineContext<S, I, A>.reduceForever() {
@@ -79,10 +85,11 @@ private abstract class ChannelIntentModule<S : MVIState, I : MVIIntent, A : MVIA
 private class SequentialChannelIntentModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     capacity: Int,
     overflow: BufferOverflow,
-    onUndeliveredIntent: ((intent: I) -> Unit)?,
+    onUndelivered: ((intent: I) -> Unit)?,
+    onEnqueue: ((intent: I) -> I?)?,
     onIntent: suspend PipelineContext<S, I, A>.(intent: I) -> I?,
     debuggable: Boolean,
-) : ChannelIntentModule<S, I, A>(capacity, overflow, onUndeliveredIntent, onIntent, debuggable) {
+) : ChannelIntentModule<S, I, A>(capacity, overflow, onUndelivered, onEnqueue, onIntent, debuggable) {
 
     override suspend fun PipelineContext<S, I, A>.dispatch(intent: I) = reduce(intent)
 }
@@ -90,10 +97,11 @@ private class SequentialChannelIntentModule<S : MVIState, I : MVIIntent, A : MVI
 private class ParallelChannelIntentModule<S : MVIState, I : MVIIntent, A : MVIAction>(
     capacity: Int,
     overflow: BufferOverflow,
-    onUndeliveredIntent: ((intent: I) -> Unit)?,
+    onUndelivered: ((intent: I) -> Unit)?,
+    onEnqueue: ((intent: I) -> I?)?,
     onIntent: suspend PipelineContext<S, I, A>.(intent: I) -> I?,
     debuggable: Boolean,
-) : ChannelIntentModule<S, I, A >(capacity, overflow, onUndeliveredIntent, onIntent, debuggable) {
+) : ChannelIntentModule<S, I, A>(capacity, overflow, onUndelivered, onEnqueue, onIntent, debuggable) {
 
     override suspend fun PipelineContext<S, I, A>.dispatch(intent: I) {
         launch { reduce(intent) }

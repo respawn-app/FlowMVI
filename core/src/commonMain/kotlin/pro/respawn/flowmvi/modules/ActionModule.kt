@@ -12,34 +12,43 @@ import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.DelicateStoreApi
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.exceptions.ActionsDisabledException
+import pro.respawn.flowmvi.util.withMap
 
 internal interface ActionModule<A : MVIAction> : ActionProvider<A>, ActionReceiver<A>
 
 internal fun <A : MVIAction> actionModule(
     behavior: ActionShareBehavior,
-    onUndeliveredAction: ((action: A) -> Unit)?,
+    onUndelivered: ((action: A) -> Unit)?,
+    onDispatch: ((action: A) -> A?)?,
 ): ActionModule<A> = when (behavior) {
     is ActionShareBehavior.Distribute -> DistributingModule(
         bufferSize = behavior.buffer,
         overflow = behavior.overflow,
-        onUndeliveredAction,
+        onUndelivered = onUndelivered,
+        onDispatch = onDispatch
     )
     is ActionShareBehavior.Restrict -> ConsumingModule(
-        behavior.buffer,
-        behavior.overflow,
-        onUndeliveredAction,
+        bufferSize = behavior.buffer,
+        overflow = behavior.overflow,
+        onUndelivered = onUndelivered,
+        onDispatch = onDispatch,
     )
-    is ActionShareBehavior.Share -> SharedModule(behavior.replay, behavior.buffer, behavior.overflow)
+    is ActionShareBehavior.Share -> SharedModule(
+        replay = behavior.replay,
+        bufferSize = behavior.buffer,
+        overflow = behavior.overflow,
+        onDispatch = onDispatch
+    )
     is ActionShareBehavior.Disabled -> ThrowingModule()
 }
 
 internal abstract class ChannelActionModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
-    onUndeliveredAction: ((action: A) -> Unit)?,
+    onUndelivered: ((action: A) -> Unit)?,
 ) : ActionModule<A> {
 
-    protected val delegate = Channel(bufferSize, overflow, onUndeliveredAction)
+    protected val delegate = Channel(bufferSize, overflow, onUndelivered)
 
     @DelicateStoreApi
     override fun send(action: A) {
@@ -52,25 +61,28 @@ internal abstract class ChannelActionModule<A : MVIAction>(
 internal class DistributingModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
-    onUndeliveredAction: ((action: A) -> Unit)?,
-) : ChannelActionModule<A>(bufferSize, overflow, onUndeliveredAction) {
+    onUndelivered: ((action: A) -> Unit)?,
+    onDispatch: ((action: A) -> A?)?,
+) : ChannelActionModule<A>(bufferSize, overflow, onUndelivered) {
 
-    override val actions = delegate.receiveAsFlow()
+    override val actions = delegate.receiveAsFlow().withMap(onDispatch)
 }
 
 internal class ConsumingModule<A : MVIAction>(
     bufferSize: Int,
     overflow: BufferOverflow,
-    onUndeliveredAction: ((action: A) -> Unit)?,
-) : ChannelActionModule<A>(bufferSize, overflow, onUndeliveredAction) {
+    onUndelivered: ((action: A) -> Unit)?,
+    onDispatch: ((action: A) -> A?)?,
+) : ChannelActionModule<A>(bufferSize, overflow, onUndelivered) {
 
-    override val actions = delegate.consumeAsFlow()
+    override val actions = delegate.consumeAsFlow().withMap(onDispatch)
 }
 
 internal class SharedModule<A : MVIAction>(
     replay: Int,
     bufferSize: Int,
     overflow: BufferOverflow,
+    onDispatch: ((action: A) -> A?)?,
 ) : ActionModule<A> {
 
     private val _actions = MutableSharedFlow<A>(
@@ -79,7 +91,7 @@ internal class SharedModule<A : MVIAction>(
         onBufferOverflow = overflow
     )
 
-    override val actions = _actions.asSharedFlow()
+    override val actions = _actions.asSharedFlow().withMap(onDispatch)
 
     @DelicateStoreApi
     override fun send(action: A) {

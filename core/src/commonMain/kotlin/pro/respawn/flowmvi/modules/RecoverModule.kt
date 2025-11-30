@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.modules
 
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.api.MVIAction
@@ -13,7 +14,6 @@ import pro.respawn.flowmvi.exceptions.RecursiveRecoverException
 import pro.respawn.flowmvi.exceptions.UnhandledStoreException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.coroutineContext
 
 /**
  * An entity that can [recover] from exceptions happening during its lifecycle. Most often, a [Store]
@@ -42,7 +42,7 @@ private tailrec fun UnrecoverableException.unwrapRecursion(): Exception = when (
     else -> cause
 }
 
-internal suspend inline fun alreadyRecovered() = coroutineContext.alreadyRecovered
+internal suspend inline fun alreadyRecovered() = currentCoroutineContext().alreadyRecovered
 
 internal inline val CoroutineContext.alreadyRecovered get() = this[RecoverModule] != null
 

@@ -44,8 +44,10 @@ import pro.respawn.flowmvi.util.setOnce
 public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @PublishedApi internal constructor() {
 
     private var _onIntent: DecorateValue<S, I, A, I>? = null
+    private var _onIntentEnqueue: DecorateValueNonSuspend<S, I, A, I>? = null
     private var _onState: DecorateState<S, I, A>? = null
     private var _onAction: DecorateValue<S, I, A, A>? = null
+    private var _onActionDispatch: DecorateValueNonSuspend<S, I, A, A>? = null
     private var _onException: DecorateValue<S, I, A, Exception>? = null
     private var _onStart: Decorate<S, I, A>? = null
     private var _onSubscribe: DecorateArg<S, I, A, Int>? = null
@@ -72,6 +74,19 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      */
     @FlowMVIDSL
     public fun onStart(block: Decorate<S, I, A>): Unit = ::_onStart.setOnce(block)
+
+    /**
+     * Wraps the [StorePlugin.onIntentEnqueue] method of the child plugin passed in the [block] parameter.
+     *
+     * The [StorePlugin.onIntentEnqueue] method will **not** be invoked
+     * unless you manually call [StorePlugin.onIntentEnqueue] inside this block!
+     *
+     * For pre-context parameters version, to correctly call the child method: `child.run { onIntentEnqueue(intent) }`
+     *
+     * See the [DecoratorBuilder] documentation for details on how this function behaves.
+     */
+    @FlowMVIDSL
+    public fun onIntentEnqueue(block: DecorateValueNonSuspend<S, I, A, I>): Unit = ::_onIntentEnqueue.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onIntent] method of the child plugin passed in the [block] parameter.
@@ -120,6 +135,19 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
      */
     @FlowMVIDSL
     public fun onAction(block: DecorateValue<S, I, A, A>): Unit = ::_onAction.setOnce(block)
+
+    /**
+     * Wraps the [StorePlugin.onActionDispatch] method of the child plugin passed in the [block] parameter.
+     *
+     * The child [StorePlugin.onActionDispatch] method will **not** be invoked
+     * unless you manually call [StorePlugin.onActionDispatch] inside this block.
+     *
+     * For pre-context parameters version, to correctly call the child method: `child.run { onActionDispatch(action) }`
+     *
+     * See the [DecoratorBuilder] documentation for details on how this function behaves.
+     */
+    @FlowMVIDSL
+    public fun onActionDispatch(block: DecorateValueNonSuspend<S, I, A, A>): Unit = ::_onActionDispatch.setOnce(block)
 
     /**
      * Wraps the [StorePlugin.onException] method of the child plugin passed in the [block] parameter.
@@ -206,9 +234,11 @@ public class DecoratorBuilder<S : MVIState, I : MVIIntent, A : MVIAction> @Publi
     @PublishedApi
     internal fun build(): PluginDecorator<S, I, A> = PluginDecorator(
         name = name,
+        onIntentEnqueue = _onIntentEnqueue,
         onIntent = _onIntent,
         onState = _onState,
         onAction = _onAction,
+        onActionDispatch = _onActionDispatch,
         onException = _onException,
         onStart = _onStart,
         onSubscribe = _onSubscribe,
