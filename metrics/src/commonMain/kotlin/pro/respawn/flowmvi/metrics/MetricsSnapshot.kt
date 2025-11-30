@@ -5,6 +5,7 @@ import kotlinx.serialization.Transient
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StoreConfiguration
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Instant
 
 /**
@@ -110,6 +111,10 @@ public data class ActionMetrics(
     val deliveryP95: Duration,
     /** 99th percentile delivery latency. */
     val deliveryP99: Duration,
+    /** Average time from emit to dispatch. */
+    val queueTimeAvg: Duration,
+    /** Median time from emit to dispatch. */
+    val queueTimeMedian: Duration,
     /** Maximum observed action buffer occupancy. */
     val bufferMaxOccupancy: Int,
     /** Action buffer overflow count. */
@@ -137,6 +142,8 @@ public data class StateMetrics(
     val updateP95: Duration,
     /** 99th percentile reducer or state update duration. */
     val updateP99: Duration,
+    /** State transition throughput over the sampling window. */
+    val opsPerSecond: Double,
 )
 
 /** Aggregated metrics for subscriptions. */
