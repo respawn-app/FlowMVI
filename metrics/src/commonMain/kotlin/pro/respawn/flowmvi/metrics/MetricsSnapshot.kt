@@ -5,7 +5,6 @@ import kotlinx.serialization.Transient
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StoreConfiguration
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Instant
 
 /**

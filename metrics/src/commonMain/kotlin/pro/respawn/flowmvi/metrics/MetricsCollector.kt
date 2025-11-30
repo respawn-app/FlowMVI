@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.metrics
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -9,7 +10,6 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import kotlin.collections.ArrayDeque
@@ -48,6 +48,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
     private val intentDurations = P2QuantileEstimator(Q50, Q90, Q95, Q99)
     private val intentPluginOverhead = P2QuantileEstimator(Q50)
+    private val intentPluginEma = Ema(emaAlpha)
     private val intentQueueTimes = ArrayDeque<Instant>()
     private val intentQueueEma = Ema(emaAlpha)
     private val intentInterArrivalEma = Ema(emaAlpha)
@@ -213,6 +214,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             intentPerf.recordOperation(durationMillis.toLong())
             intentDurations.add(durationMillis)
             intentPluginOverhead.add(durationMillis)
+            intentPluginEma.add(durationMillis)
             if (result == null) intentDropped++
             updateIntentOccupancyLocked()
         }
@@ -237,7 +239,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         synchronized(this@MetricsCollector) {
             if (result != null) {
                 actionSent++
-                actionQueueTimes.addLast(end)
+                actionQueueTimes.addLast(start)
                 actionBufferMaxOccupancy = maxOf(actionBufferMaxOccupancy, actionQueueTimes.size + actionInFlight)
             }
             actionPluginEma.add(durationMillis)
@@ -353,7 +355,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 burstMax = intentBurstMax,
                 bufferMaxOccupancy = intentBufferMaxOccupancy,
                 bufferOverflows = intentOverflows,
-                pluginOverheadAvg = intentPerf.averageTimeMillis.toDurationOrZero(),
+                pluginOverheadAvg = intentPluginEma.value.toDurationOrZero(),
                 pluginOverheadMedian = intentPluginOverhead.getQuantile(Q50).toDurationOrZero(),
             ),
             actions = ActionMetrics(
