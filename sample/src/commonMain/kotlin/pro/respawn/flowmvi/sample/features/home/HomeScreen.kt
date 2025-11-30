@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -61,6 +60,7 @@ import pro.respawn.flowmvi.sample.ui.icons.AccountTree
 import pro.respawn.flowmvi.sample.ui.icons.Code
 import pro.respawn.flowmvi.sample.ui.icons.Download
 import pro.respawn.flowmvi.sample.ui.icons.Help
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.ui.icons.Info
 import pro.respawn.flowmvi.sample.ui.icons.Layers
 import pro.respawn.flowmvi.sample.ui.icons.Refresh

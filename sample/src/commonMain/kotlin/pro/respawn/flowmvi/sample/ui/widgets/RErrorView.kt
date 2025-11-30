@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
-import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +14,7 @@ import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.generic_error_message
 import pro.respawn.flowmvi.sample.retry
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.ui.icons.Warning
 
 @Composable

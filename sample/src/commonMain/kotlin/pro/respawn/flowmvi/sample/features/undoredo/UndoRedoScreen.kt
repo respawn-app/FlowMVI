@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -31,6 +30,7 @@ import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedRedo
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.ui.icons.Redo
 import pro.respawn.flowmvi.sample.ui.icons.Undo
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText

@@ -11,7 +11,6 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.CenterAlignedTopAppBar
-import pro.respawn.flowmvi.sample.ui.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +31,7 @@ import org.jetbrains.compose.resources.stringResource
 import pro.respawn.flowmvi.sample.Res
 import pro.respawn.flowmvi.sample.app_name
 import pro.respawn.flowmvi.sample.ui.icons.ArrowBack
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.ui.theme.Montserrat
 import pro.respawn.flowmvi.sample.ui.theme.Size
 import pro.respawn.flowmvi.sample.util.branded
