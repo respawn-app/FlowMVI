@@ -26,6 +26,26 @@ class DecoratorBuilderTest : FreeSpec({
                 }
             }
         }
+        "when onIntentEnqueue assigned twice" - {
+            "then builder throws" {
+                shouldThrowExactly<IllegalArgumentException> {
+                    decorator<TestState, TestIntent, TestAction> {
+                        onIntentEnqueue { _, intent -> intent }
+                        onIntentEnqueue { _, intent -> intent }
+                    }
+                }
+            }
+        }
+        "when onActionDispatch assigned twice" - {
+            "then builder throws" {
+                shouldThrowExactly<IllegalArgumentException> {
+                    decorator<TestState, TestIntent, TestAction> {
+                        onActionDispatch { _, action -> action }
+                        onActionDispatch { _, action -> action }
+                    }
+                }
+            }
+        }
         "when onIntent assigned twice" - {
             "then builder throws" {
                 shouldThrowExactly<IllegalArgumentException> {

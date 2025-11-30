@@ -17,7 +17,7 @@ import pro.respawn.flowmvi.dsl.plugin
  *
  * It is not recommended to implement this interface, instead, use one of the [plugin] builders
  */
-@Suppress("ComplexInterface")
+@Suppress("ComplexInterface", "TooManyFunctions")
 @OptIn(ExperimentalSubclassOptIn::class)
 @SubclassOptInRequired(NotIntendedForInheritance::class)
 public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyPlugin<S, I, A> {
@@ -73,6 +73,25 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
     public suspend fun PipelineContext<S, I, A>.onState(old: S, new: S): S? = new
 
     /**
+     * Invoked immediately before an [MVIIntent] is enqueued (dispatched into the intent buffer).
+     * * Return null to drop the intent before it is buffered.
+     * * Return another intent to replace it.
+     * * Return [intent] to enqueue unchanged.
+     * * If you drop the intent here, [onIntent] will **not** receive it.
+     * * Exceptions thrown here bypass [onException] and will be thrown to the caller.
+     */
+    public fun onIntentEnqueue(intent: I): I? = intent
+
+    /**
+     * Invoked after an [MVIAction] is dequeued and before it is delivered to subscribers.
+     * * Return null to drop the action.
+     * * Return another action to replace it.
+     * * Return [action] to continue unchanged.
+     * * Exceptions thrown here bypass [onException] and will be thrown to the caller.
+     */
+    public fun onActionDispatch(action: A): A? = action
+
+    /**
      * A callback which is invoked each time an [MVIIntent] is received **and then begun** to be processed.
      * This callback is invoked **after** the intent is sent, sometimes after significant time if the store was stopped
      * or even **never** if the store's buffer overflows or store is not ever used again.
@@ -88,6 +107,7 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
      * This is invoked **after** the action has been sent, but **before** the [ActionConsumer] handles it.
      * This function will always be invoked, even after the action is later dropped because of [ActionShareBehavior],
      * and it will be invoked before the [ActionReceiver.send] returns, if it has been suspended.
+     * * If you drop an action here, [onActionDispatch] will **not** receive it.
      * * Return null to veto the processing and prevent other plugins from using the [action].
      * * Return another action to replace [action] with another one and continue with the chain.
      * * Return [action] to continue processing, leaving the it unmodified.
