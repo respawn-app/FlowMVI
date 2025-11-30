@@ -183,3 +183,4 @@ docs/javadocs/**
 /docs/.npm-cache/
 /.junie/guidelines.md
 /.idea/artifacts/
+/.idea/deviceManager.xml
