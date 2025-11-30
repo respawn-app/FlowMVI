@@ -69,4 +69,3 @@ Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!:
 - DO NOT use any build commands other than those specified - they may include unnecessary tasks.
 - Ignore warnings about experimental or unsupported features - they are informational
 - Put native platform code in nativeMain, or if using Apple APIs, in appleMain. Native includes all Apple platforms.
-- never use deprecated kotlinx.datetime.Instant. Use kotlin.time.Clock and kotlin.time.Instant

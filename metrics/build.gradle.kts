@@ -5,6 +5,7 @@ plugins {
     id(libs.plugins.androidLibrary.id)
     alias(libs.plugins.atomicfu)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.kotlin.serialization)
     dokkaDocumentation
 }
 
@@ -22,6 +23,9 @@ android {
 }
 
 dependencies {
+    commonMainApi(projects.core)
     commonMainImplementation(libs.kotlin.datetime)
     commonMainImplementation(libs.kotlin.atomicfu)
+    commonMainImplementation(libs.kotlin.serialization)
+    commonMainImplementation(libs.kotlin.serialization.json)
 }
