@@ -1,0 +1,47 @@
+package pro.respawn.flowmvi.metrics
+
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
+import pro.respawn.flowmvi.api.FlowMVIDSL
+import pro.respawn.flowmvi.api.MVIAction
+import pro.respawn.flowmvi.api.MVIIntent
+import pro.respawn.flowmvi.api.MVIState
+import pro.respawn.flowmvi.decorator.PluginDecorator
+import pro.respawn.flowmvi.dsl.StoreBuilder
+import kotlin.time.Clock
+
+@ExperimentalFlowMVIAPI
+@FlowMVIDSL
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
+    storeName: String? = null,
+    windowSeconds: Int = 60,
+    emaAlpha: Double = 0.1,
+    clock: Clock = Clock.System,
+    name: String? = "MetricsDecorator",
+    sink: MetricsSink,
+): PluginDecorator<S, I, A> = MetricsCollector<S, I, A>(
+    storeName,
+    windowSeconds,
+    emaAlpha = emaAlpha,
+    clock = clock,
+    sink = sink,
+).asDecorator(name)
+
+@FlowMVIDSL
+@ExperimentalFlowMVIAPI
+public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.collectMetrics(
+    storeName: String? = null,
+    windowSeconds: Int = 60,
+    emaAlpha: Double = 0.1,
+    clock: Clock = Clock.System,
+    name: String? = "MetricsCollector",
+    sink: MetricsSink,
+): Unit = install(
+    metricsDecorator(
+        sink = sink,
+        storeName = storeName,
+        windowSeconds = windowSeconds,
+        emaAlpha = emaAlpha,
+        clock = clock,
+        name = name
+    )
+)
