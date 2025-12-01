@@ -18,6 +18,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 import kotlin.uuid.Uuid
 
 private const val Q50 = 0.5
@@ -34,22 +36,23 @@ private const val Q99 = 0.99
  * @property clock time source for measurements
  * @property sink sink that receives snapshots produced by [snapshot]
  */
-public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
-    public val storeName: String? = null,
+internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
+    private val sink: MetricsSink,
+    val storeName: String? = null,
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val clock: Clock = Clock.System,
-    private val sink: MetricsSink = Sink { _ -> },
+    private val timeSource: TimeSource = TimeSource.Monotonic,
 ) : SynchronizedObject() {
 
     /** Stable identifier generated per collector instance. */
-    public val storeId: Uuid = Uuid.random()
+    val storeId: Uuid = Uuid.random()
 
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
     private val intentDurations = P2QuantileEstimator(Q50, Q90, Q95, Q99)
     private val intentPluginOverhead = P2QuantileEstimator(Q50)
     private val intentPluginEma = Ema(emaAlpha)
-    private val intentQueueTimes = ArrayDeque<Instant>()
+    private val intentQueueTimes = ArrayDeque<TimeMark>()
     private val intentQueueEma = Ema(emaAlpha)
     private val intentInterArrivalEma = Ema(emaAlpha)
     private val intentInterArrival = P2QuantileEstimator(Q50)
@@ -63,12 +66,12 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private var intentBurstSecond: Long? = null
     private var intentBurstCurrent: Int = 0
     private var intentBurstMax: Int = 0
-    private var lastIntentEnqueue: Instant? = null
+    private var lastIntentEnqueue: TimeMark? = null
     private var intentBufferMaxOccupancy: Int = 0
 
     private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha)
     private val actionDeliveries = P2QuantileEstimator(Q50, Q90, Q95, Q99)
-    private val actionQueueTimes = ArrayDeque<Instant>()
+    private val actionQueueTimes = ArrayDeque<TimeMark>()
     private val actionQueueEma = Ema(emaAlpha)
     private val actionQueueMedian = P2QuantileEstimator(Q50)
     private val actionPluginOverhead = P2QuantileEstimator(Q50)
@@ -88,7 +91,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private var subscriptionEvents: Long = 0
     private var currentSubscribers: Int = 0
     private var peakSubscribers: Int = 0
-    private var lastSubscribersChange: Instant = clock.now()
+    private var lastSubscribersChange: TimeMark = timeSource.markNow()
     private var subscribersTimeWeighted: Double = 0.0
     private var subscribersTimeTotalMillis: Double = 0.0
     private val subscribersMedian = P2QuantileEstimator(Q50)
@@ -98,7 +101,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private var startCount: Long = 0
     private var stopCount: Long = 0
     private var uptimeTotal: Duration = ZERO
-    private var currentStart: Instant? = null
+    private var currentStart: TimeMark? = null
     private val lifetimeRuns = P2QuantileEstimator(Q50)
     private val lifetimeRunEma = Ema(emaAlpha)
     private val bootstrapMedian = P2QuantileEstimator(Q50)
@@ -113,8 +116,8 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     /** Returns a decorator that wires metrics capture into store callbacks. */
     @OptIn(ExperimentalFlowMVIAPI::class)
-    public fun asDecorator(): PluginDecorator<S, I, A> = decorator {
-        name = "MetricsCollector"
+    fun asDecorator(name: String? = "MetricsDecorator"): PluginDecorator<S, I, A> = decorator {
+        this.name = name
         onStart { child -> recordStart(child) }
         onStop { child, e -> recordStop(child, e) }
         onIntentEnqueue { child, intent -> recordIntentEnqueue(child, intent) }
@@ -130,15 +133,14 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
-        val startedAt = clock.now()
+        val startedAt = timeSource.markNow()
         synchronized(this@MetricsCollector) {
             currentStart = startedAt
             startCount++
             storeConfiguration = config
         }
         child.run { onStart() }
-        val finishedAt = clock.now()
-        val duration = finishedAt - startedAt
+        val duration = startedAt.elapsedNow()
         synchronized(this@MetricsCollector) {
             bootstrapEma.add(duration.inWholeMilliseconds.toDouble())
             bootstrapMedian.add(duration.inWholeMilliseconds.toDouble())
@@ -150,8 +152,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             stopCount++
             val startInstant = currentStart
             if (startInstant != null) {
-                val now = clock.now()
-                val runDuration = now - startInstant
+                val runDuration = startInstant.elapsedNow()
                 uptimeTotal += runDuration
                 lifetimeRunEma.add(runDuration.inWholeMilliseconds.toDouble())
                 lifetimeRuns.add(runDuration.inWholeMilliseconds.toDouble())
@@ -167,9 +168,10 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             synchronized(this) { intentDropped++ }
             return null
         }
-        val now = clock.now()
+        val nowMark = timeSource.markNow()
+        val wallNow = clock.now()
         synchronized(this) {
-            val epoch = now.epochSeconds
+            val epoch = wallNow.epochSeconds
             if (intentBurstSecond == epoch) {
                 intentBurstCurrent++
             } else {
@@ -178,19 +180,19 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             }
             if (intentBurstCurrent > intentBurstMax) intentBurstMax = intentBurstCurrent
             lastIntentEnqueue?.let { previous ->
-                val delta = now - previous
+                val delta = nowMark.elapsedNow() - previous.elapsedNow()
                 intentInterArrivalEma.add(delta.inWholeMilliseconds.toDouble())
                 intentInterArrival.add(delta.inWholeMilliseconds.toDouble())
             }
-            lastIntentEnqueue = now
-            intentQueueTimes.addLast(now)
+            lastIntentEnqueue = nowMark
+            intentQueueTimes.addLast(nowMark)
             updateIntentOccupancyLocked()
         }
         return mapped
     }
 
     private suspend fun PipelineContext<S, I, A>.recordIntent(child: StorePlugin<S, I, A>, intent: I): I? {
-        val start = clock.now()
+        val start = timeSource.markNow()
         val queueInstant = synchronized(this@MetricsCollector) {
             val queued = if (intentQueueTimes.isEmpty()) null else intentQueueTimes.removeFirst()
             intentInFlight++
@@ -199,7 +201,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             updateIntentOccupancyLocked()
             queued
         }
-        val queueDuration = queueInstant?.let { start - it }
+        val queueDuration = queueInstant?.let { start.elapsedNow() - it.elapsedNow() }
         queueDuration?.let {
             synchronized(this@MetricsCollector) { intentQueueEma.add(it.inWholeMilliseconds.toDouble()) }
         }
@@ -207,8 +209,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             synchronized(this@MetricsCollector) { intentInFlight-- }
             throw it
         }
-        val end = clock.now()
-        val durationMillis = (end - start).inWholeMilliseconds.toDouble()
+        val durationMillis = start.elapsedNow().inWholeMilliseconds.toDouble()
         synchronized(this@MetricsCollector) {
             intentInFlight--
             intentPerf.recordOperation(durationMillis.toLong())
@@ -232,16 +233,15 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private suspend fun PipelineContext<S, I, A>.recordAction(child: StorePlugin<S, I, A>, action: A): A? {
-        val start = clock.now()
-        val result = child.run { onAction(action) }
-        val end = clock.now()
-        val durationMillis = (end - start).inWholeMilliseconds.toDouble()
+        val start = timeSource.markNow()
         synchronized(this@MetricsCollector) {
-            if (result != null) {
-                actionSent++
-                actionQueueTimes.addLast(start)
-                actionBufferMaxOccupancy = maxOf(actionBufferMaxOccupancy, actionQueueTimes.size + actionInFlight)
-            }
+            actionQueueTimes.addLast(start)
+            actionBufferMaxOccupancy = maxOf(actionBufferMaxOccupancy, actionQueueTimes.size + actionInFlight)
+        }
+        val result = child.run { onAction(action) }
+        val durationMillis = start.elapsedNow().inWholeMilliseconds.toDouble()
+        synchronized(this@MetricsCollector) {
+            if (result != null) actionSent++
             actionPluginEma.add(durationMillis)
             actionPluginOverhead.add(durationMillis)
         }
@@ -249,11 +249,11 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private fun recordActionDispatch(child: StorePlugin<S, I, A>, action: A): A? {
-        val dispatchStart = clock.now()
+        val dispatchStart = timeSource.markNow()
         val enqueueInstant = synchronized(this) {
             val queued = if (actionQueueTimes.isEmpty()) null else actionQueueTimes.removeFirst()
             queued?.let {
-                val qd = dispatchStart - it
+                val qd = dispatchStart.elapsedNow() - it.elapsedNow()
                 actionQueueEma.add(qd.inWholeMilliseconds.toDouble())
                 actionQueueMedian.add(qd.inWholeMilliseconds.toDouble())
             }
@@ -264,9 +264,10 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             synchronized(this) { actionInFlight-- }
             throw it
         }
-        val dispatchEnd = clock.now()
-        val totalDurationMillis = enqueueInstant?.let { (dispatchEnd - it).inWholeMilliseconds.toDouble() }
-            ?: (dispatchEnd - dispatchStart).inWholeMilliseconds.toDouble()
+        val dispatchDuration = dispatchStart.elapsedNow().inWholeMilliseconds.toDouble()
+        val totalDurationMillis = enqueueInstant?.let {
+            dispatchStart.elapsedNow().inWholeMilliseconds.toDouble() - it.elapsedNow().inWholeMilliseconds.toDouble()
+        } ?: dispatchDuration
         synchronized(this) {
             actionPerf.recordOperation(totalDurationMillis.toLong())
             actionDeliveries.add(totalDurationMillis)
@@ -398,7 +399,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 startCount = startCount,
                 stopCount = stopCount,
                 uptimeTotal = uptimeTotal,
-                lifetimeCurrent = currentStart?.let { clock.now() - it } ?: ZERO,
+                lifetimeCurrent = currentStart?.elapsedNow() ?: ZERO,
                 lifetimeAvg = lifetimeRunEma.value.toDurationOrZero(),
                 lifetimeMedian = lifetimeRuns.getQuantile(Q50).toDurationOrZero(),
                 bootstrapAvg = bootstrapEma.value.toDurationOrZero(),
@@ -455,7 +456,7 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         subscriptionEvents = 0
         currentSubscribers = 0
         peakSubscribers = 0
-        lastSubscribersChange = clock.now()
+        lastSubscribersChange = timeSource.markNow()
         subscribersTimeWeighted = 0.0
         subscribersTimeTotalMillis = 0.0
         subscribersMedian.clear()
@@ -495,8 +496,8 @@ public class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private fun handleSubscriptionChange(newCount: Int) {
         synchronized(this) {
-            val now = clock.now()
-            val elapsed = now - lastSubscribersChange
+            val now = timeSource.markNow()
+            val elapsed = now.elapsedNow() - lastSubscribersChange.elapsedNow()
             if (!elapsed.isNegative()) {
                 val elapsedMillis = elapsed.inWholeMilliseconds.toDouble()
                 subscribersTimeWeighted += currentSubscribers * elapsedMillis

@@ -10,10 +10,7 @@ import pro.respawn.flowmvi.logging.StoreLogger
 public typealias MetricsSink = Sink<MetricsSnapshot>
 
 /** No-op sink used by default to disable metrics emission. */
-public object NoopSink : Sink<Nothing> {
-
-    override fun emit(value: Nothing): Unit = Unit
-}
+public fun <T> NoopSink(): Sink<T> = Sink {}
 
 /** Sink that writes snapshots using [toString] to stdout. */
 public class ConsoleSink<T> : Sink<T> {
