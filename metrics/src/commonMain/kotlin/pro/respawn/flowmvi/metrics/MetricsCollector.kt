@@ -2,6 +2,10 @@ package pro.respawn.flowmvi.metrics
 
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -12,7 +16,7 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
-import kotlin.collections.ArrayDeque
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -27,6 +31,10 @@ private const val Q90 = 0.9
 private const val Q95 = 0.95
 private const val Q99 = 0.99
 
+private sealed interface Command {
+
+}
+
 /**
  * Collects store-level runtime metrics and exposes a decorator to hook into store callbacks.
  *
@@ -37,17 +45,23 @@ private const val Q99 = 0.99
  * @property sink sink that receives snapshots produced by [snapshot]
  */
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
+    private val reportingScope: CoroutineScope,
+    private val offloadContext: CoroutineContext = Dispatchers.Default,
     private val sink: MetricsSink,
     val storeName: String? = null,
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val clock: Clock = Clock.System,
     private val timeSource: TimeSource = TimeSource.Monotonic,
-) : SynchronizedObject() {
+): SynchronizedObject() {
 
     /** Stable identifier generated per collector instance. */
     val storeId: Uuid = Uuid.random()
 
+    // todo: undelivered handling, buffer etc
+    private val actor: Channel<Command> = Channel(Channel.UNLIMITED)
+
+    // region counters
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
     private val intentDurations = P2QuantileEstimator(Q50, Q90, Q95, Q99)
     private val intentPluginOverhead = P2QuantileEstimator(Q50)
@@ -111,6 +125,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private var exceptionHandled: Long = 0
     private val recoveryMedian = P2QuantileEstimator(Q50)
     private val recoveryEma = Ema(emaAlpha)
+    // endregion
 
     private var storeConfiguration: StoreConfiguration<out MVIState>? = null
 
@@ -134,6 +149,11 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
         val startedAt = timeSource.markNow()
+        reportingScope.launch(offloadContext) {
+            for (command in actor) {
+                // TODO: process offloaded
+            }
+        }
         synchronized(this@MetricsCollector) {
             currentStart = startedAt
             startCount++
@@ -142,19 +162,20 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         child.run { onStart() }
         val duration = startedAt.elapsedNow()
         synchronized(this@MetricsCollector) {
-            bootstrapEma.add(duration.inWholeMilliseconds.toDouble())
+            bootstrapEma += duration.inWholeMilliseconds.toDouble()
             bootstrapMedian.add(duration.inWholeMilliseconds.toDouble())
         }
     }
 
     private fun ShutdownContext<S, I, A>.recordStop(child: StorePlugin<S, I, A>, e: Exception?) {
+        // todo: send to actor self-stopping command
         synchronized(this@MetricsCollector) {
             stopCount++
             val startInstant = currentStart
             if (startInstant != null) {
                 val runDuration = startInstant.elapsedNow()
                 uptimeTotal += runDuration
-                lifetimeRunEma.add(runDuration.inWholeMilliseconds.toDouble())
+                lifetimeRunEma += runDuration.inWholeMilliseconds.toDouble()
                 lifetimeRuns.add(runDuration.inWholeMilliseconds.toDouble())
             }
             currentStart = null
@@ -181,7 +202,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             if (intentBurstCurrent > intentBurstMax) intentBurstMax = intentBurstCurrent
             lastIntentEnqueue?.let { previous ->
                 val delta = nowMark.elapsedNow() - previous.elapsedNow()
-                intentInterArrivalEma.add(delta.inWholeMilliseconds.toDouble())
+                intentInterArrivalEma += delta.inWholeMilliseconds.toDouble()
                 intentInterArrival.add(delta.inWholeMilliseconds.toDouble())
             }
             lastIntentEnqueue = nowMark
@@ -203,7 +224,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
         val queueDuration = queueInstant?.let { start.elapsedNow() - it.elapsedNow() }
         queueDuration?.let {
-            synchronized(this@MetricsCollector) { intentQueueEma.add(it.inWholeMilliseconds.toDouble()) }
+            synchronized(this@MetricsCollector) { intentQueueEma += it.inWholeMilliseconds.toDouble() }
         }
         val result = runCatching { child.run { onIntent(intent) } }.getOrElse {
             synchronized(this@MetricsCollector) { intentInFlight-- }
@@ -215,7 +236,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             intentPerf.recordOperation(durationMillis.toLong())
             intentDurations.add(durationMillis)
             intentPluginOverhead.add(durationMillis)
-            intentPluginEma.add(durationMillis)
+            intentPluginEma += durationMillis
             if (result == null) intentDropped++
             updateIntentOccupancyLocked()
         }
@@ -242,7 +263,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         val durationMillis = start.elapsedNow().inWholeMilliseconds.toDouble()
         synchronized(this@MetricsCollector) {
             if (result != null) actionSent++
-            actionPluginEma.add(durationMillis)
+            actionPluginEma += durationMillis
             actionPluginOverhead.add(durationMillis)
         }
         return result
@@ -254,7 +275,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             val queued = if (actionQueueTimes.isEmpty()) null else actionQueueTimes.removeFirst()
             queued?.let {
                 val qd = dispatchStart.elapsedNow() - it.elapsedNow()
-                actionQueueEma.add(qd.inWholeMilliseconds.toDouble())
+                actionQueueEma += qd.inWholeMilliseconds.toDouble()
                 actionQueueMedian.add(qd.inWholeMilliseconds.toDouble())
             }
             actionInFlight++
@@ -327,7 +348,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             val durationMillis = (clock.now() - start).inWholeMilliseconds.toDouble()
             synchronized(this@MetricsCollector) {
                 exceptionHandled++
-                recoveryEma.add(durationMillis)
+                recoveryEma += durationMillis
                 recoveryMedian.add(durationMillis)
             }
         }
@@ -507,7 +528,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 val removed = currentSubscribers - newCount
                 val durationMillis = elapsed.inWholeMilliseconds.toDouble()
                 repeat(removed) {
-                    lifetimeEma.add(durationMillis)
+                    lifetimeEma += durationMillis
                     lifetimeMedian.add(durationMillis)
                 }
             }
@@ -538,6 +559,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 }
 
 private class Ema(private val alpha: Double) {
+
     var value: Double = Double.NaN
     var count: Long = 0
 
@@ -545,4 +567,7 @@ private class Ema(private val alpha: Double) {
         value = if (count == 0L) sample else alpha * sample + (1 - alpha) * value
         count++
     }
+
+    operator fun plusAssign(sample: Double) = add(sample)
+    operator fun plusAssign(sample: Duration) = add(sample.inWholeMilliseconds.toDouble())
 }

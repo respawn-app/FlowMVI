@@ -32,7 +32,7 @@ internal class P2QuantileEstimator(
     var count: Int = 0
         private set
 
-    fun add(value: Double) = synchronized(this) {
+    suspend fun add(value: Double) = synchronized(this) {
         if (count < markerCount) {
             q[count++] = value
             if (count == markerCount) {
@@ -123,7 +123,7 @@ internal class P2QuantileEstimator(
     private fun linear(i: Int, d: Int): Double =
         q[i] + d * (q[i + d] - q[i]) / (n[i + d] - n[i]).toDouble()
 
-    fun getQuantile(p: Double): Double = synchronized(this) {
+    suspend fun getQuantile(p: Double): Double = synchronized(this) {
         if (count == 0) return Double.NaN
 
         if (count <= markerCount) {
