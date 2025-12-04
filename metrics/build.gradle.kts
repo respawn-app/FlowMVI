@@ -9,6 +9,11 @@ plugins {
     dokkaDocumentation
 }
 
+atomicfu {
+    transformJvm = true
+    jvmVariant = "VH"
+}
+
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     configureMultiplatform(

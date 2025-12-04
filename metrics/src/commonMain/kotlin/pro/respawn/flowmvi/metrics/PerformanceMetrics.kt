@@ -1,7 +1,5 @@
 package pro.respawn.flowmvi.metrics
 
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlin.math.min
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -11,7 +9,7 @@ internal class PerformanceMetrics(
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val bucketDuration: Duration = 1.seconds,
-) : SynchronizedObject() {
+) {
 
     init {
         require(windowSeconds > 0) { "windowSeconds must be > 0" }
@@ -29,7 +27,7 @@ internal class PerformanceMetrics(
     private var currentBucketIndex: Int = 0
     private var lastBucketTime = Clock.System.now()
 
-    fun recordOperation(durationMillis: Long) = synchronized(this) {
+    suspend fun recordOperation(durationMillis: Long) {
         val duration = durationMillis.toDouble()
 
         _totalOperations++
@@ -39,12 +37,12 @@ internal class PerformanceMetrics(
             emaAlpha * duration + (1.0 - emaAlpha) * emaMillis
         }
 
-        advanceBucketsLocked()
+        advanceBuckets()
         buckets[currentBucketIndex]++
         p2.add(duration)
     }
 
-    private fun advanceBucketsLocked() {
+    private fun advanceBuckets() {
         val now = Clock.System.now()
         val elapsed = now - lastBucketTime
         val elapsedBuckets = (elapsed / bucketDuration).toInt()
@@ -61,22 +59,20 @@ internal class PerformanceMetrics(
     }
 
     val totalOperations: Long
-        get() = synchronized(this) { _totalOperations }
+        get() = _totalOperations
 
     val averageTimeMillis: Double
-        get() = synchronized(this) {
-            if (_totalOperations == 0L) Double.NaN else emaMillis
-        }
+        get() = if (_totalOperations == 0L) Double.NaN else emaMillis
 
-    fun medianTimeMillis(): Double = p2.getQuantile(0.5)
+    suspend fun medianTimeMillis(): Double = p2.getQuantile(0.5)
 
-    fun opsPerSecond(): Double = synchronized(this) {
-        advanceBucketsLocked()
+    fun opsPerSecond(): Double {
+        advanceBuckets()
         val windowOps = buckets.sum()
-        windowOps.toDouble() / bucketCount.toDouble()
+        return windowOps.toDouble() / bucketCount.toDouble()
     }
 
-    fun reset() = synchronized(this) {
+    fun reset() {
         _totalOperations = 0L
         emaMillis = 0.0
         buckets.fill(0)
