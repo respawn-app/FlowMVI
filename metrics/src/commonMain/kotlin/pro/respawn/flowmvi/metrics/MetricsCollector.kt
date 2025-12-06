@@ -4,7 +4,6 @@ import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
 import kotlinx.atomicfu.update
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -40,19 +39,17 @@ private const val Q99 = 0.99
 private sealed interface Event {
     data class Bootstrap(val duration: Duration) : Event
     data class IntentInterArrival(val duration: Duration) : Event
-    data class IntentProcessed(val duration: Duration, val queueMillis: Double?) : Event
+    data class IntentProcessed(val duration: Duration, val inQueue: Duration?) : Event
     data class ActionPlugin(val duration: Duration) : Event
-    data class ActionDispatched(val duration: Duration, val queueMillis: Duration?) : Event
+    data class ActionDispatched(val duration: Duration, val inQueue: Duration?) : Event
     data class StateProcessed(val duration: Duration) : Event
     data class Subscription(val lifetimeSamples: List<Double>, val subscriberSample: Double) : Event
     data class RunDuration(val duration: Duration) : Event
     data class Recovery(val duration: Duration) : Event
-    data class Snapshot(val meta: Meta, val reply: CompletableDeferred<MetricsSnapshot>) : Event
 }
 
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val reportingScope: CoroutineScope,
-    private val sink: MetricsSink,
     private val offloadContext: CoroutineContext = Dispatchers.Default,
     private val storeName: String? = null,
     private val windowSeconds: Int = 60,
@@ -206,7 +203,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private suspend fun PipelineContext<S, I, A>.recordIntent(child: StorePlugin<S, I, A>, intent: I): I? {
         val start = timeSource.markNow()
         val queueInstant = intentQueue.removeFirstOrNull()
-        val queueDurationMillis = queueInstant?.elapsedNow()?.inWholeMilliseconds?.toDouble()
+        val queuedDuration = queueInstant?.elapsedNow()
         val inFlight = intentInFlight.incrementAndGet()
         intentInFlightMax.update { current -> maxOf(current, inFlight) }
         updateIntentOccupancy()
@@ -220,7 +217,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         intentProcessed.incrementAndGet()
         if (result == null) intentDropped.incrementAndGet()
         updateIntentOccupancy()
-        send(Event.IntentProcessed(durationMillis, queueDurationMillis))
+        send(Event.IntentProcessed(durationMillis, queuedDuration))
         return result
     }
 
@@ -391,7 +388,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 intentDurations.add(event.duration.msDouble)
                 intentPluginOverhead.add(event.duration.msDouble)
                 intentPluginEma += event.duration
-                event.queueMillis?.let { intentQueueEma += it }
+                event.inQueue?.let { intentQueueEma += it }
             }
             is Event.ActionPlugin -> {
                 actionPluginEma += event.duration
@@ -400,7 +397,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             is Event.ActionDispatched -> {
                 actionPerf.recordOperation(event.duration)
                 actionDeliveries.add(event.duration.msDouble)
-                event.queueMillis?.let {
+                event.inQueue?.let {
                     actionQueueEma += it
                     actionQueueMedian.add(it.msDouble)
                 }
@@ -424,15 +421,10 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 recoveryEma += event.duration
                 recoveryMedian.add(event.duration.msDouble)
             }
-            is Event.Snapshot -> {
-                val snapshot = takeSnapshot(event.meta)
-                sink.emit(snapshot)
-                event.reply.complete(snapshot)
-            }
         }
     }
 
-    private suspend fun takeSnapshot(meta: Meta) = MetricsSnapshot(
+    suspend fun snapshot(meta: Meta = defaultMeta()) = MetricsSnapshot(
         meta = meta,
         intents = IntentMetrics(
             total = intentTotal.value,
