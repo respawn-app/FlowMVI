@@ -6,9 +6,7 @@ import kotlinx.atomicfu.locks.synchronized
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
@@ -19,17 +17,19 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.api.context.ShutdownContext
+import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
-import kotlin.concurrent.Volatile
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 import kotlin.time.Instant
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
+import kotlin.time.measureTimedValue
 import kotlin.uuid.Uuid
 
 private const val Q50 = 0.5
@@ -38,25 +38,23 @@ private const val Q95 = 0.95
 private const val Q99 = 0.99
 
 private sealed interface Event {
-    data class Bootstrap(val millis: Double) : Event
-    data class IntentInterArrival(val millis: Double) : Event
-    data class IntentProcessed(val durationMillis: Double, val queueMillis: Double?) : Event
-    data class ActionPlugin(val durationMillis: Double) : Event
-    data class ActionDispatched(val totalMillis: Double, val queueMillis: Double?) : Event
-    data class StateProcessed(val durationMillis: Double) : Event
+    data class Bootstrap(val duration: Duration) : Event
+    data class IntentInterArrival(val duration: Duration) : Event
+    data class IntentProcessed(val duration: Duration, val queueMillis: Double?) : Event
+    data class ActionPlugin(val duration: Duration) : Event
+    data class ActionDispatched(val duration: Duration, val queueMillis: Duration?) : Event
+    data class StateProcessed(val duration: Duration) : Event
     data class Subscription(val lifetimeSamples: List<Double>, val subscriberSample: Double) : Event
-    data class RunDuration(val millis: Double) : Event
-    data class Recovery(val millis: Double) : Event
+    data class RunDuration(val duration: Duration) : Event
+    data class Recovery(val duration: Duration) : Event
     data class Snapshot(val meta: Meta, val reply: CompletableDeferred<MetricsSnapshot>) : Event
-    data object Reset : Event
-    data object Closing : Event
 }
 
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val reportingScope: CoroutineScope,
     private val sink: MetricsSink,
     private val offloadContext: CoroutineContext = Dispatchers.Default,
-    val storeName: String? = null,
+    private val storeName: String? = null,
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val clock: Clock = Clock.System,
@@ -64,16 +62,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val lockEnabled: Boolean = true,
 ) {
 
-    val storeId: Uuid = Uuid.random()
-
+    private val storeId: Uuid = Uuid.random()
     private val monitorLock = SynchronizedObject()
-
     private val actor = Channel<Event>(Channel.UNLIMITED)
-
-    private val actorStarted = atomic(false)
-
-    @Volatile
-    private var actorJob: Job? = null
 
     // region counters
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
@@ -143,13 +134,17 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val recoveryEma = Ema(emaAlpha)
     // endregion
 
+    // TODO: introduce "lazyDecorator" or "storeDecorator" to access this w/o mutability
     private val storeConfiguration = atomic<StoreConfiguration<out MVIState>?>(null)
 
     /** Returns a decorator that wires metrics capture into store callbacks. */
     @OptIn(ExperimentalFlowMVIAPI::class)
     fun asDecorator(name: String? = "MetricsDecorator"): PluginDecorator<S, I, A> = decorator {
         this.name = name
-        onStart { child -> recordStart(child) }
+        onStart { child ->
+            launch(offloadContext) { for (event in actor) onEvent(event) }
+            recordStart(child)
+        }
         onStop { child, e -> recordStop(child, e) }
         onIntentEnqueue { child, intent -> recordIntentEnqueue(child, intent) }
         onIntent { child, intent -> recordIntent(child, intent) }
@@ -164,25 +159,32 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
-        startActorOnce()
+        storeConfiguration.value = config
+        startCount.incrementAndGet()
         val startedAt = timeSource.markNow()
         currentStart.value = startedAt
-        startCount.incrementAndGet()
-        storeConfiguration.value = config
         child.run { onStart() }
-        val durationMillis = startedAt.elapsedNow().inWholeMilliseconds.toDouble()
-        sendCommand(Event.Bootstrap(durationMillis))
+        send(Event.Bootstrap(startedAt.elapsedNow()))
     }
 
     private fun ShutdownContext<S, I, A>.recordStop(child: StorePlugin<S, I, A>, e: Exception?) {
         stopCount.incrementAndGet()
         currentStart.getAndSet(null)?.let { startedAt ->
-            val runDurationMillis = startedAt.elapsedNow().inWholeMilliseconds
-            uptimeTotalMillis.addAndGet(runDurationMillis)
-            sendCommand(Event.RunDuration(runDurationMillis.toDouble()))
+            val runDurationMillis = startedAt.elapsedNow()
+            uptimeTotalMillis.addAndGet(runDurationMillis.inWholeMilliseconds)
+            send(Event.RunDuration(runDurationMillis))
         }
-        sendCommand(Event.Closing)
         child.run { onStop(e) }
+        drainPendingAsync()
+    }
+
+    private fun StoreLifecycle.drainPendingAsync() = reportingScope.launch(offloadContext) {
+        // close parent store fully first to ensure no pending events
+        awaitUntilClosed()
+        while (true) {
+            val event = actor.tryReceive().getOrNull() ?: break
+            onEvent(event)
+        }
     }
 
     private fun recordIntentEnqueue(child: StorePlugin<S, I, A>, intent: I): I? {
@@ -193,8 +195,8 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         }
         val nowMark = timeSource.markNow()
         updateIntentBurst(clock.now().epochSeconds)
-        lastIntentEnqueue.getAndSet(nowMark)?.elapsedNow()?.inWholeMilliseconds?.toDouble()?.let {
-            sendCommand(Event.IntentInterArrival(it))
+        lastIntentEnqueue.getAndSet(nowMark)?.elapsedNow()?.let {
+            send(Event.IntentInterArrival(it))
         }
         intentQueue.addLast(nowMark)
         updateIntentOccupancy()
@@ -213,12 +215,12 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             updateIntentOccupancy()
             throw it
         }
-        val durationMillis = start.elapsedNow().inWholeMilliseconds.toDouble()
+        val durationMillis = start.elapsedNow()
         intentInFlight.decrementAndGet()
         intentProcessed.incrementAndGet()
         if (result == null) intentDropped.incrementAndGet()
         updateIntentOccupancy()
-        sendCommand(Event.IntentProcessed(durationMillis, queueDurationMillis))
+        send(Event.IntentProcessed(durationMillis, queueDurationMillis))
         return result
     }
 
@@ -235,16 +237,16 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         actionQueue.addLast(start)
         updateActionOccupancy()
         val result = child.run { onAction(action) }
-        val durationMillis = start.elapsedNow().inWholeMilliseconds.toDouble()
+        val duration = start.elapsedNow()
         if (result != null) actionSent.incrementAndGet()
-        sendCommand(Event.ActionPlugin(durationMillis))
+        send(Event.ActionPlugin(duration))
         return result
     }
 
     private fun recordActionDispatch(child: StorePlugin<S, I, A>, action: A): A? {
         val dispatchStart = timeSource.markNow()
         val queued = actionQueue.removeFirstOrNull()
-        val queueDurationMillis = queued?.elapsedNow()?.inWholeMilliseconds?.toDouble()
+        val queueDurationMillis = queued?.elapsedNow()
         actionInFlight.incrementAndGet()
         updateActionOccupancy()
         val result = runCatching { child.onActionDispatch(action) }.getOrElse {
@@ -252,9 +254,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             updateActionOccupancy()
             throw it
         }
-        val dispatchDuration = dispatchStart.elapsedNow().inWholeMilliseconds.toDouble()
+        val dispatchDuration = dispatchStart.elapsedNow()
         val totalDurationMillis = queueDurationMillis?.let { it + dispatchDuration } ?: dispatchDuration
-        sendCommand(Event.ActionDispatched(totalDurationMillis, queueDurationMillis))
+        send(Event.ActionDispatched(totalDurationMillis, queueDurationMillis))
         if (result != null) actionDelivered.incrementAndGet()
         actionInFlight.decrementAndGet()
         updateActionOccupancy()
@@ -274,14 +276,13 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         old: S,
         new: S,
     ): S? {
-        val start = clock.now()
-        val result = runCatching { child.run { onState(old, new) } }.getOrElse { throw it }
-        val end = clock.now()
-        val durationMillis = (end - start).inWholeMilliseconds.toDouble()
+        val (result, duration) = timeSource.measureTimedValue {
+            child.run { onState(old, new) }
+        }
         stateTransitions.incrementAndGet()
         val vetoed = result == null || result === old
         if (vetoed) stateVetoed.incrementAndGet()
-        sendCommand(Event.StateProcessed(durationMillis))
+        send(Event.StateProcessed(duration))
         return result
     }
 
@@ -300,25 +301,219 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         e: Exception,
     ): Exception? {
         exceptionTotal.incrementAndGet()
-        val start = clock.now()
-        val result = child.run { onException(e) }
+        val (result, duration) = timeSource.measureTimedValue {
+            child.run { onException(e) }
+        }
         if (result == null) {
-            val durationMillis = (clock.now() - start).inWholeMilliseconds.toDouble()
             exceptionHandled.incrementAndGet()
-            sendCommand(Event.Recovery(durationMillis))
+            send(Event.Recovery(duration))
         }
         return result
     }
 
-    /** Produces a snapshot of all metrics and forwards it to [sink]. */
-    suspend fun snapshot(meta: Meta = defaultMeta()): MetricsSnapshot {
-        val reply = CompletableDeferred<MetricsSnapshot>()
-        sendCommand(Event.Snapshot(meta, reply))
-        return reply.await()
+    /** Builds a [Meta] instance using the collector defaults. */
+    fun defaultMeta(
+        generatedAt: Instant = clock.now(),
+        name: String? = storeName,
+        id: String? = storeId.toString(),
+    ): Meta = Meta(
+        generatedAt = generatedAt,
+        storeName = name,
+        storeId = id,
+        windowSeconds = windowSeconds,
+        emaAlpha = emaAlpha.toFloat(),
+    )
+
+    private fun send(event: Event) = actor.trySend(event)
+
+    private fun updateIntentOccupancy() {
+        val occupancy = intentQueue.size + intentInFlight.value
+        intentBufferMaxOccupancy.update { current -> maxOf(current, occupancy) }
     }
 
+    private fun updateActionOccupancy() {
+        val occupancy = actionQueue.size + actionInFlight.value
+        actionBufferMaxOccupancy.update { current -> maxOf(current, occupancy) }
+    }
+
+    private fun updateIntentBurst(epochSeconds: Long) = intentBurst.update { previous ->
+        if (previous.second == epochSeconds) {
+            val current = previous.current + 1
+            BurstState(epochSeconds, current, maxOf(previous.max, current))
+        } else {
+            BurstState(epochSeconds, 1, maxOf(previous.max, 1))
+        }
+    }
+
+    private fun handleSubscriptionChange(newCount: Int) {
+        var lifetimeSamples: List<Double> = emptyList()
+        var subscriberSample = newCount.toDouble()
+        subscribersState.update { state ->
+            val now = timeSource.markNow()
+            val elapsedMillis = state.lastChange.elapsedNow().inWholeMilliseconds.toDouble()
+            val weighted = state.weightedMillis + state.current * elapsedMillis
+            val total = state.totalMillis + elapsedMillis
+            val removed = (state.current - newCount).coerceAtLeast(0)
+            if (removed > 0) lifetimeSamples = List(removed) { elapsedMillis }
+            subscriberSample = newCount.toDouble()
+            SubscribersState(
+                events = state.events + 1,
+                current = newCount,
+                peak = maxOf(state.peak, newCount),
+                lastChange = now,
+                weightedMillis = weighted,
+                totalMillis = total,
+            )
+        }
+        send(Event.Subscription(lifetimeSamples, subscriberSample))
+    }
+
+    private fun computeSubscribersAverage(state: SubscribersState): Double {
+        if (state.totalMillis == 0.0) return state.current.toDouble()
+        return state.weightedMillis / state.totalMillis
+    }
+
+    private inline fun <T> withMonitor(crossinline block: () -> T): T =
+        if (lockEnabled) synchronized(monitorLock) { block() } else block()
+
+    private suspend fun onEvent(event: Event) {
+        when (event) {
+            is Event.Bootstrap -> {
+                bootstrapEma += event.duration
+                bootstrapMedian.add(event.duration.msDouble)
+            }
+            is Event.IntentInterArrival -> {
+                intentInterArrivalEma += event.duration
+                intentInterArrival.add(event.duration.msDouble)
+            }
+            is Event.IntentProcessed -> {
+                intentPerf.recordOperation(event.duration)
+                intentDurations.add(event.duration.msDouble)
+                intentPluginOverhead.add(event.duration.msDouble)
+                intentPluginEma += event.duration
+                event.queueMillis?.let { intentQueueEma += it }
+            }
+            is Event.ActionPlugin -> {
+                actionPluginEma += event.duration
+                actionPluginOverhead.add(event.duration.msDouble)
+            }
+            is Event.ActionDispatched -> {
+                actionPerf.recordOperation(event.duration)
+                actionDeliveries.add(event.duration.msDouble)
+                event.queueMillis?.let {
+                    actionQueueEma += it
+                    actionQueueMedian.add(it.msDouble)
+                }
+            }
+            is Event.StateProcessed -> {
+                statePerf.recordOperation(event.duration)
+                stateDurations.add(event.duration.msDouble)
+            }
+            is Event.Subscription -> {
+                event.lifetimeSamples.forEach {
+                    lifetimeEma += it
+                    lifetimeMedian.add(it)
+                }
+                subscribersMedian.add(event.subscriberSample)
+            }
+            is Event.RunDuration -> {
+                lifetimeRunEma += event.duration
+                lifetimeRuns.add(event.duration.msDouble)
+            }
+            is Event.Recovery -> {
+                recoveryEma += event.duration
+                recoveryMedian.add(event.duration.msDouble)
+            }
+            is Event.Snapshot -> {
+                val snapshot = takeSnapshot(event.meta)
+                sink.emit(snapshot)
+                event.reply.complete(snapshot)
+            }
+        }
+    }
+
+    private suspend fun takeSnapshot(meta: Meta) = MetricsSnapshot(
+        meta = meta,
+        intents = IntentMetrics(
+            total = intentTotal.value,
+            processed = intentProcessed.value,
+            dropped = intentDropped.value,
+            undelivered = intentUndelivered.value,
+            opsPerSecond = intentPerf.opsPerSecond(),
+            durationAvg = intentPerf.averageTimeMillis.toDurationOrZero(),
+            durationP50 = intentDurations.getQuantile(Q50).toDurationOrZero(),
+            durationP90 = intentDurations.getQuantile(Q90).toDurationOrZero(),
+            durationP95 = intentDurations.getQuantile(Q95).toDurationOrZero(),
+            durationP99 = intentDurations.getQuantile(Q99).toDurationOrZero(),
+            queueTimeAvg = intentQueueEma.value.toDurationOrZero(),
+            inFlightMax = intentInFlightMax.value,
+            interArrivalAvg = intentInterArrivalEma.value.toDurationOrZero(),
+            interArrivalMedian = intentInterArrival.getQuantile(Q50).toDurationOrZero(),
+            burstMax = intentBurst.value.max,
+            bufferMaxOccupancy = intentBufferMaxOccupancy.value,
+            bufferOverflows = intentOverflows.value,
+            pluginOverheadAvg = intentPluginEma.value.toDurationOrZero(),
+            pluginOverheadMedian = intentPluginOverhead.getQuantile(Q50).toDurationOrZero(),
+        ),
+        actions = ActionMetrics(
+            sent = actionSent.value,
+            delivered = actionDelivered.value,
+            undelivered = actionUndelivered.value,
+            opsPerSecond = actionPerf.opsPerSecond(),
+            deliveryAvg = actionPerf.averageTimeMillis.toDurationOrZero(),
+            deliveryP50 = actionDeliveries.getQuantile(Q50).toDurationOrZero(),
+            deliveryP90 = actionDeliveries.getQuantile(Q90).toDurationOrZero(),
+            deliveryP95 = actionDeliveries.getQuantile(Q95).toDurationOrZero(),
+            deliveryP99 = actionDeliveries.getQuantile(Q99).toDurationOrZero(),
+            queueTimeAvg = actionQueueEma.value.toDurationOrZero(),
+            queueTimeMedian = actionQueueMedian.getQuantile(Q50).toDurationOrZero(),
+            bufferMaxOccupancy = actionBufferMaxOccupancy.value,
+            bufferOverflows = actionOverflows.value,
+            pluginOverheadAvg = actionPluginEma.value.toDurationOrZero(),
+            pluginOverheadMedian = actionPluginOverhead.getQuantile(Q50).toDurationOrZero(),
+        ),
+        state = StateMetrics(
+            transitions = stateTransitions.value,
+            transitionsVetoed = stateVetoed.value,
+            updateAvg = statePerf.averageTimeMillis.toDurationOrZero(),
+            updateP50 = stateDurations.getQuantile(Q50).toDurationOrZero(),
+            updateP90 = stateDurations.getQuantile(Q90).toDurationOrZero(),
+            updateP95 = stateDurations.getQuantile(Q95).toDurationOrZero(),
+            updateP99 = stateDurations.getQuantile(Q99).toDurationOrZero(),
+            opsPerSecond = statePerf.opsPerSecond(),
+        ),
+        subscriptions = subscribersState.value.let { subs ->
+            SubscriptionMetrics(
+                events = subs.events,
+                current = subs.current,
+                peak = subs.peak,
+                lifetimeAvg = lifetimeEma.value.toDurationOrZero(),
+                lifetimeMedian = lifetimeMedian.getQuantile(Q50).toDurationOrZero(),
+                subscribersAvg = computeSubscribersAverage(subs),
+                subscribersMedian = subscribersMedian.getQuantile(Q50).takeUnless(Double::isNaN) ?: 0.0,
+            )
+        },
+        lifecycle = LifecycleMetrics(
+            startCount = startCount.value,
+            stopCount = stopCount.value,
+            uptimeTotal = uptimeTotalMillis.value.milliseconds,
+            lifetimeCurrent = currentStart.value?.elapsedNow() ?: ZERO,
+            lifetimeAvg = lifetimeRunEma.value.toDurationOrZero(),
+            lifetimeMedian = lifetimeRuns.getQuantile(Q50).toDurationOrZero(),
+            bootstrapAvg = bootstrapEma.value.toDurationOrZero(),
+            bootstrapMedian = bootstrapMedian.getQuantile(Q50).toDurationOrZero(),
+        ),
+        exceptions = ExceptionMetrics(
+            total = exceptionTotal.value,
+            handled = exceptionHandled.value,
+            recoveryLatencyAvg = recoveryEma.value.toDurationOrZero(),
+            recoveryLatencyMedian = recoveryMedian.getQuantile(Q50).toDurationOrZero(),
+        ),
+        storeConfiguration = storeConfiguration.value,
+    )
+
     /** Clears all internal counters and estimators. */
-    fun reset() {
+    fun reset() = withMonitor {
         intentTotal.value = 0
         intentProcessed.value = 0
         intentDropped.value = 0
@@ -353,102 +548,6 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         exceptionHandled.value = 0
         intentQueue.clear()
         actionQueue.clear()
-        sendCommand(Event.Reset)
-    }
-
-    /** Builds a [Meta] instance using the collector defaults. */
-    fun defaultMeta(
-        generatedAt: Instant = clock.now(),
-        name: String? = storeName,
-        id: String? = storeId.toString(),
-    ): Meta = Meta(
-        generatedAt = generatedAt,
-        storeName = name,
-        storeId = id,
-        windowSeconds = windowSeconds,
-        emaAlpha = emaAlpha.toFloat(),
-    )
-
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun startActorOnce() = withMonitor {
-        if (!actorStarted.compareAndSet(expect = false, update = true)) return@withMonitor
-        actorJob = reportingScope.launch(offloadContext) { processCommands(actor) }
-    }
-
-    private fun sendCommand(command: Event) {
-        val result = actor.trySend(command)
-        if (result.isFailure) actor.trySend(command)
-    }
-
-    private suspend fun processCommands(channel: Channel<Event>) {
-        for (command in channel) when (command) {
-            is Event.Bootstrap -> {
-                bootstrapEma += command.millis
-                bootstrapMedian.add(command.millis)
-            }
-
-            is Event.IntentInterArrival -> {
-                intentInterArrivalEma += command.millis
-                intentInterArrival.add(command.millis)
-            }
-
-            is Event.IntentProcessed -> {
-                intentPerf.recordOperation(command.durationMillis.toLong())
-                intentDurations.add(command.durationMillis)
-                intentPluginOverhead.add(command.durationMillis)
-                intentPluginEma += command.durationMillis
-                command.queueMillis?.let { intentQueueEma += it }
-            }
-
-            is Event.ActionPlugin -> {
-                actionPluginEma += command.durationMillis
-                actionPluginOverhead.add(command.durationMillis)
-            }
-
-            is Event.ActionDispatched -> {
-                actionPerf.recordOperation(command.totalMillis.toLong())
-                actionDeliveries.add(command.totalMillis)
-                command.queueMillis?.let {
-                    actionQueueEma += it
-                    actionQueueMedian.add(it)
-                }
-            }
-
-            is Event.StateProcessed -> {
-                statePerf.recordOperation(command.durationMillis.toLong())
-                stateDurations.add(command.durationMillis)
-            }
-
-            is Event.Subscription -> {
-                command.lifetimeSamples.forEach {
-                    lifetimeEma += it
-                    lifetimeMedian.add(it)
-                }
-                subscribersMedian.add(command.subscriberSample)
-            }
-
-            is Event.RunDuration -> {
-                lifetimeRunEma += command.millis
-                lifetimeRuns.add(command.millis)
-            }
-
-            is Event.Recovery -> {
-                recoveryEma += command.millis
-                recoveryMedian.add(command.millis)
-            }
-
-            is Event.Snapshot -> {
-                val snapshot = buildSnapshot(command.meta)
-                sink.emit(snapshot)
-                command.reply.complete(snapshot)
-            }
-
-            Event.Reset -> resetMetrics()
-            Event.Closing -> continue
-        }
-    }
-
-    private fun resetMetrics() {
         intentPerf.reset()
         actionPerf.reset()
         statePerf.reset()
@@ -474,151 +573,6 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         recoveryMedian.clear()
         recoveryEma.reset()
     }
-
-    private suspend fun buildSnapshot(meta: Meta): MetricsSnapshot {
-        val subs = subscribersState.value
-        // stopship: snapshot can be in an inconsistent state during read, needs its own lock for invariant
-        return MetricsSnapshot(
-            meta = meta,
-            intents = IntentMetrics(
-                total = intentTotal.value,
-                processed = intentProcessed.value,
-                dropped = intentDropped.value,
-                undelivered = intentUndelivered.value,
-                opsPerSecond = intentPerf.opsPerSecond(),
-                durationAvg = intentPerf.averageTimeMillis.toDurationOrZero(),
-                durationP50 = intentDurations.getQuantile(Q50).toDurationOrZero(),
-                durationP90 = intentDurations.getQuantile(Q90).toDurationOrZero(),
-                durationP95 = intentDurations.getQuantile(Q95).toDurationOrZero(),
-                durationP99 = intentDurations.getQuantile(Q99).toDurationOrZero(),
-                queueTimeAvg = intentQueueEma.value.toDurationOrZero(),
-                inFlightMax = intentInFlightMax.value,
-                interArrivalAvg = intentInterArrivalEma.value.toDurationOrZero(),
-                interArrivalMedian = intentInterArrival.getQuantile(Q50).toDurationOrZero(),
-                burstMax = intentBurst.value.max,
-                bufferMaxOccupancy = intentBufferMaxOccupancy.value,
-                bufferOverflows = intentOverflows.value,
-                pluginOverheadAvg = intentPluginEma.value.toDurationOrZero(),
-                pluginOverheadMedian = intentPluginOverhead.getQuantile(Q50).toDurationOrZero(),
-            ),
-            actions = ActionMetrics(
-                sent = actionSent.value,
-                delivered = actionDelivered.value,
-                undelivered = actionUndelivered.value,
-                opsPerSecond = actionPerf.opsPerSecond(),
-                deliveryAvg = actionPerf.averageTimeMillis.toDurationOrZero(),
-                deliveryP50 = actionDeliveries.getQuantile(Q50).toDurationOrZero(),
-                deliveryP90 = actionDeliveries.getQuantile(Q90).toDurationOrZero(),
-                deliveryP95 = actionDeliveries.getQuantile(Q95).toDurationOrZero(),
-                deliveryP99 = actionDeliveries.getQuantile(Q99).toDurationOrZero(),
-                queueTimeAvg = actionQueueEma.value.toDurationOrZero(),
-                queueTimeMedian = actionQueueMedian.getQuantile(Q50).toDurationOrZero(),
-                bufferMaxOccupancy = actionBufferMaxOccupancy.value,
-                bufferOverflows = actionOverflows.value,
-                pluginOverheadAvg = actionPluginEma.value.toDurationOrZero(),
-                pluginOverheadMedian = actionPluginOverhead.getQuantile(Q50).toDurationOrZero(),
-            ),
-            state = StateMetrics(
-                transitions = stateTransitions.value,
-                transitionsVetoed = stateVetoed.value,
-                updateAvg = statePerf.averageTimeMillis.toDurationOrZero(),
-                updateP50 = stateDurations.getQuantile(Q50).toDurationOrZero(),
-                updateP90 = stateDurations.getQuantile(Q90).toDurationOrZero(),
-                updateP95 = stateDurations.getQuantile(Q95).toDurationOrZero(),
-                updateP99 = stateDurations.getQuantile(Q99).toDurationOrZero(),
-                opsPerSecond = statePerf.opsPerSecond(),
-            ),
-            subscriptions = SubscriptionMetrics(
-                events = subs.events,
-                current = subs.current,
-                peak = subs.peak,
-                lifetimeAvg = lifetimeEma.value.toDurationOrZero(),
-                lifetimeMedian = lifetimeMedian.getQuantile(Q50).toDurationOrZero(),
-                subscribersAvg = computeSubscribersAverage(subs),
-                subscribersMedian = subscribersMedian.getQuantile(Q50).takeUnless(Double::isNaN) ?: 0.0,
-            ),
-            lifecycle = LifecycleMetrics(
-                startCount = startCount.value,
-                stopCount = stopCount.value,
-                uptimeTotal = uptimeTotalMillis.value.milliseconds,
-                lifetimeCurrent = currentStart.value?.elapsedNow() ?: ZERO,
-                lifetimeAvg = lifetimeRunEma.value.toDurationOrZero(),
-                lifetimeMedian = lifetimeRuns.getQuantile(Q50).toDurationOrZero(),
-                bootstrapAvg = bootstrapEma.value.toDurationOrZero(),
-                bootstrapMedian = bootstrapMedian.getQuantile(Q50).toDurationOrZero(),
-            ),
-            exceptions = ExceptionMetrics(
-                total = exceptionTotal.value,
-                handled = exceptionHandled.value,
-                recoveryLatencyAvg = recoveryEma.value.toDurationOrZero(),
-                recoveryLatencyMedian = recoveryMedian.getQuantile(Q50).toDurationOrZero(),
-            ),
-            storeConfiguration = storeConfiguration.value,
-        )
-    }
-
-    private fun updateIntentOccupancy() {
-        val occupancy = intentQueue.size + intentInFlight.value
-        intentBufferMaxOccupancy.update { current -> maxOf(current, occupancy) }
-    }
-
-    private fun updateActionOccupancy() {
-        val occupancy = actionQueue.size + actionInFlight.value
-        actionBufferMaxOccupancy.update { current -> maxOf(current, occupancy) }
-    }
-
-    private fun updateIntentBurst(epochSeconds: Long) {
-        intentBurst.update { previous ->
-            if (previous.second == epochSeconds) {
-                val current = previous.current + 1
-                BurstState(epochSeconds, current, maxOf(previous.max, current))
-            } else {
-                BurstState(epochSeconds, 1, maxOf(previous.max, 1))
-            }
-        }
-    }
-
-    private fun handleSubscriptionChange(newCount: Int) {
-        var lifetimeSamples: List<Double> = emptyList()
-        var subscriberSample = newCount.toDouble()
-        subscribersState.update { state ->
-            val now = timeSource.markNow()
-            val elapsedMillis = state.lastChange.elapsedNow().inWholeMilliseconds.toDouble()
-            val weighted = state.weightedMillis + state.current * elapsedMillis
-            val total = state.totalMillis + elapsedMillis
-            val removed = (state.current - newCount).coerceAtLeast(0)
-            if (removed > 0) {
-                lifetimeSamples = List(removed) { elapsedMillis }
-            }
-            subscriberSample = newCount.toDouble()
-            SubscribersState(
-                events = state.events + 1,
-                current = newCount,
-                peak = maxOf(state.peak, newCount),
-                lastChange = now,
-                weightedMillis = weighted,
-                totalMillis = total,
-            )
-        }
-        sendCommand(Event.Subscription(lifetimeSamples, subscriberSample))
-    }
-
-    private fun computeSubscribersAverage(state: SubscribersState): Double {
-        if (state.totalMillis == 0.0) return state.current.toDouble()
-        return state.weightedMillis / state.totalMillis
-    }
-
-    private inline fun <T> withMonitor(crossinline block: () -> T): T =
-        if (lockEnabled) synchronized(monitorLock) { block() } else block()
-
-    private fun Double.toDuration(): Duration = this.milliseconds
-
-    private fun Double.toDurationOrZero(): Duration = if (isNaN()) ZERO else toDuration()
-
-    private fun Ema.reset() {
-        value = Double.NaN
-        count = 0L
-    }
 }
 
 private data class SubscribersState(
@@ -633,6 +587,7 @@ private data class SubscribersState(
 private data class BurstState(val second: Long?, val current: Int, val max: Int)
 
 private class TimeMarkQueue : SynchronizedObject() {
+
     private val deque = ArrayDeque<TimeMark>()
 
     val size: Int
@@ -647,16 +602,25 @@ private class TimeMarkQueue : SynchronizedObject() {
     fun clear() = synchronized(this) { deque.clear() }
 }
 
-private class Ema(private val alpha: Double) {
+private class Ema(private val alpha: Double) : SynchronizedObject() {
 
     var value: Double = Double.NaN
-    var count: Long = 0
+    var count: Long = 0L
 
-    fun add(sample: Double) {
+    fun add(sample: Double) = synchronized(this) {
         value = if (count == 0L) sample else alpha * sample + (1 - alpha) * value
         count++
+        Unit
+    }
+
+    fun reset() = synchronized(this) {
+        value = Double.NaN
+        count = 0L
     }
 
     operator fun plusAssign(sample: Double) = add(sample)
-    operator fun plusAssign(sample: Duration) = add(sample.inWholeMilliseconds.toDouble())
+    operator fun plusAssign(sample: Duration) = add(sample.msDouble)
 }
+
+private inline val Duration.msDouble get() = toDouble(DurationUnit.MILLISECONDS)
+private fun Double.toDurationOrZero(): Duration = if (isNaN()) ZERO else milliseconds

@@ -4,6 +4,7 @@ import kotlin.math.min
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
 
 internal class PerformanceMetrics(
     private val windowSeconds: Int = 60,
@@ -27,9 +28,8 @@ internal class PerformanceMetrics(
     private var currentBucketIndex: Int = 0
     private var lastBucketTime = Clock.System.now()
 
-    suspend fun recordOperation(durationMillis: Long) {
-        val duration = durationMillis.toDouble()
-
+    suspend fun recordOperation(duration: Duration) {
+        val duration = duration.toDouble(DurationUnit.MILLISECONDS)
         _totalOperations++
         emaMillis = if (_totalOperations == 1L) {
             duration
