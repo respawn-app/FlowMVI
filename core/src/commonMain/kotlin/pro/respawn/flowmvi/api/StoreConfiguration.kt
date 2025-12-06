@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
  * Please see [StoreConfigurationBuilder] for details on the meaning behind the properties listed here
  */
 @Suppress("UndocumentedPublicProperty")
-public data class StoreConfiguration<S : MVIState> internal constructor(
+public data class StoreConfiguration<out S : MVIState> internal constructor(
     val initial: S,
     val allowIdleSubscriptions: Boolean,
     val allowTransientSubscriptions: Boolean,
