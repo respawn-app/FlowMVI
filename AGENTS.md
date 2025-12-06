@@ -32,7 +32,8 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 - `debugger/` - Remote debugger for the lib (desktop app, IDE plugin, runtime plugin)
 - `sample/` - Complete sample application (wasm, android, desktop). Usage examples here.
 - `benchmarks/` - Benchmarks module
-- `docs` - Documentation directory. Read documentation to self-educate on aspects of the library.
+- `docs/` - Documentation directory. Read documentation to self-educate on aspects of the library.
+- `metrics/` - Metrics decorator and related code
 
 ### Testing
 
@@ -46,13 +47,6 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 2. Assemble the target module.
 3. Run unit tests with `gradle allTests`.
 
-# Rules and notes 
-
-- Never add comments.
-- Document public code ONLY via kdocs.
-- Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
-- Avoid source breaking changes. Deprecate public api instead of removing it.
-
 ## Commit Guidelines
 
 Format: `<type>[!]: [description]` where scope is optional, `!` = breaking change
@@ -65,7 +59,9 @@ Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!:
 
 ## Notes 
 
+- Document public code via kdocs.
+- Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
+- Avoid source breaking changes. Deprecate public api instead of removing it.
 - Main branch: `master`. Master = prod.
-- DO NOT use any build commands other than those specified - they may include unnecessary tasks.
 - Ignore warnings about experimental or unsupported features - they are informational
 - Put native platform code in nativeMain, or if using Apple APIs, in appleMain. Native includes all Apple platforms.
