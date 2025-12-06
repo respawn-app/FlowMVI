@@ -49,8 +49,11 @@ private class OpenMetricsRenderer(
     private fun appendMetric(builder: StringBuilder, metric: Metric) {
         val fullName = "${namespace}_${metric.name}"
         if (includeHelp && metric.help != null) {
-            builder.append(HELP_PREFIX).append(fullName).append(' ')
-                .append(metric.help.replace('\n', ' ')).append('\n')
+            builder.append(HELP_PREFIX)
+                .append(fullName)
+                .append(' ')
+                .append(metric.help.replace('\n', ' '))
+                .append('\n')
         }
         if (includeUnit && metric.unit != null) {
             builder.append(UNIT_PREFIX).append(fullName).append(' ').append(metric.unit).append('\n')
@@ -86,6 +89,7 @@ private const val HELP_PREFIX: String = "# HELP "
 private const val UNIT_PREFIX: String = "# UNIT "
 private const val TYPE_PREFIX: String = "# TYPE "
 private const val SECONDS_UNIT: String = "seconds"
+private const val NANOS_IN_SECOND: Double = 1_000_000_000.0
 
 private data class QuantileSpec<T>(val label: String, val accessor: (T) -> Duration)
 
@@ -137,6 +141,7 @@ private fun configMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, 
         ),
     )
 
+@Suppress("LongMethod")
 private fun intentMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
     val intents = snapshot.intents
     return listOf(
@@ -404,7 +409,11 @@ private fun stateMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, t
     )
 }
 
-private fun subscriptionMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
+private fun subscriptionMetrics(
+    snapshot: MetricsSnapshot,
+    base: Map<String, String>,
+    timestampMillis: Long?,
+): List<Metric> {
     val subs = snapshot.subscriptions
     return listOf(
         counter(
@@ -461,7 +470,11 @@ private fun subscriptionMetrics(snapshot: MetricsSnapshot, base: Map<String, Str
     )
 }
 
-private fun lifecycleMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
+private fun lifecycleMetrics(
+    snapshot: MetricsSnapshot,
+    base: Map<String, String>,
+    timestampMillis: Long?,
+): List<Metric> {
     val life = snapshot.lifecycle
     return listOf(
         counter(
@@ -529,7 +542,11 @@ private fun lifecycleMetrics(snapshot: MetricsSnapshot, base: Map<String, String
     )
 }
 
-private fun exceptionMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
+private fun exceptionMetrics(
+    snapshot: MetricsSnapshot,
+    base: Map<String, String>,
+    timestampMillis: Long?,
+): List<Metric> {
     val exceptions = snapshot.exceptions
     return listOf(
         counter(
@@ -565,14 +582,19 @@ private fun exceptionMetrics(snapshot: MetricsSnapshot, base: Map<String, String
     )
 }
 
-private fun counter(name: String, help: String, value: Long, base: Map<String, String>, timestampMillis: Long?): Metric =
-    Metric(
-        name = name,
-        help = help,
-        unit = null,
-        type = MetricType.Counter,
-        samples = listOf(Sample(value.toDouble(), base, timestampMillis))
-    )
+private fun counter(
+    name: String,
+    help: String,
+    value: Long,
+    base: Map<String, String>,
+    timestampMillis: Long?,
+): Metric = Metric(
+    name = name,
+    help = help,
+    unit = null,
+    type = MetricType.Counter,
+    samples = listOf(Sample(value.toDouble(), base, timestampMillis))
+)
 
 private fun gauge(
     name: String,
@@ -614,7 +636,7 @@ private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMa
 
 private fun Duration.seconds(): Double = when {
     isInfinite() -> Double.POSITIVE_INFINITY
-    else -> inWholeNanoseconds / 1_000_000_000.0
+    else -> inWholeNanoseconds / NANOS_IN_SECOND
 }
 
 /** Builds a sink that emits OpenMetrics-compliant text. */

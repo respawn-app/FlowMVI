@@ -322,9 +322,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         currentRun.value?.channel.let {
             // todo: cleanup to self-contained class
             if (it == null && currentlyDebuggable) throw UnrecoverableException(
-                message = "Metrics were attempted to be sent outside the store lifecycle, which should be impossible. " +
-                        "This is likely a bug. If you detected this, please report to the maintainers. " +
-                        "This will not crash with debuggable=false"
+                message = "Metrics were attempted to be sent outside the store lifecycle, " +
+                    "which should be impossible. If you detected this, please report to the maintainers. " +
+                    "This will not crash with debuggable=false"
             )
             // on release, just drop, don't crash
             it?.trySend(event)
