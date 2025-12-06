@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.metrics
+package pro.respawn.flowmvi.metrics.api
 
 /** Generic sink for values. */
 public fun interface Sink<T> {

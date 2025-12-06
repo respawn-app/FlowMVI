@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.metrics
+package pro.respawn.flowmvi.metrics.dsl
 
 import kotlinx.coroutines.CoroutineScope
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
@@ -8,6 +8,8 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.metrics.MetricsCollector
+import pro.respawn.flowmvi.metrics.MetricsSink
 import kotlin.time.Clock
 import kotlin.time.TimeSource
 

@@ -5,8 +5,10 @@ import kotlinx.serialization.json.Json
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
+import pro.respawn.flowmvi.metrics.api.Sink
 
-/** Type alias for sinks that consume [MetricsSnapshot]. */
+/** Type alias for sinks that consume [pro.respawn.flowmvi.metrics.api.MetricsSnapshot]. */
 public typealias MetricsSink = Sink<MetricsSnapshot>
 
 /** No-op sink used by default to disable metrics emission. */

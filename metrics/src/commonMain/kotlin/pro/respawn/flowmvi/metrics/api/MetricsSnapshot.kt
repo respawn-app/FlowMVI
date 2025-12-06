@@ -1,4 +1,4 @@
-package pro.respawn.flowmvi.metrics
+package pro.respawn.flowmvi.metrics.api
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -28,7 +28,7 @@ public data class MetricsSnapshot(
     /** Exception and recovery metrics. */
     val exceptions: ExceptionMetrics,
     /** In-memory store configuration reference, not serialized. */
-    @Transient val storeConfiguration: StoreConfiguration<out MVIState>? = null,
+    @Transient val storeConfiguration: StoreConfiguration<MVIState>? = null,
 )
 
 /** Metadata describing snapshot timing and configuration identity. */
