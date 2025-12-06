@@ -82,7 +82,10 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         states = stateModule,
         recover = recover,
         onAction = { action -> onAction(action)?.let { _actions.action(it) } },
-        onStop = ctx@{ e -> close().also { plugin.onStop?.invoke(this@ctx, e) } },
+        onStop = ctx@{ e ->
+            this@StoreImpl.close() // sync with global ctx
+            plugin.onStop?.invoke(this@ctx, e)
+        },
         onStart = pipeline@{ lifecycle ->
             beginStartup(lifecycle, config)
             launch {
