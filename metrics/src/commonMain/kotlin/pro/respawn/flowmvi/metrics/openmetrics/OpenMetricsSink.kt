@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.metrics.openmetrics
 
 import pro.respawn.flowmvi.metrics.MappingSink
 import pro.respawn.flowmvi.metrics.MetricsSink
+import pro.respawn.flowmvi.metrics.Quantile
 import pro.respawn.flowmvi.metrics.api.ActionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
@@ -89,22 +90,22 @@ private const val SECONDS_UNIT: String = "seconds"
 private data class QuantileSpec<T>(val label: String, val accessor: (T) -> Duration)
 
 private val QUANTILES: List<QuantileSpec<IntentMetrics>> = listOf(
-    QuantileSpec("0.5") { it.durationP50 },
-    QuantileSpec("0.9") { it.durationP90 },
-    QuantileSpec("0.95") { it.durationP95 },
-    QuantileSpec("0.99") { it.durationP99 },
+    QuantileSpec(Quantile.Q50.label) { it.durationP50 },
+    QuantileSpec(Quantile.Q90.label) { it.durationP90 },
+    QuantileSpec(Quantile.Q95.label) { it.durationP95 },
+    QuantileSpec(Quantile.Q99.label) { it.durationP99 },
 )
 private val ACTION_QUANTILES: List<QuantileSpec<ActionMetrics>> = listOf(
-    QuantileSpec("0.5") { it.deliveryP50 },
-    QuantileSpec("0.9") { it.deliveryP90 },
-    QuantileSpec("0.95") { it.deliveryP95 },
-    QuantileSpec("0.99") { it.deliveryP99 },
+    QuantileSpec(Quantile.Q50.label) { it.deliveryP50 },
+    QuantileSpec(Quantile.Q90.label) { it.deliveryP90 },
+    QuantileSpec(Quantile.Q95.label) { it.deliveryP95 },
+    QuantileSpec(Quantile.Q99.label) { it.deliveryP99 },
 )
 private val STATE_QUANTILES: List<QuantileSpec<StateMetrics>> = listOf(
-    QuantileSpec("0.5") { it.updateP50 },
-    QuantileSpec("0.9") { it.updateP90 },
-    QuantileSpec("0.95") { it.updateP95 },
-    QuantileSpec("0.99") { it.updateP99 },
+    QuantileSpec(Quantile.Q50.label) { it.updateP50 },
+    QuantileSpec(Quantile.Q90.label) { it.updateP90 },
+    QuantileSpec(Quantile.Q95.label) { it.updateP95 },
+    QuantileSpec(Quantile.Q99.label) { it.updateP99 },
 )
 
 private fun metrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> =

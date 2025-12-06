@@ -21,6 +21,10 @@ import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.api.context.ShutdownContext
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
+import pro.respawn.flowmvi.metrics.Quantile.Q50
+import pro.respawn.flowmvi.metrics.Quantile.Q90
+import pro.respawn.flowmvi.metrics.Quantile.Q95
+import pro.respawn.flowmvi.metrics.Quantile.Q99
 import pro.respawn.flowmvi.metrics.api.ActionMetrics
 import pro.respawn.flowmvi.metrics.api.ExceptionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
@@ -40,11 +44,6 @@ import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlin.time.measureTimedValue
 import kotlin.uuid.Uuid
-
-private const val Q50 = 0.5
-private const val Q90 = 0.9
-private const val Q95 = 0.95
-private const val Q99 = 0.99
 
 private sealed interface Event {
     data class Bootstrap(val duration: Duration) : Event
@@ -75,13 +74,13 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     // region counters
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
-    private val intentDurations = P2QuantileEstimator(Q50, Q90, Q95, Q99)
-    private val intentPluginOverhead = P2QuantileEstimator(Q50)
+    private val intentDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
+    private val intentPluginOverhead = P2QuantileEstimator(Q50.value)
     private val intentPluginEma = Ema(emaAlpha)
     private val intentQueue = TimeMarkQueue()
     private val intentQueueEma = Ema(emaAlpha)
     private val intentInterArrivalEma = Ema(emaAlpha)
-    private val intentInterArrival = P2QuantileEstimator(Q50)
+    private val intentInterArrival = P2QuantileEstimator(Q50.value)
     private val intentTotal = atomic(0L)
     private val intentProcessed = atomic(0L)
     private val intentDropped = atomic(0L)
@@ -94,11 +93,11 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val intentBufferMaxOccupancy = atomic(0)
 
     private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha)
-    private val actionDeliveries = P2QuantileEstimator(Q50, Q90, Q95, Q99)
+    private val actionDeliveries = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val actionQueue = TimeMarkQueue()
     private val actionQueueEma = Ema(emaAlpha)
-    private val actionQueueMedian = P2QuantileEstimator(Q50)
-    private val actionPluginOverhead = P2QuantileEstimator(Q50)
+    private val actionQueueMedian = P2QuantileEstimator(Q50.value)
+    private val actionPluginOverhead = P2QuantileEstimator(Q50.value)
     private val actionPluginEma = Ema(emaAlpha)
     private val actionSent = atomic(0L)
     private val actionDelivered = atomic(0L)
@@ -108,12 +107,12 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val actionInFlight = atomic(0)
 
     private val statePerf = PerformanceMetrics(windowSeconds, emaAlpha)
-    private val stateDurations = P2QuantileEstimator(Q50, Q90, Q95, Q99)
+    private val stateDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val stateTransitions = atomic(0L)
     private val stateVetoed = atomic(0L)
 
-    private val subscribersMedian = P2QuantileEstimator(Q50)
-    private val lifetimeMedian = P2QuantileEstimator(Q50)
+    private val subscribersMedian = P2QuantileEstimator(Q50.value)
+    private val lifetimeMedian = P2QuantileEstimator(Q50.value)
     private val lifetimeEma = Ema(emaAlpha)
     private val subscribersState = atomic(
         SubscribersState(
@@ -130,14 +129,14 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val stopCount = atomic(0L)
     private val uptimeTotalMillis = atomic(0L)
     private val currentStart = atomic<TimeMark?>(null)
-    private val lifetimeRuns = P2QuantileEstimator(Q50)
+    private val lifetimeRuns = P2QuantileEstimator(Q50.value)
     private val lifetimeRunEma = Ema(emaAlpha)
-    private val bootstrapMedian = P2QuantileEstimator(Q50)
+    private val bootstrapMedian = P2QuantileEstimator(Q50.value)
     private val bootstrapEma = Ema(emaAlpha)
 
     private val exceptionTotal = atomic(0L)
     private val exceptionHandled = atomic(0L)
-    private val recoveryMedian = P2QuantileEstimator(Q50)
+    private val recoveryMedian = P2QuantileEstimator(Q50.value)
     private val recoveryEma = Ema(emaAlpha)
     // endregion
 
@@ -449,19 +448,19 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 undelivered = intentUndelivered.value,
                 opsPerSecond = intentPerf.opsPerSecond(),
                 durationAvg = intentPerf.averageTimeMillis.toDurationOrZero(),
-                durationP50 = intentDurations.getQuantile(Q50).toDurationOrZero(),
-                durationP90 = intentDurations.getQuantile(Q90).toDurationOrZero(),
-                durationP95 = intentDurations.getQuantile(Q95).toDurationOrZero(),
-                durationP99 = intentDurations.getQuantile(Q99).toDurationOrZero(),
+                durationP50 = intentDurations.getQuantile(Q50.value).toDurationOrZero(),
+                durationP90 = intentDurations.getQuantile(Q90.value).toDurationOrZero(),
+                durationP95 = intentDurations.getQuantile(Q95.value).toDurationOrZero(),
+                durationP99 = intentDurations.getQuantile(Q99.value).toDurationOrZero(),
                 queueTimeAvg = intentQueueEma.value.toDurationOrZero(),
                 inFlightMax = intentInFlightMax.value,
                 interArrivalAvg = intentInterArrivalEma.value.toDurationOrZero(),
-                interArrivalMedian = intentInterArrival.getQuantile(Q50).toDurationOrZero(),
+                interArrivalMedian = intentInterArrival.getQuantile(Q50.value).toDurationOrZero(),
                 burstMax = intentBurst.value.max,
                 bufferMaxOccupancy = intentBufferMaxOccupancy.value,
                 bufferOverflows = intentOverflows.value,
                 pluginOverheadAvg = intentPluginEma.value.toDurationOrZero(),
-                pluginOverheadMedian = intentPluginOverhead.getQuantile(Q50).toDurationOrZero(),
+                pluginOverheadMedian = intentPluginOverhead.getQuantile(Q50.value).toDurationOrZero(),
             ),
             actions = ActionMetrics(
                 sent = actionSent.value,
@@ -469,25 +468,25 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 undelivered = actionUndelivered.value,
                 opsPerSecond = actionPerf.opsPerSecond(),
                 deliveryAvg = actionPerf.averageTimeMillis.toDurationOrZero(),
-                deliveryP50 = actionDeliveries.getQuantile(Q50).toDurationOrZero(),
-                deliveryP90 = actionDeliveries.getQuantile(Q90).toDurationOrZero(),
-                deliveryP95 = actionDeliveries.getQuantile(Q95).toDurationOrZero(),
-                deliveryP99 = actionDeliveries.getQuantile(Q99).toDurationOrZero(),
+                deliveryP50 = actionDeliveries.getQuantile(Q50.value).toDurationOrZero(),
+                deliveryP90 = actionDeliveries.getQuantile(Q90.value).toDurationOrZero(),
+                deliveryP95 = actionDeliveries.getQuantile(Q95.value).toDurationOrZero(),
+                deliveryP99 = actionDeliveries.getQuantile(Q99.value).toDurationOrZero(),
                 queueTimeAvg = actionQueueEma.value.toDurationOrZero(),
-                queueTimeMedian = actionQueueMedian.getQuantile(Q50).toDurationOrZero(),
+                queueTimeMedian = actionQueueMedian.getQuantile(Q50.value).toDurationOrZero(),
                 bufferMaxOccupancy = actionBufferMaxOccupancy.value,
                 bufferOverflows = actionOverflows.value,
                 pluginOverheadAvg = actionPluginEma.value.toDurationOrZero(),
-                pluginOverheadMedian = actionPluginOverhead.getQuantile(Q50).toDurationOrZero(),
+                pluginOverheadMedian = actionPluginOverhead.getQuantile(Q50.value).toDurationOrZero(),
             ),
             state = StateMetrics(
                 transitions = stateTransitions.value,
                 transitionsVetoed = stateVetoed.value,
                 updateAvg = statePerf.averageTimeMillis.toDurationOrZero(),
-                updateP50 = stateDurations.getQuantile(Q50).toDurationOrZero(),
-                updateP90 = stateDurations.getQuantile(Q90).toDurationOrZero(),
-                updateP95 = stateDurations.getQuantile(Q95).toDurationOrZero(),
-                updateP99 = stateDurations.getQuantile(Q99).toDurationOrZero(),
+                updateP50 = stateDurations.getQuantile(Q50.value).toDurationOrZero(),
+                updateP90 = stateDurations.getQuantile(Q90.value).toDurationOrZero(),
+                updateP95 = stateDurations.getQuantile(Q95.value).toDurationOrZero(),
+                updateP99 = stateDurations.getQuantile(Q99.value).toDurationOrZero(),
                 opsPerSecond = statePerf.opsPerSecond(),
             ),
             subscriptions = subscribersState.value.let { subs ->
@@ -496,9 +495,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                     current = subs.current,
                     peak = subs.peak,
                     lifetimeAvg = lifetimeEma.value.toDurationOrZero(),
-                    lifetimeMedian = lifetimeMedian.getQuantile(Q50).toDurationOrZero(),
+                    lifetimeMedian = lifetimeMedian.getQuantile(Q50.value).toDurationOrZero(),
                     subscribersAvg = computeSubscribersAverage(subs),
-                    subscribersMedian = subscribersMedian.getQuantile(Q50).takeUnless(Double::isNaN) ?: 0.0,
+                    subscribersMedian = subscribersMedian.getQuantile(Q50.value).takeUnless(Double::isNaN) ?: 0.0,
                 )
             },
             lifecycle = LifecycleMetrics(
@@ -507,15 +506,15 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 uptimeTotal = uptimeTotalMillis.value.milliseconds,
                 lifetimeCurrent = currentStart.value?.elapsedNow() ?: ZERO,
                 lifetimeAvg = lifetimeRunEma.value.toDurationOrZero(),
-                lifetimeMedian = lifetimeRuns.getQuantile(Q50).toDurationOrZero(),
+                lifetimeMedian = lifetimeRuns.getQuantile(Q50.value).toDurationOrZero(),
                 bootstrapAvg = bootstrapEma.value.toDurationOrZero(),
-                bootstrapMedian = bootstrapMedian.getQuantile(Q50).toDurationOrZero(),
+                bootstrapMedian = bootstrapMedian.getQuantile(Q50.value).toDurationOrZero(),
             ),
             exceptions = ExceptionMetrics(
                 total = exceptionTotal.value,
                 handled = exceptionHandled.value,
                 recoveryLatencyAvg = recoveryEma.value.toDurationOrZero(),
-                recoveryLatencyMedian = recoveryMedian.getQuantile(Q50).toDurationOrZero(),
+                recoveryLatencyMedian = recoveryMedian.getQuantile(Q50.value).toDurationOrZero(),
             ),
             storeConfiguration = lastConfig.value,
         )
