@@ -1,6 +1,9 @@
 package pro.respawn.flowmvi.metrics.dsl
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -15,6 +18,8 @@ import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.metrics.MetricsSink
 import pro.respawn.flowmvi.metrics.api.Metrics
 import pro.respawn.flowmvi.metrics.api.MetricsBuilder
+import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,22 +30,27 @@ private const val DefaultName: String = "MetricsReporter"
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsReporter(
     metrics: Metrics,
     offloadScope: CoroutineScope,
+    offloadContext: CoroutineContext = Dispatchers.Default,
     interval: Duration = 30.seconds,
     flushOnStop: Boolean = true,
     name: String? = DefaultName,
     sink: MetricsSink,
 ): StorePlugin<S, I, A> = plugin {
     this.name = name
+    val queue = Channel<MetricsSnapshot>(Channel.BUFFERED, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     if (interval.isPositive() && interval.isFinite()) onStart {
-        launch {
+        // sequential offloading w/backpressure
+        launch(offloadContext) { for (snapshot in queue) sink.emit(snapshot) }
+        // fast snapshotting on interval
+        launch(offloadContext) {
             while (isActive) {
                 delay(interval)
-                sink.emit(metrics.snapshot())
+                queue.send(metrics.snapshot())
             }
         }
     }
     if (flushOnStop) onStop {
-        offloadScope.launch { sink.emit(metrics.snapshot()) }
+        offloadScope.launch(offloadContext) { sink.emit(metrics.snapshot()) }
     }
 }
 
