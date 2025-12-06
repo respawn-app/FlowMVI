@@ -67,7 +67,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val clock: Clock = Clock.System,
     private val timeSource: TimeSource = TimeSource.Monotonic,
     private val lockEnabled: Boolean = true,
-): Metrics {
+) : Metrics {
 
     private val storeId: Uuid = Uuid.random()
     private val monitorLock = SynchronizedObject()
@@ -146,7 +146,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     /** Returns a decorator that wires metrics capture into store callbacks. */
     @OptIn(ExperimentalFlowMVIAPI::class)
-    fun asDecorator(name: String? = "MetricsDecorator"): PluginDecorator<S, I, A> = decorator {
+    fun asDecorator(name: String?): PluginDecorator<S, I, A> = decorator {
         this.name = name
         onStart { child ->
             val channel = Channel<Event>(Channel.UNLIMITED)
