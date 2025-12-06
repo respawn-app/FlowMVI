@@ -6,6 +6,7 @@ import kotlinx.atomicfu.locks.synchronized
 import kotlinx.atomicfu.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
@@ -15,8 +16,8 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.api.StorePlugin
+import pro.respawn.flowmvi.api.UnrecoverableException
 import pro.respawn.flowmvi.api.context.ShutdownContext
-import pro.respawn.flowmvi.api.lifecycle.StoreLifecycle
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorator
 import kotlin.coroutines.CoroutineContext
@@ -51,7 +52,6 @@ private sealed interface Event {
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val reportingScope: CoroutineScope,
     private val offloadContext: CoroutineContext = Dispatchers.Default,
-    private val storeName: String? = null,
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val clock: Clock = Clock.System,
@@ -61,7 +61,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private val storeId: Uuid = Uuid.random()
     private val monitorLock = SynchronizedObject()
-    private val actor = Channel<Event>(Channel.UNLIMITED)
+    private val currentRun = atomic<Run?>(null)
 
     // region counters
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
@@ -132,14 +132,19 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     // endregion
 
     // TODO: introduce "lazyDecorator" or "storeDecorator" to access this w/o mutability
-    private val storeConfiguration = atomic<StoreConfiguration<out MVIState>?>(null)
+    private val lastConfig = atomic<StoreConfiguration<out MVIState>?>(null)
 
     /** Returns a decorator that wires metrics capture into store callbacks. */
     @OptIn(ExperimentalFlowMVIAPI::class)
     fun asDecorator(name: String? = "MetricsDecorator"): PluginDecorator<S, I, A> = decorator {
         this.name = name
         onStart { child ->
-            launch(offloadContext) { for (event in actor) onEvent(event) }
+            val channel = Channel<Event>(Channel.UNLIMITED)
+            val job = reportingScope.launch(offloadContext) { for (event in channel) onEvent(event) }
+            val previous = currentRun.getAndSet(Run(channel, job))
+            check(previous == null || previous.job.isCompleted) {
+                "MetricsCollector started with previous run still active for store=${config.name}"
+            }
             recordStart(child)
         }
         onStop { child, e -> recordStop(child, e) }
@@ -156,7 +161,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
-        storeConfiguration.value = config
+        lastConfig.value = config
         startCount.incrementAndGet()
         val startedAt = timeSource.markNow()
         currentStart.value = startedAt
@@ -172,15 +177,11 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             send(Event.RunDuration(runDurationMillis))
         }
         child.run { onStop(e) }
-        drainPendingAsync()
-    }
-
-    private fun StoreLifecycle.drainPendingAsync() = reportingScope.launch(offloadContext) {
-        // close parent store fully first to ensure no pending events
-        awaitUntilClosed()
-        while (true) {
-            val event = actor.tryReceive().getOrNull() ?: break
-            onEvent(event)
+        val run = currentRun.getAndSet(null) ?: return
+        reportingScope.launch(offloadContext) {
+            this@recordStop.awaitUntilClosed()
+            run.channel.close()
+            run.job.join()
         }
     }
 
@@ -311,7 +312,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     /** Builds a [Meta] instance using the collector defaults. */
     fun defaultMeta(
         generatedAt: Instant = clock.now(),
-        name: String? = storeName,
+        name: String? = lastConfig.value?.name,
         id: String? = storeId.toString(),
     ): Meta = Meta(
         generatedAt = generatedAt,
@@ -321,7 +322,18 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         emaAlpha = emaAlpha.toFloat(),
     )
 
-    private fun send(event: Event) = actor.trySend(event)
+    private fun send(event: Event) {
+        currentRun.value?.channel.let {
+            // todo: cleanup to self-contained class
+            if (it == null && currentlyDebuggable) throw UnrecoverableException(
+                message = "Metrics were attempted to be sent outside the store lifecycle, which should be impossible. " +
+                        "This is likely a bug. If you detected this, please report to the maintainers. " +
+                        "This will not crash with debuggable=false"
+            )
+            // on release, just drop, don't crash
+            it?.trySend(event)
+        }
+    }
 
     private fun updateIntentOccupancy() {
         val occupancy = intentQueue.size + intentInFlight.value
@@ -501,7 +513,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             recoveryLatencyAvg = recoveryEma.value.toDurationOrZero(),
             recoveryLatencyMedian = recoveryMedian.getQuantile(Q50).toDurationOrZero(),
         ),
-        storeConfiguration = storeConfiguration.value,
+        storeConfiguration = lastConfig.value,
     )
 
     /** Clears all internal counters and estimators. */
@@ -565,6 +577,8 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         recoveryMedian.clear()
         recoveryEma.reset()
     }
+
+    private val currentlyDebuggable: Boolean get() = lastConfig.value?.debuggable == true
 }
 
 private data class SubscribersState(
@@ -577,6 +591,8 @@ private data class SubscribersState(
 )
 
 private data class BurstState(val second: Long?, val current: Int, val max: Int)
+
+private data class Run(val channel: Channel<Event>, val job: Job)
 
 private class TimeMarkQueue : SynchronizedObject() {
 

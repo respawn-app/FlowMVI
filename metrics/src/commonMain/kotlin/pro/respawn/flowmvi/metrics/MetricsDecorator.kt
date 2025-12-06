@@ -27,7 +27,6 @@ import kotlin.time.TimeSource
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
     reportingScope: CoroutineScope,
-    storeName: String? = null,
     windowSeconds: Int = 60,
     emaAlpha: Double = 0.1,
     clock: Clock = Clock.System,
@@ -37,8 +36,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
     sink: MetricsSink,
 ): PluginDecorator<S, I, A> = MetricsCollector<S, I, A>(
     reportingScope = reportingScope,
-    // sink = sink,
-    storeName = storeName,
     windowSeconds = windowSeconds,
     emaAlpha = emaAlpha,
     timeSource = timeSource,
@@ -62,7 +59,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.collectMetrics(
     reportingScope: CoroutineScope,
-    storeName: String? = null,
     windowSeconds: Int = 60,
     emaAlpha: Double = 0.1,
     clock: Clock = Clock.System,
@@ -74,7 +70,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.co
     metricsDecorator(
         reportingScope = reportingScope,
         sink = sink,
-        storeName = storeName,
         windowSeconds = windowSeconds,
         emaAlpha = emaAlpha,
         timeSource = timeSource,
