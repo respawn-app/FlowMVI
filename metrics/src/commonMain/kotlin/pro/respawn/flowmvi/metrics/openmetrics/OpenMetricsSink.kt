@@ -110,6 +110,7 @@ private val STATE_QUANTILES: List<QuantileSpec<StateMetrics>> = listOf(
 
 private fun metrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> =
     buildList {
+        addAll(configMetrics(snapshot, base, timestampMillis))
         addAll(intentMetrics(snapshot, base, timestampMillis))
         addAll(actionMetrics(snapshot, base, timestampMillis))
         addAll(stateMetrics(snapshot, base, timestampMillis))
@@ -117,6 +118,24 @@ private fun metrics(snapshot: MetricsSnapshot, base: Map<String, String>, timest
         addAll(lifecycleMetrics(snapshot, base, timestampMillis))
         addAll(exceptionMetrics(snapshot, base, timestampMillis))
     }
+
+private fun configMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> =
+    listOf(
+        gauge(
+            name = "config_window_seconds",
+            help = "Metrics sampling window length",
+            value = snapshot.meta.windowSeconds.toDouble(),
+            base = base,
+            timestampMillis = timestampMillis
+        ),
+        gauge(
+            name = "config_ema_alpha",
+            help = "Metrics EMA smoothing factor",
+            value = snapshot.meta.emaAlpha.toDouble(),
+            base = base,
+            timestampMillis = timestampMillis
+        ),
+    )
 
 private fun intentMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
     val intents = snapshot.intents
@@ -591,8 +610,6 @@ private fun <T> quantileGauge(
 private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMap {
     snapshot.meta.storeName?.let { put("store", it) }
     snapshot.meta.storeId?.let { put("store_id", it) }
-    put("window_seconds", snapshot.meta.windowSeconds.toString())
-    put("ema_alpha", snapshot.meta.emaAlpha.toString())
 }
 
 private fun Duration.seconds(): Double = when {
