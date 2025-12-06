@@ -60,8 +60,8 @@ private sealed interface Event {
 
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     // stopship: allow configure of bucketDuration
-    private val reportingScope: CoroutineScope,
-    private val offloadContext: CoroutineContext = Dispatchers.Default,
+    val reportingScope: CoroutineScope,
+    val offloadContext: CoroutineContext = Dispatchers.Default,
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val clock: Clock = Clock.System,
