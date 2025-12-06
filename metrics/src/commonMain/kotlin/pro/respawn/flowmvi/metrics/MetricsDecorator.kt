@@ -37,7 +37,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
     sink: MetricsSink,
 ): PluginDecorator<S, I, A> = MetricsCollector<S, I, A>(
     reportingScope = reportingScope,
-    sink = sink,
+    // sink = sink,
     storeName = storeName,
     windowSeconds = windowSeconds,
     emaAlpha = emaAlpha,
