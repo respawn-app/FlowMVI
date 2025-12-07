@@ -11,7 +11,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import pro.respawn.flowmvi.metrics.AppendableStringSink
 import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
-import pro.respawn.flowmvi.metrics.otel.AggregationTemporality
 import pro.respawn.flowmvi.metrics.openmetrics.OpenMetricsSink
 import pro.respawn.flowmvi.metrics.sampleSnapshot
 import kotlin.time.Instant
@@ -273,7 +272,9 @@ class OtlpJsonSinkTest : FreeSpec({
 
         val payload = snapshot.toOtlpPayload(surfaceVersion = target)
 
-        payload.resourceMetrics.single().resource!!.attributes.associate { it.key to it.value.stringValue }["schema.version"] shouldBe "0.9"
+        payload.resourceMetrics.single().resource!!.attributes.associate {
+            it.key to it.value.stringValue
+        }["schema.version"] shouldBe "0.9"
     }
 
     "resource attributes are sorted lexicographically after merge" {
@@ -295,9 +296,22 @@ class OtlpJsonSinkTest : FreeSpec({
         val payload = odd.toOtlpPayload(namespace = "flowmvi")
         val metrics = payload.resourceMetrics.single().scopeMetrics.single().metrics.associateBy { it.name }
 
-        metrics.getValue("flowmvi_intents_ops_per_second").gauge!!.dataPoints.single().asDouble!!.isNaN() shouldBe true
-        metrics.getValue("flowmvi_actions_ops_per_second").gauge!!.dataPoints.single().asDouble shouldBe Double.POSITIVE_INFINITY
-        metrics.getValue("flowmvi_state_ops_per_second").gauge!!.dataPoints.single().asDouble shouldBe Double.NEGATIVE_INFINITY
+        metrics.getValue("flowmvi_intents_ops_per_second")
+            .gauge!!
+            .dataPoints
+            .single()
+            .asDouble!!
+            .isNaN() shouldBe true
+        metrics.getValue("flowmvi_actions_ops_per_second")
+            .gauge!!
+            .dataPoints
+            .single()
+            .asDouble shouldBe Double.POSITIVE_INFINITY
+        metrics.getValue("flowmvi_state_ops_per_second")
+            .gauge!!
+            .dataPoints
+            .single()
+            .asDouble shouldBe Double.NEGATIVE_INFINITY
     }
 
     "delta temporality uses meta startTime when present" {
