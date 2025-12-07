@@ -40,6 +40,7 @@ import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.Instant
 import kotlin.time.TimeMark
@@ -62,21 +63,20 @@ private sealed interface Event {
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     // stopship: allow configure of bucketDuration
     val reportingScope: CoroutineScope,
-    val offloadContext: CoroutineContext = Dispatchers.Default,
-    private val windowSeconds: Int = 60,
-    private val emaAlpha: Double = 0.1,
-    private val clock: Clock = Clock.System,
-    private val timeSource: TimeSource = TimeSource.Monotonic,
-    private val lockEnabled: Boolean = true,
-) : Metrics {
+    val offloadContext: CoroutineContext,
+    private val bucketDuration: Duration,
+    private val windowSeconds: Int,
+    private val emaAlpha: Double,
+    private val clock: Clock,
+    private val timeSource: TimeSource,
+) : Metrics, SynchronizedObject() {
 
     private val storeId: Uuid = Uuid.random()
-    private val monitorLock = SynchronizedObject()
     private val currentRun = atomic<Run?>(null)
     private val runId = atomic<String?>(null)
 
     // region counters
-    private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
+    private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
     private val intentDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val intentPluginOverhead = P2QuantileEstimator(Q50.value)
     private val intentPluginEma = Ema(emaAlpha)
@@ -95,7 +95,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val lastIntentEnqueue = atomic<TimeMark?>(null)
     private val intentBufferMaxOccupancy = atomic(0)
 
-    private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha)
+    private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
     private val actionDeliveries = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val actionQueue = TimeMarkQueue()
     private val actionQueueEma = Ema(emaAlpha)
@@ -109,7 +109,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val actionBufferMaxOccupancy = atomic(0)
     private val actionInFlight = atomic(0)
 
-    private val statePerf = PerformanceMetrics(windowSeconds, emaAlpha)
+    private val statePerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
     private val stateDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val stateTransitions = atomic(0L)
     private val stateVetoed = atomic(0L)
@@ -385,9 +385,6 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         return state.weightedMillis / state.totalMillis
     }
 
-    private inline fun <T> withMonitor(crossinline block: () -> T): T =
-        if (lockEnabled) synchronized(monitorLock) { block() } else block()
-
     private suspend fun onEvent(event: Event) {
         when (event) {
             is Event.Bootstrap -> {
@@ -531,7 +528,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     /** Clears all internal counters and estimators. */
-    fun reset() = withMonitor {
+    fun reset() = synchronized(this) {
         intentTotal.value = 0
         intentProcessed.value = 0
         intentDropped.value = 0

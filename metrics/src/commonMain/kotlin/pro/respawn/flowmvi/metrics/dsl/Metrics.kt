@@ -11,6 +11,8 @@ import pro.respawn.flowmvi.metrics.api.Metrics
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
 /**
@@ -35,9 +37,9 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metrics(
     offloadContext: CoroutineContext = Dispatchers.Default,
     windowSeconds: Int = 60,
     emaAlpha: Double = 0.1,
+    bucketDuration: Duration = 1.seconds,
     clock: Clock = Clock.System,
     timeSource: TimeSource = TimeSource.Monotonic,
-    lockEnabled: Boolean = true,
 ): DefaultMetrics<S, I, A> = DefaultMetrics(
     MetricsCollector(
         reportingScope = reportingScope,
@@ -46,6 +48,6 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metrics(
         emaAlpha = emaAlpha,
         clock = clock,
         timeSource = timeSource,
-        lockEnabled = lockEnabled
+        bucketDuration = bucketDuration,
     )
 )
