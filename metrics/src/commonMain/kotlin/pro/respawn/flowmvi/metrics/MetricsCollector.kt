@@ -73,6 +73,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val storeId: Uuid = Uuid.random()
     private val monitorLock = SynchronizedObject()
     private val currentRun = atomic<Run?>(null)
+    private val runId = atomic<String?>(null)
 
     // region counters
     private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha)
@@ -153,7 +154,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         onStart { child ->
             val channel = Channel<Event>(Channel.UNLIMITED)
             val job = reportingScope.launch(offloadContext) { for (event in channel) onEvent(event) }
-            val previous = currentRun.getAndSet(Run(channel, job))
+            val id = Uuid.random().toString()
+            runId.value = id
+            val previous = currentRun.getAndSet(Run(id, channel, job))
             check(previous == null || previous.job.isCompleted) {
                 "MetricsCollector started with previous run still active for store=${config.name}"
             }
@@ -440,6 +443,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         MetricsSnapshot(
             meta = Meta(
                 schemaVersion = MetricsSchemaVersion.CURRENT,
+                runId = runId.value,
                 generatedAt = clock.now(),
                 startTime = firstStartAt.value,
                 storeName = lastConfig.value?.name,
@@ -602,7 +606,7 @@ private data class SubscribersState(
 
 private data class BurstState(val second: Long?, val current: Int, val max: Int)
 
-private data class Run(val channel: Channel<Event>, val job: Job)
+private data class Run(val id: String, val channel: Channel<Event>, val job: Job)
 
 private class TimeMarkQueue : SynchronizedObject() {
 

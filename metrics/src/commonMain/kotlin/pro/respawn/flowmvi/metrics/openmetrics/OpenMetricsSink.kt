@@ -643,6 +643,7 @@ private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMa
     put("schema_version", snapshot.meta.schemaVersion.value)
     snapshot.meta.storeName?.let { put("store", it) }
     snapshot.meta.storeId?.let { put("store_id", it) }
+    snapshot.meta.runId?.let { put("run_id", it) }
 }
 
 private fun Duration.seconds(): Double = when {

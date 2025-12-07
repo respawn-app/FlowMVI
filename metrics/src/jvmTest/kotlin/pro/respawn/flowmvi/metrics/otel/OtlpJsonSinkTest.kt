@@ -48,7 +48,8 @@ class OtlpJsonSinkTest : FreeSpec({
             "schema.version" to MetricsSchemaVersion.CURRENT.value,
             "service.name" to "demo-service",
             "store" to "demo-store",
-            "store_id" to "demo-store-id"
+            "store_id" to "demo-store-id",
+            "run_id" to "demo-run-id",
         )
     }
 
@@ -59,6 +60,7 @@ class OtlpJsonSinkTest : FreeSpec({
         sink.emit(snapshot)
 
         buffer.toString() shouldContain """schema_version="${MetricsSchemaVersion.CURRENT.value}""""
+        buffer.toString() shouldContain """run_id="demo-run-id""""
     }
 
     "metric names stay stable" {
@@ -201,6 +203,7 @@ class OtlpJsonSinkTest : FreeSpec({
             "service.name" to "svc-from-provider",
             "store" to "demo-store",
             "store_id" to "overridden-id",
+            "run_id" to "demo-run-id",
         )
     }
 
@@ -221,6 +224,7 @@ private fun sampleSnapshot(): MetricsSnapshot = MetricsSnapshot(
         startTime = Instant.fromEpochMilliseconds(1_699_999_000_000),
         storeName = "demo-store",
         storeId = "demo-store-id",
+        runId = "demo-run-id",
         windowSeconds = 60,
         emaAlpha = 0.5f
     ),

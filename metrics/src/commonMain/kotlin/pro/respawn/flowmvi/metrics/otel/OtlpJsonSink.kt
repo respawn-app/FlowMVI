@@ -554,6 +554,7 @@ private fun baseAttributes(meta: Meta, extras: Map<String, String>): List<OtlpKe
     if (!merged.containsKey("schema.version")) merged["schema.version"] = meta.schemaVersion.value
     meta.storeName?.let { if (!merged.containsKey("store")) merged["store"] = it }
     meta.storeId?.let { if (!merged.containsKey("store_id")) merged["store_id"] = it }
+    meta.runId?.let { if (!merged.containsKey("run_id")) merged["run_id"] = it }
     return merged.entries
         .sortedBy { it.key }
         .map { (key, value) -> OtlpKeyValue(key, OtlpAnyValue(stringValue = value)) }

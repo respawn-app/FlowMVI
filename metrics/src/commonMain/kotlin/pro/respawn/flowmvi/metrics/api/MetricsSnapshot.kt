@@ -36,6 +36,8 @@ public data class MetricsSnapshot(
 public data class Meta(
     /** Schema version of the snapshot and rendered metrics. */
     val schemaVersion: MetricsSchemaVersion = MetricsSchemaVersion.CURRENT,
+    /** Identifier of the current store run/lifecycle period. */
+    val runId: String? = null,
     /** Wall-clock moment the snapshot was produced. */
     val generatedAt: Instant,
     /** Wall-clock moment the store (or metrics collector) started; */
