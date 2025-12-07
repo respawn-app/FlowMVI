@@ -156,7 +156,28 @@ class OtlpJsonSinkTest : FreeSpec({
 
         value.shouldContainIgnoringCase("nan")
     }
-})
+
+    "resourceAttributesProvider overrides and merges attrs" {
+        val payload = snapshot.toOtlpPayload(
+            resourceAttributesProvider = { meta ->
+                mapOf(
+                    "service.name" to "svc-from-provider",
+                    "store_id" to "overridden-id", // should override meta.storeId default
+                    "custom" to "value"
+                )
+            }
+        )
+        val attrs = payload.resourceMetrics.single().resource!!.attributes.associate { it.key to it.value.stringValue }
+
+        attrs shouldBe mapOf(
+            "custom" to "value",
+            "service.name" to "svc-from-provider",
+            "store" to "demo-store",
+            "store_id" to "overridden-id",
+        )
+    }
+
+}) 
 
 private fun sampleSnapshot(): MetricsSnapshot = MetricsSnapshot(
     meta = Meta(

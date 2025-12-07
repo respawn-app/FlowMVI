@@ -15,7 +15,6 @@ import pro.respawn.flowmvi.metrics.api.StateMetrics
 import pro.respawn.flowmvi.metrics.api.SubscriptionMetrics
 import kotlin.time.Duration
 import kotlin.time.Instant
-
 private const val DEFAULT_NAMESPACE: String = "flowmvi"
 private const val DEFAULT_SCOPE: String = "flowmvi.metrics"
 private const val SECONDS_UNIT: String = "s"
@@ -35,10 +34,12 @@ public fun MetricsSnapshot.toOtlpPayload(
     resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
     scopeName: String = DEFAULT_SCOPE,
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+    fixedTimestamp: Instant? = null,
 ): OtlpMetricsPayload {
-    val timestamp = meta.generatedAt.toEpochNanoseconds()
-    val startTime = meta.startTime?.toEpochNanoseconds()
-        ?: (timestamp - meta.windowSeconds.toLong() * NANOS_IN_SECOND_LONG).coerceAtLeast(0)
+    val effectiveInstant = fixedTimestamp ?: meta.generatedAt
+    val timestamp = effectiveInstant.toEpochNanoseconds()
+    val windowStart = (timestamp - meta.windowSeconds.toLong() * NANOS_IN_SECOND_LONG).coerceAtLeast(0)
+    val startTime = meta.startTime?.toEpochNanoseconds() ?: windowStart
     val attributes = baseAttributes(meta, resourceAttributesProvider(meta))
     val context = MetricContext(namespace, attributes, timestamp, startTime, temporality)
     return OtlpMetricsPayload(
@@ -64,6 +65,7 @@ public fun OtlpJsonMetricsSink(
     resourceAttributes: Map<String, String> = emptyMap(),
     resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+    fixedTimestamp: Instant? = null,
     json: Json = DefaultJson,
 ): MetricsSink = MappingSink(delegate) { snapshot ->
     val payload = snapshot.toOtlpPayload(
@@ -71,7 +73,8 @@ public fun OtlpJsonMetricsSink(
         resourceAttributes = resourceAttributes,
         resourceAttributesProvider = resourceAttributesProvider,
         scopeName = scopeName,
-        temporality = temporality
+        temporality = temporality,
+        fixedTimestamp = fixedTimestamp
     )
     json.encodeToString(OtlpMetricsPayload.serializer(), payload)
 }
