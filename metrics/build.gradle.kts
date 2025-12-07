@@ -20,6 +20,13 @@ kotlin {
         ext = this,
         wasmWasi = true, // datetime does not support wasmWasi
     )
+
+    sourceSets {
+        jvmTest.dependencies {
+            implementation(libs.bundles.unittest)
+            implementation(projects.test)
+        }
+    }
 }
 
 android {
