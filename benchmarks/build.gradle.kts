@@ -33,6 +33,7 @@ tasks.withType<JavaExec>().configureEach {
 }
 dependencies {
     commonMainImplementation(projects.core)
+    commonMainImplementation(projects.metrics)
 
     commonMainImplementation(libs.kotlin.coroutines.test)
     commonMainImplementation(libs.kotlin.test)
