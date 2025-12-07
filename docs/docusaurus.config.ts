@@ -14,10 +14,12 @@ const config: Config = {
     organizationName: "respawn-app",
     projectName: "FlowMVI",
     onBrokenLinks: "throw",
-    onBrokenMarkdownLinks: "throw",
     onDuplicateRoutes: "throw",
     trailingSlash: false,
     markdown: {
+        hooks : {
+            onBrokenMarkdownLinks: "throw",
+        },
         mermaid: true,
     },
     i18n: {

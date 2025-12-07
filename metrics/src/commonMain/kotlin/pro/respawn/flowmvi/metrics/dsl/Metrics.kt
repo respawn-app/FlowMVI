@@ -30,6 +30,7 @@ import kotlin.time.TimeSource
  * @param windowSeconds length of the sliding window used for rate calculations.
  * @param emaAlpha smoothing factor for [EMA](https://en.wikipedia.org/wiki/Moving_average) calculations.
  * @param clock wall-clock provider for timestamps.
+ * @param bucketDuration duration of each bucket in the moving average calculation.
  * @param timeSource monotonic time source for duration retrieval.
  */
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metrics(

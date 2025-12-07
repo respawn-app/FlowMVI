@@ -89,6 +89,8 @@ Here's a full list:
 - **While Subscribed Plugin** - run jobs when the `N`th subscriber of a store appears. Install
   with `whileSubscribed { }`.
 - **Logging Plugin** - log events to a log stream of the target platform. Install with `enableLogging()`
+- **Metrics Plugin** - capture performance metrics and export them as JSON, OpenMetrics/Prometheus, or OTLP.
+  Install with `collectMetrics()` and `reportMetrics()`. See [Metrics plugin](/plugins/metrics) for details.
 - **Cache Plugin** - cache values in store's scope lazily and with the ability to suspend, binding them to the store's
   lifecycle. Install with `val value by cache { }`
 - **Async cache plugin** - like `cache`, but returns a `Deferred` that can be awaited. Advantageous because it does not
