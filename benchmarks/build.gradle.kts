@@ -34,10 +34,6 @@ tasks.withType<JavaExec>().configureEach {
 dependencies {
     commonMainImplementation(projects.core)
 
-    val fluxo = "0.1-2306082-SNAPSHOT"
-    //noinspection UseTomlInstead
-    commonMainImplementation("io.github.fluxo-kt:fluxo-core:$fluxo")
-
     commonMainImplementation(libs.kotlin.coroutines.test)
     commonMainImplementation(libs.kotlin.test)
     commonMainImplementation(libs.kotlin.benchmark)
