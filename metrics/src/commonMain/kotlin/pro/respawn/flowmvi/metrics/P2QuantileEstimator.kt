@@ -12,12 +12,12 @@ internal class P2QuantileEstimator(
 
     private val probabilities: DoubleArray = requestedProbabilities.copyOf().apply {
         require(isNotEmpty()) { "At least one probability must be provided" }
-        sort()
         for (i in indices) {
             val p = this[i]
             require(p > 0.0 && p < 1.0) { "Probability $p is out of (0, 1) range" }
             if (i > 0) require(this[i - 1] < p) { "Probabilities must be strictly increasing" }
         }
+        sort()
     }
 
     private val probabilityToMarkerIndex: Map<Double, Int> =

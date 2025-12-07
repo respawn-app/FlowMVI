@@ -608,7 +608,7 @@ private data class BurstState(val second: Long?, val current: Int, val max: Int)
 
 private data class Run(val id: String, val channel: Channel<Event>, val job: Job)
 
-private class TimeMarkQueue : SynchronizedObject() {
+internal class TimeMarkQueue : SynchronizedObject() {
 
     private val deque = ArrayDeque<TimeMark>()
 
@@ -624,7 +624,7 @@ private class TimeMarkQueue : SynchronizedObject() {
     fun clear() = synchronized(this) { deque.clear() }
 }
 
-private class Ema(private val alpha: Double) : SynchronizedObject() {
+internal class Ema(private val alpha: Double) : SynchronizedObject() {
 
     var value: Double = Double.NaN
     var count: Long = 0L

@@ -5,11 +5,13 @@ import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
 internal class PerformanceMetrics(
     private val windowSeconds: Int = 60,
     private val emaAlpha: Double = 0.1,
     private val bucketDuration: Duration = 1.seconds,
+    private val clock: Clock = Clock.System,
 ) {
 
     init {
@@ -26,7 +28,7 @@ internal class PerformanceMetrics(
     private val bucketCount: Int = windowSeconds
     private val buckets: IntArray = IntArray(bucketCount)
     private var currentBucketIndex: Int = 0
-    private var lastBucketTime = Clock.System.now()
+    private var lastBucketTime = clock.now()
 
     suspend fun recordOperation(duration: Duration) {
         val duration = duration.toDouble(DurationUnit.MILLISECONDS)
@@ -43,7 +45,7 @@ internal class PerformanceMetrics(
     }
 
     private fun advanceBuckets() {
-        val now = Clock.System.now()
+        val now = clock.now()
         val elapsed = now - lastBucketTime
         val elapsedBuckets = (elapsed / bucketDuration).toInt()
 
@@ -77,7 +79,26 @@ internal class PerformanceMetrics(
         emaMillis = 0.0
         buckets.fill(0)
         currentBucketIndex = 0
-        lastBucketTime = Clock.System.now()
+        lastBucketTime = clock.now()
         p2.clear()
     }
+
+    /**
+     * Internal function to snapshot state for testing.
+     */
+    internal fun stateForTest(): PerformanceMetricsState = PerformanceMetricsState(
+        bucketIndex = currentBucketIndex,
+        buckets = buckets.copyOf(),
+        lastBucketTime = lastBucketTime,
+        totalOperations = _totalOperations,
+        emaMillis = emaMillis,
+    )
 }
+
+internal data class PerformanceMetricsState(
+    val bucketIndex: Int,
+    val buckets: IntArray,
+    val lastBucketTime: Instant,
+    val totalOperations: Long,
+    val emaMillis: Double,
+)
