@@ -3,6 +3,7 @@ package pro.respawn.flowmvi.metrics.otel
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldContainIgnoringCase
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -14,9 +15,11 @@ import pro.respawn.flowmvi.metrics.api.ExceptionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
 import pro.respawn.flowmvi.metrics.api.LifecycleMetrics
 import pro.respawn.flowmvi.metrics.api.Meta
+import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.flowmvi.metrics.api.StateMetrics
 import pro.respawn.flowmvi.metrics.api.SubscriptionMetrics
+import pro.respawn.flowmvi.metrics.openmetrics.OpenMetricsSink
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -42,10 +45,20 @@ class OtlpJsonSinkTest : FreeSpec({
             .attributes
             .associate { it.key to it.value.stringValue }
         attributes shouldBe mapOf(
+            "schema.version" to MetricsSchemaVersion.CURRENT.value,
             "service.name" to "demo-service",
             "store" to "demo-store",
             "store_id" to "demo-store-id"
         )
+    }
+
+    "openmetrics output includes schema version label" {
+        val buffer = StringBuilder()
+        val sink = OpenMetricsSink(delegate = AppendableStringSink(buffer), includeTimestamp = true)
+
+        sink.emit(snapshot)
+
+        buffer.toString() shouldContain """schema_version="${MetricsSchemaVersion.CURRENT.value}""""
     }
 
     "metric names stay stable" {
@@ -55,6 +68,7 @@ class OtlpJsonSinkTest : FreeSpec({
         names shouldContainExactly listOf(
             "flowmvi_config_window_seconds",
             "flowmvi_config_ema_alpha",
+            "flowmvi_config_schema_version",
             "flowmvi_intents_total",
             "flowmvi_intents_processed_total",
             "flowmvi_intents_dropped_total",
@@ -130,6 +144,18 @@ class OtlpJsonSinkTest : FreeSpec({
         dataPoint.timeUnixNano shouldBe snapshot.meta.generatedAt.toEpochMilliseconds() * 1_000_000
     }
 
+    "config schema version is exposed as numeric gauge" {
+        val payload = snapshot.toOtlpPayload(namespace = "flowmvi")
+        val metric = payload.resourceMetrics
+            .single()
+            .scopeMetrics
+            .single()
+            .metrics
+            .first { it.name == "flowmvi_config_schema_version" }
+
+        metric.gauge!!.dataPoints.single().asDouble shouldBe 1.0
+    }
+
     "sink serializes NaN values when present" {
         val buffer = StringBuilder()
         val sink = OtlpJsonMetricsSink(
@@ -171,13 +197,23 @@ class OtlpJsonSinkTest : FreeSpec({
 
         attrs shouldBe mapOf(
             "custom" to "value",
+            "schema.version" to MetricsSchemaVersion.CURRENT.value,
             "service.name" to "svc-from-provider",
             "store" to "demo-store",
             "store_id" to "overridden-id",
         )
     }
 
-}) 
+    "surfaceVersion override is honored in schema version attribute" {
+        val payload = snapshot.toOtlpPayload(
+            namespace = "flowmvi",
+            surfaceVersion = MetricsSchemaVersion(2, 0)
+        )
+        val attrs = payload.resourceMetrics.single().resource!!.attributes.associate { it.key to it.value.stringValue }
+
+        attrs["schema.version"] shouldBe "2.0"
+    }
+})
 
 private fun sampleSnapshot(): MetricsSnapshot = MetricsSnapshot(
     meta = Meta(

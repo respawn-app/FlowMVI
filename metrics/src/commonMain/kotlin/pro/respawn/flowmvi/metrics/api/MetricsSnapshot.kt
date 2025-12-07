@@ -34,6 +34,8 @@ public data class MetricsSnapshot(
 /** Metadata describing snapshot timing and configuration identity. */
 @Serializable
 public data class Meta(
+    /** Schema version of the snapshot and rendered metrics. */
+    val schemaVersion: MetricsSchemaVersion = MetricsSchemaVersion.CURRENT,
     /** Wall-clock moment the snapshot was produced. */
     val generatedAt: Instant,
     /** Wall-clock moment the store (or metrics collector) started; */

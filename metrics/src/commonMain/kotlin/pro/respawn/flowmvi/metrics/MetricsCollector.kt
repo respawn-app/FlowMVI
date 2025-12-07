@@ -31,6 +31,7 @@ import pro.respawn.flowmvi.metrics.api.IntentMetrics
 import pro.respawn.flowmvi.metrics.api.LifecycleMetrics
 import pro.respawn.flowmvi.metrics.api.Meta
 import pro.respawn.flowmvi.metrics.api.Metrics
+import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.flowmvi.metrics.api.StateMetrics
 import pro.respawn.flowmvi.metrics.api.SubscriptionMetrics
@@ -438,6 +439,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     override suspend fun snapshot() = withContext(offloadContext) {
         MetricsSnapshot(
             meta = Meta(
+                schemaVersion = MetricsSchemaVersion.CURRENT,
                 generatedAt = clock.now(),
                 startTime = firstStartAt.value,
                 storeName = lastConfig.value?.name,

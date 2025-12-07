@@ -5,9 +5,12 @@ import pro.respawn.flowmvi.metrics.MetricsSink
 import pro.respawn.flowmvi.metrics.Quantile
 import pro.respawn.flowmvi.metrics.api.ActionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
+import pro.respawn.flowmvi.metrics.api.MetricSurface
+import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.flowmvi.metrics.api.Sink
 import pro.respawn.flowmvi.metrics.api.StateMetrics
+import pro.respawn.flowmvi.metrics.api.downgradeTo
 import kotlin.time.Duration
 
 private enum class MetricType(val wire: String) {
@@ -136,6 +139,13 @@ private fun configMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, 
             name = "config_ema_alpha",
             help = "Metrics EMA smoothing factor",
             value = snapshot.meta.emaAlpha.toDouble(),
+            base = base,
+            timestampMillis = timestampMillis
+        ),
+        gauge(
+            name = "config_schema_version",
+            help = "Metrics schema version (major.minor as number)",
+            value = snapshot.meta.schemaVersion.toDouble(),
             base = base,
             timestampMillis = timestampMillis
         ),
@@ -630,6 +640,7 @@ private fun <T> quantileGauge(
 )
 
 private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMap {
+    put("schema_version", snapshot.meta.schemaVersion.value)
     snapshot.meta.storeName?.let { put("store", it) }
     snapshot.meta.storeId?.let { put("store_id", it) }
 }
@@ -646,14 +657,17 @@ public fun OpenMetricsSink(
     includeHelp: Boolean = true,
     includeUnit: Boolean = true,
     includeTimestamp: Boolean = false,
+    surfaceVersion: MetricsSchemaVersion? = null,
 ): MetricsSink = MappingSink(delegate) {
+    val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
+    val snapshot = it.downgradeTo(surface.version)
     OpenMetricsRenderer(
         namespace = namespace,
         includeHelp = includeHelp,
         includeUnit = includeUnit,
         includeTimestamp = includeTimestamp,
         trailingEof = true
-    ).render(it)
+    ).render(snapshot)
 }
 
 /** Builds a sink that emits Prometheus exposition format (0.0.4) text. */
@@ -663,12 +677,15 @@ public fun PrometheusSink(
     includeHelp: Boolean = true,
     includeUnit: Boolean = false,
     includeTimestamp: Boolean = false,
+    surfaceVersion: MetricsSchemaVersion? = null,
 ): MetricsSink = MappingSink(delegate) {
+    val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
+    val snapshot = it.downgradeTo(surface.version)
     OpenMetricsRenderer(
         namespace = namespace,
         includeHelp = includeHelp,
         includeUnit = includeUnit,
         includeTimestamp = includeTimestamp,
         trailingEof = false
-    ).render(it)
+    ).render(snapshot)
 }

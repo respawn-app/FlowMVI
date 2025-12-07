@@ -9,12 +9,16 @@ import pro.respawn.flowmvi.metrics.api.ExceptionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
 import pro.respawn.flowmvi.metrics.api.LifecycleMetrics
 import pro.respawn.flowmvi.metrics.api.Meta
+import pro.respawn.flowmvi.metrics.api.MetricSurface
+import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.flowmvi.metrics.api.Sink
 import pro.respawn.flowmvi.metrics.api.StateMetrics
 import pro.respawn.flowmvi.metrics.api.SubscriptionMetrics
+import pro.respawn.flowmvi.metrics.api.downgradeTo
 import kotlin.time.Duration
 import kotlin.time.Instant
+
 private const val DEFAULT_NAMESPACE: String = "flowmvi"
 private const val DEFAULT_SCOPE: String = "flowmvi.metrics"
 private const val SECONDS_UNIT: String = "s"
@@ -35,12 +39,17 @@ public fun MetricsSnapshot.toOtlpPayload(
     scopeName: String = DEFAULT_SCOPE,
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
+    surfaceVersion: MetricsSchemaVersion? = null,
 ): OtlpMetricsPayload {
-    val effectiveInstant = fixedTimestamp ?: meta.generatedAt
+    val targetVersion = surfaceVersion ?: meta.schemaVersion
+    val effectiveSnapshot = downgradeTo(targetVersion)
+    val effectiveMeta = effectiveSnapshot.meta
+    val effectiveInstant = fixedTimestamp ?: effectiveMeta.generatedAt
     val timestamp = effectiveInstant.toEpochNanoseconds()
-    val windowStart = (timestamp - meta.windowSeconds.toLong() * NANOS_IN_SECOND_LONG).coerceAtLeast(0)
-    val startTime = meta.startTime?.toEpochNanoseconds() ?: windowStart
-    val attributes = baseAttributes(meta, resourceAttributesProvider(meta))
+    val windowStart = (timestamp - effectiveMeta.windowSeconds.toLong() * NANOS_IN_SECOND_LONG).coerceAtLeast(0)
+    val startTime = effectiveMeta.startTime?.toEpochNanoseconds() ?: windowStart
+    val attributes = baseAttributes(effectiveMeta, resourceAttributesProvider(effectiveMeta))
+    val surface = MetricSurface.fromVersion(targetVersion)
     val context = MetricContext(namespace, attributes, timestamp, startTime, temporality)
     return OtlpMetricsPayload(
         resourceMetrics = listOf(
@@ -49,7 +58,7 @@ public fun MetricsSnapshot.toOtlpPayload(
                 scopeMetrics = listOf(
                     OtlpScopeMetrics(
                         scope = OtlpInstrumentationScope(name = scopeName),
-                        metrics = metrics(snapshot = this, context = context)
+                        metrics = metrics(snapshot = effectiveSnapshot, context = context, surface = surface)
                     )
                 )
             )
@@ -66,6 +75,7 @@ public fun OtlpJsonMetricsSink(
     resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
+    surfaceVersion: MetricsSchemaVersion? = null,
     json: Json = DefaultJson,
 ): MetricsSink = MappingSink(delegate) { snapshot ->
     val payload = snapshot.toOtlpPayload(
@@ -74,7 +84,8 @@ public fun OtlpJsonMetricsSink(
         resourceAttributesProvider = resourceAttributesProvider,
         scopeName = scopeName,
         temporality = temporality,
-        fixedTimestamp = fixedTimestamp
+        fixedTimestamp = fixedTimestamp,
+        surfaceVersion = surfaceVersion
     )
     json.encodeToString(OtlpMetricsPayload.serializer(), payload)
 }
@@ -113,6 +124,7 @@ private data class MetricContext(
 private fun metrics(
     snapshot: MetricsSnapshot,
     context: MetricContext,
+    @Suppress("UNUSED_PARAMETER") surface: MetricSurface,
 ): List<OtlpMetric> = buildList {
     addAll(configMetrics(snapshot, context))
     addAll(intentMetrics(snapshot.intents, context))
@@ -136,6 +148,11 @@ private fun configMetrics(
         name = "config_ema_alpha",
         description = "Metrics EMA smoothing factor",
         value = snapshot.meta.emaAlpha.toDouble(),
+    ),
+    context.gauge(
+        name = "config_schema_version",
+        description = "Metrics schema version (major.minor as number)",
+        value = snapshot.meta.schemaVersion.toDouble(),
     ),
 )
 
@@ -534,6 +551,7 @@ private fun metricName(namespace: String, name: String): String = "${namespace}_
 private fun baseAttributes(meta: Meta, extras: Map<String, String>): List<OtlpKeyValue> {
     val merged = linkedMapOf<String, String>()
     merged.putAll(extras)
+    if (!merged.containsKey("schema.version")) merged["schema.version"] = meta.schemaVersion.value
     meta.storeName?.let { if (!merged.containsKey("store")) merged["store"] = it }
     meta.storeId?.let { if (!merged.containsKey("store_id")) merged["store_id"] = it }
     return merged.entries
