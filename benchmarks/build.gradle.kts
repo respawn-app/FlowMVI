@@ -51,7 +51,7 @@ benchmark {
             mode = "avgt" // "thrpt" - throughput, "avgt" - average
             reportFormat = "text"
             // advanced("nativeGCAfterIteration", true)
-            // advanced("jvmForks", "definedByJmh")
+            advanced("jvmForks", "definedByJmh")
         }
     }
     targets {

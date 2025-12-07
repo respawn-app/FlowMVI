@@ -111,3 +111,21 @@ Built-in sinks:
 
 Pass `surfaceVersion` to downgrade emitted payloads for older consumers; otherwise the snapshot’s schema version is
 used.
+
+
+## Performance Overhead
+
+You can find fresh benchmark results on CI and the source code in the `benchmarks` module.
+In raw numbers, the results are (on a MacBook Pro M1 2021):
+
+- Baseline: 0.342 ± 0.003 us/10k intents (~813 ns/intent)
+- With Metrics: 1.029 ± 0.014 us/10k intents (~4382 ns/intent)
+
+According to these, the overhead of metric collection is ~5.39x for a workflow with a single intent/state update path
+compared to an identical configuration without metrics.
+
+That looks like a big hit on paper, but in practice the hit is so small it's basically a rounding error.
+With metrics enabled, you can still easily process 1000 intents in a single frame (16ms).
+
+**Metrics becomes a meaningful CPU cost only if you process tens of thousands of
+intents per second on a single hot path**
