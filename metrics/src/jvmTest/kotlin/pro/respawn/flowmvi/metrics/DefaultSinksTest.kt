@@ -55,4 +55,25 @@ class DefaultSinksTest : FreeSpec({
         Json.parseToJsonElement(entry.message).jsonObject["meta"]!!
             .jsonObject["runId"]!!.jsonPrimitive.content shouldBe "demo-run-id"
     }
+
+    "StoreLoggerSink logs with level and tag" {
+        val logger = RecordingLogger()
+        val sink = StoreLoggerSink(logger = logger, level = StoreLogLevel.Warn, tag = "MetricsTag")
+
+        sink.emit("hello")
+
+        val entry = logger.entries.single()
+        entry.level shouldBe StoreLogLevel.Warn
+        entry.tag shouldBe "MetricsTag"
+        entry.message shouldBe "hello"
+    }
+
+    "MappingSink propagates exceptions without calling delegate" {
+        var delegated = false
+        val delegate = Sink<String> { delegated = true }
+        val sink = MappingSink<Int, String>(delegate) { error("boom: $it") }
+
+        runCatching { sink.emit(1) }.isFailure shouldBe true
+        delegated shouldBe false
+    }
 })

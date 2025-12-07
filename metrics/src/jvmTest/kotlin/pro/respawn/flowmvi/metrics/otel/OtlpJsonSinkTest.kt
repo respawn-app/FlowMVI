@@ -267,6 +267,53 @@ class OtlpJsonSinkTest : FreeSpec({
         sumPoint.timeUnixNano shouldBe expectedTimestamp
         sumPoint.startTimeUnixNano shouldBe expectedStart
     }
+
+    "surfaceVersion override downgrades schema attribute" {
+        val target = MetricsSchemaVersion(0, 9)
+
+        val payload = snapshot.toOtlpPayload(surfaceVersion = target)
+
+        payload.resourceMetrics.single().resource!!.attributes.associate { it.key to it.value.stringValue }["schema.version"] shouldBe "0.9"
+    }
+
+    "resource attributes are sorted lexicographically after merge" {
+        val payload = snapshot.toOtlpPayload(
+            resourceAttributes = mapOf("z-key" to "z", "a-key" to "a")
+        )
+        val keys = payload.resourceMetrics.single().resource!!.attributes.map { it.key }
+
+        keys shouldBe keys.sorted()
+    }
+
+    "gauges render NaN and infinities as doubles" {
+        val odd = snapshot.copy(
+            intents = snapshot.intents.copy(opsPerSecond = Double.NaN),
+            actions = snapshot.actions.copy(opsPerSecond = Double.POSITIVE_INFINITY),
+            state = snapshot.state.copy(opsPerSecond = Double.NEGATIVE_INFINITY),
+        )
+
+        val payload = odd.toOtlpPayload(namespace = "flowmvi")
+        val metrics = payload.resourceMetrics.single().scopeMetrics.single().metrics.associateBy { it.name }
+
+        metrics.getValue("flowmvi_intents_ops_per_second").gauge!!.dataPoints.single().asDouble!!.isNaN() shouldBe true
+        metrics.getValue("flowmvi_actions_ops_per_second").gauge!!.dataPoints.single().asDouble shouldBe Double.POSITIVE_INFINITY
+        metrics.getValue("flowmvi_state_ops_per_second").gauge!!.dataPoints.single().asDouble shouldBe Double.NEGATIVE_INFINITY
+    }
+
+    "delta temporality uses meta startTime when present" {
+        val start = Instant.fromEpochMilliseconds(123_000)
+        val fixedMeta = snapshot.meta.copy(startTime = start)
+        val payload = snapshot.copy(meta = fixedMeta).toOtlpPayload(
+            temporality = AggregationTemporality.AGGREGATION_TEMPORALITY_DELTA
+        )
+        val sumPoint = payload.resourceMetrics.single().scopeMetrics.single().metrics
+            .first { it.sum != null }
+            .sum!!
+            .dataPoints
+            .single()
+
+        sumPoint.startTimeUnixNano shouldBe start.toEpochMilliseconds() * 1_000_000
+    }
 })
 
 private fun OtlpNumberDataPoint.quantileLabel(): String? = attributes

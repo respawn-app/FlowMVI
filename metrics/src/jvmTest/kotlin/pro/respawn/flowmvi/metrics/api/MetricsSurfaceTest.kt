@@ -32,4 +32,26 @@ class MetricsSurfaceTest : FreeSpec({
         downgraded shouldNotBeSameInstanceAs snapshot
         downgraded.copy(meta = snapshot.meta) shouldBe snapshot
     }
+
+    "downgrade is idempotent for the same target" {
+        val snapshot = sampleSnapshot()
+        val target = MetricsSchemaVersion(1, 0)
+
+        val first = snapshot.downgradeTo(target)
+        val second = first.downgradeTo(target)
+
+        first shouldBe second
+        first.meta.schemaVersion shouldBe target
+    }
+
+    "downgrade then restore current preserves payload" {
+        val snapshot = sampleSnapshot()
+        val older = MetricsSchemaVersion(0, 9)
+
+        val downgraded = snapshot.downgradeTo(older)
+        val restored = downgraded.downgradeTo(MetricsSchemaVersion.CURRENT)
+
+        restored.meta.schemaVersion shouldBe MetricsSchemaVersion.CURRENT
+        restored.copy(meta = snapshot.meta) shouldBe snapshot
+    }
 })
