@@ -36,6 +36,8 @@ public data class MetricsSnapshot(
 public data class Meta(
     /** Wall-clock moment the snapshot was produced. */
     val generatedAt: Instant,
+    /** Wall-clock moment the store (or metrics collector) started; */
+    val startTime: Instant? = null,
     /** Logical store name or identifier to tag metrics. */
     val storeName: String? = null,
     /** Optional configuration fingerprint provided by the user. */

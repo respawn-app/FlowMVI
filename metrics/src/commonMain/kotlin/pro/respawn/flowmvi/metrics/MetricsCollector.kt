@@ -40,6 +40,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
+import kotlin.time.Instant
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
 import kotlin.time.measureTimedValue
@@ -129,6 +130,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val stopCount = atomic(0L)
     private val uptimeTotalMillis = atomic(0L)
     private val currentStart = atomic<TimeMark?>(null)
+    private val firstStartAt = atomic<Instant?>(null)
     private val lifetimeRuns = P2QuantileEstimator(Q50.value)
     private val lifetimeRunEma = Ema(emaAlpha)
     private val bootstrapMedian = P2QuantileEstimator(Q50.value)
@@ -141,7 +143,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     // endregion
 
     // TODO: introduce "lazyDecorator" or "storeDecorator" to access this w/o mutability
-    private val lastConfig = atomic<StoreConfiguration<out MVIState>?>(null)
+    private val lastConfig = atomic<StoreConfiguration<MVIState>?>(null)
 
     /** Returns a decorator that wires metrics capture into store callbacks. */
     @OptIn(ExperimentalFlowMVIAPI::class)
@@ -171,6 +173,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
         lastConfig.value = config
+        firstStartAt.compareAndSet(null, clock.now())
         startCount.incrementAndGet()
         val startedAt = timeSource.markNow()
         currentStart.value = startedAt
@@ -436,6 +439,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         MetricsSnapshot(
             meta = Meta(
                 generatedAt = clock.now(),
+                startTime = firstStartAt.value,
                 storeName = lastConfig.value?.name,
                 storeId = storeId.toString(),
                 windowSeconds = windowSeconds,

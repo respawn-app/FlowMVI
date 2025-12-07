@@ -121,6 +121,15 @@ class OtlpJsonSinkTest : FreeSpec({
         metric.unit shouldBe "s"
     }
 
+    "cumulative counters keep stable start time from meta" {
+        val payload = snapshot.toOtlpPayload(namespace = "flowmvi")
+        val metrics = payload.resourceMetrics.single().scopeMetrics.single().metrics.associateBy { it.name }
+        val metric = metrics.getValue("flowmvi_intents_total")
+        val dataPoint = metric.sum!!.dataPoints.single()
+        dataPoint.startTimeUnixNano shouldBe snapshot.meta.startTime!!.toEpochMilliseconds() * 1_000_000
+        dataPoint.timeUnixNano shouldBe snapshot.meta.generatedAt.toEpochMilliseconds() * 1_000_000
+    }
+
     "sink serializes NaN values when present" {
         val buffer = StringBuilder()
         val sink = OtlpJsonMetricsSink(
@@ -152,6 +161,7 @@ class OtlpJsonSinkTest : FreeSpec({
 private fun sampleSnapshot(): MetricsSnapshot = MetricsSnapshot(
     meta = Meta(
         generatedAt = Instant.fromEpochMilliseconds(1_700_000_000_000),
+        startTime = Instant.fromEpochMilliseconds(1_699_999_000_000),
         storeName = "demo-store",
         storeId = "demo-store-id",
         windowSeconds = 60,
