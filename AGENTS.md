@@ -35,11 +35,6 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 - `docs/` - Documentation directory. Read documentation to self-educate on aspects of the library.
 - `metrics/` - Metrics decorator and related code
 
-### Testing
-
-- All business logic in `core` module must be covered by unit tests written using Kotest FreeSpec style. Examples: 
-   - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/plugin/ReducePluginTest.kt - plugin test
-   - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/store/ChildStoreTest.kt - store test
 
 ### Before you complete a task
 
@@ -56,6 +51,10 @@ Format: `<type>[!]: [description]` where scope is optional, `!` = breaking chang
 
 Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!: change Saver API`
 
+
+## Additional docs.
+
+- Before writing tests, read `./docs/ai/testing.md` for instructions.
 
 ## Notes 
 
