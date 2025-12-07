@@ -42,7 +42,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.co
     timeSource: TimeSource = TimeSource.Monotonic,
     lockEnabled: Boolean = true,
     name: String? = DefaultDecoratorName
-): Metrics = metrics<S, I, A>(
+): MetricsBuilder<S, I, A> = metrics<S, I, A>(
     reportingScope = reportingScope,
     offloadContext = offloadContext,
     windowSeconds = windowSeconds,
