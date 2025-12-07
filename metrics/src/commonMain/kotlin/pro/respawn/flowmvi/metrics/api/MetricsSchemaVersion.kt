@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
  * Schema version for metrics payloads and rendered metric surfaces.
  *
  * Major increments may change names/labels/units; minor increments must be additive.
+ *
+ * @property major incompatible/breaking dimension of the schema.
+ * @property minor additive dimension of the schema.
  */
 @Serializable
 public data class MetricsSchemaVersion(
@@ -28,6 +31,7 @@ public data class MetricsSchemaVersion(
 
     override fun toString(): String = value
 
+    /** Canonical constants for schema evolution. */
     public companion object {
         /** Initial released schema. */
         public val V1_0: MetricsSchemaVersion = MetricsSchemaVersion(1, 0)

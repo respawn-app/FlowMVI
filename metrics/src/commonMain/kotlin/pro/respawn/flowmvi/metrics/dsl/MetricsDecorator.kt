@@ -9,28 +9,51 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.metrics.api.DefaultMetrics
 import pro.respawn.flowmvi.metrics.api.Metrics
-import pro.respawn.flowmvi.metrics.api.MetricsBuilder
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
 
 private const val DefaultDecoratorName: String = "MetricsDecorator"
 
+/**
+ * Creates a decorator that populates the [pro.respawn.flowmvi.metrics.api.MetricsSnapshot]s
+ * returned by the [metrics]. Without this decorator, [Metrics] won't do anything on its own (please see the definition)
+ * for more details
+ *
+ * Install the resulting decorator into a store to start collecting metrics.
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsDecorator(
-    factory: MetricsBuilder<S, I, A>,
+    metrics: DefaultMetrics<S, I, A>,
     name: String? = DefaultDecoratorName
-): PluginDecorator<S, I, A> = factory.asDecorator(name)
+): PluginDecorator<S, I, A> = metrics.asDecorator(name)
 
+/**
+ * Install a new [metricsDecorator]
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.collectMetrics(
-    factory: MetricsBuilder<S, I, A>,
+    metrics: DefaultMetrics<S, I, A>,
     name: String? = DefaultDecoratorName
-): Metrics = factory.also { install(it.asDecorator(name)) }
+): Metrics = metrics.also { install(it.asDecorator(name)) }
 
+/**
+ * Create, install, and return a [Metrics] instance that will use the provided configuration to populate and produce
+ * [pro.respawn.flowmvi.metrics.api.MetricsSnapshot]s.
+ *
+ * For the explanation of the parameters, see [metrics].
+ *
+ * To understand how to collect metrics, see [Metrics] interface definition.
+ *
+ * Do NOT pass the same or short-lived [reportingScope] to this method. The scope should have a longer lifetime to
+ * reliably collect metrics while the store is closed or restarted. More details are in the [metrics] definition
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.collectMetrics(
@@ -39,15 +62,15 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.co
     windowSeconds: Int = 60,
     emaAlpha: Double = 0.1,
     clock: Clock = Clock.System,
+    bucketDuration: Duration = 1.seconds,
     timeSource: TimeSource = TimeSource.Monotonic,
-    lockEnabled: Boolean = true,
     name: String? = DefaultDecoratorName
-): MetricsBuilder<S, I, A> = metrics<S, I, A>(
+): DefaultMetrics<S, I, A> = metrics<S, I, A>(
     reportingScope = reportingScope,
     offloadContext = offloadContext,
     windowSeconds = windowSeconds,
     emaAlpha = emaAlpha,
+    bucketDuration = bucketDuration,
     clock = clock,
-    timeSource = timeSource,
-    lockEnabled = lockEnabled
+    timeSource = timeSource
 ).also { install(it.asDecorator(name)) }

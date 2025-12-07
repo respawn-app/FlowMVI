@@ -16,8 +16,8 @@ import pro.respawn.flowmvi.api.StorePlugin
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.plugin
 import pro.respawn.flowmvi.metrics.MetricsSink
+import pro.respawn.flowmvi.metrics.api.DefaultMetrics
 import pro.respawn.flowmvi.metrics.api.Metrics
-import pro.respawn.flowmvi.metrics.api.MetricsBuilder
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
@@ -25,6 +25,24 @@ import kotlin.time.Duration.Companion.seconds
 
 private const val DefaultName: String = "MetricsReporter"
 
+/**
+ * A default [Metrics] collection plugin that periodically snapshots
+ * [metrics] and forwards them to [sink], optionally flushing on stop.
+ *
+ * This plugin supports backpressure. If the [sink] is slow, oldest snapshots will be dropped,
+ * reducing frequency of reporting until load normalizes.
+ *
+ * @param metrics provider that exposes snapshots. A default provider is exposed via [pro.respawn.flowmvi.metrics.dsl.metrics]
+ * builder
+ * @param offloadScope scope used to launch flushing jobs AFTER store cancellation.
+ * This must **NOT** be the store's scope or scope that the store is launched in! See [pro.respawn.flowmvi.metrics.dsl.metrics] for details.
+ * @param offloadContext dispatcher for offloaded work
+ * @param interval how often to collect snapshots; set to [Duration.INFINITE] or 0 to disable periodic emission
+ * @param flushOnStop whether to emit one last snapshot during [StorePlugin.onStop]
+ * @param name optional plugin name
+ *
+ * @param sink destination [pro.respawn.flowmvi.metrics.api.Sink] for snapshots.
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsReporter(
@@ -54,10 +72,25 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsReporter(
     }
 }
 
+/**
+ * A default [Metrics] collection plugin that periodically snapshots
+ * [metrics] and forwards them to [sink], optionally flushing on stop.
+ *
+ * This plugin supports backpressure. If the [sink] is slow, oldest snapshots will be dropped,
+ * reducing frequency of reporting until load normalizes.
+ *
+ * @param metrics provider that exposes snapshots. A default provider is exposed via [pro.respawn.flowmvi.metrics.dsl.metrics]
+ * builder
+ * @param interval how often to collect snapshots; set to [Duration.INFINITE] or 0 to disable periodic emission
+ * @param flushOnStop whether to emit one last snapshot during [StorePlugin.onStop]
+ * @param name optional plugin name
+ *
+ * @param sink destination [pro.respawn.flowmvi.metrics.api.Sink] for snapshots.
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsReporter(
-    builder: MetricsBuilder<S, I, A>,
+    builder: DefaultMetrics<S, I, A>,
     interval: Duration = 30.seconds,
     flushOnStop: Boolean = true,
     name: String? = DefaultName,
@@ -65,17 +98,22 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> metricsReporter(
 ): StorePlugin<S, I, A> = metricsReporter(
     metrics = builder,
     offloadScope = builder.collector.reportingScope,
+    offloadContext = builder.collector.offloadContext,
     interval = interval,
     flushOnStop = flushOnStop,
     name = name,
-    sink = sink
+    sink = sink,
 )
 
+/**
+ * Install a new [metricsReporter] into the current [pro.respawn.flowmvi.api.Store].
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reportMetrics(
     metrics: Metrics,
     offloadScope: CoroutineScope,
+    offloadContext: CoroutineContext = Dispatchers.Default,
     interval: Duration = 30.seconds,
     flushOnStop: Boolean = true,
     name: String? = DefaultName,
@@ -85,23 +123,27 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.re
         metrics = metrics,
         offloadScope = offloadScope,
         interval = interval,
+        offloadContext = offloadContext,
         flushOnStop = flushOnStop,
         name = name,
         sink = sink
     )
 )
 
+/**
+ * Install a new [metricsReporter] into the current [pro.respawn.flowmvi.api.Store].
+ */
 @FlowMVIDSL
 @ExperimentalFlowMVIAPI
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.reportMetrics(
-    builder: MetricsBuilder<S, I, A>,
+    metrics: DefaultMetrics<S, I, A>,
     interval: Duration = 30.seconds,
     flushOnStop: Boolean = true,
     name: String? = DefaultName,
     sink: MetricsSink,
 ): Unit = install(
     metricsReporter(
-        builder = builder,
+        builder = metrics,
         interval = interval,
         flushOnStop = flushOnStop,
         name = name,
