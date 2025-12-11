@@ -11,7 +11,6 @@ import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent.Increment
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.dsl.store
-import pro.respawn.flowmvi.dsl.updateStateImmediate
 import pro.respawn.flowmvi.metrics.NoopSink
 import pro.respawn.flowmvi.metrics.dsl.collectMetrics
 import pro.respawn.flowmvi.metrics.dsl.reportMetrics

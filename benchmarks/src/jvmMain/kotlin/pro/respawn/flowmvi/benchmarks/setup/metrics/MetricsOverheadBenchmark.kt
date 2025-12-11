@@ -7,11 +7,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.openjdk.jmh.annotations.Benchmark
+import org.openjdk.jmh.annotations.OperationsPerInvocation
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.annotations.Threads
-import org.openjdk.jmh.annotations.OperationsPerInvocation
 import pro.respawn.flowmvi.api.Store
 import pro.respawn.flowmvi.benchmarks.BenchmarkDefaults
 import pro.respawn.flowmvi.benchmarks.setup.BenchmarkIntent
