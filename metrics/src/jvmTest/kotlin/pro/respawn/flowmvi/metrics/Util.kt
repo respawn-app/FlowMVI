@@ -8,17 +8,21 @@ import io.kotest.engine.coroutines.coroutineTestScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.withContext
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StorePlugin
-import pro.respawn.flowmvi.decorator.PluginDecorator
 import pro.respawn.flowmvi.decorator.decorates
 import pro.respawn.flowmvi.dsl.StoreConfigurationBuilder
+import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.plugins.NoOpPlugin
 import pro.respawn.flowmvi.plugins.TimeTravel
+import pro.respawn.flowmvi.plugins.timeTravelPlugin
+import pro.respawn.flowmvi.test.TestStore
 import pro.respawn.flowmvi.test.plugin.PluginTestScope
 import pro.respawn.flowmvi.test.plugin.test
+import pro.respawn.flowmvi.test.test
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Clock
 import kotlin.time.Duration
@@ -98,4 +102,31 @@ internal fun Spec.asUnconfined() {
         ): T = withContext(dispatcher) { f() }
     }
     this.coroutineDebugProbes = true
+}
+
+@OptIn(ExperimentalFlowMVIAPI::class)
+internal suspend inline fun TerminalScope.testCollectorAsStore(
+    windowSeconds: Int = 60,
+    emaAlpha: Double = 0.5,
+    bucketDuration: Duration = 1.seconds,
+    timeTravel: TimeTravel<TestState, TestIntent, TestAction> = TimeTravel(),
+    noinline configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
+    crossinline block: suspend TestStore<TestState, TestIntent, TestAction>.(TestMetrics) -> Unit,
+) {
+    val clock = MutableClock(Instant.fromEpochMilliseconds(0))
+    val ts = MutableTimeSource()
+    val collector = MetricsCollector<TestState, TestIntent, TestAction>(
+        reportingScope = coroutineTestScope,
+        offloadContext = EmptyCoroutineContext,
+        bucketDuration = bucketDuration,
+        windowSeconds = windowSeconds,
+        emaAlpha = emaAlpha,
+        clock = clock,
+        timeSource = ts
+    )
+    store(TestState()) {
+        configure(configuration)
+        install(timeTravelPlugin(timeTravel))
+        install(collector.asDecorator(null))
+    }.test { block.invoke(this, collector) }
 }
