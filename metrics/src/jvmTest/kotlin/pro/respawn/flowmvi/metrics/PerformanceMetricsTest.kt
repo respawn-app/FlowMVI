@@ -158,13 +158,3 @@ class PerformanceMetricsTest : FreeSpec({
         shouldThrow<IllegalArgumentException> { PerformanceMetrics(windowSeconds = 1, bucketDuration = Duration.ZERO) }
     }
 })
-
-private class MutableClock(initial: Instant) : Clock {
-    private var current = initial
-
-    override fun now(): Instant = current
-
-    fun advanceBy(duration: Duration) {
-        current += duration
-    }
-}
