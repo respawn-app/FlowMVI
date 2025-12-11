@@ -66,7 +66,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val emaAlpha: Double,
     internal val clock: Clock, // for tests
     internal val timeSource: TimeSource,
-) : Metrics, SynchronizedObject() {
+) : Metrics, SynchronizedObject(), AutoCloseable {
 
     private val storeId: Uuid = Uuid.random()
     private val currentRun = atomic<Run?>(null)
@@ -355,20 +355,21 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private fun handleSubscriptionChange(newCount: Int) {
+        val clampedCount = newCount.coerceAtLeast(0)
         var lifetimeSamples: List<Double> = emptyList()
-        var subscriberSample = newCount.toDouble()
+        var subscriberSample = clampedCount.toDouble()
         subscribersState.update { state ->
             val now = timeSource.markNow()
             val elapsedMillis = state.lastChange.elapsedNow().inWholeMilliseconds.toDouble()
             val weighted = state.weightedMillis + state.current * elapsedMillis
             val total = state.totalMillis + elapsedMillis
-            val removed = (state.current - newCount).coerceAtLeast(0)
+            val removed = (state.current - clampedCount).coerceAtLeast(0)
             if (removed > 0) lifetimeSamples = List(removed) { elapsedMillis }
-            subscriberSample = newCount.toDouble()
+            subscriberSample = clampedCount.toDouble()
             SubscribersState(
                 events = state.events + 1,
-                current = newCount,
-                peak = maxOf(state.peak, newCount),
+                current = clampedCount,
+                peak = maxOf(state.peak, clampedCount),
                 lastChange = now,
                 weightedMillis = weighted,
                 totalMillis = total,
@@ -584,6 +585,12 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         bootstrapEma.reset()
         recoveryMedian.clear()
         recoveryEma.reset()
+    }
+
+    override fun close() = currentRun.update {
+        it?.channel?.close()
+        it?.job?.cancel()
+        null
     }
 
     private val currentlyDebuggable: Boolean get() = lastConfig.value?.debuggable == true
