@@ -15,7 +15,6 @@ import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.advanceBy
 import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.idle
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
 
