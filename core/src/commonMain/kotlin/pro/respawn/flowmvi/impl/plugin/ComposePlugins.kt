@@ -22,6 +22,9 @@ internal fun <S : MVIState, I : MVIIntent, A : MVIAction> List<PluginInstance<S,
     onUndeliveredIntent = compose(PluginInstance<S, I, A>::onUndeliveredIntent) {
         ctx@{ intent -> fastForEach { it(this@ctx, intent) } }
     },
+    onUndeliveredAction = compose(PluginInstance<S, I, A>::onUndeliveredAction) {
+        ctx@{ action -> fastForEach { it(this@ctx, action) } }
+    },
     onState = compose(PluginInstance<S, I, A>::onState) {
         ctx@{ old: S, new: S -> fold(new) { next -> invoke(this@ctx, old, next) } }
     },
@@ -71,6 +74,7 @@ internal fun <
     onUnsubscribe = { subscriberCount -> onUnsubscribe(subscriberCount) },
     onStop = { e -> onStop(e) },
     onUndeliveredIntent = { intent -> onUndeliveredIntent(intent) },
+    onUndeliveredAction = { action -> onUndeliveredAction(action) },
 )
 
 private inline fun <A : MVIAction, I : MVIIntent, S : MVIState, L, R> List<PluginInstance<S, I, A>>.compose(
