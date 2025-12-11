@@ -74,7 +74,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val runId = atomic<String?>(null)
 
     // region counters
-    private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
+    private val intentPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration, clock)
     private val intentDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val intentPluginOverhead = P2QuantileEstimator(Q50.value)
     private val intentPluginEma = Ema(emaAlpha)
@@ -93,7 +93,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val lastIntentEnqueue = atomic<TimeMark?>(null)
     private val intentBufferMaxOccupancy = atomic(0)
 
-    private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
+    private val actionPerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration, clock)
     private val actionDeliveries = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val actionQueue = TimeMarkQueue()
     private val actionQueueEma = Ema(emaAlpha)
@@ -107,7 +107,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val actionBufferMaxOccupancy = atomic(0)
     private val actionInFlight = atomic(0)
 
-    private val statePerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration)
+    private val statePerf = PerformanceMetrics(windowSeconds, emaAlpha, bucketDuration, clock)
     private val stateDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val stateTransitions = atomic(0L)
     private val stateVetoed = atomic(0L)
