@@ -29,7 +29,7 @@ public suspend fun <S : MVIState, I : MVIIntent, A : MVIAction> LazyPlugin<S, I,
     block: suspend PluginTestScope<S, I, A>.() -> Unit,
 ): Unit = coroutineScope {
     val config = configuration(initial, configuration)
-    val scope = PluginTestScope(config, this@test, timeTravel, this)
+    val scope = PluginTestScopeImpl(config, this@test, timeTravel, this)
     try {
         scope.block()
     } finally {
