@@ -14,6 +14,15 @@ import pro.respawn.flowmvi.plugins.TimeTravel
 import pro.respawn.flowmvi.plugins.loggingPlugin
 import pro.respawn.flowmvi.plugins.timeTravelPlugin
 
+@OptIn(NotIntendedForInheritance::class)
+public interface PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> :
+    PipelineContext<S, I, A>,
+    ShutdownContext<S, I, A>,
+    StorePlugin<S, I, A> {
+
+    public val timeTravel: TimeTravel<S, I, A>
+}
+
 /**
  * A class which provides DSL for testing a [StorePlugin].
  *
@@ -25,10 +34,11 @@ import pro.respawn.flowmvi.plugins.timeTravelPlugin
  * See [StorePlugin.test] for a function that allows to test the plugin
  */
 @OptIn(NotIntendedForInheritance::class)
-public class PluginTestScope<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
+internal class PluginTestScopeImpl<S : MVIState, I : MVIIntent, A : MVIAction> private constructor(
     private val ctx: TestPipelineContext<S, I, A>,
-    public val timeTravel: TimeTravel<S, I, A>,
-) : PipelineContext<S, I, A> by ctx,
+    override val timeTravel: TimeTravel<S, I, A>,
+) : PluginTestScope<S, I, A>,
+    PipelineContext<S, I, A> by ctx,
     ShutdownContext<S, I, A>,
     StorePlugin<S, I, A> by ctx.plugin {
 
