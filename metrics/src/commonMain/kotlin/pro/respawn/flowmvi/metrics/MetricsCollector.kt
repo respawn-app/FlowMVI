@@ -59,14 +59,13 @@ private sealed interface Event {
 }
 
 internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
-    // stopship: allow configure of bucketDuration
     val reportingScope: CoroutineScope,
     val offloadContext: CoroutineContext,
     private val bucketDuration: Duration,
     private val windowSeconds: Int,
     private val emaAlpha: Double,
-    private val clock: Clock,
-    private val timeSource: TimeSource,
+    internal val clock: Clock, // for tests
+    internal val timeSource: TimeSource,
 ) : Metrics, SynchronizedObject() {
 
     private val storeId: Uuid = Uuid.random()
