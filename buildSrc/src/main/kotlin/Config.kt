@@ -61,7 +61,7 @@ object Config {
         // "-Xwhen-guards",
     )
     val jvmCompilerArgs = buildList {
-        add("-Xjvm-default=all") // enable all jvm optimizations
+        add("-jvm-default=enable") // enable all jvm optimizations
         add("-Xcontext-parameters")
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
@@ -94,7 +94,7 @@ object Config {
 
         const val configFile = "detekt.yml"
         val includedFiles = listOf("**/*.kt", "**/*.kts")
-        val excludedFiles = listOf("**/resources/**", "**/build/**", "**/.idea/**")
+        val excludedFiles = listOf("**/resources/**", "**/build/**", "**/.idea/**", "**/generated/**")
     }
 
     object Debugger {
