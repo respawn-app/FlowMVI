@@ -18,7 +18,7 @@ class DecoratorBuilderTest : FreeSpec({
         "when callbacks set once" - {
             "then decorator builds successfully" {
                 shouldNotThrowAny {
-                    decorator<TestState, TestIntent, TestAction> {
+                    val _ = decorator<TestState, TestIntent, TestAction> {
                         onStart { child -> child.run { onStart() } }
                         onIntent { _, intent -> intent }
                         onState { _, old, _ -> old }

@@ -14,6 +14,11 @@
 - All business logic in all modules except sample/debugger must be covered by unit tests written using Kotest FreeSpec style.
 - Note: we don't do screenshot/ui/instrumented tests.
 
+## Value-class intents and equality
+
+- `LambdaIntent`/`TestIntent` is a value class; referential equality (`===`) is unreliable because boxing/unboxing can create new wrappers. Always compare by value (`==`) or by a stable field/label you add yourself.
+- When you need to branch on a specific intent in tests (e.g., timeout selectors), tag it (store an id/label) and compare that tag, not the object identity.
+
 - Test examples:
     - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/plugin/ReducePluginTest.kt - plugin test
     - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/store/ChildStoreTest.kt - store test
