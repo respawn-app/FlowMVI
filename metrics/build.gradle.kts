@@ -18,7 +18,6 @@ kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     configureMultiplatform(
         ext = this,
-        wasmWasi = true, // datetime does not support wasmWasi
     )
 
     sourceSets {
