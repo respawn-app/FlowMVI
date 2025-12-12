@@ -1,12 +1,16 @@
 package pro.respawn.flowmvi.debugger.server
 
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.server.request.receive
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.util.getOrFail
+import io.ktor.server.websocket.WebSocketServerSession
 import io.ktor.server.websocket.receiveDeserialized
 import io.ktor.server.websocket.sendSerialized
 import io.ktor.server.websocket.webSocket
@@ -15,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
@@ -23,6 +28,7 @@ import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
+import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.invoke
@@ -44,8 +50,9 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
             store.intent(ServerStarted)
             routing {
                 get("/") { call.respondText("FlowMVI Debugger Online", null) }
+                post("/{id}") { intent(EventReceived(call.receive<ClientEvent>(), call.storeId)) }
                 webSocket("/{id}") {
-                    val storeId = call.parameters.getOrFail("id").asUUID.toKotlinUuid()
+                    val storeId = call.storeId
                     with(store) {
                         try {
                             subscribe {
@@ -55,8 +62,7 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
                                     .collect { sendSerialized<ServerEvent>(it.event) }
                             }
                             while (true) {
-                                val event = receiveDeserialized<ClientEvent>()
-                                intent(EventReceived(event, storeId))
+                                intent(EventReceived(eventOrNull() ?: continue, storeId))
                             }
                         } finally {
                             logger(StoreLogLevel.Debug) { "Store $storeId disconnected" }
@@ -75,4 +81,13 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
         server?.stop()
         server = null
     }
+
+    private suspend fun WebSocketServerSession.eventOrNull() = try {
+        receiveDeserialized<ClientEvent>()
+    } catch (e: SerializationException) {
+        logger(StoreLogLevel.Warn) { "Failed to decode ClientEvent: ${e.message}" }
+        null
+    }
 }
+
+val ApplicationCall.storeId get() = parameters.getOrFail("id").asUUID.toKotlinUuid()
