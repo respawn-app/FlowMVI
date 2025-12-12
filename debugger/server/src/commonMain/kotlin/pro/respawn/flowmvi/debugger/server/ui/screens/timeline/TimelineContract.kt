@@ -14,7 +14,7 @@ import pro.respawn.flowmvi.debugger.server.util.type
 import kotlin.uuid.Uuid
 
 internal enum class EventType {
-    Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
+    Intent, Action, StateChange, Subscription, Connection, Disconnection, Exception, Initialization
 }
 
 @Immutable
@@ -29,7 +29,7 @@ internal data class StoreItem(
     val isConnected: Boolean,
 ) {
 
-    val label = "${name ?: "Unnamed"} $id"
+    val label = "${name ?: "Unnamed"}\n$id"
 }
 
 @Immutable
