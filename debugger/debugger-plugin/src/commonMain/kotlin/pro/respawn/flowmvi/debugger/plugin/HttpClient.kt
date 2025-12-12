@@ -49,7 +49,7 @@ internal fun HttpClient(
     }
     install(DataConversion)
     install(ContentEncoding) {
-        mode = ContentEncodingConfig.Mode.All // compress requests
+        mode = ContentEncodingConfig.Mode.All
         deflate(1f)
         gzip(0.8f)
         identity(0.5f)
