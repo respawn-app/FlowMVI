@@ -114,7 +114,7 @@ Here's what you get:
 * Automatic multiplatform system **lifecycle handling**
 * First class, one-liner **Compose Multiplatform support** with Previews and UI tests.
 * Integrates with [Decompose](https://github.com/arkivanov/Decompose), Koin, Kodein, androidx.navigation, Nav3, and more
-* Dedicated **IDE Plugin for debugging and codegen** and app for Windows, Linux, MacOS
+* Dedicated **IDE Plugin for debugging and codegen** and app for Windows, Linux, macOS
 * The core **library has no dependencies** - just coroutines
 * Extensively covered by **350+ tests**
 * **Minimal performance overhead**, equal to using a simple Channel, with regular benchmarking
@@ -168,8 +168,6 @@ val authStore = store(initial = State.Loading, coroutineScope) {
         }
     }
 }
-
-store.intent(ClickedSignOut)
 ```
 
 FlowMVI lets you scale your app in a way that does not increase complexity.
@@ -210,16 +208,14 @@ Using FlowMVI with Compose is a matter of one line of code:
 
 ```kotlin
 @Composable
-fun CounterScreen() {
-    val store = counterStore
-
+fun AuthScreen() {
     // subscribe based on system lifecycle - on any platform
-    val state by store.subscribe()
+    val state by authStore.subscribe
 
     when (state) {
-        is DisplayingCounter -> {
-            Button(onClick = { store.intent(ClickedCounter) }) {
-                Text("Counter: ${state.counter}")
+        is Content -> {
+            Button(onClick = { store.intent(ClickedSignOut) }) {
+                Text("Sign Out")
             }
         }
     }
@@ -235,16 +231,16 @@ Bundled Test Harness with minimal verbosity:
 ### Test Stores
 
 ```kotlin
-store.subscribeAndTest {
+authStore.subscribeAndTest {
     // turbine + kotest example
     
-    intent(ClickedCounter)
+    intent(ClickedSignOut)
     
     states.test {
-        awaitItem() shouldBe State(counter = 1)
+        awaitItem() shouldBe Content(user = null)
     }
     actions.test {
-        awaitItem() shouldBe ShowMessage
+        awaitItem() shouldBe ShowMessage("Bye!")
     }
 }
 ```

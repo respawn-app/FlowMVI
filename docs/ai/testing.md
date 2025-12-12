@@ -10,7 +10,7 @@
 - Aim for comprehensive coverage of logic without coverage-farming or neglect. 
 - Tests should cover as many scenarios and edge cases as possible **without** duplicating existing tests.
 
-- Tests for plugins, decorators, and Stores should be dogfed with the harness from the `test` module. Do not attempt to rawdog plugin/store tests w/o the harness!
+- Tests for plugins, decorators, and Stores should be dogfooded with the harness from the `test` module. Do not attempt to rawdog plugin/store tests w/o the harness!
 - All business logic in all modules except sample/debugger must be covered by unit tests written using Kotest FreeSpec style.
 - Note: we don't do screenshot/ui/instrumented tests.
 

@@ -61,7 +61,7 @@ object Config {
         // "-Xwhen-guards",
     )
     val jvmCompilerArgs = buildList {
-        add("-jvm-default=enable") // enable all jvm optimizations
+        add("-jvm-default=enable")
         add("-Xcontext-parameters")
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
