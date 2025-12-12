@@ -4,5 +4,5 @@ package pro.respawn.flowmvi.metrics.api
 public fun interface Sink<T> {
 
     /** Emits a value downstream. Implementations should return quickly. */
-    public fun emit(value: T)
+    public suspend fun emit(value: T)
 }

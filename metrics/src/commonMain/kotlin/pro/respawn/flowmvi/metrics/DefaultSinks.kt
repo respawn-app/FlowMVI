@@ -17,7 +17,7 @@ public fun <T> NoopSink(): Sink<T> = Sink {}
 /** Sink that writes snapshots using [toString] to stdout. */
 public class ConsoleSink<T> : Sink<T> {
 
-    override fun emit(value: T): Unit = println(value)
+    override suspend fun emit(value: T): Unit = println(value)
 }
 
 /** Sink that logs strings through a [StoreLogger] (defaults to [PlatformStoreLogger]). */
@@ -30,7 +30,7 @@ public fun StoreLoggerSink(
 /** Sink that appends strings to an [Appendable], one line per emit. */
 public class AppendableStringSink(private val appendable: Appendable) : Sink<String> {
 
-    override fun emit(value: String) {
+    override suspend fun emit(value: String) {
         appendable.appendLine(value)
     }
 }
