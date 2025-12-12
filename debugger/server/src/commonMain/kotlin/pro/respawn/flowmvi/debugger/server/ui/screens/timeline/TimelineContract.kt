@@ -25,18 +25,22 @@ internal data class TimelineFilters(
 @Immutable
 internal data class StoreItem(
     val id: Uuid,
-    val name: String,
+    val name: String?,
     val isConnected: Boolean,
-)
+) {
+
+    val label = "${name ?: "Unnamed"} $id"
+}
 
 @Immutable
 internal data class FocusedEvent(
     val timestamp: LocalDateTime,
-    val storeName: String,
+    val storeName: String?,
     val type: EventType,
     val event: ClientEvent,
     val id: Uuid,
 ) {
+
     constructor(entry: ServerEventEntry) : this(
         timestamp = entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
         storeName = entry.name,

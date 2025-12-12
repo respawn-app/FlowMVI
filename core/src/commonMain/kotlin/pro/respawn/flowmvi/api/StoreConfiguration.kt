@@ -1,9 +1,11 @@
 package pro.respawn.flowmvi.api
 
 import kotlinx.coroutines.channels.BufferOverflow
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.dsl.StoreConfigurationBuilder
 import pro.respawn.flowmvi.logging.StoreLogger
 import kotlin.coroutines.CoroutineContext
+import kotlin.uuid.Uuid
 
 /**
  * A configuration of the [Store].
@@ -26,6 +28,9 @@ public data class StoreConfiguration<out S : MVIState> internal constructor(
     val verifyPlugins: Boolean,
     val name: String?,
 ) {
+
+    @InternalFlowMVIAPI
+    val id: Uuid = Uuid.random()
 
     @Deprecated(
         "Please use the StateStrategy directly",

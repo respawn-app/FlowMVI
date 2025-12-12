@@ -21,7 +21,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.serialization.SerializationException
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.EmptyState
 import pro.respawn.flowmvi.api.Store
@@ -43,17 +42,17 @@ import kotlin.uuid.Uuid
 internal typealias DebugClientStore = Store<EmptyState, ClientEvent, ServerEvent>
 
 internal fun debugClientStore(
-    clientName: String,
+    clientId: Uuid,
+    clientKey: String?,
     client: HttpClient,
     host: String,
     port: Int,
     reconnectionDelay: Duration,
     logEvents: Boolean = false,
 ) = store(EmptyState) {
-    val id = Uuid.random()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     configure {
-        name = "${clientName}Debugger"
+        name = "${clientKey ?: "Store"}Debugger"
         coroutineContext = Dispatchers.Default
         debuggable = true
         parallelIntents = false // ensure the order of events matches server's expectations
@@ -76,22 +75,20 @@ internal fun debugClientStore(
                 }
             },
         ) {
-            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$id" }
+            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/${clientId}" }
             val _ = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
                 port = port,
-                path = "/$id",
+                path = "/${clientId}",
             ).apply {
                 session.update {
                     it?.close()
                     this
                 }
-                sendSerialized<ClientEvent>(StoreConnected(clientName, id))
+                sendSerialized<ClientEvent>(StoreConnected(clientKey, clientId))
                 log(StoreLogLevel.Trace) { "Established connection to ${call.request.url}" }
-                awaitEvents(config.logger) {
-                    if (it.storeId == id) action(it)
-                }
+                awaitEvents(config.logger) { if (it.storeId == clientId) action(it) }
             }
         }
     }

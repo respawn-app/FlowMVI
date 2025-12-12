@@ -1,3 +1,5 @@
+@file:OptIn(InternalFlowMVIAPI::class)
+
 package pro.respawn.flowmvi.metrics
 
 import kotlinx.atomicfu.atomic
@@ -10,6 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -68,7 +71,6 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     internal val timeSource: TimeSource,
 ) : Metrics, SynchronizedObject(), AutoCloseable {
 
-    private val storeId: Uuid = Uuid.random()
     private val currentRun = atomic<Run?>(null)
     private val runId = atomic<String?>(null)
 
@@ -442,7 +444,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 generatedAt = clock.now(),
                 startTime = firstStartAt.value,
                 storeName = lastConfig.value?.name,
-                storeId = storeId.toString(),
+                storeId = lastConfig.value?.id?.toString(),
                 windowSeconds = windowSeconds,
                 emaAlpha = emaAlpha.toFloat(),
             ),

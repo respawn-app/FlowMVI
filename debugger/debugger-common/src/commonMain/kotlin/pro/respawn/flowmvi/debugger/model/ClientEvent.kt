@@ -17,7 +17,7 @@ public sealed interface ClientEvent : MVIIntent {
     @Serializable
     @SerialName("connected")
     public data class StoreConnected(
-        val name: String,
+        val name: String?,
         val id: Uuid,
     ) : ClientEvent
 
@@ -30,13 +30,14 @@ public sealed interface ClientEvent : MVIIntent {
     @Serializable
     @SerialName("started")
     public data class StoreStarted(
-        val name: String,
+        val name: String?,
     ) : ClientEvent
 
     @Serializable
     @SerialName("stopped")
     public data class StoreStopped(
-        val name: String,
+        val name: String?,
+        val id: Uuid,
     ) : ClientEvent
 
     @Serializable

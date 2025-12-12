@@ -21,7 +21,7 @@ internal enum class StoreCommand {
 @Immutable
 internal data class ServerClientState(
     val id: Uuid,
-    val name: String,
+    val name: String?,
     val isConnected: Boolean,
     val lastConnected: Instant = Clock.System.now(),
 )
@@ -29,7 +29,7 @@ internal data class ServerClientState(
 @Immutable
 internal data class ServerEventEntry(
     val storeId: Uuid,
-    val name: String,
+    val name: String?,
     val event: ClientEvent,
     val timestamp: Instant = Clock.System.now(),
     val id: Uuid = Uuid.random(),
