@@ -44,7 +44,7 @@ flowmvi-metrics = { module = "pro.respawn.flowmvi:metrics", version.ref = "flowm
 commonMainImplementation("pro.respawn.flowmvi:metrics:<version>")
 ```
 
-The artifact is lightweight depends on kotlinx.serialization only.
+The artifact is lightweight and depends only on kotlinx.serialization.
 
 ### 2. Install the decorator
 
@@ -83,8 +83,8 @@ itself to ensure proper cleanup and not lose data on lifecycle changes.
 2. `reportMetrics` installs a plugin that provides the default logic for metric flushing:
    it snapshots the collector on a fixed interval and delivers the data to the `MetricsSink` you give it.
     - Set `interval = Duration.INFINITE` to disable periodic snapshots and keep on-stop flushing only.
-    - If your sink is slow, the plugin wil sacrifice reporting frequency by dropping oldest snapshots without
-      sacrificing overall data integrity
+    - If your sink is slow, the plugin will sacrifice reporting frequency by dropping the oldest snapshots without
+      sacrificing overall data integrity.
 
 ### 3. Implement a Sink that will send metrics
 
@@ -96,8 +96,8 @@ To make your job easier, the library provides `Sink` decorators to format metric
 - [OpenTelemetry](https://opentelemetry.io/),
 - [Prometheus](https://prometheus.io/),
 - [Open Metrics](https://openmetrics.io/),
-- Restful Json endpoints
-- Plaintext/file-based loggers
+- RESTful JSON endpoints.
+- Plaintext/file-based loggers.
 
 Built-in sinks:
 

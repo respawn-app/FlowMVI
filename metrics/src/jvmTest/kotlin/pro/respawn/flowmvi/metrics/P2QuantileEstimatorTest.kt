@@ -75,7 +75,7 @@ class P2QuantileEstimatorTest : FreeSpec({
 
         listOf(0.25, 0.5, 0.75).forEach { p ->
             val q = estimator.getQuantile(p)
-            (q in 0.0..1000.0) shouldBe true // stays within [0,1000]
+            (q in 0.0..1000.0) shouldBe true
         }
     }
 

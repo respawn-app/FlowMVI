@@ -58,8 +58,16 @@ class OpenMetricsSinkJvmTest : FreeSpec({
 
         val rendered = buffer.toString()
         rendered.shouldContain("# TYPE flowmvi_intents_duration_seconds gauge")
-        rendered.shouldContain("""intents_duration_seconds{quantile="0.9",run_id="demo-run-id",""")
-        rendered.shouldContain("""intents_duration_seconds{quantile="0.99",""")
+
+        val q90Line = rendered.lineSequence()
+            .first { it.startsWith("flowmvi_intents_duration_seconds{") && it.contains("quantile=\"0.9\"") }
+        q90Line.shouldContain("quantile=\"0.9\"")
+        q90Line.shouldContain("run_id=\"demo-run-id\"")
+
+        val q99Line = rendered.lineSequence()
+            .first { it.startsWith("flowmvi_intents_duration_seconds{") && it.contains("quantile=\"0.99\"") }
+        q99Line.shouldContain("quantile=\"0.99\"")
+        q99Line.shouldContain("run_id=\"demo-run-id\"")
     }
 
     "adds EOF marker when trailingEof enabled" {
@@ -79,7 +87,7 @@ class OpenMetricsSinkJvmTest : FreeSpec({
 
         sink.emit(snapshot)
 
-        buffer.toString().shouldContain("""schema_version="1.0"""")
+        buffer.toString().shouldContain("schema_version=\"1.0\"")
     }
 
     "escapes quotes backslashes and newlines in labels" {
@@ -100,8 +108,8 @@ class OpenMetricsSinkJvmTest : FreeSpec({
         sink.emit(snapshot.copy(meta = weirdMeta))
 
         val rendered = buffer.toString()
-        rendered.shouldContain("""store="strange\"store\nx\\y"""")
-        rendered.shouldContain("""store_id="id\"with\\slash"""")
+        rendered.shouldContain("""store="strange\"store\nx\\y""")
+        rendered.shouldContain("""store_id="id\"with\\slash""")
     }
 
     "formats NaN and infinities in gauge samples" {

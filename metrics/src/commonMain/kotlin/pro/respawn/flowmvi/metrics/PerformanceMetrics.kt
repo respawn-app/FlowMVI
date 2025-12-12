@@ -31,18 +31,18 @@ internal class PerformanceMetrics(
     private var currentBucketIndex: Int = 0
     private var lastBucketTime = clock.now()
 
-    suspend fun recordOperation(duration: Duration) {
-        val duration = duration.toDouble(DurationUnit.MILLISECONDS)
+    fun recordOperation(duration: Duration) {
+        val durationMillis = duration.toDouble(DurationUnit.MILLISECONDS)
         _totalOperations++
         emaMillis = if (_totalOperations == 1L) {
-            duration
+            durationMillis
         } else {
-            emaAlpha * duration + (1.0 - emaAlpha) * emaMillis
+            emaAlpha * durationMillis + (1.0 - emaAlpha) * emaMillis
         }
 
         advanceBuckets()
         buckets[currentBucketIndex]++
-        p2.add(duration)
+        p2.add(durationMillis)
     }
 
     private fun advanceBuckets() {
