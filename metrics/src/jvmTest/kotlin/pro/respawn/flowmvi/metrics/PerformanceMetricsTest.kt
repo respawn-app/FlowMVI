@@ -68,6 +68,24 @@ class PerformanceMetricsTest : FreeSpec({
         metrics.opsPerSecond() shouldBe (1.0 plusOrMinus 1e-9)
     }
 
+    "opsPerSecond accounts for sub-second bucketDuration" {
+        val clock = MutableClock(Clock.System.now())
+        val metrics = PerformanceMetrics(windowSeconds = 10, emaAlpha = 0.1, bucketDuration = 200.milliseconds, clock = clock)
+
+        repeat(10) { metrics.recordOperation(1.milliseconds) }
+
+        metrics.opsPerSecond() shouldBe (5.0 plusOrMinus 1e-9)
+    }
+
+    "opsPerSecond accounts for multi-second bucketDuration" {
+        val clock = MutableClock(Clock.System.now())
+        val metrics = PerformanceMetrics(windowSeconds = 5, emaAlpha = 0.1, bucketDuration = 2.seconds, clock = clock)
+
+        repeat(5) { metrics.recordOperation(1.milliseconds) }
+
+        metrics.opsPerSecond() shouldBe (0.5 plusOrMinus 1e-9)
+    }
+
     "opsPerSecond resets after large time jump beyond window" {
         val clock = MutableClock(Clock.System.now())
         val metrics = PerformanceMetrics(windowSeconds = 4, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)

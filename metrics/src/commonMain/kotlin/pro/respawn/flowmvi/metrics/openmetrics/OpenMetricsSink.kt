@@ -647,8 +647,8 @@ private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMa
 }
 
 private fun Duration.seconds(): Double = when {
-    isInfinite() -> Double.POSITIVE_INFINITY
-    else -> inWholeNanoseconds / NANOS_IN_SECOND
+    isInfinite() -> if (isNegative()) Double.NEGATIVE_INFINITY else Double.POSITIVE_INFINITY
+    else -> inWholeNanoseconds.toDouble() / NANOS_IN_SECOND
 }
 
 /** Builds a sink that emits OpenMetrics-compliant text. */

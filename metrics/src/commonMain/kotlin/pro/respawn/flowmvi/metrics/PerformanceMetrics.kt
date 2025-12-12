@@ -72,7 +72,8 @@ internal class PerformanceMetrics(
     fun opsPerSecond(): Double {
         advanceBuckets()
         val windowOps = buckets.sum()
-        return windowOps.toDouble() / bucketCount.toDouble()
+        val windowDurationSeconds = (bucketDuration * bucketCount).toDouble(DurationUnit.SECONDS)
+        return windowOps.toDouble() / windowDurationSeconds
     }
 
     fun reset() {

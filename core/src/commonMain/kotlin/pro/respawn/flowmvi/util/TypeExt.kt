@@ -53,6 +53,7 @@ internal inline fun <T> wrap(
     handle: (T) -> Unit
 ): Unit = map?.let { handle(map(value) ?: return) } ?: handle(value)
 
-internal fun <T> Flow<T>.withMap(map: ((value: T) -> T?)?) = mapNotNull { value ->
+// Note: `T` is non-null; for nullable flows use `mapNotNull` directly.
+internal fun <T : Any> Flow<T>.withMap(map: ((value: T) -> T?)?) = mapNotNull { value ->
     map?.let { map(value) ?: return@mapNotNull null } ?: value
 }

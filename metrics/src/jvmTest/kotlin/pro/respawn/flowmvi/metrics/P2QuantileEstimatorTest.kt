@@ -1,5 +1,6 @@
 package pro.respawn.flowmvi.metrics
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.doubles.plusOrMinus
@@ -18,8 +19,11 @@ class P2QuantileEstimatorTest : FreeSpec({
         shouldThrow<IllegalArgumentException> { P2QuantileEstimator(-0.1) }
         shouldThrow<IllegalArgumentException> { P2QuantileEstimator(0.0) }
         shouldThrow<IllegalArgumentException> { P2QuantileEstimator(1.0) }
-        shouldThrow<IllegalArgumentException> { P2QuantileEstimator(0.9, 0.5) }
         shouldThrow<IllegalArgumentException> { P2QuantileEstimator(0.2, 0.2) }
+    }
+
+    "constructor accepts unsorted probabilities" {
+        shouldNotThrowAny { P2QuantileEstimator(0.9, 0.5) }
     }
 
     "bootstrap path uses sorted samples when fewer than markerCount" {
