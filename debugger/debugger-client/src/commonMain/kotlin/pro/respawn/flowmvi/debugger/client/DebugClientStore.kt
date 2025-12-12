@@ -132,6 +132,8 @@ private suspend inline fun DefaultClientWebSocketSession.awaitEvents(
             val event = receiveDeserialized<ServerEvent>()
             log(StoreLogLevel.Trace) { "Received event: $event" }
             onEvent(event)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             log(e, StoreLogLevel.Warn)
             continue
