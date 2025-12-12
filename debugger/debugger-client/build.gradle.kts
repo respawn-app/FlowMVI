@@ -10,7 +10,7 @@ kotlin {
         this,
         // not supported by all needed ktor artifacts?
         watchOs = false,
-        wasmJs = false,
+        wasmJs = true,
         wasmWasi = false,
     )
 }

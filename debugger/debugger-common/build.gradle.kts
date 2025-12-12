@@ -17,6 +17,7 @@ android {
 
 dependencies {
     commonMainApi(projects.core)
+    commonMainApi(projects.metrics)
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.bundles.serialization)
 }
