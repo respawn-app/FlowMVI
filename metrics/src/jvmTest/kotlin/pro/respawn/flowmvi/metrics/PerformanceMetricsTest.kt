@@ -17,7 +17,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "recordOperation updates EMA sequentially and sets baseline" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 5, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 5,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         metrics.recordOperation(10.milliseconds)
         metrics.averageTimeMillis shouldBe 10.0
@@ -30,7 +35,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "recordOperation handles very large duration without NaN" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.2, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.2,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         metrics.recordOperation(2.days)
 
@@ -39,7 +49,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "medianTimeMillis returns expected values including bootstrap" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 10, emaAlpha = 0.2, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 10,
+            emaAlpha = 0.2,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         listOf(10, 50, 20, 40, 30).forEach { metrics.recordOperation(it.milliseconds) }
         metrics.medianTimeMillis() shouldBe (30.0 plusOrMinus 0.0001)
@@ -47,21 +62,35 @@ class PerformanceMetricsTest : FreeSpec({
 
     "medianTimeMillis uses sorted bootstrap for fewer samples" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 10, emaAlpha = 0.2, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 10,
+            emaAlpha = 0.2,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         listOf(5, 15, 10).forEach { metrics.recordOperation(it.milliseconds) }
         metrics.medianTimeMillis() shouldBe (10.0 plusOrMinus 0.0001)
     }
 
     "medianTimeMillis without samples returns NaN" {
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.1, bucketDuration = 1.seconds)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds
+        )
 
         metrics.medianTimeMillis().shouldBeNaN()
     }
 
     "opsPerSecond counts operations within window" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 5, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 5,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         repeat(5) { metrics.recordOperation(1.milliseconds) }
 
@@ -70,7 +99,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "opsPerSecond accounts for sub-second bucketDuration" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 10, emaAlpha = 0.1, bucketDuration = 200.milliseconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 10,
+            emaAlpha = 0.1,
+            bucketDuration = 200.milliseconds,
+            clock = clock
+        )
 
         repeat(10) { metrics.recordOperation(1.milliseconds) }
 
@@ -79,7 +113,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "opsPerSecond accounts for multi-second bucketDuration" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 5, emaAlpha = 0.1, bucketDuration = 2.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 5,
+            emaAlpha = 0.1,
+            bucketDuration = 2.seconds,
+            clock = clock
+        )
 
         repeat(5) { metrics.recordOperation(1.milliseconds) }
 
@@ -88,7 +127,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "opsPerSecond resets after large time jump beyond window" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 4, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 4,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         repeat(3) { metrics.recordOperation(1.milliseconds) }
 
@@ -99,7 +143,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "opsPerSecond handles rapid bucket rolls without negative indices" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 4, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 4,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         repeat(10) {
             clock.advanceBy(1.seconds)
@@ -111,7 +160,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "advanceBuckets moves exactly one slot after bucketDuration" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         val startIndex = metrics.stateForTest().bucketIndex
         clock.advanceBy(1.seconds)
@@ -122,7 +176,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "advanceBuckets past full window clears buckets" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         repeat(2) { metrics.recordOperation(1.milliseconds) }
         clock.advanceBy(5.seconds)
@@ -133,7 +192,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "advanceBuckets with no elapsed time keeps index" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.1, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         val before = metrics.stateForTest().bucketIndex
         metrics.opsPerSecond()
@@ -142,7 +206,12 @@ class PerformanceMetricsTest : FreeSpec({
 
     "reset clears counters, ema and quantiles" {
         val clock = MutableClock(Clock.System.now())
-        val metrics = PerformanceMetrics(windowSeconds = 3, emaAlpha = 0.3, bucketDuration = 1.seconds, clock = clock)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 3,
+            emaAlpha = 0.3,
+            bucketDuration = 1.seconds,
+            clock = clock
+        )
 
         repeat(3) { metrics.recordOperation(10.milliseconds) }
         metrics.opsPerSecond()
@@ -161,7 +230,11 @@ class PerformanceMetricsTest : FreeSpec({
     }
 
     "reset after no samples leaves default state" {
-        val metrics = PerformanceMetrics(windowSeconds = 2, emaAlpha = 0.1, bucketDuration = 1.seconds)
+        val metrics = PerformanceMetrics(
+            windowSeconds = 2,
+            emaAlpha = 0.1,
+            bucketDuration = 1.seconds
+        )
 
         metrics.reset()
 
@@ -172,6 +245,8 @@ class PerformanceMetricsTest : FreeSpec({
 
     "parameter validation rejects non positive window and bucket duration" {
         shouldThrow<IllegalArgumentException> { PerformanceMetrics(windowSeconds = 0) }
-        shouldThrow<IllegalArgumentException> { PerformanceMetrics(windowSeconds = 1, bucketDuration = Duration.ZERO) }
+        shouldThrow<IllegalArgumentException> {
+            PerformanceMetrics(windowSeconds = 1, bucketDuration = Duration.ZERO)
+        }
     }
 })
