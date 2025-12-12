@@ -85,8 +85,11 @@ class OpenMetricsSinkJvmTest : FreeSpec({
     "escapes quotes backslashes and newlines in labels" {
         val buffer = StringBuilder()
         val weirdMeta = snapshot.meta.copy(
-            storeName = "strange\"store\nx\\y",
-            storeId = "id\"with\\slash",
+            storeName = """
+                strange"store
+                x\y
+            """.trimIndent(),
+            storeId = """id"with\slash""",
         )
         val sink = OpenMetricsSink(
             delegate = AppendableStringSink(buffer),

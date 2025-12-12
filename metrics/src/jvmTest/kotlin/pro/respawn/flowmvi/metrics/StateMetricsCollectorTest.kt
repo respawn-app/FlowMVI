@@ -95,10 +95,11 @@ class StateMetricsCollectorTest : FreeSpec({
 
     "State.updateAvg stable for identical durations" {
         testCollectorWithTime(emaAlpha = 0.5, childFactory = { _, ts ->
-            plugin { onState { _, new ->
-                ts.advanceBy(10.milliseconds)
-                new
-            }
+            plugin {
+                onState { _, new ->
+                    ts.advanceBy(10.milliseconds)
+                    new
+                }
             }
         }) { collector, _, _ ->
             onStart()
@@ -133,10 +134,11 @@ class StateMetricsCollectorTest : FreeSpec({
 
     "State.update quantiles for single sample equal that sample" {
         testCollectorWithTime(childFactory = { _, ts ->
-            plugin { onState { _, new ->
-                ts.advanceBy(10.milliseconds)
-                new
-            }
+            plugin {
+                onState { _, new ->
+                    ts.advanceBy(10.milliseconds)
+                    new
+                }
             }
         }) { collector, _, _ ->
             onStart()
@@ -162,10 +164,11 @@ class StateMetricsCollectorTest : FreeSpec({
 
     "State.opsPerSecond reflects updates within window" {
         testCollectorWithTime(windowSeconds = 2, childFactory = { _, ts ->
-            plugin { onState { _, new ->
-                ts.advanceBy(1.milliseconds)
-                new
-            }
+            plugin {
+                onState { _, new ->
+                    ts.advanceBy(1.milliseconds)
+                    new
+                }
             }
         }) { collector, _, _ ->
             onStart()
@@ -183,10 +186,11 @@ class StateMetricsCollectorTest : FreeSpec({
 
     "State.opsPerSecond drops updates outside window" {
         testCollectorWithTime(windowSeconds = 2, childFactory = { _, ts ->
-            plugin { onState { _, new ->
-                ts.advanceBy(1.milliseconds)
-                new
-            }
+            plugin {
+                onState { _, new ->
+                    ts.advanceBy(1.milliseconds)
+                    new
+                }
             }
         }) { collector, clock, _ ->
             onStart()

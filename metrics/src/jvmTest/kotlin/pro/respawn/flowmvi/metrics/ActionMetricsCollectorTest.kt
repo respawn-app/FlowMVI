@@ -133,10 +133,11 @@ class ActionMetricsCollectorTest : FreeSpec({
 
     "Action.opsPerSecond drops samples outside window" {
         testCollectorWithTime(windowSeconds = 2, childFactory = { _, ts ->
-            plugin { onActionDispatch {
-                ts.advanceBy(1.milliseconds);
-                it
-            }
+            plugin {
+                onActionDispatch {
+                    ts.advanceBy(1.milliseconds)
+                    it
+                }
             }
         }) { collector, clock, _ ->
             onStart()
@@ -161,9 +162,9 @@ class ActionMetricsCollectorTest : FreeSpec({
             }
         }) { collector, _, _ ->
             onStart()
-            onAction(TestAction(1));
+            onAction(TestAction(1))
             onActionDispatch(TestAction(1))
-            onAction(TestAction(2));
+            onAction(TestAction(2))
             onActionDispatch(TestAction(2))
             collector.snapshot().actions.deliveryAvg shouldBe 15.milliseconds
         }
@@ -204,7 +205,7 @@ class ActionMetricsCollectorTest : FreeSpec({
         }) { collector, _, _ ->
             onStart()
             repeat(5) {
-                onAction(TestAction(it));
+                onAction(TestAction(it))
                 onActionDispatch(TestAction(it))
             }
             val snap = collector.snapshot().actions
@@ -217,14 +218,15 @@ class ActionMetricsCollectorTest : FreeSpec({
 
     "Action.delivery quantiles for single sample equal that sample" {
         testCollectorWithTime(childFactory = { _, ts ->
-            plugin { onActionDispatch {
-                ts.advanceBy(10.milliseconds);
-                it
-            }
+            plugin {
+                onActionDispatch {
+                    ts.advanceBy(10.milliseconds)
+                    it
+                }
             }
         }) { collector, _, _ ->
             onStart()
-            onAction(TestAction(1));
+            onAction(TestAction(1))
             onActionDispatch(TestAction(1))
             val snap = collector.snapshot().actions
             snap.deliveryP50 shouldBe 10.milliseconds

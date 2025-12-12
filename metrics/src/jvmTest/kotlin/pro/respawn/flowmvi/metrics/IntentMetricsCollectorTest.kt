@@ -173,10 +173,11 @@ class IntentMetricsCollectorTest : FreeSpec({
 
     "Intent.opsPerSecond drops samples outside window" {
         testCollectorWithTime(windowSeconds = 3, childFactory = { _, ts ->
-            plugin { onIntent {
-                ts.advanceBy(1.milliseconds);
-                it
-            }
+            plugin {
+                onIntent {
+                    ts.advanceBy(1.milliseconds)
+                    it
+                }
             }
         }) { collector, clock, _ ->
             onStart()
@@ -201,9 +202,9 @@ class IntentMetricsCollectorTest : FreeSpec({
             }
         }) { collector, _, _ ->
             onStart()
-            onIntentEnqueue(TestIntent(1));
+            onIntentEnqueue(TestIntent(1))
             onIntent(TestIntent(1))
-            onIntentEnqueue(TestIntent(2));
+            onIntentEnqueue(TestIntent(2))
             onIntent(TestIntent(2))
             collector.snapshot().intents.durationAvg shouldBe 15.milliseconds
         }
@@ -218,15 +219,16 @@ class IntentMetricsCollectorTest : FreeSpec({
 
     "Intent.durationAvg unchanged for identical durations" {
         testCollectorWithTime(emaAlpha = 0.5, childFactory = { _, ts ->
-            plugin { onIntent {
-                ts.advanceBy(10.milliseconds);
-                it
-            }
+            plugin {
+                onIntent {
+                    ts.advanceBy(10.milliseconds)
+                    it
+                }
             }
         }) { collector, _, _ ->
             onStart()
             repeat(2) {
-                onIntentEnqueue(TestIntent(it));
+                onIntentEnqueue(TestIntent(it))
                 onIntent(TestIntent(it))
             }
             collector.snapshot().intents.durationAvg shouldBe 10.milliseconds
@@ -246,7 +248,7 @@ class IntentMetricsCollectorTest : FreeSpec({
         }) { collector, _, _ ->
             onStart()
             repeat(5) {
-                onIntentEnqueue(TestIntent(it));
+                onIntentEnqueue(TestIntent(it))
                 onIntent(TestIntent(it))
             }
             val snap = collector.snapshot().intents
@@ -259,14 +261,15 @@ class IntentMetricsCollectorTest : FreeSpec({
 
     "Intent.duration quantiles for single sample equal that sample" {
         testCollectorWithTime(childFactory = { _, ts ->
-            plugin { onIntent {
-                ts.advanceBy(10.milliseconds);
-                it
-            }
+            plugin {
+                onIntent {
+                    ts.advanceBy(10.milliseconds)
+                    it
+                }
             }
         }) { collector, _, _ ->
             onStart()
-            onIntentEnqueue(TestIntent(1));
+            onIntentEnqueue(TestIntent(1))
             onIntent(TestIntent(1))
             val snap = collector.snapshot().intents
             snap.durationP50 shouldBe 10.milliseconds
@@ -552,9 +555,9 @@ class IntentMetricsCollectorTest : FreeSpec({
             }
         }) { collector, _, _ ->
             onStart()
-            onIntentEnqueue(TestIntent(1));
+            onIntentEnqueue(TestIntent(1))
             onIntent(TestIntent(1))
-            onIntentEnqueue(TestIntent(2));
+            onIntentEnqueue(TestIntent(2))
             onIntent(TestIntent(2))
             collector.snapshot().intents.pluginOverheadAvg shouldBe 15.milliseconds
         }
@@ -569,15 +572,16 @@ class IntentMetricsCollectorTest : FreeSpec({
 
     "Intent.pluginOverheadAvg stable for identical durations" {
         testCollectorWithTime(emaAlpha = 0.5, childFactory = { _, ts ->
-            plugin { onIntent {
-                ts.advanceBy(10.milliseconds);
-                it
-            }
+            plugin {
+                onIntent {
+                    ts.advanceBy(10.milliseconds)
+                    it
+                }
             }
         }) { collector, _, _ ->
             onStart()
             repeat(2) {
-                onIntentEnqueue(TestIntent(it));
+                onIntentEnqueue(TestIntent(it))
                 onIntent(TestIntent(it))
             }
             collector.snapshot().intents.pluginOverheadAvg shouldBe 10.milliseconds
@@ -597,7 +601,7 @@ class IntentMetricsCollectorTest : FreeSpec({
         }) { collector, _, _ ->
             onStart()
             repeat(5) {
-                onIntentEnqueue(TestIntent(it));
+                onIntentEnqueue(TestIntent(it))
                 onIntent(TestIntent(it))
             }
             collector.snapshot().intents.pluginOverheadMedian shouldBe 15.milliseconds
@@ -606,14 +610,15 @@ class IntentMetricsCollectorTest : FreeSpec({
 
     "Intent.pluginOverheadMedian for single sample equals that value" {
         testCollectorWithTime(childFactory = { _, ts ->
-            plugin { onIntent {
-                ts.advanceBy(12.milliseconds);
-                it
-            }
+            plugin {
+                onIntent {
+                    ts.advanceBy(12.milliseconds)
+                    it
+                }
             }
         }) { collector, _, _ ->
             onStart()
-            onIntentEnqueue(TestIntent(1));
+            onIntentEnqueue(TestIntent(1))
             onIntent(TestIntent(1))
             collector.snapshot().intents.pluginOverheadMedian shouldBe 12.milliseconds
         }
