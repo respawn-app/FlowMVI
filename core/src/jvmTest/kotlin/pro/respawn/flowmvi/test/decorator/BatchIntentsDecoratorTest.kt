@@ -25,8 +25,8 @@ import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.advanceBy
 import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.testTimeTravel
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.ZERO
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalFlowMVIAPI::class, DelicateStoreApi::class)
 class BatchIntentsDecoratorTest : FreeSpec({
