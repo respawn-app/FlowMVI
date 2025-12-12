@@ -20,7 +20,7 @@ jobs:
       debugger-url: ${{ steps.upload-debugger.outputs.artifact-url }}
       sample-url: ${{ steps.upload-sample.outputs.artifact-url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
