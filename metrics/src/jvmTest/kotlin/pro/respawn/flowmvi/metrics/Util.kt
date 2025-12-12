@@ -2,12 +2,9 @@ package pro.respawn.flowmvi.metrics
 
 import io.kotest.core.spec.Spec
 import io.kotest.core.spec.style.scopes.TerminalScope
-import io.kotest.core.test.TestCase
-import io.kotest.engine.coroutines.CoroutineDispatcherFactory
 import io.kotest.engine.coroutines.coroutineTestScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.withContext
 import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
@@ -23,7 +20,6 @@ import pro.respawn.flowmvi.test.TestStore
 import pro.respawn.flowmvi.test.plugin.PluginTestScope
 import pro.respawn.flowmvi.test.plugin.test
 import pro.respawn.flowmvi.test.test
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
@@ -69,39 +65,56 @@ internal suspend inline fun TerminalScope.testCollector(
     emaAlpha: Double = 0.5,
     bucketDuration: Duration = 1.seconds,
     timeTravel: TimeTravel<TestState, TestIntent, TestAction> = TimeTravel(),
-    child: StorePlugin<TestState, TestIntent, TestAction> = NoOpPlugin(),
     noinline configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
     crossinline block: suspend TestCtx.(TestMetrics) -> Unit,
+) {
+    testCollectorWithTime(
+        windowSeconds = windowSeconds,
+        emaAlpha = emaAlpha,
+        bucketDuration = bucketDuration,
+        timeTravel = timeTravel,
+        configuration = configuration,
+        childFactory = { _, _ -> NoOpPlugin() },
+    ) { collector, _, _ ->
+        block(collector)
+    }
+}
+
+internal suspend inline fun TerminalScope.testCollectorWithTime(
+    windowSeconds: Int = 60,
+    emaAlpha: Double = 0.5,
+    bucketDuration: Duration = 1.seconds,
+    timeTravel: TimeTravel<TestState, TestIntent, TestAction> = TimeTravel(),
+    noinline configuration: StoreConfigurationBuilder.() -> Unit = { debuggable = true },
+    crossinline childFactory: (MutableClock, MutableTimeSource) -> StorePlugin<TestState, TestIntent, TestAction> =
+        { _, _ -> NoOpPlugin() },
+    crossinline block: suspend TestCtx.(TestMetrics, MutableClock, MutableTimeSource) -> Unit,
 ) {
     val clock = MutableClock(Instant.fromEpochMilliseconds(0))
     val ts = MutableTimeSource()
     val collector = MetricsCollector<TestState, TestIntent, TestAction>(
         reportingScope = coroutineTestScope,
-        offloadContext = EmptyCoroutineContext,
+        offloadContext = UnconfinedTestDispatcher(),
         bucketDuration = bucketDuration,
         windowSeconds = windowSeconds,
         emaAlpha = emaAlpha,
         clock = clock,
         timeSource = ts
     )
+    val child = childFactory(clock, ts)
     val wrapped = collector.asDecorator(null) decorates child
-    wrapped.test(TestState(), timeTravel, configuration) {
-        block(collector)
+    collector.use {
+        wrapped.test(TestState(), timeTravel, configuration) {
+            block(collector, clock, ts)
+            // force shutdown if test didn't
+        }
     }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun Spec.asUnconfined() {
+internal fun Spec.configure() {
     coroutineTestScope = true
-    coroutineDispatcherFactory = object : CoroutineDispatcherFactory {
-        val dispatcher = UnconfinedTestDispatcher()
-        override suspend fun <T> withDispatcher(spec: Spec, f: suspend () -> T): T = withContext(dispatcher) { f() }
-
-        override suspend fun <T> withDispatcher(
-            testCase: TestCase, f: suspend () -> T
-        ): T = withContext(dispatcher) { f() }
-    }
-    this.coroutineDebugProbes = true
+    this.coroutineDebugProbes = false
 }
 
 @OptIn(ExperimentalFlowMVIAPI::class)
@@ -117,7 +130,7 @@ internal suspend inline fun TerminalScope.testCollectorAsStore(
     val ts = MutableTimeSource()
     val collector = MetricsCollector<TestState, TestIntent, TestAction>(
         reportingScope = coroutineTestScope,
-        offloadContext = EmptyCoroutineContext,
+        offloadContext = UnconfinedTestDispatcher(), // makes advance() work, eliminates races between actor/test
         bucketDuration = bucketDuration,
         windowSeconds = windowSeconds,
         emaAlpha = emaAlpha,
