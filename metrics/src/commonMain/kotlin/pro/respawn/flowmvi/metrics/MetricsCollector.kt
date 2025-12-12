@@ -627,6 +627,10 @@ internal class TimeMarkQueue : SynchronizedObject() {
 
 internal class Ema(private val alpha: Double) : SynchronizedObject() {
 
+    init {
+        require(alpha > 0.0 && alpha < 1.0) { "emaAlpha must be in (0, 1)" }
+    }
+
     var value: Double = Double.NaN
     var count: Long = 0L
 

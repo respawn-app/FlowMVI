@@ -16,6 +16,7 @@ internal class PerformanceMetrics(
 
     init {
         require(windowSeconds > 0) { "windowSeconds must be > 0" }
+        require(emaAlpha > 0.0 && emaAlpha < 1.0) { "emaAlpha must be in (0, 1)" }
         require(bucketDuration.isPositive()) { "bucketDuration must be > 0" }
     }
 
