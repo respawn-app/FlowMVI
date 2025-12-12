@@ -33,10 +33,7 @@ tasks.withType<JavaExec>().configureEach {
 }
 dependencies {
     commonMainImplementation(projects.core)
-
-    val fluxo = "0.1-2306082-SNAPSHOT"
-    //noinspection UseTomlInstead
-    commonMainImplementation("io.github.fluxo-kt:fluxo-core:$fluxo")
+    commonMainImplementation(projects.metrics)
 
     commonMainImplementation(libs.kotlin.coroutines.test)
     commonMainImplementation(libs.kotlin.test)
@@ -54,7 +51,7 @@ benchmark {
             mode = "avgt" // "thrpt" - throughput, "avgt" - average
             reportFormat = "text"
             // advanced("nativeGCAfterIteration", true)
-            // advanced("jvmForks", "definedByJmh")
+            advanced("jvmForks", "definedByJmh")
         }
     }
     targets {

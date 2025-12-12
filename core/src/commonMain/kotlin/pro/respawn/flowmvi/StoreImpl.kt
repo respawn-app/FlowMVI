@@ -64,13 +64,15 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private val intents = intentModule<S, I, A>(
         config = config,
+        onEnqueue = plugin.onIntentEnqueue,
         onIntent = plugin.onIntent?.let { onIntent -> { intent -> catch(recover) { onIntent(this, intent) } } },
-        onUndeliveredIntent = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
+        onUndelivered = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
     )
 
-    private val _actions = actionModule<A>(
+    private val _actions = actionModule(
         behavior = config.actionShareBehavior,
-        onUndeliveredAction = plugin.onUndeliveredAction?.let { { action -> it(this, action) } }
+        onUndelivered = plugin.onUndeliveredAction?.let { { action -> it(this, action) } },
+        onDispatch = plugin.onActionDispatch,
     )
 
     // region pipeline

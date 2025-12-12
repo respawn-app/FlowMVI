@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.test.decorator
 
 import app.cash.turbine.test
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
@@ -24,11 +25,27 @@ import pro.respawn.flowmvi.util.TestState
 import pro.respawn.flowmvi.util.advanceBy
 import pro.respawn.flowmvi.util.configure
 import pro.respawn.flowmvi.util.testTimeTravel
+import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalFlowMVIAPI::class, DelicateStoreApi::class)
 class BatchIntentsDecoratorTest : FreeSpec({
     configure()
+
+    "batching mode validates parameters" - {
+        "amount mode rejects non-positive size" {
+            shouldThrow<IllegalArgumentException> { BatchingMode.Amount(size = 0) }
+            shouldThrow<IllegalArgumentException> { BatchingMode.Amount(size = -1) }
+        }
+        "time mode rejects non-positive duration" {
+            shouldThrow<IllegalArgumentException> { BatchingMode.Time(duration = ZERO) }
+            shouldThrow<IllegalArgumentException> { BatchingMode.Time(duration = (-1).milliseconds) }
+        }
+        "valid parameters construct successfully" {
+            BatchingMode.Amount(size = 1)
+            BatchingMode.Time(duration = 1.milliseconds)
+        }
+    }
 
     "given amount batching mode" - {
         val timeTravel = testTimeTravel()

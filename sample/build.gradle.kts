@@ -109,6 +109,7 @@ kotlin {
                 implementation(projects.essenty)
                 implementation(projects.compose)
                 implementation(projects.savedstate)
+                implementation(projects.metrics)
             }
         }
         nativeMain.dependencies {

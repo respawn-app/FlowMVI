@@ -60,8 +60,7 @@ Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!:
 
 - Document public code via kdocs.
 - Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
-- Avoid source breaking changes. Deprecate public api instead of removing it.
+- Avoid source-breaking changes. Deprecate public api instead of removing it.
 - Main branch: `master`. Master = prod.
 - Ignore warnings about experimental or unsupported features - they are informational
 - Put native platform code in nativeMain, or if using Apple APIs, in appleMain. Native includes all Apple platforms.
-- never use deprecated kotlinx.datetime.Instant. Use kotlin.time.Clock and kotlin.time.Instant

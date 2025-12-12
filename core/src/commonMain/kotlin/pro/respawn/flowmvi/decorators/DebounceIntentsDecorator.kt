@@ -19,7 +19,7 @@ import pro.respawn.flowmvi.dsl.StoreBuilder
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 
-private class JobHandle() {
+private class JobHandle {
 
     var job by atomic<Job?>(null)
         private set

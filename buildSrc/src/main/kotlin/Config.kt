@@ -18,10 +18,10 @@ object Config {
     const val artifactId = "$group.$artifact"
 
     const val majorRelease = 3
-    const val minorRelease = 2
-    const val patch = 1
-    const val postfix = "" // include dash (-)
-    const val versionCode = 13
+    const val minorRelease = 3
+    const val patch = 0
+    const val postfix = "-alpha01" // include dash (-)
+    const val versionCode = 14
 
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"
@@ -61,7 +61,7 @@ object Config {
         // "-Xwhen-guards",
     )
     val jvmCompilerArgs = buildList {
-        add("-jvm-default=enable") // enable all jvm optimizations
+        add("-jvm-default=enable")
         add("-Xcontext-parameters")
         add("-Xstring-concat=inline")
         add("-Xlambdas=indy")
