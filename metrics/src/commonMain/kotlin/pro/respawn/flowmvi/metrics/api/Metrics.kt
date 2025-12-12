@@ -24,6 +24,7 @@ public fun interface Metrics {
      */
     public suspend fun snapshot(): MetricsSnapshot
 
+    /** Namespace companion for [Metrics]. */
     @Suppress("UndocumentedPublicProperty")
     public companion object
 }

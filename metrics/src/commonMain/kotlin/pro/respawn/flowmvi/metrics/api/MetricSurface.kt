@@ -11,6 +11,7 @@ public sealed interface MetricSurface {
     /** Schema version this surface renders. */
     public val version: MetricsSchemaVersion
 
+    /** Predefined metric surfaces and a resolver by schema version. */
     @Suppress("UndocumentedPublicProperty")
     public companion object {
 
