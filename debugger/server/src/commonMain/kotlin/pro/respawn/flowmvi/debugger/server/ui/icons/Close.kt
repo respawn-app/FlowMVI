@@ -21,13 +21,13 @@ val Icons.Close: ImageVector
             viewportHeight = 24f,
         ).apply {
             path(
-                stroke = SolidColor(Color.White),
-                strokeLineWidth = 1.5f,
+                stroke = SolidColor(Color(0xFFFFFFFF)),
+                strokeLineWidth = 2f,
                 strokeLineCap = StrokeCap.Round,
                 strokeLineJoin = StrokeJoin.Round,
             ) {
-                moveTo(4.852f, 19.15f)
-                lineTo(19.15f, 4.852f)
+                moveTo(4.852f, 19.149f)
+                lineTo(19.15f, 4.851f)
                 moveTo(19.045f, 19.046f)
                 lineTo(4.954f, 4.955f)
             }

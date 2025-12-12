@@ -14,8 +14,10 @@ import pro.respawn.flowmvi.api.context.ShutdownContext
 @OptIn(NotIntendedForInheritance::class)
 internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
     val onState: (suspend PipelineContext<S, I, A>.(old: S, new: S) -> S?)? = null,
+    val onIntentEnqueue: ((intent: I) -> I?)? = null,
     val onIntent: (suspend PipelineContext<S, I, A>.(intent: I) -> I?)? = null,
     val onAction: (suspend PipelineContext<S, I, A>.(action: A) -> A?)? = null,
+    val onActionDispatch: ((action: A) -> A?)? = null,
     val onException: (suspend PipelineContext<S, I, A>.(e: Exception) -> Exception?)? = null,
     val onStart: (suspend PipelineContext<S, I, A>.() -> Unit)? = null,
     val onSubscribe: (suspend PipelineContext<S, I, A>.(subscriberCount: Int) -> Unit)? = null,
@@ -30,12 +32,20 @@ internal data class PluginInstance<S : MVIState, I : MVIIntent, A : MVIAction>(
         return (onState ?: return new).invoke(this, old, new)
     }
 
+    override fun onIntentEnqueue(intent: I): I? {
+        return (onIntentEnqueue ?: return intent).invoke(intent)
+    }
+
     override suspend fun PipelineContext<S, I, A>.onIntent(intent: I): I? {
         return (onIntent ?: return intent).invoke(this, intent)
     }
 
     override suspend fun PipelineContext<S, I, A>.onAction(action: A): A? {
         return (onAction ?: return action).invoke(this, action)
+    }
+
+    override fun onActionDispatch(action: A): A? {
+        return (onActionDispatch ?: return action).invoke(action)
     }
 
     override suspend fun PipelineContext<S, I, A>.onException(e: Exception): Exception? {

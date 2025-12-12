@@ -1,4 +1,4 @@
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.decorator
 
@@ -16,6 +16,8 @@ import pro.respawn.flowmvi.impl.plugin.asInstance
 public typealias DecorateValue<S, I, A, V> = (
 suspend PipelineContext<S, I, A>.(child: StorePlugin<S, I, A>, it: V) -> V?
 )
+
+public typealias DecorateValueNonSuspend<S, I, A, V> = (child: StorePlugin<S, I, A>, it: V) -> V?
 
 public typealias DecorateState<S, I, A> = (
 suspend PipelineContext<S, I, A>.(child: StorePlugin<S, I, A>, old: S, new: S) -> S?
@@ -80,8 +82,20 @@ internal infix fun <S : MVIState, I : MVIIntent, A : MVIAction> PluginInstance<S
     onIntent = wrapNotNull(onIntent, decorator.onIntent) { wrap ->
         ctx@{ wrap(this, this@decorate, it) }
     },
+    onIntentEnqueue = wrapNotNull(onIntentEnqueue, decorator.onIntentEnqueue) { wrap ->
+        {
+                intent ->
+            wrap(this@decorate, intent)
+        }
+    },
     onAction = wrapNotNull(onAction, decorator.onAction) { wrap ->
         ctx@{ wrap(this, this@decorate, it) }
+    },
+    onActionDispatch = wrapNotNull(onActionDispatch, decorator.onActionDispatch) { wrap ->
+        {
+                action ->
+            wrap(this@decorate, action)
+        }
     },
     onException = wrapNotNull(onException, decorator.onException) { wrap ->
         ctx@{ wrap(this, this@decorate, it) }

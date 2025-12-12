@@ -64,13 +64,15 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private val intents = intentModule<S, I, A>(
         config = config,
+        onEnqueue = plugin.onIntentEnqueue,
         onIntent = plugin.onIntent?.let { onIntent -> { intent -> catch(recover) { onIntent(this, intent) } } },
-        onUndeliveredIntent = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
+        onUndelivered = plugin.onUndeliveredIntent?.let { { intent -> it(this, intent) } },
     )
 
-    private val _actions = actionModule<A>(
+    private val _actions = actionModule(
         behavior = config.actionShareBehavior,
-        onUndeliveredAction = plugin.onUndeliveredAction?.let { { action -> it(this, action) } }
+        onUndelivered = plugin.onUndeliveredAction?.let { { action -> it(this, action) } },
+        onDispatch = plugin.onActionDispatch,
     )
 
     // region pipeline
@@ -80,7 +82,10 @@ internal class StoreImpl<S : MVIState, I : MVIIntent, A : MVIAction>(
         states = stateModule,
         recover = recover,
         onAction = { action -> onAction(action)?.let { _actions.action(it) } },
-        onStop = { e -> close().also { plugin.onStop?.invoke(this, e) } },
+        onStop = ctx@{ e ->
+            this@StoreImpl.close() // sync with global ctx
+            plugin.onStop?.invoke(this@ctx, e)
+        },
         onStart = pipeline@{ lifecycle ->
             beginStartup(lifecycle, config)
             launch {

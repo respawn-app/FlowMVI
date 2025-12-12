@@ -41,7 +41,7 @@ public class StoreTestScope<S : MVIState, I : MVIIntent, A : MVIAction> @Publish
      */
     public suspend inline fun <reified S> I.resultsIn() {
         emit(this)
-        assertIs<S>(states.value)
+        val _ = assertIs<S>(states.value)
     }
 
     /**

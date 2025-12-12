@@ -62,14 +62,13 @@ kotlin {
             implementation(projects.compose)
             implementation(projects.debugger.debuggerCommon)
 
-            implementation(compose.components.resources)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.animation)
-            implementation(compose.animationGraphics)
-            implementation(compose.ui)
-            implementation(compose.materialIconsExtended)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.animation)
+            implementation(libs.compose.animation.graphics)
+            implementation(libs.compose.ui)
 
             implementation(applibs.decompose.compose)
             implementation(applibs.decompose)
@@ -86,7 +85,7 @@ kotlin {
             implementation(libs.kotlin.atomicfu)
         }
         jvmMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
     }
 }

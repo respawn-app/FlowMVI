@@ -18,10 +18,30 @@ class DecoratorBuilderTest : FreeSpec({
         "when callbacks set once" - {
             "then decorator builds successfully" {
                 shouldNotThrowAny {
-                    decorator<TestState, TestIntent, TestAction> {
+                    val _ = decorator<TestState, TestIntent, TestAction> {
                         onStart { child -> child.run { onStart() } }
                         onIntent { _, intent -> intent }
                         onState { _, old, _ -> old }
+                    }
+                }
+            }
+        }
+        "when onIntentEnqueue assigned twice" - {
+            "then builder throws" {
+                shouldThrowExactly<IllegalArgumentException> {
+                    decorator<TestState, TestIntent, TestAction> {
+                        onIntentEnqueue { _, intent -> intent }
+                        onIntentEnqueue { _, intent -> intent }
+                    }
+                }
+            }
+        }
+        "when onActionDispatch assigned twice" - {
+            "then builder throws" {
+                shouldThrowExactly<IllegalArgumentException> {
+                    decorator<TestState, TestIntent, TestAction> {
+                        onActionDispatch { _, action -> action }
+                        onActionDispatch { _, action -> action }
                     }
                 }
             }

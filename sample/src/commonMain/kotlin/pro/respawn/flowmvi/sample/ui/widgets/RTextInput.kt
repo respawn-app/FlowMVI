@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import pro.respawn.flowmvi.sample.ui.icons.Close
+import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.util.bringIntoViewOnFocus
 import pro.respawn.flowmvi.sample.util.default
 import pro.respawn.kmmutils.inputforms.Input
@@ -156,7 +156,7 @@ fun ClearFieldIcon(
 ) {
     AnimatedVisibility(visible = !input.isEmptyValue) {
         RIcon(
-            icon = Icons.Rounded.Close,
+            icon = Icons.Close,
             onClick = onClear,
             enabled = !input.isEmptyValue && enabled,
             size = 16.dp,

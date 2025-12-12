@@ -166,12 +166,26 @@ or even **never** if the store's buffer overflows or store is not ever used agai
 * Return another intent to replace `intent` with another one and continue with the chain.
 * Return `intent` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`.
-* Generally, you can send other intents inside this handler, but avoid infinite loops of course.
+* Generally, you can send other intents inside this handler, but watch out for infinite loops.
+
+### onIntentEnqueue
+
+```kotlin
+fun onIntentEnqueue(intent: I): I? = intent
+```
+
+Invoked immediately before an intent is enqueued into the store buffer (pre-buffer). 
+Return `null` to drop, or a transformed intent to enqueue instead.
+
+:::warning
+This callback runs outside the store pipeline. Exceptions thrown here will **not** be caught by `onException`/recover
+and will be thrown to the caller of `intent/emit`. Keep it fast and exception-safe.
+:::
 
 ### onAction
 
 ```kotlin
- suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action
+suspend fun PipelineContext<S, I, A>.onAction(action: A): A? = action
 ```
 
 A callback that is invoked each time an `MVIAction` has been sent.
@@ -186,6 +200,20 @@ parent coroutine that wanted to send the action.
 * Return `action` to continue processing, leaving it unmodified.
 * Execute other operations using `PipelineContext`
 * Generally, you can send other Actions here.
+
+### onActionDispatch
+
+```kotlin
+fun onActionDispatch(action: A): A? = action
+```
+
+Invoked after an action is dequeued and before it is delivered to subscribers. 
+Return `null` to drop, or transform the action before delivery.
+
+:::warning
+This callback also executes outside the recoverable pipeline. Exceptions thrown here will **not** reach `onException`
+and will escape to the caller that triggered delivery. Make it non-throwing.
+:::
 
 ### onException
 

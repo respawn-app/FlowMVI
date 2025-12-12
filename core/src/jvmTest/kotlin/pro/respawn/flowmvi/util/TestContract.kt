@@ -14,4 +14,8 @@ sealed interface TestAction : MVIAction {
     data class SomeData<T>(val data: T) : TestAction
 }
 
+/**
+ * Test intents are value classes (`LambdaIntent`) – do not use referential equality (`===`) in tests.
+ * Use `==` or compare a stable label/id you attach to the intent instead.
+ */
 typealias TestIntent = LambdaIntent<TestState, TestAction>

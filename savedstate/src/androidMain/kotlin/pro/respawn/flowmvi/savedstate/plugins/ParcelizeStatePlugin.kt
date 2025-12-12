@@ -1,5 +1,5 @@
 @file:Suppress("ERROR_SUPPRESSION")
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.savedstate.plugins
 

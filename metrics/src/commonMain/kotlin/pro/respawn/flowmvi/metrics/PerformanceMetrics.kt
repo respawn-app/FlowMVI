@@ -1,56 +1,106 @@
 package pro.respawn.flowmvi.metrics
 
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import kotlin.math.min
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.Instant
 
-internal class PerformanceMetrics : SynchronizedObject() {
+internal class PerformanceMetrics(
+    private val windowSeconds: Int = 60,
+    private val emaAlpha: Double = 0.1,
+    private val bucketDuration: Duration = 1.seconds,
+    private val clock: Clock = Clock.System,
+) {
 
-    // For Average Time using EMA
-    private var ema: Double = 0.0
-    private val alpha: Double = 0.1 // Smoothing factor
-
-    // For Median Time using P² Algorithm
-    private var p2: P2QuantileEstimator = P2QuantileEstimator(0.5) // Median
-
-    var totalOperations: Long = 0
-        private set
-
-    private val numberOfBuckets: Int = 60 // Last 60 seconds
-    private val frequencyBuckets = IntArray(numberOfBuckets)
-    private val bucketDurationMillis = 1.seconds // 1 second per bucket
-    private var lastBucketTime = Clock.System.now()
-
-    fun recordOperation(durationMillis: Long) = synchronized(this) {
-        totalOperations++
-        ema = if (ema == 0.0) durationMillis.toDouble() else alpha * durationMillis + (1 - alpha) * ema
-        p2.add(durationMillis.toDouble())
-        updateFrequencyCounter()
+    init {
+        require(windowSeconds > 0) { "windowSeconds must be > 0" }
+        require(emaAlpha > 0.0 && emaAlpha < 1.0) { "emaAlpha must be in (0, 1)" }
+        require(bucketDuration.isPositive()) { "bucketDuration must be > 0" }
     }
 
-    private fun updateFrequencyCounter() = synchronized(this) {
-        val currentTime = Clock.System.now()
-        val elapsedBuckets = ((currentTime - lastBucketTime) / bucketDurationMillis).toInt()
+    private var emaMillis: Double = 0.0
 
-        if (elapsedBuckets > 0) {
-            val shift = min(elapsedBuckets, numberOfBuckets)
-            frequencyBuckets.copyInto(frequencyBuckets, shift, 0, numberOfBuckets - shift)
-            for (i in numberOfBuckets - shift until numberOfBuckets) {
-                frequencyBuckets[i] = 0
-            }
-            lastBucketTime += bucketDurationMillis * elapsedBuckets
+    private val p2: P2QuantileEstimator = P2QuantileEstimator(0.5)
+
+    private var _totalOperations: Long = 0L
+
+    private val bucketCount: Int = windowSeconds
+    private val buckets: IntArray = IntArray(bucketCount)
+    private var currentBucketIndex: Int = 0
+    private var lastBucketTime = clock.now()
+
+    fun recordOperation(duration: Duration) {
+        val durationMillis = duration.toDouble(DurationUnit.MILLISECONDS)
+        _totalOperations++
+        emaMillis = if (_totalOperations == 1L) {
+            durationMillis
+        } else {
+            emaAlpha * durationMillis + (1.0 - emaAlpha) * emaMillis
         }
 
-        frequencyBuckets[numberOfBuckets - 1]++
+        advanceBuckets()
+        buckets[currentBucketIndex]++
+        p2.add(durationMillis)
     }
 
-    val averageTime get() = ema
+    private fun advanceBuckets() {
+        val now = clock.now()
+        val elapsed = now - lastBucketTime
+        val elapsedBuckets = (elapsed / bucketDuration).toInt()
 
-    fun medianTime(q: Double): Double = p2.getQuantile(q)
+        if (elapsedBuckets <= 0) return
 
-    fun opsPerSecond(): Double = synchronized(this) {
-        return frequencyBuckets.sum().toDouble() / numberOfBuckets
+        val steps = min(elapsedBuckets, bucketCount)
+        repeat(steps) {
+            currentBucketIndex = (currentBucketIndex + 1) % bucketCount
+            buckets[currentBucketIndex] = 0
+        }
+
+        lastBucketTime += bucketDuration * elapsedBuckets
     }
+
+    val totalOperations: Long
+        get() = _totalOperations
+
+    val averageTimeMillis: Double
+        get() = if (_totalOperations == 0L) Double.NaN else emaMillis
+
+    suspend fun medianTimeMillis(): Double = p2.getQuantile(0.5)
+
+    fun opsPerSecond(): Double {
+        advanceBuckets()
+        val windowOps = buckets.sum()
+        val windowDurationSeconds = (bucketDuration * bucketCount).toDouble(DurationUnit.SECONDS)
+        return windowOps.toDouble() / windowDurationSeconds
+    }
+
+    fun reset() {
+        _totalOperations = 0L
+        emaMillis = 0.0
+        buckets.fill(0)
+        currentBucketIndex = 0
+        lastBucketTime = clock.now()
+        p2.clear()
+    }
+
+    /**
+     * Internal function to snapshot state for testing.
+     */
+    internal fun stateForTest(): PerformanceMetricsState = PerformanceMetricsState(
+        bucketIndex = currentBucketIndex,
+        buckets = buckets.copyOf(),
+        lastBucketTime = lastBucketTime,
+        totalOperations = _totalOperations,
+        emaMillis = emaMillis,
+    )
 }
+
+internal data class PerformanceMetricsState(
+    val bucketIndex: Int,
+    val buckets: IntArray,
+    val lastBucketTime: Instant,
+    val totalOperations: Long,
+    val emaMillis: Double,
+)

@@ -32,26 +32,15 @@ FlowMVI is a Kotlin Multiplatform MVI (Model-View-Intent) framework built on cor
 - `debugger/` - Remote debugger for the lib (desktop app, IDE plugin, runtime plugin)
 - `sample/` - Complete sample application (wasm, android, desktop). Usage examples here.
 - `benchmarks/` - Benchmarks module
-- `docs` - Documentation directory. Read documentation to self-educate on aspects of the library.
+- `docs/` - Documentation directory. Read documentation to self-educate on aspects of the library.
+- `metrics/` - Metrics decorator and related code
 
-### Testing
-
-- All business logic in `core` module must be covered by unit tests written using Kotest FreeSpec style. Examples: 
-   - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/plugin/ReducePluginTest.kt - plugin test
-   - core/src/jvmTest/kotlin/pro/respawn/flowmvi/test/store/ChildStoreTest.kt - store test
 
 ### Before you complete a task
 
 1. Run `detektFormat`. It will autofix lint, and warn you about remaining issues to solve.
 2. Assemble the target module.
 3. Run unit tests with `gradle allTests`.
-
-# Rules and notes 
-
-- Never add comments.
-- Document public code ONLY via kdocs.
-- Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
-- Avoid source breaking changes. Deprecate public api instead of removing it.
 
 ## Commit Guidelines
 
@@ -61,3 +50,17 @@ Format: `<type>[!]: [description]` where scope is optional, `!` = breaking chang
 `perf`, `refactor`, `test`, `chore`, `build`, `ci`, `style`, `revert`
 
 Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!: change Saver API`
+
+
+## Additional docs.
+
+- Before writing tests, read `./docs/ai/testing.md` for instructions.
+
+## Notes 
+
+- Document public code via kdocs.
+- Do not run `assemble` on the entire project, that task can take hours, use more granular tasks
+- Avoid source-breaking changes. Deprecate public api instead of removing it.
+- Main branch: `master`. Master = prod.
+- Ignore warnings about experimental or unsupported features - they are informational
+- Put native platform code in nativeMain, or if using Apple APIs, in appleMain. Native includes all Apple platforms.

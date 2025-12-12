@@ -1,4 +1,4 @@
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.plugins
 

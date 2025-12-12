@@ -1,33 +1,35 @@
 [versions]
-activity = "1.12.0-rc01"
+activity = "1.12.0"
 # @pin
 #noinspection GradleDependency - must match jb-lifecycle
 androidx-lifecycle = "2.9.2"
-compose = "1.10.0-beta01"
+compose = "1.10.0-beta02"
 composeDetektPlugin = "1.4.0"
+composeMaterial3 = "1.9.0"
 core-ktx = "1.13.1"
 coroutines = "1.10.2"
-datetime = "0.7.1"
+datetime = "0.7.1-0.6.x-compat"
 detekt = "1.23.8"
 dokka = "2.1.0"
 essenty = "2.5.0"
 fragment = "1.8.9"
-gradleAndroid = "8.13.0"
-intellij-ide-plugin = "2.10.4"
+# @pin  TODO: need to migrate to  9.0 beta
+gradleAndroid = "8.13.1"
+intellij-ide-plugin = "2.10.5"
 intellij-idea = "2025.2.1"
 jmh = "1.37"
 junit = "4.13.2"
 kotest = "6.0.4"
 # @pin
-kotlin = "2.2.21"
+kotlin = "2.3.0-RC"
 kotlin-benchmark = "0.4.14"
 kotlin-browser = "0.5.0"
 kotlin-collections = "0.4.0"
-kotlin-io = "0.8.0"
+kotlin-io = "0.8.2"
 kotlinx-atomicfu = "0.30.0-beta"
-ktor = "3.3.2"
-lifecycle = "2.9.5"
-maven-publish-plugin = "0.34.0"
+ktor = "3.3.3"
+lifecycle = "2.9.6"
+maven-publish-plugin = "0.35.0"
 serialization = "1.9.0"
 turbine = "1.2.1"
 versionCatalogUpdatePlugin = "1.0.1"
@@ -37,6 +39,21 @@ android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gra
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "compose" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
+compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "compose" }
+compose-animation-graphics = { module = "org.jetbrains.compose.animation:animation-graphics", version.ref = "compose" }
+compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "composeMaterial3" }
+compose-desktop-jvm-windows-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-windows-x64", version.ref = "compose" }
+compose-desktop-jvm-macos-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-x64", version.ref = "compose" }
+compose-desktop-jvm-macos-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-macos-arm64", version.ref = "compose" }
+compose-desktop-jvm-linux-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-x64", version.ref = "compose" }
+compose-desktop-jvm-linux-arm64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-arm64", version.ref = "compose" }
 detekt-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "composeDetektPlugin" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
@@ -93,6 +110,7 @@ lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runti
 lifecycle-savedstate = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
 lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "lifecycle" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
 
 [bundles]
 ktor-client = [

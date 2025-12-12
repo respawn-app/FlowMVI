@@ -1,7 +1,9 @@
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.util
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.MVIState
 import kotlin.contracts.InvocationKind
@@ -43,4 +45,15 @@ public inline fun <reified T : MVIState> nameByType(): String? = T::class.simple
 internal infix fun <T> KMutableProperty0<T?>.setOnce(value: T) {
     require(get() == null) { duplicatePropMessage(name) }
     set(value)
+}
+
+internal inline fun <T> wrap(
+    value: T,
+    noinline map: ((action: T) -> T?)?,
+    handle: (T) -> Unit
+): Unit = map?.let { handle(map(value) ?: return) } ?: handle(value)
+
+// Note: `T` is non-null; for nullable flows use `mapNotNull` directly.
+internal fun <T : Any> Flow<T>.withMap(map: ((value: T) -> T?)?) = mapNotNull { value ->
+    map?.let { map(value) ?: return@mapNotNull null } ?: value
 }

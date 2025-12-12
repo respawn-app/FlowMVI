@@ -20,9 +20,11 @@ import pro.respawn.flowmvi.api.StorePlugin
 public data class PluginDecorator<S : MVIState, I : MVIIntent, A : MVIAction> internal constructor(
     /** The name of the decorator. Must be unique or `null` */
     public val name: String?,
+    internal val onIntentEnqueue: DecorateValueNonSuspend<S, I, A, I>? = null,
     internal val onIntent: DecorateValue<S, I, A, I>? = null,
     internal val onState: DecorateState<S, I, A>? = null,
     internal val onAction: DecorateValue<S, I, A, A>? = null,
+    internal val onActionDispatch: DecorateValueNonSuspend<S, I, A, A>? = null,
     internal val onException: DecorateValue<S, I, A, Exception>? = null,
     internal val onStart: Decorate<S, I, A>? = null,
     internal val onSubscribe: DecorateArg<S, I, A, Int>? = null,

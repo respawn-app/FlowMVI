@@ -101,13 +101,13 @@ dependencies {
     // platform already includes bindings
     // implementation(libs.kotlin.coroutines.swing)
 
-    implementation(compose.desktop.common)
-    implementation(compose.desktop.linux_arm64)
-    implementation(compose.desktop.linux_x64)
-    implementation(compose.desktop.macos_arm64)
-    implementation(compose.desktop.macos_x64)
-    implementation(compose.desktop.windows_x64)
-    implementation(compose.material3)
+    implementation(libs.compose.desktop)
+    implementation(libs.compose.desktop.jvm.linux.arm64)
+    implementation(libs.compose.desktop.jvm.linux.x64)
+    implementation(libs.compose.desktop.jvm.macos.arm64)
+    implementation(libs.compose.desktop.jvm.macos.x64)
+    implementation(libs.compose.desktop.jvm.windows.x64)
+    implementation(libs.compose.material3)
 
     implementation(projects.core)
     implementation(projects.debugger.server)

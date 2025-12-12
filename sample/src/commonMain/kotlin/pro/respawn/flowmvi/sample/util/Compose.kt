@@ -160,7 +160,7 @@ fun Modifier.fadingEdge(
 }
 
 @Composable
-fun String.branded(color: Color = MaterialTheme.colorScheme.primary) = buildAnnotatedString {
+fun String.branded(color: Color = MaterialTheme.colorScheme.primary): AnnotatedString = buildAnnotatedString {
     when {
         !isValid() -> return@buildAnnotatedString
         !first().isLetterOrDigit() -> return AnnotatedString(this@branded)

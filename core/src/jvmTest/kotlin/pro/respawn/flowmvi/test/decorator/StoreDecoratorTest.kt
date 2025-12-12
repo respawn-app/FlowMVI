@@ -104,10 +104,12 @@ class StoreDecoratorTest : FreeSpec({
     "given a decorator with all callbacks defined" - {
         val decorator = testDecorator {
             onStart { it.run { onStart() } }
+            onIntentEnqueue { chain, intent -> chain.run { onIntentEnqueue(intent) } }
             onIntent { chain, it -> chain.run { onIntent(it) } }
             onException { chain, it -> chain.run { onException(it) } }
             onState { chain, old, new -> chain.run { onState(old, new) } }
             onAction { chain, it -> chain.run { onAction(it) } }
+            onActionDispatch { chain, action -> chain.run { onActionDispatch(action) } }
             onSubscribe { chain, it -> chain.run { onSubscribe(it) } }
             onUnsubscribe { chain, it -> chain.run { onUnsubscribe(it) } }
         }
@@ -125,6 +127,50 @@ class StoreDecoratorTest : FreeSpec({
                 timeTravel.subscriptions shouldBe 1
                 onUnsubscribe(1)
                 timeTravel.unsubscriptions shouldBe 1
+            }
+        }
+    }
+    "given decorator that wraps enqueue" - {
+        val calls = mutableListOf<String>()
+        val plugin = plugin<TestState, TestIntent, TestAction> {
+            onIntentEnqueue { intent ->
+                calls += "child:$intent"
+                intent
+            }
+        }
+        val decorator = testDecorator {
+            onIntentEnqueue { chain, intent ->
+                calls += "decorator:$intent"
+                chain.run { onIntentEnqueue(intent) }
+            }
+        }
+        "then decorator invokes child" {
+            (decorator decorates plugin).test(TestState.Some) {
+                val intent = TestIntent { }
+                onIntentEnqueue(intent)
+                calls shouldContainExactly listOf("decorator:$intent", "child:$intent")
+            }
+        }
+    }
+    "given decorator that wraps action dispatch" - {
+        val calls = mutableListOf<String>()
+        val plugin = plugin<TestState, TestIntent, TestAction> {
+            onActionDispatch { action ->
+                calls += "child:$action"
+                action
+            }
+        }
+        val decorator = testDecorator {
+            onActionDispatch { chain, action ->
+                calls += "decorator:$action"
+                chain.run { onActionDispatch(action) }
+            }
+        }
+        "then decorator invokes child" {
+            (decorator decorates plugin).test(TestState.Some) {
+                val action = TestAction.Some
+                onActionDispatch(action)
+                calls shouldContainExactly listOf("decorator:$action", "child:$action")
             }
         }
     }

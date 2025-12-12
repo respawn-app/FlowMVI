@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.Redo
-import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +30,9 @@ import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedRedo
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoIntent.ClickedUndo
 import pro.respawn.flowmvi.sample.navigation.util.Navigator
 import pro.respawn.flowmvi.sample.navigation.util.backNavigator
+import pro.respawn.flowmvi.sample.ui.icons.Icons
+import pro.respawn.flowmvi.sample.ui.icons.Redo
+import pro.respawn.flowmvi.sample.ui.icons.Undo
 import pro.respawn.flowmvi.sample.ui.widgets.CodeText
 import pro.respawn.flowmvi.sample.ui.widgets.RIcon
 import pro.respawn.flowmvi.sample.ui.widgets.RScaffold
@@ -130,12 +130,12 @@ private fun IntentReceiver<UndoRedoIntent>.UndoRedoScreenContent(
         Text("Index: ${state.index}")
         Spacer(Modifier.weight(1f))
         RIcon(
-            icon = Icons.AutoMirrored.Rounded.Undo,
+            icon = Icons.Undo,
             onClick = { intent(ClickedUndo) },
             enabled = state.canUndo,
         )
         RIcon(
-            icon = Icons.AutoMirrored.Rounded.Redo,
+            icon = Icons.Redo,
             onClick = { intent(ClickedRedo) },
             enabled = state.canRedo,
         )

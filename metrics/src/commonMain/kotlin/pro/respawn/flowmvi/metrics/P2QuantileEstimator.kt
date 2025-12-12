@@ -6,12 +6,22 @@ import kotlin.math.abs
 import kotlin.math.round
 import kotlin.math.sign
 
-/**
- * P2quantile algorithm implementation to estimate median values.
- * Credit: https://aakinshin.net/posts/ex-p2-quantile-estimator/
- * Accessed on 2024-11-27
- */
-internal class P2QuantileEstimator(private vararg val probabilities: Double) : SynchronizedObject() {
+internal class P2QuantileEstimator(
+    vararg requestedProbabilities: Double,
+) : SynchronizedObject() {
+
+    private val probabilities: DoubleArray = requestedProbabilities.copyOf().apply {
+        sort()
+        require(isNotEmpty()) { "At least one probability must be provided" }
+        for (i in indices) {
+            val p = this[i]
+            require(p > 0.0 && p < 1.0) { "Probability $p is out of (0, 1) range" }
+            if (i > 0) require(this[i - 1] < p) { "Probabilities must be strictly increasing" }
+        }
+    }
+
+    private val probabilityToMarkerIndex: Map<Double, Int> =
+        probabilities.mapIndexed { i, p -> p to 2 * i + 2 }.toMap()
 
     private val m: Int = probabilities.size
     private val markerCount: Int = 2 * m + 3
@@ -29,13 +39,9 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
                 q.sort()
 
                 updateNs(markerCount - 1)
-                for (i in 0 until markerCount) {
-                    n[i] = round(ns[i]).toInt()
-                }
+                for (i in 0 until markerCount) n[i] = round(ns[i]).toInt()
                 q.copyInto(ns)
-                for (i in 0 until markerCount) {
-                    q[i] = ns[n[i]]
-                }
+                for (i in 0 until markerCount) q[i] = ns[n[i]]
                 updateNs(markerCount - 1)
             }
             return@synchronized
@@ -58,9 +64,7 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
             }
         }
 
-        for (i in k + 1 until markerCount) {
-            n[i]++
-        }
+        for (i in k + 1 until markerCount) n[i]++
         updateNs(count)
 
         var leftI = 1
@@ -81,18 +85,12 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
     }
 
     private fun updateNs(maxIndex: Int) {
-        // Principal markers
         ns[0] = 0.0
-        for (i in 0 until m) {
-            ns[i * 2 + 2] = maxIndex * probabilities[i]
-        }
+        for (i in 0 until m) ns[i * 2 + 2] = maxIndex * probabilities[i]
         ns[markerCount - 1] = maxIndex.toDouble()
 
-        // Middle markers
         ns[1] = maxIndex * probabilities[0] / 2.0
-        for (i in 1 until m) {
-            ns[2 * i + 1] = maxIndex * (probabilities[i - 1] + probabilities[i]) / 2.0
-        }
+        for (i in 1 until m) ns[2 * i + 1] = maxIndex * (probabilities[i - 1] + probabilities[i]) / 2.0
         ns[markerCount - 2] = maxIndex * (1 + probabilities[m - 1]) / 2.0
     }
 
@@ -101,11 +99,7 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
         if (d >= 1 && n[i + 1] - n[i] > 1 || d <= -1 && n[i - 1] - n[i] < -1) {
             val dInt = d.sign.toInt()
             val qs = parabolic(i, dInt.toDouble())
-            if (q[i - 1] < qs && qs < q[i + 1]) {
-                q[i] = qs
-            } else {
-                q[i] = linear(i, dInt)
-            }
+            q[i] = if (q[i - 1] < qs && qs < q[i + 1]) qs else linear(i, dInt)
             n[i] += dInt
         }
     }
@@ -119,31 +113,35 @@ internal class P2QuantileEstimator(private vararg val probabilities: Double) : S
         val qMinus1 = q[i - 1]
         val qI = q[i]
 
-        val numerator = (nI - nMinus1 + d) * (qPlus1 - qI) / (nPlus1 - nI) +
-            (nPlus1 - nI - d) * (qI - qMinus1) / (nI - nMinus1)
+        val numerator =
+            (nI - nMinus1 + d) * (qPlus1 - qI) / (nPlus1 - nI) +
+                (nPlus1 - nI - d) * (qI - qMinus1) / (nI - nMinus1)
 
         return qI + d / (nPlus1 - nMinus1) * numerator
     }
 
-    private fun linear(i: Int, d: Int) = q[i] + d * (q[i + d] - q[i]) / (n[i + d] - n[i]).toDouble()
+    private fun linear(i: Int, d: Int): Double =
+        q[i] + d * (q[i + d] - q[i]) / (n[i + d] - n[i]).toDouble()
 
     fun getQuantile(p: Double): Double = synchronized(this) {
         if (count == 0) return Double.NaN
+
         if (count <= markerCount) {
             q.sort(0, count)
-            val index = round((count - 1) * p).toInt()
+            val index = round((count - 1) * p).toInt().coerceIn(0, count - 1)
             return q[index]
         }
 
-        for (i in probabilities.indices) {
-            if (probabilities[i] == p)
-                return q[2 * i + 2]
-        }
+        val markerIndex = probabilityToMarkerIndex[p]
+            ?: throw IllegalArgumentException("Target quantile ($p) wasn't requested in the constructor")
 
-        throw IllegalStateException("Target quantile ($p) wasn't requested in the constructor")
+        return q[markerIndex]
     }
 
-    fun clear() {
+    fun clear() = synchronized(this) {
         count = 0
+        n.fill(0)
+        ns.fill(0.0)
+        q.fill(0.0)
     }
 }

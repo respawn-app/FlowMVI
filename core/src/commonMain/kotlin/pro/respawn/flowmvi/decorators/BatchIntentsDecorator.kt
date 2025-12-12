@@ -1,4 +1,4 @@
-@file:MustUseReturnValue
+@file:MustUseReturnValues
 
 package pro.respawn.flowmvi.decorators
 
@@ -33,14 +33,22 @@ public sealed interface BatchingMode {
      * Batch intents until [size] is reached after which the intents will be flushed one-by-one in the order they
      * originally came.
      */
-    public data class Amount(val size: Int) : BatchingMode
+    public data class Amount(val size: Int) : BatchingMode {
+        init {
+            require(size > 0) { "Batch size must be > 0" }
+        }
+    }
 
     /**
      * Batch intents for the [duration]. Each [duration] increment, all intents in the queue (if any) will be flushed.
      * This process starts when the first intent is received and store is started.
      * The intents will be flushed one-by-one in the order they originally came.
      */
-    public data class Time(val duration: Duration) : BatchingMode
+    public data class Time(val duration: Duration) : BatchingMode {
+        init {
+            require(duration.isPositive()) { "Batch duration must be > 0" }
+        }
+    }
 }
 
 /**
@@ -108,7 +116,7 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> batchIntentsDecorator(
                 config.logger.debug(name) {
                     "Flushing ${intents.size} after batching for ${mode.duration}"
                 }
-                intents.fold<I, I?>(null) { _, next ->
+                val _ = intents.fold<I, I?>(null) { _, next ->
                     val result = child.run { onIntent(next) } ?: return@fold null
                     onUnhandledIntent(result)
                     result

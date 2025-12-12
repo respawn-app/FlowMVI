@@ -14,13 +14,13 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.animation)
-            implementation(compose.animationGraphics)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.animation)
+            implementation(libs.compose.animation.graphics)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
 
             implementation(applibs.decompose)
             implementation(applibs.decompose.compose)
@@ -32,7 +32,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.coroutines.swing)
                 implementation(compose.desktop.currentOs)
-                implementation(compose.preview)
+                implementation(libs.compose.ui.tooling.preview)
             }
         }
     }

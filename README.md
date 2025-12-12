@@ -9,23 +9,24 @@
 [![Slack channel](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/respawn-app/FlowMVI)
 
-
 ![badge][badge-android] ![badge][badge-jvm] ![badge][badge-js] ![badge][badge-nodejs] ![badge][badge-linux] ![badge][badge-windows] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-watchos] ![badge][badge-tvos] ![badge][badge-wasm]
 
-FlowMVI is a Kotlin Multiplatform architectural framework based on coroutines.
-It enables you to extend your business logic with reusable plugins, handle errors,
-achieve thread-safety, and more. It takes about 10 minutes to get started.
+#### FlowMVI is a Kotlin Multiplatform Architectural Framework.
+
+It **adds a plug-in system** to your code that helps prevent crashes, handle errors, 
+split responsibilities, reuse code, collect analytics, debug & log operations, monitor & improve performance,
+achieve thread-safety, save state, manage background jobs, and more.
 
 ## ⚡️ Quickstart:
 
-* Get Started in 10 minutes:
+* Get Started in 10 mins:
   [![Quickstart](https://img.shields.io/website?down_color=red&down_message=Offline&label=Quickstart&up_color=green&up_message=Online&url=https%3A%2F%2Fopensource.respawn.pro%2FFlowMVI)](https://opensource.respawn.pro/FlowMVI/quickstart)
 * Latest version:
   [![Maven Central](https://img.shields.io/maven-central/v/pro.respawn.flowmvi/core?label=Maven%20Central)](https://central.sonatype.com/namespace/pro.respawn.flowmvi)
 * API Docs:
   [![Javadoc](https://javadoc.io/badge2/pro.respawn.flowmvi/core/javadoc.svg)](https://opensource.respawn.pro/FlowMVI/javadocs/index.html)
-* Sample App in your browser:
-  [![Static Badge](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample/)
+* Sample App + Showcase (Web):
+  [![Sample](https://img.shields.io/badge/Click_Me-Click_Me?style=flat&color=00b147)](https://opensource.respawn.pro/FlowMVI/sample/)
 * Ask questions on
   [![Slack](https://img.shields.io/badge/Chat-Slack-orange.svg?style=flat&logo=slack)](https://kotlinlang.slack.com/messages/flowmvi/)
 
@@ -47,6 +48,8 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowm
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
+# Performance metrics collection
+flowmvi-metrics = { module = "pro.respawn.flowmvi:metrics", version.ref = "flowmvi" }
 # Remote debugging client
 flowmvi-debugger-client = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
 # Essenty (Decompose) integration
@@ -68,6 +71,8 @@ dependencies {
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
     // saving and restoring state
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
+    // metrics collection & export
+    commonMainImplementation("pro.respawn.flowmvi:metrics:$flowmvi")
     // essenty integration
     commonMainImplementation("pro.respawn.flowmvi:essenty:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:essenty-compose:$flowmvi")
@@ -84,35 +89,37 @@ dependencies {
 
 ## 🚀 Why FlowMVI?
 
-Usually architecture frameworks mean boilerplate and support difficulty for marginal benefits of "clean code".
-FlowMVI does not dictate what your code should do or look like.
-Instead, this library focuses on building a supporting infrastructure to enable new possibilities for your app.
+Usually architecture frameworks mean boilerplate, restrictions, and support difficulty for marginal benefits
+of "clean code". FlowMVI does not dictate what your code should do or look like.
+Instead, this library focuses on **building a supporting infrastructure** to enable new possibilities for your app.
 
 Here's what you get:
 
-* Powerful Plug-In system to automate processes and **reuse any business logic** you desire
-    * Create automatic analytics handlers, websocket connections, error handling mechanisms, or anything else **once**
-      and reuse them throughout your whole project automatically
-* Automatically **recover from any errors** and report them to analytics.
-* Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
-* Create **multiplatform business logic** components with pluggable UI
-* Automatic multiplatform system **lifecycle handling**
-* Out of the box **debugging, logging, caching and long-running tasks** support
-* Debounce, retry, batch, throttle, conflate, monitor, **modify any operations** automatically
+* Powerful plug-in system to **reuse any business logic** you desire. 
+  Write your auth, error handling, analytics, logging, configuration, and any other code **once**
+  and forget about it, focusing on more important things instead.
+
+* Automatically **recover from exceptions**, prevent crashes, and report them to analytics.
+* Automatically collect and view logs: forget about `Log.e("asdf")` sprinkling.
+* **Collect 50+ performance metrics** with Prometheus, Grafana, OpenTelemetry export and 5 lines of setup.
+* Manage concurrent, long-running **background jobs** with complete thread-safety.
+* Debounce, retry, batch, throttle, conflate, **intercept any operations** automatically
 * **Compress, persist, and restore state** automatically on any platform
-* **No base classes, complicated interfaces**, or factories of factories - logic is declarative and built with a DSL
-* Build **Restartable, reusable business logic components** with no external dependencies or dedicated lifecycles
 * Create **compile-time safe state machines** with a readable DSL. Forget about casts, inconsistent states, and `null`s
-* First class **Compose Multiplatform support** optimized for performance and ease of use
-* Use both **MVVM+** (functional) or **MVI** (model-driven) style of programming
-* Share, distribute, disable, **manage side-effects** based on your team's needs
-* Dedicated **IDE Plugin for debugging and codegen** and app for Windows, Linux, MacOS
-* **Integration with popular libraries**, such as [Decompose (Essenty)](https://github.com/arkivanov/Decompose), Koin, Kodein, androidx.navigation, and more.
-* The core **library has no dependencies** except kotlin coroutines.
-* Core library is fully covered by **hundreds of tests**
+* Share, distribute, disable, intercept, safely **manage side-effects**
+* Build fully **async, reactive and parallel apps** - with no manual thread synchronization required!
+* Write **simple, familiar MVVM+** code or follow MVI/Redux - no limits or requirements 
+* Build restartable, reusable business logic components with **no external dependencies** or dedicated lifecycles
+* No base classes, complicated abstractions, or factories of factories - write **simple, declarative logic** using a DSL
+* Automatic multiplatform system **lifecycle handling**
+* First class, one-liner **Compose Multiplatform support** with Previews and UI tests.
+* Integrates with [Decompose](https://github.com/arkivanov/Decompose), Koin, Kodein, androidx.navigation, Nav3, and more
+* Dedicated **IDE Plugin for debugging and codegen** and app for Windows, Linux, macOS
+* The core **library has no dependencies** - just coroutines
+* Extensively covered by **350+ tests**
 * **Minimal performance overhead**, equal to using a simple Channel, with regular benchmarking
-* **Test any business logic** using clean, declarative DSL.
-* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser 
+* **Test any business logic** using clean, declarative DSL
+* Learn more by exploring the [sample app](https://opensource.respawn.pro/FlowMVI/sample/) in your browser
 * 10 minutes to try by following the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/quickstart).
 
 ## 👀 Show me the code!
@@ -126,14 +133,14 @@ sealed interface State : MVIState {
 
     data object Loading : State
     data class Error(val e: Exception) : State
-    data class Content(val counter: Int = 0) : State
+    data class Content(val user: User?) : State
 }
 
 sealed interface Intent : MVIIntent {
-    data object ClickedCounter : Intent
+    data object ClickedSignOut : Intent
 }
 
-sealed interface Action : MVIAction {
+sealed interface Action : MVIAction { // optional side-effect
     data class ShowMessage(val message: String) : Action
 }
 ```
@@ -141,116 +148,30 @@ sealed interface Action : MVIAction {
 ### 2. Declare your business logic:
 
 ```kotlin
-val counterStore = store(initial = State.Loading, scope = coroutineScope) {
-
-    install(analyticsPlugin) // install custom plugins
-
-    recover { e: Exception -> // recover from errors
+val authStore = store(initial = State.Loading, coroutineScope) {
+    recover { e: Exception -> // handle errors
         updateState { State.Error(e) }
         null
     }
     init { // load data
         updateState {
-            State.Content(counter = repository.loadCounter())
+            State.Content(user = repository.loadUser())
         }
     }
     reduce { intent: Intent -> // respond to events
         when (intent) {
-            is ClickedCounter -> updateState<State.Content, _> {
-                action(ShowMessage("Incremented!"))
-
-                copy(counter = counter + 1)
+            is ClickedSignOut -> updateState<State.Content, _> {
+                
+                action(ShowMessage("Bye!"))
+                copy(user = null)
             }
         }
     }
 }
-
-store.intent(ClickedCounter)
 ```
-
-### 3. Scale your app
 
 FlowMVI lets you scale your app in a way that does not increase complexity.
 Adding a new feature is as simple as calling a function.
-
-<details>
-<summary>Advanced configuration example</summary>
-
-```kotlin
-class CounterContainer(
-    private val repo: CounterRepository, // inject dependencies
-) {
-    val store = store<CounterState, CounterIntent, CounterAction>(initial = Loading) {
-
-        configure {
-            // use various side-effect strategies
-            actionShareBehavior = Distribute()
-
-            // checks and verifies your business logic for you
-            debuggable = true
-
-            // make the store fully async, parallel and thread-safe
-            parallelIntents = true
-            coroutineContext = Dispatchers.Default
-            stateStrategy = Atomic()
-        }
-
-        // out of the box logging
-        enableLogging()
-
-        // debug using the IDE plugin
-        enableRemoteDebugging()
-
-        // undo / redo any operation
-        val undoRedo = undoRedo()
-
-        // manage long-running jobs
-        val jobManager = manageJobs<CounterJob>()
-
-        // save and restore the state automatically
-        serializeState(
-            path = repo.cacheFile("counter"),
-            serializer = DisplayingCounter.serializer(),
-        )
-
-        // perform long-running tasks on startup
-        init {
-            repo.startTimer()
-        }
-
-        // save resources when there are no subscribers
-        whileSubscribed {
-            repo.timer.collect {
-                updateState<DisplayingCounter, _> {
-                    copy(timer = timer)
-                }
-            }
-        }
-
-        // lazily evaluate and cache values, even when the method is suspending.
-        val pagingData by cache {
-            repo.getPagedDataSuspending()
-        }
-
-        // testable reducer as a function
-        reduce { intent: CounterIntent ->
-            when (intent) {
-                // typed state update prevents races and allows using sealed class hierarchies for LCE
-                is ClickedCounter -> updateState<DisplayingCounter, _> {
-                    copy(counter = counter + 1)
-                }
-            }
-        }
-
-        // cleanup resources
-        deinit {
-            repo.stopTimer()
-        }
-    }
-}
-```
-
-</details>
 
 ## Extend your logic with Plugins
 
@@ -268,41 +189,33 @@ fun analyticsPlugin(analytics: Analytics) = plugin<MVIState, MVIIntent, MVIActio
         analytics.logError(e)
     }
     onSubscribe {
-        analytics.logEngagementStart()
+        analytics.logEngagementStart(config.name)
     }
     onUnsubscribe {
-        analytics.logEngagementEnd()
+        analytics.logEngagementEnd(config.name)
     }
     onStop {
-        analytics.logScreenLeave()
+        analytics.logScreenLeave(config.name)
     }
 }
 ```
 
-Never write analytics, debugging, or state persistence code again.
+Never write analytics, debugging, logging, or state persistence code again.
 
-## Compose Multiplatform Support
-
-![badge][badge-android] ![badge][badge-ios] ![badge][badge-mac] ![badge][badge-jvm] ![badge][badge-wasm] ![badge][badge-js]
+## Compose Multiplatform
 
 Using FlowMVI with Compose is a matter of one line of code:
 
 ```kotlin
 @Composable
-fun CounterScreen() {
-    val store = counterStore
-
-    // subscribe to store based on system lifecycle - on any platform
-    val state by store.subscribe { action ->
-        when (action) {
-            is ShowMessage -> /* ... */
-        }
-    }
+fun AuthScreen() {
+    // subscribe based on system lifecycle - on any platform
+    val state by authStore.subscribe
 
     when (state) {
-        is DisplayingCounter -> {
-            Button(onClick = { store.intent(ClickedCounter) }) {
-                Text("Counter: ${state.counter}")
+        is Content -> {
+            Button(onClick = { store.intent(ClickedSignOut) }) {
+                Text("Sign Out")
             }
         }
     }
@@ -311,51 +224,23 @@ fun CounterScreen() {
 
 Enjoy testable UI and free `@Preview`s.
 
-### Android Support
-
-No more subclassing `ViewModel`. Use `StoreViewModel` instead and make your business logic multiplatform.
-
-```kotlin
-val module = module { // Koin example
-    factoryOf(::CounterContainer)
-    viewModel(qualifier<CounterContainer>()) { ContainerViewModel(get<CounterContainer>()) }
-}
-
-class ScreenFragment : Fragment() {
-
-    private val vm by viewModel(qualifier<CounterContainer>())
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        subscribe(vm, ::consume, ::render)
-    }
-
-    private fun render(state: CounterState) {
-        // update your views
-    }
-
-    private fun consume(action: CounterAction) {
-        // handle actions
-    }
-}
-```
-
 ## Testing DSL
 
-Finally stop writing UI tests and replace them with unit tests:
+Bundled Test Harness with minimal verbosity:
 
 ### Test Stores
 
 ```kotlin
-store.subscribeAndTest {
+authStore.subscribeAndTest {
     // turbine + kotest example
-    ClickedCounter resultsIn {
-        states.test {
-            awaitItem() shouldBe State(counter = 1)
-        }
-        actions.test {
-            awaitItem() shouldBe ShowMessage
-        }
+    
+    intent(ClickedSignOut)
+    
+    states.test {
+        awaitItem() shouldBe Content(user = null)
+    }
+    actions.test {
+        awaitItem() shouldBe ShowMessage("Bye!")
     }
 }
 ```
@@ -379,17 +264,19 @@ timerPlugin(timer).test(Loading) {
 }
 ```
 
+Finally stop writing UI tests and replace them with unit tests.
+
 ## Debugger IDE Plugin + App
 
 IDE plugin generates code and lets you debug and control your app remotely:
 [![Plugin](https://img.shields.io/jetbrains/plugin/v/25766?style=flat)](https://plugins.jetbrains.com/plugin/25766-flowmvi)
 
 <video
-  src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'
-  controls
-  width="100%"
-  alt="FlowMVI IDE Plugin Demo">
-  Your browser does not support the video element. You can view the demo at our website.
+src='https://github.com/user-attachments/assets/05f8efdb-d125-4c4a-9bda-79875f22578f'
+controls
+width="100%"
+alt="FlowMVI IDE Plugin Demo">
+Your browser does not support the video element. You can view the demo at our website.
 </video>
 
 ## People love the library:
@@ -411,7 +298,7 @@ Begin by reading the [Quickstart Guide](https://opensource.respawn.pro/FlowMVI/q
 ## License
 
 ```
-   Copyright 2022-2025 Respawn Team and contributors
+   Copyright 2022-2026 Respawn Team and contributors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

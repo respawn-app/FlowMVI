@@ -83,16 +83,15 @@ kotlin {
         commonMain {
             kotlin.srcDir(generateBuildConfig.map { it.destinationDir })
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.materialIconsExtended)
-                implementation(compose.animation)
-                implementation(compose.animationGraphics)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(compose.uiUtil)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.animation)
+                implementation(libs.compose.animation.graphics)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.components.resources)
+                implementation(libs.compose.ui.tooling.preview)
+                implementation(libs.compose.ui.util)
 
                 implementation(libs.bundles.serialization)
                 implementation(libs.kotlin.datetime)
@@ -110,6 +109,7 @@ kotlin {
                 implementation(projects.essenty)
                 implementation(projects.compose)
                 implementation(projects.savedstate)
+                implementation(projects.metrics)
             }
         }
         nativeMain.dependencies {
@@ -121,7 +121,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
         }
         androidMain.dependencies {
-            api(compose.preview)
+            api(libs.compose.ui.tooling.preview)
             implementation(projects.android)
             implementation(applibs.view.constraintlayout)
             implementation(applibs.view.material)

@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.atomicfu) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.kotlin.benchmark) apply false
+    alias(libs.plugins.intellij.ide) apply false
     // plugins already on a classpath (conventions)
     // alias(libs.plugins.androidApplication) apply false
     // alias(libs.plugins.androidLibrary) apply false
@@ -175,6 +176,6 @@ gradle.taskGraph.whenReady {
     val lastTask = allTasks.lastOrNull()
     lastTask?.doLast {
         if (this.state.failure != null) return@doLast
-        println("✅ TASK SUCCESSFUL. Some messages suppressed by logging.level=warn")
+        println("✅ TASK SUCCESSFUL. Some messages suppressed by logging.level=quiet")
     }
 }
