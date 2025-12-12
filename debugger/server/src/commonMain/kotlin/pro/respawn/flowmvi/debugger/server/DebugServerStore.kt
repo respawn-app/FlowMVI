@@ -7,11 +7,13 @@ import kotlinx.coroutines.channels.BufferOverflow
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.DebuggerDefaults.ServerHistorySize
+import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
+import pro.respawn.flowmvi.debugger.server.ServerIntent.MetricsReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.RestoreRequested
 import pro.respawn.flowmvi.debugger.server.ServerIntent.SendCommand
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
@@ -49,6 +51,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
     }
     reduce { intent ->
         when (intent) {
+            is MetricsReceived -> intent(EventReceived(ClientEvent.Metrics(intent.snapshot), intent.from))
             is RestoreRequested -> updateState<State.Error, _> { previous }
             is StopRequested -> updateStateImmediate { Idle } // needs to be fast
             is ServerStarted -> updateStateImmediate { Running() }

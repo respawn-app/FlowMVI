@@ -10,4 +10,5 @@ import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.invoke
 
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() = enableRemoteDebugging()
+
 actual fun metricsSink() = DebuggerSink { PlatformStoreLogger(it) }

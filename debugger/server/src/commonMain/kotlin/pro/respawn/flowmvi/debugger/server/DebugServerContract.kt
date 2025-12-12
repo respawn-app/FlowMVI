@@ -10,6 +10,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ServerEvent
+import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
@@ -37,6 +38,7 @@ internal data class ServerEventEntry(
 
 @Immutable
 internal sealed interface ServerState : MVIState {
+
     data class Error(val e: Exception, val previous: ServerState) : ServerState
     data object Idle : ServerState
     data class Running(
@@ -51,14 +53,17 @@ internal sealed interface ServerState : MVIState {
 
 @Immutable
 internal sealed interface ServerIntent : MVIIntent {
+
     data object RestoreRequested : ServerIntent
     data object StopRequested : ServerIntent
     data object ServerStarted : ServerIntent
     data class EventReceived(val event: ClientEvent, val from: Uuid) : ServerIntent
     data class SendCommand(val command: StoreCommand, val storeId: Uuid) : ServerIntent
+    data class MetricsReceived(val snapshot: MetricsSnapshot, val from: Uuid): ServerIntent
 }
 
 @Immutable
 internal sealed interface ServerAction : MVIAction {
+
     data class SendClientEvent(val client: Uuid, val event: ServerEvent) : ServerAction
 }

@@ -1,10 +1,12 @@
 package pro.respawn.flowmvi.debugger.server
 
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.request.receive
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -26,12 +28,14 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreDisconnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.debugger.server.ServerAction.SendClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerIntent.EventReceived
+import pro.respawn.flowmvi.debugger.server.ServerIntent.MetricsReceived
 import pro.respawn.flowmvi.debugger.server.ServerIntent.ServerStarted
 import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.dsl.intent
 import pro.respawn.flowmvi.logging.PlatformStoreLogger
 import pro.respawn.flowmvi.logging.StoreLogLevel
 import pro.respawn.flowmvi.logging.invoke
+import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.kmmutils.common.asUUID
 import kotlin.uuid.toKotlinUuid
 
@@ -51,6 +55,10 @@ internal object DebugServer : Container<ServerState, ServerIntent, ServerAction>
             routing {
                 get("/") { call.respondText("FlowMVI Debugger Online", null) }
                 post("/{id}") { intent(EventReceived(call.receive<ClientEvent>(), call.storeId)) }
+                post("/{id}/metrics") {
+                    intent(MetricsReceived(call.receive<MetricsSnapshot>(), call.storeId))
+                    call.respond(HttpStatusCode.OK)
+                }
                 webSocket("/{id}") {
                     val storeId = call.storeId
                     with(store) {

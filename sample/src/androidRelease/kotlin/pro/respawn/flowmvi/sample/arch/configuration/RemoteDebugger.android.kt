@@ -4,5 +4,8 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.metrics.NoopSink
+import pro.respawn.flowmvi.dsl.StoreBuilder
 
 actual fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.remoteDebugger() = Unit
+actual fun metricsSink() = NoOpSink()

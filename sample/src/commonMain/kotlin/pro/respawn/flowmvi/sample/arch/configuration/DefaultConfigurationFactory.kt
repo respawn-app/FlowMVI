@@ -10,6 +10,7 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.StoreBuilder
+import pro.respawn.flowmvi.metrics.CompositeSink
 import pro.respawn.flowmvi.metrics.LoggingJsonMetricsSink
 import pro.respawn.flowmvi.metrics.dsl.collectMetrics
 import pro.respawn.flowmvi.metrics.dsl.reportMetrics
@@ -61,7 +62,10 @@ internal class DefaultConfigurationFactory(
         reportMetrics(
             metrics = metrics,
             interval = 10.seconds,
-            sink = LoggingJsonMetricsSink(json, tag = name),
+            sink = CompositeSink(
+                LoggingJsonMetricsSink(json, tag = name),
+                metricsSink()
+            ),
         )
         if (saver != null) install(
             saveStatePlugin(
