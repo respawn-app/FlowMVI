@@ -21,6 +21,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.SerializationException
 import pro.respawn.flowmvi.api.ActionShareBehavior
 import pro.respawn.flowmvi.api.EmptyState
 import pro.respawn.flowmvi.api.Store
@@ -29,6 +30,8 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.StoreLogLevel
+import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.logging.invoke
 import pro.respawn.flowmvi.logging.log
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.init
@@ -86,8 +89,7 @@ internal fun debugClientStore(
                 }
                 sendSerialized<ClientEvent>(StoreConnected(clientName, id))
                 log(StoreLogLevel.Trace) { "Established connection to ${call.request.url}" }
-                awaitEvents {
-                    log(StoreLogLevel.Trace) { "Received event: $it" }
+                awaitEvents(config.logger) {
                     if (it.storeId == id) action(it)
                 }
             }
@@ -124,6 +126,18 @@ private inline fun CoroutineScope.launchConnectionLoop(
     }
 }
 
-private suspend inline fun DefaultClientWebSocketSession.awaitEvents(onEvent: (ServerEvent) -> Unit) {
-    while (isActive) onEvent(receiveDeserialized<ServerEvent>())
+private suspend inline fun DefaultClientWebSocketSession.awaitEvents(
+    log: StoreLogger,
+    onEvent: (ServerEvent) -> Unit
+) {
+    while (isActive) {
+        try {
+            val event = receiveDeserialized<ServerEvent>()
+            log(StoreLogLevel.Trace) { "Received event: $event" }
+            onEvent(event)
+        } catch (e: Exception) {
+            log(e, StoreLogLevel.Warn)
+            continue
+        }
+    }
 }
