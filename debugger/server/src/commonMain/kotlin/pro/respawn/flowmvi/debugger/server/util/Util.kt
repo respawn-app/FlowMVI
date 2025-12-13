@@ -1,9 +1,13 @@
 package pro.respawn.flowmvi.debugger.server.util
 
 import androidx.compose.runtime.Stable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.DebuggerDefaults.PrettyPrintJson
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventType
+
+fun <T> PersistentList<T>?.orEmpty() = this ?: persistentListOf()
 
 @Stable
 internal val ClientEvent.type

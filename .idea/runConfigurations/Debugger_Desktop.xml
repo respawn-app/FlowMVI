@@ -3,6 +3,7 @@
     <ExternalSystemSettings>
       <option name="env">
         <map>
+          <entry key="DEBUG" value="true" />
           <entry key="DEVELOPER_DIR" value="/Applications/Xcode.app/Contents/Developer" />
         </map>
       </option>

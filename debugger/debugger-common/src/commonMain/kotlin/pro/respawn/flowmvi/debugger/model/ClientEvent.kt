@@ -4,6 +4,7 @@ package pro.respawn.flowmvi.debugger.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -15,12 +16,17 @@ import kotlin.uuid.Uuid
 @SerialName("client")
 public sealed interface ClientEvent : MVIIntent {
 
+    @Transient
+    public val storeName: String? get() = null
+
     @Serializable
     @SerialName("connected")
     public data class StoreConnected(
         val name: String?,
         val id: Uuid,
-    ) : ClientEvent
+    ) : ClientEvent {
+        override val storeName: String? = name
+    }
 
     @Serializable
     @SerialName("disconnected")
@@ -32,14 +38,20 @@ public sealed interface ClientEvent : MVIIntent {
     @SerialName("started")
     public data class StoreStarted(
         val name: String?,
-    ) : ClientEvent
+    ) : ClientEvent {
+
+        override val storeName: String? = name
+    }
 
     @Serializable
     @SerialName("stopped")
     public data class StoreStopped(
         val name: String?,
         val id: Uuid,
-    ) : ClientEvent
+    ) : ClientEvent {
+
+        override val storeName: String? = name
+    }
 
     @Serializable
     @SerialName("intent")

@@ -11,7 +11,9 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="EXECUTE_IN_TERMINAL" value="true" />
     <option name="EXECUTE_SCRIPT_FILE" value="false" />
-    <envs />
+    <envs>
+      <env name="DEBUG" value="true" />
+    </envs>
     <method v="2" />
   </configuration>
 </component>

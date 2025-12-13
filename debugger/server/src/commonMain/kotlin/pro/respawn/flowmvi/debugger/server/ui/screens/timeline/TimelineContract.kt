@@ -10,6 +10,7 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
+import pro.respawn.flowmvi.debugger.server.SessionKey
 import pro.respawn.flowmvi.debugger.server.util.type
 import kotlin.uuid.Uuid
 
@@ -35,7 +36,7 @@ internal data class StoreItem(
 @Immutable
 internal data class FocusedEvent(
     val timestamp: LocalDateTime,
-    val storeName: String?,
+    val source: SessionKey,
     val type: EventType,
     val event: ClientEvent,
     val id: Uuid,
@@ -43,7 +44,7 @@ internal data class FocusedEvent(
 
     constructor(entry: ServerEventEntry) : this(
         timestamp = entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
-        storeName = entry.name,
+        source = entry.source,
         type = entry.event.type,
         event = entry.event,
         id = entry.id,

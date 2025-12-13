@@ -11,6 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
+import pro.respawn.kmmutils.common.takeIfValid
 import kotlin.time.Clock
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
@@ -19,19 +20,39 @@ internal enum class StoreCommand {
     Stop, ResendIntent, RollbackState, ResendAction, RethrowException, SetInitialState
 }
 
-@Immutable
-internal data class ServerClientState(
+@JvmInline
+value class StoreKey(val value: String) {
+
+    constructor(name: String?, id: Uuid) : this(name?.takeIfValid() ?: id.toString())
+
+    override fun toString(): String = value
+}
+
+data class SessionKey(
+    val id: Uuid,
+    val name: String?
+) {
+
+    val key = StoreKey(name, id)
+}
+
+internal val Client.sessionKey get() = SessionKey(id, name)
+
+internal data class Client(
     val id: Uuid,
     val name: String?,
-    val isConnected: Boolean,
-    val lastConnected: Instant = Clock.System.now(),
-)
+    val events: PersistentList<ServerEventEntry> = persistentListOf(),
+    val isConnected: Boolean = true,
+    val lastConnected: Instant = Clock.System.now()
+) {
+
+    val key get() = StoreKey(name, id)
+}
 
 @Immutable
 internal data class ServerEventEntry(
-    val storeId: Uuid,
-    val name: String?,
     val event: ClientEvent,
+    val source: SessionKey,
     val timestamp: Instant = Clock.System.now(),
     val id: Uuid = Uuid.random(),
 )
@@ -42,12 +63,10 @@ internal sealed interface ServerState : MVIState {
     data class Error(val e: Exception, val previous: ServerState) : ServerState
     data object Idle : ServerState
     data class Running(
-        val clients: PersistentMap<Uuid, ServerClientState> = persistentMapOf(),
-        val eventLog: PersistentList<ServerEventEntry> = persistentListOf(),
+        val clients: PersistentMap<Uuid, Client> = persistentMapOf(),
     ) : ServerState {
 
-        override fun toString() =
-            "Running(clients=${clients.count { it.value.isConnected }}, logSize = ${eventLog.size})"
+        override fun toString() = "Running(clients=${clients.count { it.value.isConnected }})"
     }
 }
 

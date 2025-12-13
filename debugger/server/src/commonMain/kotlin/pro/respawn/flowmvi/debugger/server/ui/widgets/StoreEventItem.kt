@@ -50,7 +50,7 @@ internal fun StoreEventItem(
         headlineContent = {
             SelectionContainer {
                 Text(
-                    text = "${event.name} <- ${event.event.type}",
+                    text = "${event.source.key} <- ${event.event.type}",
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )

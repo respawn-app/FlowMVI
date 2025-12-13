@@ -1,6 +1,7 @@
 package pro.respawn.flowmvi.debugger.server
 
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -21,9 +22,11 @@ import pro.respawn.flowmvi.debugger.server.ServerIntent.StopRequested
 import pro.respawn.flowmvi.debugger.server.ServerState.Idle
 import pro.respawn.flowmvi.debugger.server.ServerState.Running
 import pro.respawn.flowmvi.debugger.server.arch.configuration.debuggable
+import pro.respawn.flowmvi.debugger.server.util.orEmpty
 import pro.respawn.flowmvi.dsl.lazyStore
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.dsl.updateStateImmediate
+import pro.respawn.flowmvi.logging.logw
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
@@ -57,23 +60,55 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
             is ServerStarted -> updateStateImmediate { Running() }
             is SendCommand -> action(SendClientEvent(intent.storeId, intent.command.event(intent.storeId)))
             is EventReceived -> state {
+                val existing = clients[intent.from]
                 when (val event = intent.event) {
                     is StoreDisconnected -> {
-                        val existing = clients[intent.from] ?: return@state this
+                        existing ?: return@state this
                         copy(
-                            clients = clients.put(intent.from, existing.copy(isConnected = false)),
-                            eventLog = eventLog.putEvent(ServerEventEntry(intent.from, existing.name, event)),
+                            clients = clients.put(
+                                key = intent.from,
+                                value = existing.copy(
+                                    isConnected = false,
+                                    events = existing.events.putEvent(ServerEventEntry(event, existing.sessionKey))
+                                ),
+                            ),
                         )
                     }
                     is StoreConnected -> copy(
-                        clients = clients.put(intent.from, ServerClientState(intent.from, event.name, true)),
-                        eventLog = eventLog.putEvent(ServerEventEntry(intent.from, event.name, event)),
+                        clients = clients.put(
+                            key = intent.from,
+                            value = Client(
+                                id = intent.from,
+                                name = event.name,
+                                events = existing?.events.orEmpty().putEvent(
+                                    ServerEventEntry(event, SessionKey(intent.from, event.name))
+                                ),
+                            )
+                        ),
                     )
-                    else -> copy(
-                        eventLog = eventLog.putEvent(
-                            ServerEventEntry(intent.from, clients[intent.from]?.name ?: return@state this, event)
+                    else -> {
+                        if (existing == null) logw {
+                            "It should not be possible to send events to non-connected clients, event: $intent"
+                        }
+                        val client = existing ?: return@state copy(
+                            clients = clients.put(
+                                key = intent.from,
+                                value = Client(
+                                    id = intent.from,
+                                    name = intent.event.storeName,
+                                    events = persistentListOf(ServerEventEntry(event, SessionKey(intent.from, null)))
+                                )
+                            )
                         )
-                    )
+                        copy(
+                            clients = clients.put(
+                                key = intent.from,
+                                value = client.copy(
+                                    events = client.events.putEvent(ServerEventEntry(event, client.sessionKey))
+                                )
+                            )
+                        )
+                    }
                 }
             }
         }

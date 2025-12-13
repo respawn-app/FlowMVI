@@ -28,6 +28,7 @@ import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
+import pro.respawn.flowmvi.debugger.server.SessionKey
 import pro.respawn.flowmvi.debugger.server.StoreCommand
 import pro.respawn.flowmvi.debugger.server.di.container
 import pro.respawn.flowmvi.debugger.server.navigation.AppNavigator
@@ -129,8 +130,7 @@ private fun StoreDetailsScreenPreview() = RespawnTheme {
                 name = "Store ".repeat(10),
                 connected = false,
                 eventLog = ServerEventEntry(
-                    storeId = Uuid.random(),
-                    name = "Store",
+                    source = SessionKey(id = Uuid.random(), name = "Store"),
                     event = ClientEvent.StoreConnected("Store", id = Uuid.random())
                 ).copies(10).toImmutableList(),
             ),
