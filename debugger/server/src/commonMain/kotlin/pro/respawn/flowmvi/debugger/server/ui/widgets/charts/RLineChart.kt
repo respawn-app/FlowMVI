@@ -95,6 +95,27 @@ data class StyledLine<T>(
 
 @Composable
 @Suppress("ComplexMethod", "ComposableParametersOrdering")
+/**
+ * Renders one or more styled line series as a chart.
+ *
+ * Supports optional X/Y axes, optional dots, and an animated reveal (width/height) keyed by [animationKeys].
+ *
+ * @param T X-axis point key type.
+ * @param lines Line series to render.
+ * @param modifier Modifier applied to the chart container.
+ * @param dotsRadius Optional radius for point markers (null disables).
+ * @param lineWidth Stroke width of the line path.
+ * @param labelTextStyle Text style for axis labels.
+ * @param animate Whether to animate the chart reveal.
+ * @param bezierIntensity Bezier smoothing intensity for curved lines.
+ * @param yAxis Optional Y axis configuration.
+ * @param xAxis Optional X axis configuration.
+ * @param animationDurationMs Reveal animation duration in milliseconds.
+ * @param animDelayMs Reveal animation delay in milliseconds.
+ * @param animationKeys Keys that restart the animation when changed.
+ *
+ * @see RLineChartPreview
+ */
 fun <T> RLineChart(
     lines: List<StyledLine<T>>,
     modifier: Modifier = Modifier,

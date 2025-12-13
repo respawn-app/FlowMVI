@@ -30,6 +30,7 @@ import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
+import kotlin.time.Clock
 import kotlin.uuid.Uuid
 import pro.respawn.flowmvi.debugger.server.ServerAction as Action
 import pro.respawn.flowmvi.debugger.server.ServerIntent as Intent
@@ -60,8 +61,17 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
             is SendCommand -> action(SendClientEvent(intent.storeId, intent.command.event(intent.storeId)))
             is MetricsReceived -> state {
                 val key = intent.snapshot.key(intent.from)
-                val client = clients[key] ?: return@state this
+                val existing = clients[key]
+                if (existing == null) logw {
+                    "Received metrics for missing/evicted client $key (id=${intent.from}), creating placeholder entry."
+                }
+                val client = existing ?: Client(
+                    id = intent.from,
+                    name = intent.snapshot.meta.storeName,
+                    isConnected = false,
+                )
                 client.copy(
+                    name = client.name ?: intent.snapshot.meta.storeName,
                     metrics = client.metrics
                         .add(intent.snapshot)
                         .let { list ->
@@ -90,11 +100,13 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                     is StoreConnected -> copy(
                         clients = clients.put(
                             key = intent.key,
-                            value = Client(
+                            value = (existing ?: Client(id = intent.from, name = event.name)).copy(
                                 id = intent.from,
                                 name = event.name,
+                                isConnected = true,
+                                lastConnected = Clock.System.now(),
                                 events = existing?.events.orEmpty().putEvent(ServerEventEntry(event)),
-                            )
+                            ),
                         ),
                     )
                     else -> {
