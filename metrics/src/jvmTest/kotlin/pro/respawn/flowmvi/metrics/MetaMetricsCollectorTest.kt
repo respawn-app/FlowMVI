@@ -165,8 +165,6 @@ class MetaMetricsCollectorTest : FreeSpec({
             onStart()
             val id = collector.snapshot().meta.storeId
             id.shouldNotBeNull()
-            id.shouldNotBeBlank()
-            id.length shouldBe 36
         }
     }
 

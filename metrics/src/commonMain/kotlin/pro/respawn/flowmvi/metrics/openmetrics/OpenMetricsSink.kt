@@ -642,7 +642,7 @@ private fun <T> quantileGauge(
 private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMap {
     put("schema_version", snapshot.meta.schemaVersion.value)
     snapshot.meta.storeName?.let { put("store", it) }
-    snapshot.meta.storeId?.let { put("store_id", it) }
+    snapshot.meta.storeId?.let { put("store_id", it.toString()) }
     snapshot.meta.runId?.let { put("run_id", it) }
 }
 

@@ -444,7 +444,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
                 generatedAt = clock.now(),
                 startTime = firstStartAt.value,
                 storeName = lastConfig.value?.name,
-                storeId = lastConfig.value?.id?.toString(),
+                storeId = lastConfig.value?.id,
                 windowSeconds = windowSeconds,
                 emaAlpha = emaAlpha.toFloat(),
             ),

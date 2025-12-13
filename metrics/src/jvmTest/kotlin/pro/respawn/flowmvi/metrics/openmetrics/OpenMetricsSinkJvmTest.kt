@@ -6,6 +6,7 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import pro.respawn.flowmvi.metrics.AppendableStringSink
 import pro.respawn.flowmvi.metrics.sampleSnapshot
+import kotlin.uuid.Uuid
 
 class OpenMetricsSinkJvmTest : FreeSpec({
 
@@ -97,7 +98,7 @@ class OpenMetricsSinkJvmTest : FreeSpec({
                 strange"store
                 x\y
             """.trimIndent(),
-            storeId = """id"with\slash""",
+            storeId = Uuid.random(),
         )
         val sink = OpenMetricsSink(
             delegate = AppendableStringSink(buffer),

@@ -6,6 +6,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StoreConfiguration
 import kotlin.time.Duration
 import kotlin.time.Instant
+import kotlin.uuid.Uuid
 
 /**
  * Root metrics payload composed of typed sections. Serializable for transport; the in-memory store configuration is
@@ -44,8 +45,10 @@ public data class Meta(
     val startTime: Instant? = null,
     /** Logical store name or identifier to tag metrics. */
     val storeName: String? = null,
-    /** Optional configuration fingerprint provided by the user. */
-    val storeId: String? = null,
+    /**
+     * Id of the store instance
+     */
+    val storeId: Uuid?,
     /** Sliding-window length in seconds used for ops/sec and moving stats. */
     val windowSeconds: Int,
     /** EMA smoothing factor used for averages. */
