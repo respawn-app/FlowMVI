@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import pro.respawn.flowmvi.debugger.model.ClientEvent
-import pro.respawn.flowmvi.debugger.server.DebuggerDefaults.PrettyPrintJson
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventType
 
 fun <T> PersistentList<T>?.orEmpty() = this ?: persistentListOf()
@@ -22,7 +21,6 @@ internal val ClientEvent.type
         is ClientEvent.StoreDisconnected -> EventType.Disconnection
         is ClientEvent.StoreSubscribed,
         is ClientEvent.StoreUnsubscribed -> EventType.Subscription
-        is ClientEvent.Metrics -> EventType.Metrics
     }
 
 // TODO: Need a custom layout for some events, create a composable
@@ -39,7 +37,6 @@ internal val ClientEvent.representation: String
         is ClientEvent.StoreStopped -> "$name stopped"
         is ClientEvent.StoreSubscribed -> "Subscription count changed to $newSubscriptionCount"
         is ClientEvent.StoreUnsubscribed -> "Subscription count changed to $newSubscriptionCount"
-        is ClientEvent.Metrics -> PrettyPrintJson.encodeToString(snapshot)
         is ClientEvent.StoreStateChanged -> """
 ${from.name} ---> 
 

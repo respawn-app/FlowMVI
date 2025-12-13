@@ -31,7 +31,7 @@ public fun DebuggerSink(
             url.host = host
             url.port = port
             contentType(ContentType.Application.Json)
-            url.path(storeId, "metrics")
+            url.path(storeId.toString(), "metrics")
             setBody(snapshot)
         }
     }.onFailure {

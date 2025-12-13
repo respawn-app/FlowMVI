@@ -42,8 +42,9 @@ internal data class Client(
     val id: Uuid,
     val name: String?,
     val events: PersistentList<ServerEventEntry> = persistentListOf(),
+    val metrics: PersistentList<MetricsSnapshot> = persistentListOf(),
     val isConnected: Boolean = true,
-    val lastConnected: Instant = Clock.System.now()
+    val lastConnected: Instant = Clock.System.now(),
 ) {
 
     val key get() = StoreKey(name, id)

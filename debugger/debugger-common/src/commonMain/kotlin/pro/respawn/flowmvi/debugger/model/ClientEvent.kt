@@ -8,7 +8,6 @@ import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.name
-import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import kotlin.uuid.Uuid
 
 // @Serializable
@@ -135,14 +134,5 @@ public sealed interface ClientEvent : MVIIntent {
     ) : ClientEvent {
 
         public constructor(e: Exception, name: String?) : this(e.name, e.message, e.stackTraceToString(), name)
-    }
-
-    @Serializable
-    @SerialName("metrics")
-    public data class Metrics(
-        val snapshot: MetricsSnapshot,
-    ) : ClientEvent {
-
-        override val storeName: String? = snapshot.meta.storeName
     }
 }
