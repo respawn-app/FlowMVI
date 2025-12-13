@@ -4,7 +4,6 @@ package pro.respawn.flowmvi.debugger.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -12,12 +11,16 @@ import pro.respawn.flowmvi.debugger.name
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
 import kotlin.uuid.Uuid
 
+// @Serializable
+// public data class ClientMeta(
+//     val name: String? = null,
+// )
+
 @Serializable
 @SerialName("client")
 public sealed interface ClientEvent : MVIIntent {
 
-    @Transient
-    public val storeName: String? get() = null
+    public val storeName: String?
 
     @Serializable
     @SerialName("connected")
@@ -25,6 +28,7 @@ public sealed interface ClientEvent : MVIIntent {
         val name: String?,
         val id: Uuid,
     ) : ClientEvent {
+
         override val storeName: String? = name
     }
 
@@ -32,7 +36,10 @@ public sealed interface ClientEvent : MVIIntent {
     @SerialName("disconnected")
     public data class StoreDisconnected(
         val id: Uuid,
-    ) : ClientEvent
+    ) : ClientEvent {
+
+        override val storeName: String? = null
+    }
 
     @Serializable
     @SerialName("started")
@@ -58,9 +65,17 @@ public sealed interface ClientEvent : MVIIntent {
     public data class StoreIntent(
         val name: String,
         val data: String,
+        override val storeName: String? = null,
     ) : ClientEvent {
 
-        public constructor(intent: MVIIntent) : this(name = intent.name, intent.toString())
+        public constructor(
+            intent: MVIIntent,
+            storeName: String?,
+        ) : this(
+            name = intent.name,
+            data = intent.toString(),
+            storeName = storeName
+        )
     }
 
     @Serializable
@@ -68,9 +83,17 @@ public sealed interface ClientEvent : MVIIntent {
     public data class StoreAction(
         val name: String,
         val data: String,
+        override val storeName: String? = null,
     ) : ClientEvent {
 
-        public constructor(action: MVIAction) : this(name = action.name, action.toString())
+        public constructor(
+            action: MVIAction,
+            storeName: String?
+        ) : this(
+            name = action.name,
+            action.toString(),
+            storeName = storeName
+        )
     }
 
     @Serializable
@@ -78,21 +101,28 @@ public sealed interface ClientEvent : MVIIntent {
     public data class StoreStateChanged(
         val from: StoreState,
         val to: StoreState,
+        override val storeName: String? = null,
     ) : ClientEvent {
 
-        public constructor(from: MVIState, to: MVIState) : this(from = StoreState(from), to = StoreState(to))
+        public constructor(from: MVIState, to: MVIState, name: String?) : this(
+            from = StoreState(from),
+            to = StoreState(to),
+            storeName = name,
+        )
     }
 
     @Serializable
     @SerialName("unsubscribed")
     public data class StoreUnsubscribed(
         val newSubscriptionCount: Int,
+        override val storeName: String? = null,
     ) : ClientEvent
 
     @Serializable
     @SerialName("subscribed")
     public data class StoreSubscribed(
         val newSubscriptionCount: Int,
+        override val storeName: String? = null,
     ) : ClientEvent
 
     @Serializable
@@ -101,14 +131,18 @@ public sealed interface ClientEvent : MVIIntent {
         val name: String,
         val message: String?,
         val stackTrace: String,
+        override val storeName: String? = null,
     ) : ClientEvent {
 
-        public constructor(e: Exception) : this(e.name, e.message, e.stackTraceToString())
+        public constructor(e: Exception, name: String?) : this(e.name, e.message, e.stackTraceToString(), name)
     }
 
     @Serializable
     @SerialName("metrics")
     public data class Metrics(
         val snapshot: MetricsSnapshot,
-    ) : ClientEvent
+    ) : ClientEvent {
+
+        override val storeName: String? = snapshot.meta.storeName
+    }
 }
