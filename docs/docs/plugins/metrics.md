@@ -129,3 +129,57 @@ With metrics enabled, you can still easily process 1000 intents in a single fram
 
 **Metrics becomes a meaningful CPU cost only if you process tens of thousands of
 intents per second on a single hot path**
+
+## Visualizing Metrics in the Debugger
+
+FlowMVI's [Remote Debugger](/misc/debugging.md) can display metrics collected from your stores in real-time.
+This allows you to monitor store performance directly in the IDE plugin or desktop app without setting up
+external monitoring infrastructure.
+
+### Setup
+
+To send metrics to the debugger, use the `DebuggerSink` provided by the `debugger-plugin` module:
+
+```toml
+flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
+```
+
+```kotlin
+commonMainImplementation("pro.respawn.flowmvi:debugger-plugin:<version>")
+```
+
+Then configure your store to report metrics to the debugger:
+
+```kotlin
+import pro.respawn.flowmvi.debugger.plugin.DebuggerSink
+import pro.respawn.flowmvi.metrics.CompositeSink
+import pro.respawn.flowmvi.metrics.LoggingJsonMetricsSink
+import pro.respawn.flowmvi.metrics.dsl.collectMetrics
+import pro.respawn.flowmvi.metrics.dsl.reportMetrics
+
+val store = store(Initial) {
+    val metrics = collectMetrics(reportingScope = applicationScope)
+    reportMetrics(
+        metrics = metrics,
+        interval = 10.seconds,
+        sink = CompositeSink(
+            LoggingJsonMetricsSink(json, tag = name), // optional: also log to console
+            DebuggerSink { e -> logger.error(e) },    // send to debugger
+        ),
+    )
+}
+```
+
+::::tip[Combine with other sinks]
+Use `CompositeSink` to send metrics to multiple destinations simultaneously – for example,
+both to the debugger for development and to your production monitoring backend.
+::::
+
+::::warning[Debug builds only]
+Like the debugger plugin itself, `DebuggerSink` should only be used in debug builds.
+See the [Remote Debugger Setup](/misc/debugging.md) guide for how to configure source sets
+to exclude debugging code from release builds.
+::::
+
+The debugger will display metrics for each connected store, allowing you to monitor performance
+characteristics like intent throughput, state transition latency, and subscription counts in real-time.
