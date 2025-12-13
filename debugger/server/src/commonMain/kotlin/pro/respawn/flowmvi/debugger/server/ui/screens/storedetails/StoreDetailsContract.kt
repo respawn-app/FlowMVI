@@ -22,7 +22,9 @@ internal sealed interface StoreDetailsState : MVIState {
         val connected: Boolean,
         val eventLog: ImmutableList<ServerEventEntry>,
         val focusedEvent: FocusedEvent? = null,
-    ) : StoreDetailsState
+    ) : StoreDetailsState {
+        val title = name ?: id.toString()
+    }
 }
 
 @Immutable

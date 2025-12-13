@@ -8,6 +8,7 @@ import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.server.DebugServer
 import pro.respawn.flowmvi.debugger.server.ServerIntent
 import pro.respawn.flowmvi.debugger.server.ServerState
+import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.arch.configuration.StoreConfiguration
 import pro.respawn.flowmvi.debugger.server.arch.configuration.configure
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsAction.CopyToClipboard
@@ -27,13 +28,12 @@ import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
 import pro.respawn.flowmvi.util.typed
-import kotlin.uuid.Uuid
 
 private typealias Ctx = PipelineContext<StoreDetailsState, StoreDetailsIntent, StoreDetailsAction>
 
 @OptIn(ExperimentalFlowMVIAPI::class)
 internal class StoreDetailsContainer(
-    private val id: Uuid,
+    private val storeKey: StoreKey,
     configuration: StoreConfiguration,
 ) : Container<StoreDetailsState, StoreDetailsIntent, StoreDetailsAction> {
 
@@ -51,7 +51,7 @@ internal class StoreDetailsContainer(
                     when (state) {
                         is ServerState.Error -> StoreDetailsState.Error(state.e)
                         is ServerState.Idle -> StoreDetailsState.Disconnected
-                        is ServerState.Running -> state.clients[id]?.run {
+                        is ServerState.Running -> state.clients[storeKey]?.run {
                             DisplayingStore(
                                 id = id,
                                 name = name,
@@ -67,7 +67,9 @@ internal class StoreDetailsContainer(
         reduce { intent ->
             when (intent) {
                 is CloseFocusedEventClicked -> updateState<DisplayingStore, _> { copy(focusedEvent = null) }
-                is SendCommandClicked -> DebugServer.store.intent(ServerIntent.SendCommand(intent.event, id))
+                is SendCommandClicked -> withState<DisplayingStore, _> {
+                    DebugServer.store.intent(ServerIntent.SendCommand(intent.event, id))
+                }
                 is CopyEventClicked -> withState<DisplayingStore, _> {
                     val event = focusedEvent?.event?.representation ?: return@withState
                     action(CopyToClipboard(event))

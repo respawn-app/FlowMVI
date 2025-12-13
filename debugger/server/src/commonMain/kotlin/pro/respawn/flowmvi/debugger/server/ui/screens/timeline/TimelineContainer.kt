@@ -74,7 +74,7 @@ internal class TimelineContainer(
                                 .toImmutableList(),
                             stores = state.clients
                                 .asSequence()
-                                .map { StoreItem(it.key, it.value.name, it.value.isConnected) }
+                                .map { StoreItem(it.key, it.value.isConnected) }
                                 .toImmutableList(),
                         ).also {
                             val hasFocusedItem = it.focusedEvent != null
@@ -89,7 +89,7 @@ internal class TimelineContainer(
         }
         reduce { intent ->
             when (intent) {
-                is StoreSelected -> action(GoToStoreDetails(intent.store.id))
+                is StoreSelected -> action(GoToStoreDetails(intent.store.key))
                 is CloseFocusedEventClicked -> updateState<DisplayingTimeline, _> { copy(focusedEvent = null) }
                 is RetryClicked -> DebugServer.store.intent(RestoreRequested)
                 is CopyEventClicked -> withState<DisplayingTimeline, _> {

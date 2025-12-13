@@ -36,7 +36,7 @@ internal fun IntentReceiver<TimelineIntent>.StoreSelectorDropDown(
                 stores.forEach {
                     DropDownAction(
                         modifier = Modifier.widthIn(max = 400.dp),
-                        text = it.label,
+                        text = it.key.toString(),
                         icon = if (it.isConnected) Icons.CloudConnection else Icons.CloudRemove,
                         tint = if (it.isConnected) connectedColor else errorColor,
                         onClick = { intent(StoreSelected(it)) },

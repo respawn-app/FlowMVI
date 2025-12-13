@@ -45,7 +45,7 @@ fun TimelineScreen(
             is ScrollToItem -> listState.animateScrollToItem(it.index)
             is CopyToClipboard -> clip.setText(it.text)
             is GoToConnect -> navigator.connect()
-            is GoToStoreDetails -> navigator.storeDetails(it.storeId)
+            is GoToStoreDetails -> navigator.storeDetails(it.key)
         }
     }
     TimelineScreenContent(state, listState)

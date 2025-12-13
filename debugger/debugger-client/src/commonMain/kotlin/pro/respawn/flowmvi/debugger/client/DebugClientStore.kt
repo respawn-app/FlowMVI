@@ -52,7 +52,7 @@ internal fun debugClientStore(
 ) = store(EmptyState) {
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     configure {
-        name = "${clientKey ?: "Store"}Debugger"
+        name = clientKey ?: "Debugger"
         coroutineContext = Dispatchers.Default
         debuggable = true
         parallelIntents = false // ensure the order of events matches server's expectations
@@ -75,7 +75,6 @@ internal fun debugClientStore(
                 }
             },
         ) {
-            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$clientId" }
             val _ = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,

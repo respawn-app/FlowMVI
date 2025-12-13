@@ -30,6 +30,7 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.SessionKey
 import pro.respawn.flowmvi.debugger.server.StoreCommand
+import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.di.container
 import pro.respawn.flowmvi.debugger.server.navigation.AppNavigator
 import pro.respawn.flowmvi.debugger.server.navigation.util.backNavigator
@@ -51,9 +52,9 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoreDetailsScreen(
-    storeId: Uuid,
+    key: StoreKey,
     navigator: AppNavigator,
-) = with(container<StoreDetailsContainer, _, _, _> { parametersOf(storeId) }) {
+) = with(container<StoreDetailsContainer, _, _, _> { parametersOf(key) }) {
     val clipboard = LocalClipboard.current
 
     val state by subscribe(requireLifecycle()) {
@@ -63,7 +64,7 @@ fun StoreDetailsScreen(
     }
 
     RScaffold(
-        title = state.typed<DisplayingStore>()?.let { it.name ?: it.id.toString() },
+        title = state.typed<DisplayingStore>()?.title,
         onBack = navigator.backNavigator,
     ) {
         StoreDetailsScreenContent(state = state)

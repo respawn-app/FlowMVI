@@ -60,13 +60,13 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
             is ServerStarted -> updateStateImmediate { Running() }
             is SendCommand -> action(SendClientEvent(intent.storeId, intent.command.event(intent.storeId)))
             is EventReceived -> state {
-                val existing = clients[intent.from]
+                val existing = clients[intent.key]
                 when (val event = intent.event) {
                     is StoreDisconnected -> {
                         existing ?: return@state this
                         copy(
                             clients = clients.put(
-                                key = intent.from,
+                                key = intent.key,
                                 value = existing.copy(
                                     isConnected = false,
                                     events = existing.events.putEvent(ServerEventEntry(event, existing.sessionKey))
@@ -76,7 +76,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                     }
                     is StoreConnected -> copy(
                         clients = clients.put(
-                            key = intent.from,
+                            key = intent.key,
                             value = Client(
                                 id = intent.from,
                                 name = event.name,
@@ -92,7 +92,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                         }
                         val client = existing ?: return@state copy(
                             clients = clients.put(
-                                key = intent.from,
+                                key = intent.key,
                                 value = Client(
                                     id = intent.from,
                                     name = intent.event.storeName,
@@ -102,7 +102,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                         )
                         copy(
                             clients = clients.put(
-                                key = intent.from,
+                                key = intent.key,
                                 value = client.copy(
                                     events = client.events.putEvent(ServerEventEntry(event, client.sessionKey))
                                 )
@@ -132,3 +132,6 @@ private fun StoreCommand.event(storeId: Uuid) = when (this) {
     StoreCommand.RethrowException -> ServerEvent.RethrowLastException(storeId)
     StoreCommand.SetInitialState -> ServerEvent.RollbackToInitialState(storeId)
 }
+
+internal val Client.sessionKey get() = SessionKey(id, name)
+internal val EventReceived.key get() = StoreKey(event.storeName, from)

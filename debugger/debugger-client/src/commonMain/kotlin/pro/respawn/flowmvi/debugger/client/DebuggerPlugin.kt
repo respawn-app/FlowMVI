@@ -73,25 +73,25 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
         emit(StoreStarted(clientKey))
     }
     onIntent {
-        emit(StoreIntent(it, config.name))
+        emit(StoreIntent(it, clientKey))
         it
     }
     onAction {
-        emit(StoreAction(it, config.name))
+        emit(StoreAction(it, clientKey))
         it
     }
     onState { old, new ->
-        emit(StoreStateChanged(old, new, config.name))
+        emit(StoreStateChanged(old, new, clientKey))
         new
     }
     onException {
-        emit(StoreException(it, config.name))
+        emit(StoreException(it, clientKey))
         it
     }
-    onSubscribe { emit(StoreSubscribed(it)) }
-    onUnsubscribe { emit(StoreUnsubscribed(it)) }
+    onSubscribe { emit(StoreSubscribed(it, clientKey)) }
+    onUnsubscribe { emit(StoreUnsubscribed(it, clientKey)) }
     onStop {
-        intent(StoreStopped(config.name, config.id))
+        intent(StoreStopped(clientKey, config.id))
         close()
     }
 }

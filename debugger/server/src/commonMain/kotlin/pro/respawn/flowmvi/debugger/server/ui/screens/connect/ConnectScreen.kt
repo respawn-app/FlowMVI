@@ -82,7 +82,7 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
                 Text("Compatible with v${BuildFlags.VersionName}", style = MaterialTheme.typography.labelMedium)
                 RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
                 RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
-                Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
+                Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Start Server") }
                 Box(Modifier.weight(0.5f, fill = false))
             }
         }

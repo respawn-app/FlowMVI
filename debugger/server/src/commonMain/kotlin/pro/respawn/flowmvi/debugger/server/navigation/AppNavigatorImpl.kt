@@ -5,11 +5,11 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.navigation.component.RootComponent
 import pro.respawn.flowmvi.debugger.server.navigation.component.StackComponent
 import pro.respawn.flowmvi.debugger.server.navigation.destination.Destination
 import pro.respawn.flowmvi.debugger.server.navigation.details.DetailsComponent
-import kotlin.uuid.Uuid
 
 @Composable
 fun rememberAppNavigator(
@@ -39,7 +39,7 @@ private class AppNavigatorImpl(
 
     override fun timeline() = navigate(Destination.Timeline)
     override fun connect() = navigate(Destination.Connect)
-    override fun storeDetails(storeId: Uuid) = navigate(Destination.StoreDetails(storeId))
+    override fun storeDetails(key: StoreKey) = navigate(Destination.StoreDetails(key))
 
     @Composable
     override fun rememberBackNavigationState(): State<Boolean> {

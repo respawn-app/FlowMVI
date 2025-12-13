@@ -11,6 +11,7 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.SessionKey
+import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.util.type
 import kotlin.uuid.Uuid
 
@@ -25,13 +26,9 @@ internal data class TimelineFilters(
 
 @Immutable
 internal data class StoreItem(
-    val id: Uuid,
-    val name: String?,
+    val key: StoreKey,
     val isConnected: Boolean,
-) {
-
-    val label = "${name ?: "Unnamed"}\n$id"
-}
+)
 
 @Immutable
 internal data class FocusedEvent(
@@ -85,6 +82,6 @@ internal sealed interface TimelineAction : MVIAction {
 
     data class CopyToClipboard(val text: String) : TimelineAction
     data class ScrollToItem(val index: Int) : TimelineAction
-    data class GoToStoreDetails(val storeId: Uuid) : TimelineAction
+    data class GoToStoreDetails(val key: StoreKey) : TimelineAction
     data object GoToConnect : TimelineAction
 }

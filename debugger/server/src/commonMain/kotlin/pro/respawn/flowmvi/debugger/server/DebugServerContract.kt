@@ -5,6 +5,7 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
@@ -21,6 +22,7 @@ internal enum class StoreCommand {
 }
 
 @JvmInline
+@Serializable
 value class StoreKey(val value: String) {
 
     constructor(name: String?, id: Uuid) : this(name?.takeIfValid() ?: id.toString())
@@ -35,8 +37,6 @@ data class SessionKey(
 
     val key = StoreKey(name, id)
 }
-
-internal val Client.sessionKey get() = SessionKey(id, name)
 
 internal data class Client(
     val id: Uuid,
@@ -63,7 +63,7 @@ internal sealed interface ServerState : MVIState {
     data class Error(val e: Exception, val previous: ServerState) : ServerState
     data object Idle : ServerState
     data class Running(
-        val clients: PersistentMap<Uuid, Client> = persistentMapOf(),
+        val clients: PersistentMap<StoreKey, Client> = persistentMapOf(),
     ) : ServerState {
 
         override fun toString() = "Running(clients=${clients.count { it.value.isConnected }})"
