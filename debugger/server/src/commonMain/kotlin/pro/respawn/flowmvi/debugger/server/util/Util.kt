@@ -14,8 +14,8 @@ internal val ClientEvent.type
         is ClientEvent.StoreStateChanged -> EventType.StateChange
         is ClientEvent.StoreStarted,
         is ClientEvent.StoreStopped -> EventType.Initialization
+        is ClientEvent.StoreConnected -> EventType.Connection
         is ClientEvent.StoreDisconnected -> EventType.Disconnection
-        is ClientEvent.StoreConnected,
         is ClientEvent.StoreSubscribed,
         is ClientEvent.StoreUnsubscribed -> EventType.Subscription
         is ClientEvent.Metrics -> EventType.Metrics
