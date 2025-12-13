@@ -2,6 +2,7 @@ package pro.respawn.flowmvi.debugger.server.ui.screens.timeline
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,10 +26,13 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.Co
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.RetryClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
+import pro.respawn.flowmvi.debugger.server.ui.util.TimestampFormatter
 import pro.respawn.flowmvi.debugger.server.ui.util.setText
+import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
+import pro.respawn.flowmvi.debugger.server.ui.widgets.FocusedEventLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
-import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
+import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventList
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 
 /**
@@ -62,14 +66,31 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
             is TimelineState.Error -> RErrorView(e) { intent(RetryClicked) }
             is DisplayingTimeline -> Column {
                 TimelineMenuBar(this@TypeCrossfade)
-                StoreEventListDetailsLayout(
-                    events = currentEvents,
-                    focusedEvent = focusedEvent,
-                    listState = listState,
-                    onCopy = { intent(CopyEventClicked) },
-                    onClose = { intent(CloseFocusedEventClicked) },
-                    onClick = { intent(EventClicked(it)) },
-                    modifier = Modifier.fillMaxSize().padding(8.dp)
+                DynamicTwoPaneLayout(
+                    modifier = Modifier.fillMaxSize().padding(8.dp),
+                    secondPaneVisible = focusedEvent != null,
+                    firstPaneContent = {
+                        StoreEventList(
+                            events = currentEvents,
+                            isSelected = { it.entry.id == focusedEvent?.id },
+                            onClick = {intent(EventClicked(it)) },
+                            formatTimestamp = TimestampFormatter,
+                            listState = listState,
+                            entry = { it.entry },
+                            source = { it.source },
+                        )
+                    },
+                    secondaryPaneContent = {
+                        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) inner@{
+                            if (focusedEvent == null) return@inner
+                            FocusedEventLayout(
+                                event = focusedEvent,
+                                onCopy = { intent(CopyEventClicked) },
+                                onClose = { intent(CloseFocusedEventClicked) },
+                                format = TimestampFormatter,
+                            )
+                        }
+                    }
                 )
             } // column
         } // when

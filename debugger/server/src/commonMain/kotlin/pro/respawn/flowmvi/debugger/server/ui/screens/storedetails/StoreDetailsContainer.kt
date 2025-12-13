@@ -76,7 +76,7 @@ internal class StoreDetailsContainer(
                 }
                 is EventClicked -> updateState<DisplayingStore, _> {
                     if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
-                    copy(focusedEvent = FocusedEvent(intent.entry))
+                    copy(focusedEvent = FocusedEvent(intent.entry, storeKey))
                 }
             }
         }

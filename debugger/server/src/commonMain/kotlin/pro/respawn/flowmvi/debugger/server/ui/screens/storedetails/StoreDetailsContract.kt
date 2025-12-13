@@ -7,6 +7,8 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.StoreCommand
+import pro.respawn.flowmvi.debugger.server.StoreKey
+import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventItem
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
 import kotlin.uuid.Uuid
 
@@ -24,6 +26,7 @@ internal sealed interface StoreDetailsState : MVIState {
         val focusedEvent: FocusedEvent? = null,
     ) : StoreDetailsState {
         val title = name ?: id.toString()
+        val key = StoreKey(name, id)
     }
 }
 

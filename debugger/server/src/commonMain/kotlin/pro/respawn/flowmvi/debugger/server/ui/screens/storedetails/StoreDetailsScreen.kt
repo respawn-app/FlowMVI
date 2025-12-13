@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.storedetails
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toImmutableList
 import org.koin.core.parameter.parametersOf
@@ -28,7 +29,6 @@ import pro.respawn.flowmvi.compose.dsl.subscribe
 import pro.respawn.flowmvi.compose.preview.EmptyReceiver
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
-import pro.respawn.flowmvi.debugger.server.SessionKey
 import pro.respawn.flowmvi.debugger.server.StoreCommand
 import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.di.container
@@ -40,13 +40,15 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsI
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.EventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
+import pro.respawn.flowmvi.debugger.server.ui.util.TimestampFormatter
 import pro.respawn.flowmvi.debugger.server.ui.util.setText
+import pro.respawn.flowmvi.debugger.server.ui.widgets.DynamicTwoPaneLayout
+import pro.respawn.flowmvi.debugger.server.ui.widgets.FocusedEventLayout
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RErrorView
 import pro.respawn.flowmvi.debugger.server.ui.widgets.RScaffold
-import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventListDetailsLayout
+import pro.respawn.flowmvi.debugger.server.ui.widgets.StoreEventList
 import pro.respawn.flowmvi.debugger.server.ui.widgets.TypeCrossfade
 import pro.respawn.flowmvi.util.typed
-import pro.respawn.kmmutils.common.copies
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -99,13 +101,31 @@ private fun IntentReceiver<StoreDetailsIntent>.StoreDetailsScreenContent(
                 }
             }
             Spacer(Modifier.height(12.dp))
-            StoreEventListDetailsLayout(
-                events = eventLog,
-                focusedEvent = focusedEvent,
-                onCopy = { intent(CopyEventClicked) },
-                onClose = { intent(CloseFocusedEventClicked) },
-                onClick = { intent(EventClicked(it)) },
-                modifier = Modifier.fillMaxSize().padding(8.dp)
+            DynamicTwoPaneLayout(
+                modifier = Modifier.fillMaxSize().padding(8.dp),
+                secondPaneVisible = focusedEvent != null,
+                firstPaneContent = {
+                    StoreEventList(
+                        events = eventLog,
+                        isSelected = { it.id == focusedEvent?.id },
+                        onClick = { intent(EventClicked(it)) },
+                        formatTimestamp = TimestampFormatter,
+                        listState = rememberLazyListState(),
+                        entry = { it },
+                        source = { key },
+                    )
+                },
+                secondaryPaneContent = {
+                    Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) inner@{
+                        if (focusedEvent == null) return@inner
+                        FocusedEventLayout(
+                            event = focusedEvent,
+                            onCopy = { intent(CopyEventClicked) },
+                            onClose = { intent(CloseFocusedEventClicked) },
+                            format = TimestampFormatter,
+                        )
+                    }
+                }
             )
         }
     }
@@ -130,10 +150,9 @@ private fun StoreDetailsScreenPreview() = RespawnTheme {
                 id = Uuid.random(),
                 name = "Store ".repeat(10),
                 connected = false,
-                eventLog = ServerEventEntry(
-                    source = SessionKey(id = Uuid.random(), name = "Store"),
-                    event = ClientEvent.StoreConnected("Store", id = Uuid.random())
-                ).copies(10).toImmutableList(),
+                eventLog = List(10) {
+                    ServerEventEntry(event = ClientEvent.StoreConnected("Store", id = Uuid.random()))
+                }.toImmutableList(),
             ),
         )
     }

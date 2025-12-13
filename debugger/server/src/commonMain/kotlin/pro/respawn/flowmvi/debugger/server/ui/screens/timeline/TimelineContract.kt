@@ -10,7 +10,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
-import pro.respawn.flowmvi.debugger.server.SessionKey
 import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.util.type
 import kotlin.uuid.Uuid
@@ -31,18 +30,24 @@ internal data class StoreItem(
 )
 
 @Immutable
+internal data class EventItem(
+    val source: StoreKey,
+    val entry: ServerEventEntry,
+)
+
+@Immutable
 internal data class FocusedEvent(
     val timestamp: LocalDateTime,
-    val source: SessionKey,
     val type: EventType,
     val event: ClientEvent,
+    val source: StoreKey,
     val id: Uuid,
 ) {
 
-    constructor(entry: ServerEventEntry) : this(
+    constructor(entry: ServerEventEntry, source: StoreKey) : this(
         timestamp = entry.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()),
-        source = entry.source,
         type = entry.event.type,
+        source = source,
         event = entry.event,
         id = entry.id,
     )
@@ -57,7 +62,7 @@ internal sealed interface TimelineState : MVIState {
 
     data class DisplayingTimeline(
         val stores: ImmutableList<StoreItem>,
-        val currentEvents: ImmutableList<ServerEventEntry>,
+        val currentEvents: ImmutableList<EventItem>,
         val focusedEvent: FocusedEvent? = null,
         val filters: TimelineFilters = TimelineFilters(),
         val autoScroll: Boolean = true,
@@ -71,7 +76,7 @@ internal sealed interface TimelineIntent : MVIIntent {
     data object StopServerClicked : TimelineIntent
     data class StoreSelected(val store: StoreItem) : TimelineIntent
     data object RetryClicked : TimelineIntent
-    data class EventClicked(val entry: ServerEventEntry) : TimelineIntent
+    data class EventClicked(val item: EventItem) : TimelineIntent
     data object CopyEventClicked : TimelineIntent
     data object CloseFocusedEventClicked : TimelineIntent
     data object AutoScrollToggled : TimelineIntent

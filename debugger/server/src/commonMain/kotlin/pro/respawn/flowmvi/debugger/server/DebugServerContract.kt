@@ -52,7 +52,6 @@ internal data class Client(
 @Immutable
 internal data class ServerEventEntry(
     val event: ClientEvent,
-    val source: SessionKey,
     val timestamp: Instant = Clock.System.now(),
     val id: Uuid = Uuid.random(),
 )

@@ -69,7 +69,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                                 key = intent.key,
                                 value = existing.copy(
                                     isConnected = false,
-                                    events = existing.events.putEvent(ServerEventEntry(event, existing.sessionKey))
+                                    events = existing.events.putEvent(ServerEventEntry(event))
                                 ),
                             ),
                         )
@@ -80,9 +80,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                             value = Client(
                                 id = intent.from,
                                 name = event.name,
-                                events = existing?.events.orEmpty().putEvent(
-                                    ServerEventEntry(event, SessionKey(intent.from, event.name))
-                                ),
+                                events = existing?.events.orEmpty().putEvent( ServerEventEntry(event) ),
                             )
                         ),
                     )
@@ -96,7 +94,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                                 value = Client(
                                     id = intent.from,
                                     name = intent.event.storeName,
-                                    events = persistentListOf(ServerEventEntry(event, SessionKey(intent.from, null)))
+                                    events = persistentListOf(ServerEventEntry(event))
                                 )
                             )
                         )
@@ -104,7 +102,7 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                             clients = clients.put(
                                 key = intent.key,
                                 value = client.copy(
-                                    events = client.events.putEvent(ServerEventEntry(event, client.sessionKey))
+                                    events = client.events.putEvent(ServerEventEntry(event))
                                 )
                             )
                         )

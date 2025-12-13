@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debugger Desktop" type="GradleRunConfiguration" factoryName="Gradle" singleton="false">
+  <configuration default="false" name="Debugger Desktop" type="GradleRunConfiguration" factoryName="Gradle" singleton="true">
     <ExternalSystemSettings>
       <option name="env">
         <map>

@@ -69,8 +69,8 @@ internal class TimelineContainer(
                             filters = currentFilters,
                             currentEvents = state.clients
                                 .asSequence()
-                                .flatMap { it.value.events }
-                                .filter { it.event.type in currentFilters.events }
+                                .flatMap { (k, v) -> v.events.asSequence().map { EventItem(k, it) } }
+                                .filter { it.entry.event.type in currentFilters.events }
                                 .toImmutableList(),
                             stores = state.clients
                                 .asSequence()
@@ -114,8 +114,8 @@ internal class TimelineContainer(
                     )
                 }
                 is EventClicked -> updateState<DisplayingTimeline, _> {
-                    if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
-                    copy(focusedEvent = FocusedEvent(intent.entry))
+                    if (intent.item.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
+                    copy(focusedEvent = FocusedEvent(intent.item.entry, intent.item.source))
                 }
             }
         }
