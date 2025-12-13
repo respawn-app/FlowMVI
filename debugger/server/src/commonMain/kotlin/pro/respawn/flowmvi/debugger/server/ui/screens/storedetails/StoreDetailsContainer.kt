@@ -15,6 +15,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsA
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.CloseFocusedEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.EventClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.MetricsClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.SendCommandClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.FocusedEvent
@@ -57,6 +58,7 @@ internal class StoreDetailsContainer(
                                 name = name,
                                 connected = isConnected,
                                 focusedEvent = current?.focusedEvent,
+                                showingMetrics = current?.showingMetrics ?: false,
                                 eventLog = events
                             )
                         } ?: return@updateState StoreDetailsState.Disconnected
@@ -76,7 +78,14 @@ internal class StoreDetailsContainer(
                 }
                 is EventClicked -> updateState<DisplayingStore, _> {
                     if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
-                    copy(focusedEvent = FocusedEvent(intent.entry, storeKey))
+                    copy(
+                        focusedEvent = FocusedEvent(intent.entry, storeKey),
+                        showingMetrics = false,
+                    )
+                }
+                is MetricsClicked -> updateState<DisplayingStore, _> {
+                    if (showingMetrics) return@updateState copy(showingMetrics = false)
+                    copy(showingMetrics = true, focusedEvent = null)
                 }
             }
         }

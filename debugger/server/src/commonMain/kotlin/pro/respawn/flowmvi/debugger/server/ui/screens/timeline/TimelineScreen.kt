@@ -73,7 +73,7 @@ private fun IntentReceiver<TimelineIntent>.TimelineScreenContent(
                         StoreEventList(
                             events = currentEvents,
                             isSelected = { it.entry.id == focusedEvent?.id },
-                            onClick = {intent(EventClicked(it)) },
+                            onClick = { intent(EventClicked(it)) },
                             formatTimestamp = TimestampFormatter,
                             listState = listState,
                             entry = { it.entry },

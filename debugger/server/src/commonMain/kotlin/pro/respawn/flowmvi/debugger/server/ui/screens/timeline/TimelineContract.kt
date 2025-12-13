@@ -15,7 +15,7 @@ import pro.respawn.flowmvi.debugger.server.util.type
 import kotlin.uuid.Uuid
 
 internal enum class EventType {
-    Intent, Action, StateChange, Subscription, Connection, Disconnection, Exception, Initialization
+    Intent, Action, StateChange, Subscription, Connection, Exception, Initialization
 }
 
 @Immutable

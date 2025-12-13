@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
@@ -38,7 +39,9 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsA
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.CloseFocusedEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.CopyEventClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.EventClicked
+import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsIntent.MetricsClicked
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsState.DisplayingStore
+import pro.respawn.flowmvi.debugger.server.ui.screens.storemetrics.StoreMetricsPage
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 import pro.respawn.flowmvi.debugger.server.ui.util.TimestampFormatter
 import pro.respawn.flowmvi.debugger.server.ui.util.setText
@@ -99,11 +102,19 @@ private fun IntentReceiver<StoreDetailsIntent>.StoreDetailsScreenContent(
                         modifier = Modifier.padding(8.dp),
                     ) { Text(text = it.label) }
                 }
+                OutlinedButton(
+                    onClick = { intent(MetricsClicked) },
+                    colors = if (showingMetrics)
+                        ButtonDefaults.filledTonalButtonColors()
+                    else
+                        ButtonDefaults.outlinedButtonColors(),
+                    modifier = Modifier.padding(8.dp)
+                ) { Text(text = if (showingMetrics) "Hide metrics" else "Show metrics") }
             }
             Spacer(Modifier.height(12.dp))
             DynamicTwoPaneLayout(
                 modifier = Modifier.fillMaxSize().padding(8.dp),
-                secondPaneVisible = focusedEvent != null,
+                secondPaneVisible = focusedEvent != null || showingMetrics,
                 firstPaneContent = {
                     StoreEventList(
                         events = eventLog,
@@ -116,14 +127,19 @@ private fun IntentReceiver<StoreDetailsIntent>.StoreDetailsScreenContent(
                     )
                 },
                 secondaryPaneContent = {
-                    Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) inner@{
-                        if (focusedEvent == null) return@inner
-                        FocusedEventLayout(
-                            event = focusedEvent,
-                            onCopy = { intent(CopyEventClicked) },
-                            onClose = { intent(CloseFocusedEventClicked) },
-                            format = TimestampFormatter,
-                        )
+                    Column(modifier = Modifier.fillMaxSize().padding(12.dp)) inner@{
+                        when {
+                            showingMetrics -> StoreMetricsPage(
+                                key = key,
+                                onClose = { intent(MetricsClicked) },
+                            )
+                            focusedEvent != null -> FocusedEventLayout(
+                                event = focusedEvent,
+                                onCopy = { intent(CopyEventClicked) },
+                                onClose = { intent(CloseFocusedEventClicked) },
+                                format = TimestampFormatter,
+                            )
+                        }
                     }
                 }
             )

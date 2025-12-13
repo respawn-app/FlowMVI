@@ -17,10 +17,10 @@ internal val ClientEvent.type
         is ClientEvent.StoreStateChanged -> EventType.StateChange
         is ClientEvent.StoreStarted,
         is ClientEvent.StoreStopped -> EventType.Initialization
-        is ClientEvent.StoreConnected -> EventType.Connection
-        is ClientEvent.StoreDisconnected -> EventType.Disconnection
         is ClientEvent.StoreSubscribed,
         is ClientEvent.StoreUnsubscribed -> EventType.Subscription
+        is ClientEvent.StoreDisconnected,
+        is ClientEvent.StoreConnected -> EventType.Connection
     }
 
 // TODO: Need a custom layout for some events, create a composable

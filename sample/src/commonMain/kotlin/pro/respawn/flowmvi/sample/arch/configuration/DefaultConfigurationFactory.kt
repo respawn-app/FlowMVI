@@ -11,7 +11,6 @@ import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.dsl.StoreBuilder
 import pro.respawn.flowmvi.metrics.CompositeSink
-import pro.respawn.flowmvi.metrics.LoggingJsonMetricsSink
 import pro.respawn.flowmvi.metrics.dsl.collectMetrics
 import pro.respawn.flowmvi.metrics.dsl.reportMetrics
 import pro.respawn.flowmvi.plugins.enableLogging
@@ -61,11 +60,8 @@ internal class DefaultConfigurationFactory(
         val metrics = collectMetrics(reportingScope = appScope)
         reportMetrics(
             metrics = metrics,
-            interval = 10.seconds,
-            sink = CompositeSink(
-                LoggingJsonMetricsSink(json, tag = name),
-                metricsSink()
-            ),
+            interval = 5.seconds,
+            sink = CompositeSink(metricsSink()),
         )
         if (saver != null) install(
             saveStatePlugin(

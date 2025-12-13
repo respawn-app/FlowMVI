@@ -1,7 +1,6 @@
 package pro.respawn.flowmvi.debugger.server.ui.widgets.charts
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseOutCubic
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
@@ -88,11 +87,16 @@ data class XAxis<T>(
     val labelFormatter: (Point<T>, Int) -> String = { _, i -> i.toString() },
 )
 
+@Immutable
+data class StyledLine<T>(
+    val line: Line<T>,
+    val color: Color,
+)
+
 @Composable
-@Suppress("ComplexMethod")
+@Suppress("ComplexMethod", "ComposableParametersOrdering")
 fun <T> RLineChart(
-    line: Line<T>,
-    chartColor: Color,
+    lines: List<StyledLine<T>>,
     modifier: Modifier = Modifier,
     dotsRadius: Dp? = null,
     lineWidth: Dp = 2.dp,
@@ -107,8 +111,14 @@ fun <T> RLineChart(
     bezierIntensity: Float = RLineChartDefaults.BezierIntensity,
     yAxis: YAxis? = null,
     xAxis: XAxis<T>? = null,
+    vararg animationKeys: Any?,
 ) {
-    val state = remember(line.points, animate) {
+    val baseLine = lines.firstOrNull()?.line ?: return
+    val minValue = baseLine.minValue
+    val maxValue = baseLine.maxValue
+    val fillEnabled = lines.size == 1
+
+    val state = remember(animate, *animationKeys) {
         MutableTransitionState(if (animate) 0f else 1f).also { it.targetState = 1f }
     }
     val transition = rememberTransition(state, label = "transition")
@@ -135,19 +145,18 @@ fun <T> RLineChart(
         },
         targetValueByState = { it }
     )
-    val lineColor by animateColorAsState(chartColor)
 
-    val cacheSize = remember(xAxis, line.points.size, yAxis) {
+    val cacheSize = remember(xAxis, baseLine.points.size, yAxis) {
         @Suppress("MagicNumber")
 
-        (xAxis?.drawXLabelEvery?.takeIfNotZero()?.let { line.points.size / it } ?: 1)
+        (xAxis?.drawXLabelEvery?.takeIfNotZero()?.let { baseLine.points.size / it } ?: 1)
             .coerceAtLeast(yAxis?.labelAmount ?: 8)
     }
     val textMeasurer = rememberTextMeasurer(cacheSize)
 
-    val xLabelsByPoint: List<TextLayoutResult?> = remember(labelTextStyle, xAxis, textMeasurer, line) {
+    val xLabelsByPoint: List<TextLayoutResult?> = remember(labelTextStyle, xAxis, textMeasurer, baseLine) {
         if (xAxis == null || xAxis.drawXLabelEvery <= 0) return@remember emptyList()
-        line.points.mapIndexed iteration@{ i, it ->
+        baseLine.points.mapIndexed iteration@{ i, it ->
             if (i % xAxis.drawXLabelEvery != 0) return@iteration null
             val text = xAxis.labelFormatter(it, i)
             textMeasurer.measure(
@@ -166,13 +175,16 @@ fun <T> RLineChart(
     val xLabelHeightDp = with(LocalDensity.current) { xLabelHeightPx.toDp() }
 
     val contentColor = LocalContentColor.current
-    val gradientColors = remember(lineColor) { listOf(lineColor, Color.Transparent) }
+    val gradientColors = remember(lines) {
+        lines.singleOrNull()?.let { listOf(it.color, Color.Transparent) }.orEmpty()
+    }
 
     Row(modifier = Modifier.height(Min) then modifier) {
         // region y axis
         AnimatedVisibility(yAxis != null && yAxis.labelAmount > 0) {
             if (yAxis == null || yAxis.labelAmount <= 0) return@AnimatedVisibility
-            val valueDelta = (line.maxValue - line.minValue) / yAxis.labelAmount
+            val divisor = (yAxis.labelAmount - 1).coerceAtLeast(1)
+            val valueDelta = (maxValue - minValue) / divisor
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = yAxis.alignment,
@@ -182,7 +194,7 @@ fun <T> RLineChart(
                     .widthIn(max = yAxis.maxWidth),
             ) {
                 repeat(yAxis.labelAmount) { i ->
-                    val value = line.maxValue - i * valueDelta
+                    val value = maxValue - i * valueDelta
                     Text(
                         text = yAxis.labelFormatter(value),
                         style = labelTextStyle,
@@ -201,7 +213,7 @@ fun <T> RLineChart(
                 .weight(1f, fill = true)
                 .fillMaxHeight()
         ) {
-            if (line.points.size < MinLabelPointsThreshold) return@Canvas
+            if (baseLine.points.size < MinLabelPointsThreshold) return@Canvas
             val firstLabelWidth = xLabelsByPoint.firstOrNull()?.size?.width ?: 0
             val lastLabelWidth = xLabelsByPoint.lastOrNull()?.size?.width ?: 0
             val chartLineArea = Rect(
@@ -212,7 +224,7 @@ fun <T> RLineChart(
             )
 
             // -1 because we start at 0
-            val horizontalDistanceDelta = chartLineArea.width / (line.points.size - 1)
+            val horizontalDistanceDelta = chartLineArea.width / (baseLine.points.size - 1)
 
             // TODO: Add Y axis value lines
 
@@ -235,36 +247,37 @@ fun <T> RLineChart(
             )
             // line
             clipPath(clipPath) {
-                val path = Path()
-                path.drawLine(
-                    line = line,
-                    area = chartLineArea,
-                    heightFraction = heightFraction,
-                    lineDistance = horizontalDistanceDelta,
-                    minValue = line.minValue,
-                    maxValue = line.maxValue,
-                    bezierIntensity = bezierIntensity,
-                )
-                if (dotsRadius != null && dotsRadius > 0.dp) drawDots(
-                    dotRadiusPx = dotsRadius.toPx(),
-                    line = line,
-                    lineColor = lineColor,
-                    chartLineArea = chartLineArea,
-                    horizontalDistanceDelta = horizontalDistanceDelta,
-                    maxValue = line.maxValue,
-                    minValue = line.minValue
-                )
-                drawPath(
-                    path = path,
-                    color = lineColor,
-                    style = Stroke(
-                        width = lineWidth.toPx(),
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round,
-                    ),
-                )
-
-                drawLineGradient(path, chartLineArea, gradientColors)
+                lines.forEachIndexed { index, styled ->
+                    val path = Path()
+                    path.drawLine(
+                        line = styled.line,
+                        area = chartLineArea,
+                        heightFraction = heightFraction,
+                        lineDistance = horizontalDistanceDelta,
+                        minValue = minValue,
+                        maxValue = maxValue,
+                        bezierIntensity = bezierIntensity,
+                    )
+                    if (dotsRadius != null && dotsRadius > 0.dp) drawDots(
+                        dotRadiusPx = dotsRadius.toPx(),
+                        line = styled.line,
+                        lineColor = styled.color,
+                        chartLineArea = chartLineArea,
+                        horizontalDistanceDelta = horizontalDistanceDelta,
+                        maxValue = maxValue,
+                        minValue = minValue
+                    )
+                    drawPath(
+                        path = path,
+                        color = styled.color,
+                        style = Stroke(
+                            width = lineWidth.toPx(),
+                            cap = StrokeCap.Round,
+                            join = StrokeJoin.Round,
+                        ),
+                    )
+                    if (fillEnabled && index == 0) drawLineGradient(path, chartLineArea, gradientColors)
+                }
             }
         } // endregion chart area
     }
@@ -296,10 +309,7 @@ private fun RLineChartPreview() = RespawnTheme {
             .clickable { line = getLine() },
     ) {
         RLineChart(
-            // line = Line(points = listOf(0f, 5f, 7f, 12f, 8f, 19f, 25f), Color.random()),
-            // line = Line(points = listOf(0f, 10f, 0f), Color.random()),
-            line = line,
-            chartColor = MaterialTheme.colorScheme.primary,
+            lines = listOf(StyledLine(line = line, color = MaterialTheme.colorScheme.primary)),
             dotsRadius = 0.dp
         )
     }

@@ -4,7 +4,6 @@ package pro.respawn.flowmvi.debugger.server.navigation.destination
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 import pro.respawn.flowmvi.debugger.server.StoreKey
-import kotlin.uuid.Uuid
 
 @Serializable
 @Immutable

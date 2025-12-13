@@ -30,7 +30,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDateTime
-import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.ui.icons.Close
 import pro.respawn.flowmvi.debugger.server.ui.icons.Copy
 import pro.respawn.flowmvi.debugger.server.ui.icons.Icons
@@ -48,7 +47,7 @@ internal fun FocusedEventLayout(
     modifier: Modifier = Modifier
 ) = Crossfade(event) { value ->
     SelectionContainer(modifier = modifier) {
-        Column( verticalArrangement = Arrangement.spacedBy(12.dp), ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp),) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(

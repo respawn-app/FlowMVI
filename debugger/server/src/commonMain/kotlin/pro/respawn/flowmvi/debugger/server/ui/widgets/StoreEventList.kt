@@ -19,7 +19,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
 import pro.respawn.flowmvi.debugger.server.StoreKey
-import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventItem
 
 @Composable
 internal fun <T> StoreEventList(
