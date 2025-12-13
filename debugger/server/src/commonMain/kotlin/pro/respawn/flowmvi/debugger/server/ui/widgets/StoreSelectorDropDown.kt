@@ -1,11 +1,13 @@
 package pro.respawn.flowmvi.debugger.server.ui.widgets
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.debugger.server.ui.icons.CloudConnection
@@ -33,7 +35,8 @@ internal fun IntentReceiver<TimelineIntent>.StoreSelectorDropDown(
             actions = {
                 stores.forEach {
                     DropDownAction(
-                        text = it.name,
+                        modifier = Modifier.widthIn(max = 400.dp),
+                        text = it.key.toString(),
                         icon = if (it.isConnected) Icons.CloudConnection else Icons.CloudRemove,
                         tint = if (it.isConnected) connectedColor else errorColor,
                         onClick = { intent(StoreSelected(it)) },

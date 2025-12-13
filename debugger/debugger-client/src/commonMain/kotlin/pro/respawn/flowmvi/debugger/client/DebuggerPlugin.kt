@@ -1,8 +1,11 @@
+@file:OptIn(InternalFlowMVIAPI::class)
+
 package pro.respawn.flowmvi.debugger.client
 
 import io.ktor.client.HttpClient
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.FlowMVIDSL
 import pro.respawn.flowmvi.api.LazyPlugin
 import pro.respawn.flowmvi.api.MVIAction
@@ -16,6 +19,7 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreException
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreIntent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreStarted
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreStateChanged
+import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreStopped
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreSubscribed
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreUnsubscribed
 import pro.respawn.flowmvi.debugger.model.ServerEvent
@@ -42,10 +46,10 @@ Don't include debug code in production builds.
 """
 
 private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlugin(
-    clientName: String,
+    clientKey: String?,
     timeTravel: TimeTravel<S, I, A>, // will be used later
 ) = plugin<S, I, A> {
-    this.name = "${clientName}DebuggerPlugin"
+    this.name = "${clientKey.orEmpty()}Debugger"
     onStart ctx@{
         start(this)
         subscribe { // subscribe to store events
@@ -66,27 +70,30 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
                 }
             }
         }
-        emit(StoreStarted(config.name ?: "Store"))
+        emit(StoreStarted(clientKey))
     }
     onIntent {
-        emit(StoreIntent(it))
+        emit(StoreIntent(it, clientKey))
         it
     }
     onAction {
-        emit(StoreAction(it))
+        emit(StoreAction(it, clientKey))
         it
     }
     onState { old, new ->
-        emit(StoreStateChanged(old, new))
+        emit(StoreStateChanged(old, new, clientKey))
         new
     }
     onException {
-        emit(StoreException(it))
+        emit(StoreException(it, clientKey))
         it
     }
-    onSubscribe { emit(StoreSubscribed(it)) }
-    onUnsubscribe { emit(StoreUnsubscribed(it)) }
-    onStop { close() }
+    onSubscribe { emit(StoreSubscribed(it, clientKey)) }
+    onUnsubscribe { emit(StoreUnsubscribed(it, clientKey)) }
+    onStop {
+        intent(StoreStopped(clientKey, config.id))
+        close()
+    }
 }
 
 /**
@@ -102,6 +109,7 @@ private fun <S : MVIState, I : MVIIntent, A : MVIAction> DebugClientStore.asPlug
  * Better yet, do not include the debugger-client dependency at all in production builds,
  * because the plugin depends on a lot of things you may not need for your application.
  */
+@OptIn(InternalFlowMVIAPI::class)
 @FlowMVIDSL
 public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     client: HttpClient,
@@ -111,14 +119,14 @@ public fun <S : MVIState, I : MVIIntent, A : MVIAction> debuggerPlugin(
     reconnectionDelay: Duration = DebuggerDefaults.ReconnectionDelay,
 ): LazyPlugin<S, I, A> = LazyPlugin { config ->
     config.ensureDebuggable { return@LazyPlugin NoOpPlugin() }
-    val name = config.name ?: "Store"
     debugClientStore(
-        clientName = name,
+        clientKey = config.name,
+        clientId = config.id,
         client = client,
         host = host,
         port = port,
         reconnectionDelay = reconnectionDelay
-    ).asPlugin(name, timeTravel)
+    ).asPlugin(config.name, timeTravel)
 }
 
 /**

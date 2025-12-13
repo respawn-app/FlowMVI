@@ -39,8 +39,8 @@ class OtlpJsonSinkTest : FreeSpec({
             "schema.version" to MetricsSchemaVersion.CURRENT.value,
             "service.name" to "demo-service",
             "store" to "demo-store",
-            "store_id" to "demo-store-id",
             "run_id" to "demo-run-id",
+            "store_id" to snapshot.meta.storeId.toString(),
         )
     }
 
@@ -54,7 +54,7 @@ class OtlpJsonSinkTest : FreeSpec({
             .associate { it.key to it.value.stringValue } shouldBe mapOf(
             "schema.version" to MetricsSchemaVersion.CURRENT.value,
             "store" to "demo-store",
-            "store_id" to "demo-store-id",
+            "store_id" to snapshot.meta.storeId.toString(),
             "run_id" to "demo-run-id",
         )
     }

@@ -13,13 +13,14 @@ import pro.respawn.flowmvi.metrics.api.SubscriptionMetrics
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
+import kotlin.uuid.Uuid
 
 internal fun sampleSnapshot(
     meta: Meta = Meta(
         generatedAt = Instant.fromEpochMilliseconds(1_700_000_000_000),
         startTime = Instant.fromEpochMilliseconds(1_699_999_000_000),
         storeName = "demo-store",
-        storeId = "demo-store-id",
+        storeId = Uuid.random(),
         runId = "demo-run-id",
         windowSeconds = 60,
         emaAlpha = 0.5f

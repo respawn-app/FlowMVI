@@ -160,19 +160,18 @@ class MetaMetricsCollectorTest : FreeSpec({
         }
     }
 
-    "Meta.storeId is non-empty UUID per collector run" {
+    "Meta.storeId is non-empty UUID after first start" {
         testCollectorWithTime { collector, _, _ ->
+            onStart()
             val id = collector.snapshot().meta.storeId
             id.shouldNotBeNull()
-            id.shouldNotBeBlank()
-            id.length shouldBe 36
         }
     }
 
     "Meta.storeId stable across lifecycle until reset" {
         testCollectorWithTime { collector, _, _ ->
-            val first = collector.snapshot().meta.storeId
             onStart()
+            val first = collector.snapshot().meta.storeId
             onStop(null)
             onStart()
             collector.snapshot().meta.storeId shouldBe first
@@ -181,6 +180,7 @@ class MetaMetricsCollectorTest : FreeSpec({
 
     "Meta.storeId does not change after reset" {
         testCollectorWithTime { collector, _, _ ->
+            onStart()
             val first = collector.snapshot().meta.storeId
             collector.reset()
             collector.snapshot().meta.storeId shouldBe first

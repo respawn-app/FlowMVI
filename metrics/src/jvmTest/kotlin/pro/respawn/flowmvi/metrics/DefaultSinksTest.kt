@@ -30,12 +30,13 @@ class DefaultSinksTest : FreeSpec({
             serializer = MetricsSnapshot.serializer()
         )
 
-        sink.emit(sampleSnapshot())
+        val snapshot = sampleSnapshot()
+        sink.emit(snapshot)
 
         val encoded = emitted.single()
         val decoded = Json.decodeFromString(MetricsSnapshot.serializer(), encoded)
 
-        decoded shouldBe sampleSnapshot()
+        decoded shouldBe snapshot
     }
 
     "LoggingJsonMetricsSink emits JSON through logger" {

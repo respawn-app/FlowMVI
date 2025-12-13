@@ -2,7 +2,6 @@
 
 package pro.respawn.flowmvi.debugger.server.ui.theme
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import pro.respawn.flowmvi.server.generated.resources.Res

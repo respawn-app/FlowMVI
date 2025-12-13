@@ -225,3 +225,54 @@ The setup is a little bit more complicated, but in short, it involves:
 3. Provide the IP address of the PC to the debugger store plugin (in the code) to let it know to which address to connect to using the
    plugin parameters.
 4. Make sure the debugging port you are using is open on both devices.
+
+## Step 4: Visualizing Metrics (Optional)
+
+The debugger can also display [metrics](/plugins/metrics.md) collected from your stores in real-time.
+This gives you insight into store performance characteristics like intent throughput, state transition latency,
+queue times, and subscription counts directly in the IDE plugin or desktop app.
+
+### 4.1 Add the metrics dependency
+
+```toml
+flowmvi-metrics = { module = "pro.respawn.flowmvi:metrics", version.ref = "flowmvi" }
+```
+
+```kotlin
+commonMainImplementation("pro.respawn.flowmvi:metrics:<version>")
+```
+
+### 4.2 Configure metrics collection with DebuggerSink
+
+Use `DebuggerSink` to send metrics to the debugger. You can combine it with other sinks using `CompositeSink`:
+
+```kotlin
+import pro.respawn.flowmvi.debugger.plugin.DebuggerSink
+import pro.respawn.flowmvi.metrics.CompositeSink
+import pro.respawn.flowmvi.metrics.LoggingJsonMetricsSink
+import pro.respawn.flowmvi.metrics.dsl.collectMetrics
+import pro.respawn.flowmvi.metrics.dsl.reportMetrics
+
+val store = store(Initial) {
+    val metrics = collectMetrics(reportingScope = applicationScope)
+    reportMetrics(
+        metrics = metrics,
+        interval = 10.seconds,
+        sink = CompositeSink(
+            LoggingJsonMetricsSink(json, tag = name), // optional: also log to console
+            DebuggerSink { e -> logger.error(e) },    // send to debugger
+        ),
+    )
+    // ... other plugins
+}
+```
+
+::::tip[Platform-specific setup]
+Like `remoteDebugger()`, you should use expect/actual declarations to provide `DebuggerSink` only in debug builds
+and a no-op sink (like `NoopSink`) in release builds.
+::::
+
+Once configured, the debugger will display metrics for each connected store alongside the event timeline,
+allowing you to correlate performance data with specific intents and state changes.
+
+For more details on metrics collection and available sinks, see the [Metrics Plugin](/plugins/metrics.md) documentation.

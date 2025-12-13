@@ -17,22 +17,26 @@ import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDateTime
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
+import pro.respawn.flowmvi.debugger.server.StoreKey
 
 @Composable
-internal fun StoreEventList(
-    events: ImmutableList<ServerEventEntry>,
-    isSelected: (ServerEventEntry) -> Boolean,
-    onClick: (ServerEventEntry) -> Unit,
+internal fun <T> StoreEventList(
+    events: ImmutableList<T>,
+    isSelected: (T) -> Boolean,
+    onClick: (T) -> Unit,
+    entry: (T) -> ServerEventEntry,
+    source: (T) -> StoreKey,
     formatTimestamp: (LocalDateTime) -> String,
     listState: LazyListState = rememberLazyListState(),
 ) = LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
-    items(events, key = { it.id }) {
+    items(events, key = { entry(it).id }) {
         StoreEventItem(
-            event = it,
+            event = entry(it),
             onClick = { onClick(it) },
             format = formatTimestamp,
             modifier = Modifier.animateItem(),
             selected = isSelected(it),
+            source = source(it),
         )
     }
     if (events.isEmpty()) item {

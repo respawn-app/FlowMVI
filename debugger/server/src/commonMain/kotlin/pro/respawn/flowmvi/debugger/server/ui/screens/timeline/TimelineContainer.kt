@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.ExperimentalFlowMVIAPI
 import pro.respawn.flowmvi.api.Container
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.debugger.server.DebugServer
@@ -27,10 +28,11 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineIntent.St
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState.DisplayingTimeline
 import pro.respawn.flowmvi.debugger.server.util.representation
 import pro.respawn.flowmvi.debugger.server.util.type
-import pro.respawn.flowmvi.dsl.collect
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.dsl.updateState
 import pro.respawn.flowmvi.dsl.withState
+import pro.respawn.flowmvi.plugins.delegate.DelegationMode
+import pro.respawn.flowmvi.plugins.delegate.delegate
 import pro.respawn.flowmvi.plugins.recover
 import pro.respawn.flowmvi.plugins.reduce
 import pro.respawn.flowmvi.plugins.whileSubscribed
@@ -40,6 +42,7 @@ import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineState as 
 
 private typealias Ctx = PipelineContext<State, Intent, TimelineAction>
 
+@OptIn(ExperimentalFlowMVIAPI::class)
 internal class TimelineContainer(
     configuration: StoreConfiguration,
 ) : Container<State, Intent, TimelineAction> {
@@ -48,45 +51,45 @@ internal class TimelineContainer(
 
     override val store = store(State.Loading) {
         configure(configuration, "Timeline")
+        val serverState by delegate(DebugServer.store, DelegationMode.Immediate(), start = false)
         recover {
             updateState { State.Error(it) }
             null
         }
         whileSubscribed {
-            DebugServer.store.collect {
-                combine(states, filters) { state, currentFilters ->
-                    updateState {
-                        val current = typed<DisplayingTimeline>()
-                        when (state) {
-                            is ServerState.Idle -> State.Loading
-                            is ServerState.Error -> State.Error(state.e)
-                            is ServerState.Running -> DisplayingTimeline(
-                                autoScroll = current?.autoScroll ?: true,
-                                focusedEvent = current?.focusedEvent,
-                                filters = currentFilters,
-                                currentEvents = state.eventLog
-                                    .asSequence()
-                                    .filter { it.event.type in currentFilters.events }
-                                    .toImmutableList(),
-                                stores = state.clients
-                                    .asSequence()
-                                    .map { StoreItem(it.key, it.value.name, it.value.isConnected) }
-                                    .toImmutableList(),
-                            ).also {
-                                val hasFocusedItem = it.focusedEvent != null
-                                val hasEvents = it.currentEvents.isNotEmpty()
-                                if (current == null || !it.autoScroll) return@also
-                                if (hasFocusedItem || !hasEvents) return@also
-                                action(ScrollToItem(0))
-                            }
+            combine(serverState, filters) { state, currentFilters ->
+                updateState {
+                    val current = typed<DisplayingTimeline>()
+                    when (state) {
+                        is ServerState.Idle -> State.Loading
+                        is ServerState.Error -> State.Error(state.e)
+                        is ServerState.Running -> DisplayingTimeline(
+                            autoScroll = current?.autoScroll ?: true,
+                            focusedEvent = current?.focusedEvent,
+                            filters = currentFilters,
+                            currentEvents = state.clients
+                                .asSequence()
+                                .flatMap { (k, v) -> v.events.asSequence().map { EventItem(k, it) } }
+                                .filter { it.entry.event.type in currentFilters.events }
+                                .toImmutableList(),
+                            stores = state.clients
+                                .asSequence()
+                                .map { StoreItem(it.key, it.value.isConnected) }
+                                .toImmutableList(),
+                        ).also {
+                            val hasFocusedItem = it.focusedEvent != null
+                            val hasEvents = it.currentEvents.isNotEmpty()
+                            if (current == null || !it.autoScroll) return@also
+                            if (hasFocusedItem || !hasEvents) return@also
+                            action(ScrollToItem(0))
                         }
                     }
-                }.consume(Dispatchers.Default)
-            }
+                }
+            }.consume(Dispatchers.Default)
         }
         reduce { intent ->
             when (intent) {
-                is StoreSelected -> action(GoToStoreDetails(intent.store.id))
+                is StoreSelected -> action(GoToStoreDetails(intent.store.key))
                 is CloseFocusedEventClicked -> updateState<DisplayingTimeline, _> { copy(focusedEvent = null) }
                 is RetryClicked -> DebugServer.store.intent(RestoreRequested)
                 is CopyEventClicked -> withState<DisplayingTimeline, _> {
@@ -111,8 +114,8 @@ internal class TimelineContainer(
                     )
                 }
                 is EventClicked -> updateState<DisplayingTimeline, _> {
-                    if (intent.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
-                    copy(focusedEvent = FocusedEvent(intent.entry))
+                    if (intent.item.entry.id == focusedEvent?.id) return@updateState copy(focusedEvent = null)
+                    copy(focusedEvent = FocusedEvent(intent.item.entry, intent.item.source))
                 }
             }
         }

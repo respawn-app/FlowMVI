@@ -6,6 +6,7 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import pro.respawn.flowmvi.metrics.AppendableStringSink
 import pro.respawn.flowmvi.metrics.sampleSnapshot
+import kotlin.uuid.Uuid
 
 class OpenMetricsSinkJvmTest : FreeSpec({
 
@@ -97,7 +98,8 @@ class OpenMetricsSinkJvmTest : FreeSpec({
                 strange"store
                 x\y
             """.trimIndent(),
-            storeId = """id"with\slash""",
+            storeId = Uuid.parse("00000000-0000-0000-0000-000000000000"),
+            runId = "id\"with\\slash",
         )
         val sink = OpenMetricsSink(
             delegate = AppendableStringSink(buffer),
@@ -109,7 +111,7 @@ class OpenMetricsSinkJvmTest : FreeSpec({
 
         val rendered = buffer.toString()
         rendered.shouldContain("""store="strange\"store\nx\\y""")
-        rendered.shouldContain("""store_id="id\"with\\slash""")
+        rendered.shouldContain("""run_id="id\"with\\slash""")
     }
 
     "formats NaN and infinities in gauge samples" {

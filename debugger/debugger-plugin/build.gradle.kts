@@ -12,8 +12,8 @@ kotlin {
         watchOs = false,
         tvOs = false,
         linux = false,
-        js = false,
-        wasmJs = false,
+        js = true,
+        wasmJs = true,
         windows = false,
         wasmWasi = false,
     )

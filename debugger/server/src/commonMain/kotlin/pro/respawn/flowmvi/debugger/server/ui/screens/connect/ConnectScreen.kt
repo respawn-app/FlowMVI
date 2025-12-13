@@ -1,6 +1,5 @@
 package pro.respawn.flowmvi.debugger.server.ui.screens.connect
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.api.IntentReceiver
 import pro.respawn.flowmvi.compose.dsl.requireLifecycle
@@ -82,7 +82,7 @@ private fun IntentReceiver<ConnectIntent>.ConnectScreenContent(
                 Text("Compatible with v${BuildFlags.VersionName}", style = MaterialTheme.typography.labelMedium)
                 RTextInput(host, onTextChange = { intent(HostChanged(it)) }, label = "Host")
                 RTextInput(port, onTextChange = { intent(PortChanged(it)) }, label = "Port")
-                Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Connect") }
+                Button(onClick = { intent(StartServerClicked) }, enabled = canStart) { Text("Start Server") }
                 Box(Modifier.weight(0.5f, fill = false))
             }
         }

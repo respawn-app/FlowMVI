@@ -7,6 +7,7 @@ import pro.respawn.flowmvi.debugger.server.arch.configuration.DefaultStoreConfig
 import pro.respawn.flowmvi.debugger.server.arch.configuration.StoreConfiguration
 import pro.respawn.flowmvi.debugger.server.ui.screens.connect.ConnectContainer
 import pro.respawn.flowmvi.debugger.server.ui.screens.storedetails.StoreDetailsContainer
+import pro.respawn.flowmvi.debugger.server.ui.screens.storemetrics.StoreMetricsContainer
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.TimelineContainer
 
 val appModule = module {
@@ -15,4 +16,5 @@ val appModule = module {
     container { new(::ConnectContainer) }
     container { new(::TimelineContainer) }
     container { new(::StoreDetailsContainer) }
+    container { new(::StoreMetricsContainer) }
 }

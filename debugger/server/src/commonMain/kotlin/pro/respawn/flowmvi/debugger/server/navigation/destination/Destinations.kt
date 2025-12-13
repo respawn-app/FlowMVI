@@ -17,6 +17,6 @@ fun Destinations(
     when (destination) {
         is Destination.Timeline -> TimelineScreen(navigator)
         is Destination.Connect -> ConnectScreen(navigator)
-        is Destination.StoreDetails -> StoreDetailsScreen(destination.storeId, navigator)
+        is Destination.StoreDetails -> StoreDetailsScreen(destination.key, navigator)
     }
 }

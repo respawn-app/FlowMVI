@@ -1,8 +1,12 @@
 package pro.respawn.flowmvi.debugger.server.util
 
 import androidx.compose.runtime.Stable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.server.ui.screens.timeline.EventType
+
+fun <T> PersistentList<T>?.orEmpty() = this ?: persistentListOf()
 
 @Stable
 internal val ClientEvent.type
@@ -11,9 +15,12 @@ internal val ClientEvent.type
         is ClientEvent.StoreException -> EventType.Exception
         is ClientEvent.StoreIntent -> EventType.Intent
         is ClientEvent.StoreStateChanged -> EventType.StateChange
-        is ClientEvent.StoreStarted, is ClientEvent.StoreStopped -> EventType.Initialization
-        is ClientEvent.StoreConnected, is ClientEvent.StoreDisconnected -> EventType.Connection
-        is ClientEvent.StoreSubscribed, is ClientEvent.StoreUnsubscribed -> EventType.Subscription
+        is ClientEvent.StoreStarted,
+        is ClientEvent.StoreStopped -> EventType.Initialization
+        is ClientEvent.StoreSubscribed,
+        is ClientEvent.StoreUnsubscribed -> EventType.Subscription
+        is ClientEvent.StoreDisconnected,
+        is ClientEvent.StoreConnected -> EventType.Connection
     }
 
 // TODO: Need a custom layout for some events, create a composable

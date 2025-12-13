@@ -129,3 +129,12 @@ With metrics enabled, you can still easily process 1000 intents in a single fram
 
 **Metrics becomes a meaningful CPU cost only if you process tens of thousands of
 intents per second on a single hot path**
+
+## Visualizing Metrics in the Debugger
+
+FlowMVI's [Remote Debugger](/misc/debugging.md) can display metrics collected from your stores in real-time.
+This allows you to monitor store performance directly in the IDE plugin or desktop app without setting up
+external monitoring infrastructure.
+
+See [Step 4: Visualizing Metrics](/misc/debugging.md#step-4-visualizing-metrics-optional) in the Remote Debugger
+Setup guide for instructions on how to configure `DebuggerSink` to send metrics to the debugger.

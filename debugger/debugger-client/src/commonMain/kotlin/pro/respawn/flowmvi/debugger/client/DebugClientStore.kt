@@ -29,6 +29,8 @@ import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreConnected
 import pro.respawn.flowmvi.debugger.model.ServerEvent
 import pro.respawn.flowmvi.dsl.store
 import pro.respawn.flowmvi.logging.StoreLogLevel
+import pro.respawn.flowmvi.logging.StoreLogger
+import pro.respawn.flowmvi.logging.invoke
 import pro.respawn.flowmvi.logging.log
 import pro.respawn.flowmvi.plugins.enableLogging
 import pro.respawn.flowmvi.plugins.init
@@ -40,17 +42,17 @@ import kotlin.uuid.Uuid
 internal typealias DebugClientStore = Store<EmptyState, ClientEvent, ServerEvent>
 
 internal fun debugClientStore(
-    clientName: String,
+    clientId: Uuid,
+    clientKey: String?,
     client: HttpClient,
     host: String,
     port: Int,
     reconnectionDelay: Duration,
     logEvents: Boolean = false,
 ) = store(EmptyState) {
-    val id = Uuid.random()
     val session = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     configure {
-        name = "${clientName}Debugger"
+        name = clientKey ?: "Debugger"
         coroutineContext = Dispatchers.Default
         debuggable = true
         parallelIntents = false // ensure the order of events matches server's expectations
@@ -73,23 +75,19 @@ internal fun debugClientStore(
                 }
             },
         ) {
-            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$id" }
             val _ = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
                 port = port,
-                path = "/$id",
+                path = "/$clientId",
             ).apply {
                 session.update {
                     it?.close()
                     this
                 }
-                sendSerialized<ClientEvent>(StoreConnected(clientName, id))
+                sendSerialized<ClientEvent>(StoreConnected(clientKey, clientId))
                 log(StoreLogLevel.Trace) { "Established connection to ${call.request.url}" }
-                awaitEvents {
-                    log(StoreLogLevel.Trace) { "Received event: $it" }
-                    if (it.storeId == id) action(it)
-                }
+                awaitEvents(config.logger) { if (it.storeId == clientId) action(it) }
             }
         }
     }
@@ -124,6 +122,21 @@ private inline fun CoroutineScope.launchConnectionLoop(
     }
 }
 
-private suspend inline fun DefaultClientWebSocketSession.awaitEvents(onEvent: (ServerEvent) -> Unit) {
-    while (isActive) onEvent(receiveDeserialized<ServerEvent>())
+@Suppress("TooGenericExceptionCaught") // intentional - resilient event loop
+private suspend inline fun DefaultClientWebSocketSession.awaitEvents(
+    log: StoreLogger,
+    onEvent: (ServerEvent) -> Unit
+) {
+    while (isActive) {
+        try {
+            val event = receiveDeserialized<ServerEvent>()
+            log(StoreLogLevel.Trace) { "Received event: $event" }
+            onEvent(event)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            log(e, StoreLogLevel.Warn)
+            continue
+        }
+    }
 }

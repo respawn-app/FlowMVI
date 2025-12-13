@@ -47,16 +47,14 @@ internal fun FocusedEventLayout(
     modifier: Modifier = Modifier
 ) = Crossfade(event) { value ->
     SelectionContainer(modifier = modifier) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp),) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = buildAnnotatedString {
                             append("${value.event.type} in ")
                             withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                                append(value.storeName)
+                                append(value.source.toString())
                             }
                         },
                         style = MaterialTheme.typography.titleMedium,
@@ -66,7 +64,7 @@ internal fun FocusedEventLayout(
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = remember(event.timestamp) { format(event.timestamp) },
+                        text = remember(value.timestamp) { format(value.timestamp) },
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier
                             .padding(end = 8.dp)

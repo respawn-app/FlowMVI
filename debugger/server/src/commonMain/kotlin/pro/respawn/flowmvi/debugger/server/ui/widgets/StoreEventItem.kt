@@ -20,11 +20,13 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import pro.respawn.flowmvi.debugger.server.ServerEventEntry
+import pro.respawn.flowmvi.debugger.server.StoreKey
 import pro.respawn.flowmvi.debugger.server.ui.theme.Opacity
 import pro.respawn.flowmvi.debugger.server.util.type
 
 @Composable
 internal fun StoreEventItem(
+    source: StoreKey,
     event: ServerEventEntry,
     selected: Boolean,
     onClick: () -> Unit,
@@ -50,7 +52,7 @@ internal fun StoreEventItem(
         headlineContent = {
             SelectionContainer {
                 Text(
-                    text = "${event.name} <- ${event.event.type}",
+                    text = "$source <- ${event.event.type}",
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )

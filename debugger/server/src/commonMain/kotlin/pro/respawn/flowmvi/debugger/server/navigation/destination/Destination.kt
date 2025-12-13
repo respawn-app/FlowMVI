@@ -3,7 +3,7 @@ package pro.respawn.flowmvi.debugger.server.navigation.destination
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
-import kotlin.uuid.Uuid
+import pro.respawn.flowmvi.debugger.server.StoreKey
 
 @Serializable
 @Immutable
@@ -23,5 +23,5 @@ sealed interface Destination {
     }
 
     @Serializable
-    data class StoreDetails(val storeId: Uuid) : Destination
+    data class StoreDetails(val key: StoreKey) : Destination
 }

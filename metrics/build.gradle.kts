@@ -35,7 +35,6 @@ android {
 
 dependencies {
     commonMainApi(projects.core)
-    commonMainImplementation(libs.kotlin.datetime)
     commonMainImplementation(libs.kotlin.atomicfu)
     commonMainImplementation(libs.kotlin.serialization)
     commonMainImplementation(libs.kotlin.serialization.json)

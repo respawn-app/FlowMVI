@@ -112,6 +112,9 @@ kotlin {
                 implementation(projects.metrics)
             }
         }
+        webMain.dependencies {
+            implementation(projects.debugger.debuggerPlugin)
+        }
         nativeMain.dependencies {
             implementation(projects.debugger.debuggerPlugin)
         }
