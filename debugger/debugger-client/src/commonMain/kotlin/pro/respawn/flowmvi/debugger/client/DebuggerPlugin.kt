@@ -14,7 +14,6 @@ import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.StoreConfiguration
 import pro.respawn.flowmvi.debugger.DebuggerDefaults
 import pro.respawn.flowmvi.debugger.DebuggerDefaults.DefaultHistorySize
-import pro.respawn.flowmvi.debugger.model.ClientEvent
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreAction
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreException
 import pro.respawn.flowmvi.debugger.model.ClientEvent.StoreIntent

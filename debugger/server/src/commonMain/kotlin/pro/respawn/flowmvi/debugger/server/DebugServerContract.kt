@@ -59,7 +59,7 @@ internal sealed interface ServerIntent : MVIIntent {
     data object ServerStarted : ServerIntent
     data class EventReceived(val event: ClientEvent, val from: Uuid) : ServerIntent
     data class SendCommand(val command: StoreCommand, val storeId: Uuid) : ServerIntent
-    data class MetricsReceived(val snapshot: MetricsSnapshot, val from: Uuid): ServerIntent
+    data class MetricsReceived(val snapshot: MetricsSnapshot, val from: Uuid) : ServerIntent
 }
 
 @Immutable

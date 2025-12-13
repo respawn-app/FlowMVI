@@ -75,12 +75,12 @@ internal fun debugClientStore(
                 }
             },
         ) {
-            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/${clientId}" }
+            log(StoreLogLevel.Trace) { "Starting connection at $host:$port/$clientId" }
             val _ = client.webSocketSession(
                 method = HttpMethod.Get,
                 host = host,
                 port = port,
-                path = "/${clientId}",
+                path = "/$clientId",
             ).apply {
                 session.update {
                     it?.close()
@@ -123,6 +123,7 @@ private inline fun CoroutineScope.launchConnectionLoop(
     }
 }
 
+@Suppress("TooGenericExceptionCaught") // intentional - resilient event loop
 private suspend inline fun DefaultClientWebSocketSession.awaitEvents(
     log: StoreLogger,
     onEvent: (ServerEvent) -> Unit
