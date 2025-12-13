@@ -40,6 +40,7 @@ class OtlpJsonSinkTest : FreeSpec({
             "service.name" to "demo-service",
             "store" to "demo-store",
             "run_id" to "demo-run-id",
+            "store_id" to snapshot.meta.storeId.toString(),
         )
     }
 

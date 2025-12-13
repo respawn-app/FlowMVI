@@ -63,10 +63,11 @@ internal fun debugServerStore() = lazyStore<State, Intent, Action>(Idle) {
                 val client = clients[key] ?: return@state this
                 client.copy(
                     metrics = client.metrics
-                        .asSequence()
-                        .plus(intent.snapshot)
-                        .take(ServerHistorySize)
-                        .toPersistentList()
+                        .add(intent.snapshot)
+                        .let { list ->
+                            if (list.size <= ServerHistorySize) list
+                            else list.takeLast(ServerHistorySize).toPersistentList()
+                        }
                 )
                     .let { clients.put(key, it) }
                     .let { copy(clients = it) }

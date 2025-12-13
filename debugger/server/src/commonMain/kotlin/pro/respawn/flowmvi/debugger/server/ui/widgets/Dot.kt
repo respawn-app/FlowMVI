@@ -13,6 +13,13 @@ import androidx.compose.ui.unit.dp
 import pro.respawn.flowmvi.debugger.server.ui.theme.Elevation
 import pro.respawn.flowmvi.debugger.server.ui.theme.RespawnTheme
 
+/**
+ * Renders a small circular indicator.
+ *
+ * @param color The dot fill color.
+ * @param modifier Modifier applied to the dot surface.
+ * @param size Diameter of the dot.
+ */
 @Composable
 fun Dot(
     color: Color,

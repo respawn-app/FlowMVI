@@ -25,7 +25,9 @@ fun DefaultLabelText(
 }
 
 internal fun getValueLabels(labelAmount: Int, maxValue: Float, minValue: Float = 0f): List<Float> {
-    val labelDelta = maxValue / labelAmount
+    if (labelAmount <= 0) return listOf(minValue)
+
+    val labelDelta = (maxValue - minValue) / labelAmount
 
     return (0..labelAmount).map {
         minValue + labelDelta * it

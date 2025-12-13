@@ -114,9 +114,10 @@ fun <T> RLineChart(
     vararg animationKeys: Any?,
 ) {
     val baseLine = lines.firstOrNull()?.line ?: return
-    val minValue = baseLine.minValue
-    val maxValue = baseLine.maxValue
+    val minValue = lines.minOf { it.line.minValue }
+    val maxValue = lines.maxOf { it.line.maxValue }
     val fillEnabled = lines.size == 1
+    val pointCount = baseLine.points.size
 
     val state = remember(animate, *animationKeys) {
         MutableTransitionState(if (animate) 0f else 1f).also { it.targetState = 1f }
@@ -146,10 +147,10 @@ fun <T> RLineChart(
         targetValueByState = { it }
     )
 
-    val cacheSize = remember(xAxis, baseLine.points.size, yAxis) {
+    val cacheSize = remember(xAxis, pointCount, yAxis) {
         @Suppress("MagicNumber")
 
-        (xAxis?.drawXLabelEvery?.takeIfNotZero()?.let { baseLine.points.size / it } ?: 1)
+        (xAxis?.drawXLabelEvery?.takeIfNotZero()?.let { pointCount / it } ?: 1)
             .coerceAtLeast(yAxis?.labelAmount ?: 8)
     }
     val textMeasurer = rememberTextMeasurer(cacheSize)
