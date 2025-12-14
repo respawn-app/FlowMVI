@@ -12,7 +12,7 @@ excessive allocations or memory usage, excessive restarts, state updates, lock c
 excessive errors side effect count, as well as behavioral patterns from real-world users.
 
 :::warning[Experimental]
-This feature is experimental.
+This feature is experimental. Expect breaking changes in metrics schema.
 :::
 
 ## Metrics collected
@@ -48,7 +48,7 @@ The artifact is lightweight and depends only on kotlinx.serialization.
 
 ### 2. Install the decorator
 
-To actually collect metrics, you need a decorator, a plugin, and a sink:
+To collect metrics, you need a decorator, a plugin, and a sink:
 
 ```kotlin
 val store = store(Initial) {
@@ -112,6 +112,9 @@ Built-in sinks:
 Pass `surfaceVersion` to downgrade emitted payloads for older consumers; otherwise the snapshot’s schema version is
 used.
 
+::::tip[Only release builds]
+Reminder: you should only send metrics on release builds of your app to not pollute prod data.
+::::
 
 ## Performance Overhead
 
@@ -135,6 +138,3 @@ intents per second on a single hot path**
 FlowMVI's [Remote Debugger](/misc/debugging.md) can display metrics collected from your stores in real-time.
 This allows you to monitor store performance directly in the IDE plugin or desktop app without setting up
 external monitoring infrastructure.
-
-See [Step 4: Visualizing Metrics](/misc/debugging.md#step-4-visualizing-metrics-optional) in the Remote Debugger
-Setup guide for instructions on how to configure `DebuggerSink` to send metrics to the debugger.

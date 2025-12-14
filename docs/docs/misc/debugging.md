@@ -244,32 +244,21 @@ commonMainImplementation("pro.respawn.flowmvi:metrics:<version>")
 
 ### 4.2 Configure metrics collection with DebuggerSink
 
-Use `DebuggerSink` to send metrics to the debugger. You can combine it with other sinks using `CompositeSink`:
+Use `DebuggerSink` to send metrics to the debugger:
 
 ```kotlin
-import pro.respawn.flowmvi.debugger.plugin.DebuggerSink
-import pro.respawn.flowmvi.metrics.CompositeSink
-import pro.respawn.flowmvi.metrics.LoggingJsonMetricsSink
-import pro.respawn.flowmvi.metrics.dsl.collectMetrics
-import pro.respawn.flowmvi.metrics.dsl.reportMetrics
-
 val store = store(Initial) {
+    
     val metrics = collectMetrics(reportingScope = applicationScope)
     reportMetrics(
         metrics = metrics,
-        interval = 10.seconds,
-        sink = CompositeSink(
-            LoggingJsonMetricsSink(json, tag = name), // optional: also log to console
-            DebuggerSink { e -> logger.error(e) },    // send to debugger
-        ),
+        sink = if (Build.debuggable) DebuggerSink() else BackendSink(),
     )
-    // ... other plugins
 }
 ```
 
 ::::tip[Platform-specific setup]
-Like `remoteDebugger()`, you should use expect/actual declarations to provide `DebuggerSink` only in debug builds
-and a no-op sink (like `NoopSink`) in release builds.
+Like `remoteDebugger()`, you should send metrics to debugger
 ::::
 
 Once configured, the debugger will display metrics for each connected store alongside the event timeline,
