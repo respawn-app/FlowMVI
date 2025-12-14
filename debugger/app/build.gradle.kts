@@ -54,7 +54,7 @@ compose.desktop {
             description = Config.Debugger.appDescription
             vendor = Config.vendorName
             licenseFile = rootProject.rootDir.resolve(Config.licenseFile)
-            val iconDir = rootProject.rootDir.resolve("docs").resolve("images")
+            val iconDir = rootProject.rootDir.resolve("docs").resolve("static")
             macOS {
                 packageName = Config.Debugger.name
                 dockName = Config.Debugger.name
@@ -75,7 +75,7 @@ compose.desktop {
             linux {
                 debMaintainer = Config.supportEmail
                 appCategory = "Development"
-                iconFile = iconDir.resolve("icon_512.png")
+                iconFile = iconDir.resolve("icon-512.png")
             }
         }
     }
