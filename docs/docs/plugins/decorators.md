@@ -135,7 +135,52 @@ It is useful when you want to save some resources and want to do computations in
 By default, it can only be installed once per Store.
 Install with `batchIntents(mode)`.
 
-### ConflateDecorator
+### Debounce Intents Decorator 
+
+```kotlin
+fun <S : MVIState, I : MVIIntent, A : MVIAction> debounceIntentsDecorator(
+    timeout: Duration,
+    name: String? = "DebounceIntents",
+): PluginDecorator<S, I, A>
+
+fun <S : MVIState, I : MVIIntent, A : MVIAction> debounceIntentsDecorator(
+    name: String? = "DebounceIntents",
+    timeoutSelector: suspend PipelineContext<S, I, A>.(I) -> Duration,
+): PluginDecorator<S, I, A>
+```
+
+Debounces incoming intents, mirroring the semantics of `kotlinx.coroutines.flow.debounce`:
+
+* Only the latest intent emitted after a period of inactivity is forwarded downstream.
+* Intents arriving within the debounce window cancel the pending delivery and schedule a new one.
+* If the selected timeout is non-positive, the intent is forwarded immediately.
+* The delivery runs in a background job; if a new intent arrives while the previous one is still being processed,
+  that processing is cancelled.
+
+Install with `debounceIntents(timeout)` or `debounceIntents(name, timeoutSelector)`:
+
+```kotlin
+@OptIn(ExperimentalFlowMVIAPI::class)
+val store = store(initial = State()) {
+    debounceIntents(300.milliseconds)
+}
+```
+
+Dynamic timeouts are useful when only some intents should be debounced:
+
+```kotlin
+@OptIn(ExperimentalFlowMVIAPI::class)
+val store = store(initial = State()) {
+    debounceIntents { intent ->
+        when (intent) {
+            is Intent.SearchQueryChanged -> 300.milliseconds
+            else -> Duration.ZERO
+        }
+    }
+}
+```
+
+### Conflate Decorator
 
 ```kotlin
 fun <S : MVIState, I : MVIIntent, A : MVIAction> conflateIntentsDecorator(
@@ -196,11 +241,3 @@ fun <S : MVIState, I : MVIIntent, A : MVIAction> retryIntentsDecorator(
     * `RetryStrategy.Immediate` - retry immediately (while blocking other intents, if `parallelIntents` is not used),
       for up to `retries` times.
     * `RetryStrategy.Infinite` - retry indefinitely and immediately until store is closed or succeeded. Very dangerous.
-
-----
-
-:::info[ ]
-
-The word "Decorator" has been said 60 times in this document. Uhm, I meant, 61.
-
-:::

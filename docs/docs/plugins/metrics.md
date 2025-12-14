@@ -135,6 +135,6 @@ intents per second on a single hot path**
 
 ## Visualizing Metrics in the Debugger
 
-FlowMVI's [Remote Debugger](/misc/debugging.md) can display metrics collected from your stores in real-time.
+FlowMVI's [Remote Debugger](/plugins/debugging.md) can display metrics collected from your stores in real-time.
 This allows you to monitor store performance directly in the IDE plugin or desktop app without setting up
 external monitoring infrastructure.

@@ -56,6 +56,20 @@ benchmark {
             // advanced("nativeGCAfterIteration", true)
             advanced("jvmForks", "definedByJmh")
         }
+        register("intentThrpt") {
+            include("""pro\.respawn\.flowmvi\.benchmarks\.setup\.optimized\.OptimizedFMVIBenchmark.*""")
+            include("""pro\.respawn\.flowmvi\.benchmarks\.setup\.mvikotlin\.MviKotlinIntentThroughputBenchmark.*""")
+            include("""pro\.respawn\.flowmvi\.benchmarks\.setup\.orbit\.OrbitIntentThroughputBenchmark.*""")
+
+            iterations = 100
+            warmups = 20
+            iterationTime = 500
+            iterationTimeUnit = "ms"
+            outputTimeUnit = "s"
+            mode = "thrpt"
+            reportFormat = "text"
+            advanced("jvmForks", "definedByJmh")
+        }
     }
     targets {
         register("jvm") {
