@@ -257,10 +257,6 @@ val store = store(Initial) {
 }
 ```
 
-::::tip[Platform-specific setup]
-Like `remoteDebugger()`, you should send metrics to debugger
-::::
-
 Once configured, the debugger will display metrics for each connected store alongside the event timeline,
 allowing you to correlate performance data with specific intents and state changes.
 
