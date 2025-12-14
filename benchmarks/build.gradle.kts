@@ -1,8 +1,6 @@
-
 import kotlinx.benchmark.gradle.JvmBenchmarkTarget
 import kotlinx.benchmark.gradle.benchmark
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     id(libs.plugins.kotlin.multiplatform.id)
     alias(libs.plugins.kotlin.benchmark)
@@ -38,6 +36,11 @@ dependencies {
     commonMainImplementation(libs.kotlin.coroutines.test)
     commonMainImplementation(libs.kotlin.test)
     commonMainImplementation(libs.kotlin.benchmark)
+
+    commonMainImplementation(applibs.mvikotlin.main)
+    commonMainImplementation(applibs.mvikotlin)
+    commonMainImplementation(applibs.mvikotlin.coroutines)
+    commonMainImplementation(applibs.orbit.core)
 }
 
 benchmark {

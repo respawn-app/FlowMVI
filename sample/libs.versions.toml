@@ -6,6 +6,8 @@ kmputils = "1.7.0"
 kodein = "7.30.0"
 koin = "4.1.1"
 material = "1.13.0"
+orbit = "11.0.0"
+mvikotlin = "4.3.0"
 splashscreen = "1.2.0"
 xml-constraintlayout = "2.2.1"
 
@@ -25,6 +27,10 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+mvikotlin-coroutines = { module = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines", version.ref = "mvikotlin" }
+mvikotlin-main = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mvikotlin" }
+mvikotlin = { module = "com.arkivanov.mvikotlin:mvikotlin", version.ref = "mvikotlin" }
+orbit-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
 view-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "xml-constraintlayout" }
 view-material = { module = "com.google.android.material:material", version.ref = "material" }
 
