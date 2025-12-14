@@ -3,7 +3,7 @@ sidebar_position: 1
 ---
 
 
-# Remote Debugger Setup
+# Remote Debugging
 
 FlowMVI comes with a remote debugging setup with a dedicated Jetbrains IDEs / Android Studio plugin and a desktop app
 for Windows, Linux, and MacOS.

@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4
-sidebar_label: Testing
+sidebar_position: 3
+sidebar_label: Test Harness
 ---
 
 import Tabs from '@theme/Tabs';
