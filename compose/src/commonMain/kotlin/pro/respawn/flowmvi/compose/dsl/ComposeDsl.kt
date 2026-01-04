@@ -1,4 +1,4 @@
-@file:MustUseReturnValues
+@file:pro.respawn.flowmvi.annotation.MustUseReturnValues
 @file:OptIn(DelicateStoreApi::class)
 
 package pro.respawn.flowmvi.compose.dsl

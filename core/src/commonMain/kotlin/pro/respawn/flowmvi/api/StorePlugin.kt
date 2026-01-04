@@ -84,6 +84,16 @@ public interface StorePlugin<S : MVIState, I : MVIIntent, A : MVIAction> : LazyP
 
     /**
      * Invoked after an [MVIAction] is dequeued and before it is delivered to subscribers.
+     *
+     * This callback is applied as a transformation stage on [ActionProvider.actions], so invocation semantics depend
+     * on the store's [ActionShareBehavior]:
+     * * [ActionShareBehavior.Distribute] / [ActionShareBehavior.Restrict]: invoked once per action delivery
+     *   (the action is consumed by a single subscriber).
+     * * [ActionShareBehavior.Share]: invoked once per subscriber collecting [ActionProvider.actions],
+     *   including replays for new subscribers when `replay > 0`.
+     *
+     * If you need behavior branching based on the share mode, you can read it from [PipelineContext.config]
+     * (e.g. in [onStart]/[onAction]) and store it in your plugin instance.
      * * Return null to drop the action.
      * * Return another action to replace it.
      * * Return [action] to continue unchanged.

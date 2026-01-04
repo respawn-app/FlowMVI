@@ -20,8 +20,8 @@ object Config {
     const val majorRelease = 3
     const val minorRelease = 3
     const val patch = 0
-    const val postfix = "-alpha02" // include dash (-)
-    const val versionCode = 14
+    const val postfix = "-alpha03" // include dash (-)
+    const val versionCode = 15
 
     const val majorVersionName = "$majorRelease.$minorRelease.$patch"
     const val versionName = "$majorVersionName$postfix"

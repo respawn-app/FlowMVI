@@ -210,6 +210,12 @@ fun onActionDispatch(action: A): A? = action
 Invoked after an action is dequeued and before it is delivered to subscribers. 
 Return `null` to drop, or transform the action before delivery.
 
+:::note
+Invocation semantics depend on the store's `config.actionShareBehavior`:
+- `Distribute` / `Restrict` (channel-backed): invoked once per action delivery (single subscriber consumes it).
+- `Share` (shared-flow-backed): invoked once per subscriber collecting `actions` (and also for replayed actions).
+:::
+
 :::warning
 This callback also executes outside the recoverable pipeline. Exceptions thrown here will **not** reach `onException`
 and will escape to the caller that triggered delivery. Make it non-throwing.
