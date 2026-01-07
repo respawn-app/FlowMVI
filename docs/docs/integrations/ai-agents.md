@@ -33,12 +33,17 @@ Install the FlowMVI Claude Code plugin from the Respawn marketplace:
 
 Install the FlowMVI Codex skill with the `skill-installer` skill:
 
-```bash
-scripts/install-skill-from-github.py --repo respawn-app/FlowMVI --path skills/flowmvi
+```text
+$skill-installer install https://github.com/respawn-app/FlowMVI/tree/main/skills/flowmvi
 ```
 
 Restart Codex after installation to pick up the new skill.
 
 ## Manual use (no harness)
 
-Download the `skills/flowmvi` folder and place it in your repository, then read `skills/flowmvi/SKILL.md` (and browse `skills/flowmvi/references/`) to learn how to use FlowMVI without Claude Code or Codex.
+Download the `skills/flowmvi` folder and place it in your repository, then add to your `AGENTS.md`:
+
+```
+When working with FlowMVI stores/containers, plugin pipelines, composing stores, decorators, or authoring plugins, read 
+`skills/flowmvi/SKILL.md` to learn how to use the framework.
+```
