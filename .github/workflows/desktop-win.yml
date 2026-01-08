@@ -43,7 +43,7 @@ jobs:
         run: echo "$LOCAL_PROPERTIES" | base64 --decode > local.properties
 
       - name: Cache konan directory
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('*.gradle.kts', 'buildSrc/*') }}
