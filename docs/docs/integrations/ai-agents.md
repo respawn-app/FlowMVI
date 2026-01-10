@@ -7,11 +7,11 @@ sidebar_label: AI Agents
 
 ## LLM-friendly docs
 
-We publish `LLMs.txt` and `LLMs-full.txt` at the documentation root so agents can index the full docs quickly.
+We publish `llms.txt` and `llms-full.txt` at the documentation root so agents can index the full docs quickly.
 
 ```bash
-curl -L https://opensource.respawn.pro/FlowMVI/LLMs.txt
-curl -L https://opensource.respawn.pro/FlowMVI/LLMs-full.txt
+curl -L https://opensource.respawn.pro/FlowMVI/llms.txt
+curl -L https://opensource.respawn.pro/FlowMVI/llms-full.txt
 ```
 
 You can also fetch any doc page as markdown by appending `.md` to its URL, which makes `curl`-based discovery easy:
