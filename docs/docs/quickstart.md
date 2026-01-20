@@ -57,6 +57,8 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowm
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
+# Performance metrics collection
+flowmvi-metrics = { module = "pro.respawn.flowmvi:metrics", version.ref = "flowmvi" }
 # Remote debugging client
 flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
 # Essenty (Decompose) integration
@@ -76,6 +78,8 @@ dependencies {
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
     // saving and restoring state
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
+    // metrics collection & export
+    commonMainImplementation("pro.respawn.flowmvi:metrics:$flowmvi")
     // essenty integration
     commonMainImplementation("pro.respawn.flowmvi:essenty:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:essenty-compose:$flowmvi")
