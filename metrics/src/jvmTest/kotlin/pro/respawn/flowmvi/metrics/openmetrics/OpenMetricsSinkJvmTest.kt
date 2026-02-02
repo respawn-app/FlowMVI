@@ -88,7 +88,7 @@ class OpenMetricsSinkJvmTest : FreeSpec({
 
         sink.emit(snapshot)
 
-        buffer.toString().shouldContain("schema_version=\"1.0\"")
+        buffer.toString().shouldContain("schema_version=\"1.1\"")
     }
 
     "escapes quotes backslashes and newlines in labels" {

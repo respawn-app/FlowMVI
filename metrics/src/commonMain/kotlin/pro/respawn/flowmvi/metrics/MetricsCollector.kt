@@ -112,6 +112,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     private val stateDurations = P2QuantileEstimator(Q50.value, Q90.value, Q95.value, Q99.value)
     private val stateTransitions = atomic(0L)
     private val stateVetoed = atomic(0L)
+    private val startedInInitialState = atomic(false)
+    private val timeToFirstStateStart = atomic<TimeMark?>(null)
+    private val timeToFirstState = atomic<Duration?>(null)
 
     private val subscribersMedian = P2QuantileEstimator(Q50.value)
     private val lifetimeMedian = P2QuantileEstimator(Q50.value)
@@ -176,6 +179,10 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private suspend fun PipelineContext<S, I, A>.recordStart(child: StorePlugin<S, I, A>) {
         lastConfig.value = config
+        val shouldTrackTtfs = states.value == config.initial
+        startedInInitialState.value = shouldTrackTtfs
+        timeToFirstState.value = null
+        timeToFirstStateStart.value = if (shouldTrackTtfs) timeSource.markNow() else null
         firstStartAt.compareAndSet(null, clock.now())
         startCount.incrementAndGet()
         val startedAt = timeSource.markNow()
@@ -186,6 +193,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
 
     private fun ShutdownContext<S, I, A>.recordStop(child: StorePlugin<S, I, A>, e: Exception?) {
         stopCount.incrementAndGet()
+        timeToFirstStateStart.value = null
         currentStart.getAndSet(null)?.let { startedAt ->
             val runDurationMillis = startedAt.elapsedNow()
             uptimeTotalMillis.addAndGet(runDurationMillis.inWholeMilliseconds)
@@ -295,6 +303,7 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         stateTransitions.incrementAndGet()
         val vetoed = result == null || result === old
         if (vetoed) stateVetoed.incrementAndGet()
+        recordTimeToFirstState(result, config.initial)
         send(Event.StateProcessed(duration))
         return result
     }
@@ -325,16 +334,15 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private fun send(event: Event) {
-        currentRun.value?.channel.let {
-            // todo: cleanup to self-contained class
-            if (it == null && currentlyDebuggable) throw UnrecoverableException(
-                message = "Metrics were attempted to be sent outside the store lifecycle, " +
-                    "which should be impossible. If you detected this, please report to the maintainers. " +
-                    "This will not crash with debuggable=false"
-            )
-            // on release, just drop, don't crash
-            it?.trySend(event)
-        }
+        val channel = currentRun.value?.channel
+        // todo: cleanup to self-contained class
+        if (channel == null && currentlyDebuggable) throw UnrecoverableException(
+            message = "Metrics were attempted to be sent outside the store lifecycle, " +
+                "which should be impossible. If you detected this, please report to the maintainers. " +
+                "This will not crash with debuggable=false"
+        )
+        // on release, just drop, don't crash
+        channel?.trySend(event)
     }
 
     private fun updateIntentOccupancy() {
@@ -489,6 +497,8 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
             state = StateMetrics(
                 transitions = stateTransitions.value,
                 transitionsVetoed = stateVetoed.value,
+                startedInInitialState = startedInInitialState.value,
+                timeToFirstState = timeToFirstState.value,
                 updateAvg = statePerf.averageTimeMillis.toDurationOrZero(),
                 updateP50 = stateDurations.getQuantile(Q50.value).toDurationOrZero(),
                 updateP90 = stateDurations.getQuantile(Q90.value).toDurationOrZero(),
@@ -547,6 +557,9 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
         actionInFlight.value = 0
         stateTransitions.value = 0
         stateVetoed.value = 0
+        startedInInitialState.value = false
+        timeToFirstStateStart.value = null
+        timeToFirstState.value = null
         subscribersState.value = SubscribersState(
             events = 0,
             current = 0,
@@ -596,6 +609,14 @@ internal class MetricsCollector<S : MVIState, I : MVIIntent, A : MVIAction>(
     }
 
     private val currentlyDebuggable: Boolean get() = lastConfig.value?.debuggable == true
+
+    private fun recordTimeToFirstState(result: S?, initial: S) {
+        if (result == null || result == initial) return
+        val start = timeToFirstStateStart.value ?: return
+        if (timeToFirstState.compareAndSet(null, start.elapsedNow())) {
+            timeToFirstStateStart.value = null
+        }
+    }
 }
 
 private data class SubscribersState(

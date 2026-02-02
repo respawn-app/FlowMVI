@@ -68,6 +68,8 @@ internal fun sampleSnapshot(
     state = StateMetrics(
         transitions = 7,
         transitionsVetoed = 1,
+        startedInInitialState = true,
+        timeToFirstState = 2.seconds,
         updateAvg = 5.milliseconds,
         updateP50 = 3.milliseconds,
         updateP90 = 7.milliseconds,

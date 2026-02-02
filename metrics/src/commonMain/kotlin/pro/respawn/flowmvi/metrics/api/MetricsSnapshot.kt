@@ -140,6 +140,10 @@ public data class StateMetrics(
     val transitions: Long,
     /** State transitions vetoed or rolled back. */
     val transitionsVetoed: Long,
+    /** Whether the current run started in the configured initial state. */
+    val startedInInitialState: Boolean,
+    /** Time to first non-initial state transition in the current run (if applicable). */
+    val timeToFirstState: Duration?,
     /** Average reducer or state update duration. */
     val updateAvg: Duration,
     /** Median reducer or state update duration. */

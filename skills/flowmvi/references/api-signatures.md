@@ -118,6 +118,24 @@ public inline fun <S : MVIState> configuration(
 ): StoreConfiguration<S>
 ```
 
+## Metrics (state)
+
+```kotlin
+@Serializable
+public data class StateMetrics(
+    val transitions: Long,
+    val transitionsVetoed: Long,
+    val startedInInitialState: Boolean,
+    val timeToFirstState: Duration?,
+    val updateAvg: Duration,
+    val updateP50: Duration,
+    val updateP90: Duration,
+    val updateP95: Duration,
+    val updateP99: Duration,
+    val opsPerSecond: Double,
+)
+```
+
 ## Store lifecycle and subscription
 
 ```kotlin
