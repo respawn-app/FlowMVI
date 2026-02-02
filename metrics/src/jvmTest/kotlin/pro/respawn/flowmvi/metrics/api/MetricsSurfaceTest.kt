@@ -8,9 +8,10 @@ import pro.respawn.flowmvi.metrics.sampleSnapshot
 
 class MetricsSurfaceTest : FreeSpec({
 
-    "fromVersion returns V1 for known and unknown versions" {
+    "fromVersion returns known surfaces and falls back to latest" {
         MetricSurface.fromVersion(MetricsSchemaVersion.V1_0) shouldBe MetricSurface.V1
-        MetricSurface.fromVersion(MetricsSchemaVersion(9, 9)) shouldBe MetricSurface.V1
+        MetricSurface.fromVersion(MetricsSchemaVersion.V1_1) shouldBe MetricSurface.V1_1
+        MetricSurface.fromVersion(MetricsSchemaVersion(9, 9)) shouldBe MetricSurface.V1_1
     }
 
     "downgradeTo returns same instance when version matches" {
@@ -44,7 +45,7 @@ class MetricsSurfaceTest : FreeSpec({
         first.meta.schemaVersion shouldBe target
     }
 
-    "downgrade then restore current preserves payload" {
+    "downgrade then restore current preserves payload except removed fields" {
         val snapshot = sampleSnapshot()
         val older = MetricsSchemaVersion(0, 9)
 
@@ -52,6 +53,11 @@ class MetricsSurfaceTest : FreeSpec({
         val restored = downgraded.downgradeTo(MetricsSchemaVersion.CURRENT)
 
         restored.meta.schemaVersion shouldBe MetricsSchemaVersion.CURRENT
-        restored.copy(meta = snapshot.meta) shouldBe snapshot
+        restored.copy(meta = snapshot.meta) shouldBe snapshot.copy(
+            state = snapshot.state.copy(
+                startedInInitialState = false,
+                timeToFirstState = null
+            )
+        )
     }
 })

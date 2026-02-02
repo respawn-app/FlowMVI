@@ -36,7 +36,10 @@ public data class MetricsSchemaVersion(
         /** Initial released schema. */
         public val V1_0: MetricsSchemaVersion = MetricsSchemaVersion(1, 0)
 
+        /** Adds time-to-first-state metric. */
+        public val V1_1: MetricsSchemaVersion = MetricsSchemaVersion(1, 1)
+
         /** The version used by newly produced snapshots. */
-        public val CURRENT: MetricsSchemaVersion = V1_0
+        public val CURRENT: MetricsSchemaVersion = V1_1
     }
 }

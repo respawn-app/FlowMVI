@@ -377,46 +377,79 @@ private fun actionMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, 
 
 private fun stateMetrics(snapshot: MetricsSnapshot, base: Map<String, String>, timestampMillis: Long?): List<Metric> {
     val state = snapshot.state
-    return listOf(
-        counter(
-            name = "state_transitions_total",
-            help = "State transitions",
-            value = state.transitions,
-            base = base,
-            timestampMillis = timestampMillis
-        ),
-        counter(
-            name = "state_transitions_vetoed_total",
-            help = "Vetoed state transitions",
-            value = state.transitionsVetoed,
-            base = base,
-            timestampMillis = timestampMillis
-        ),
-        gauge(
-            name = "state_update_seconds_avg",
-            help = "Average state update",
-            value = state.updateAvg.seconds(),
-            base = base,
-            timestampMillis = timestampMillis,
-            unit = SECONDS_UNIT
-        ),
-        quantileGauge(
-            name = "state_update_seconds",
-            help = "State update quantiles",
-            quantiles = STATE_QUANTILES,
-            source = state,
-            base = base,
-            timestampMillis = timestampMillis,
-            unit = SECONDS_UNIT
-        ),
-        gauge(
-            name = "state_ops_per_second",
-            help = "State transition throughput",
-            value = state.opsPerSecond,
-            base = base,
-            timestampMillis = timestampMillis
-        ),
-    )
+    return buildList {
+        add(
+            counter(
+                name = "state_transitions_total",
+                help = "State transitions",
+                value = state.transitions,
+                base = base,
+                timestampMillis = timestampMillis
+            )
+        )
+        add(
+            counter(
+                name = "state_transitions_vetoed_total",
+                help = "Vetoed state transitions",
+                value = state.transitionsVetoed,
+                base = base,
+                timestampMillis = timestampMillis
+            )
+        )
+        if (snapshot.meta.schemaVersion >= MetricsSchemaVersion.V1_1) {
+            add(
+                gauge(
+                    name = "state_started_in_initial_state",
+                    help = "Whether run started in initial state",
+                    value = if (state.startedInInitialState) 1.0 else 0.0,
+                    base = base,
+                    timestampMillis = timestampMillis
+                )
+            )
+            val _ = state.timeToFirstState?.let { duration ->
+                add(
+                    gauge(
+                        name = "state_time_to_first_state_seconds",
+                        help = "Time to first non-initial state",
+                        value = duration.seconds(),
+                        base = base,
+                        timestampMillis = timestampMillis,
+                        unit = SECONDS_UNIT
+                    )
+                )
+            }
+        }
+        add(
+            gauge(
+                name = "state_update_seconds_avg",
+                help = "Average state update",
+                value = state.updateAvg.seconds(),
+                base = base,
+                timestampMillis = timestampMillis,
+                unit = SECONDS_UNIT
+            )
+        )
+        add(
+            quantileGauge(
+                name = "state_update_seconds",
+                help = "State update quantiles",
+                quantiles = STATE_QUANTILES,
+                source = state,
+                base = base,
+                timestampMillis = timestampMillis,
+                unit = SECONDS_UNIT
+            )
+        )
+        add(
+            gauge(
+                name = "state_ops_per_second",
+                help = "State transition throughput",
+                value = state.opsPerSecond,
+                base = base,
+                timestampMillis = timestampMillis
+            )
+        )
+    }
 }
 
 private fun subscriptionMetrics(
@@ -641,9 +674,9 @@ private fun <T> quantileGauge(
 
 private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMap {
     put("schema_version", snapshot.meta.schemaVersion.value)
-    snapshot.meta.storeName?.let { put("store", it) }
-    snapshot.meta.storeId?.let { put("store_id", it.toString()) }
-    snapshot.meta.runId?.let { put("run_id", it) }
+    val _ = snapshot.meta.storeName?.let { put("store", it) }
+    val _ = snapshot.meta.storeId?.let { put("store_id", it.toString()) }
+    val _ = snapshot.meta.runId?.let { put("run_id", it) }
 }
 
 private fun Duration.seconds(): Double = when {
