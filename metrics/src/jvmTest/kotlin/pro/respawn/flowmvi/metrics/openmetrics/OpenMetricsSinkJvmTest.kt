@@ -147,4 +147,64 @@ class OpenMetricsSinkJvmTest : FreeSpec({
         rendered.shouldNotContain("# EOF")
         rendered.shouldNotContain("# UNIT")
     }
+
+    "resource attributes are included as labels on all samples" {
+        val buffer = StringBuilder()
+        val sink = OpenMetricsSink(
+            delegate = AppendableStringSink(buffer),
+            resourceAttributes = mapOf("install_id" to "abc-123", "device_model" to "Pixel 9"),
+        )
+
+        sink.emit(snapshot)
+
+        val rendered = buffer.toString()
+        rendered.shouldContain("install_id=\"abc-123\"")
+        rendered.shouldContain("device_model=\"Pixel 9\"")
+    }
+
+    "resource attributes provider overrides static attributes and meta defaults" {
+        val buffer = StringBuilder()
+        val sink = OpenMetricsSink(
+            delegate = AppendableStringSink(buffer),
+            resourceAttributes = mapOf("env" to "staging"),
+            resourceAttributesProvider = { mapOf("env" to "production", "store" to "custom_store") },
+        )
+
+        sink.emit(snapshot)
+
+        val rendered = buffer.toString()
+        rendered.shouldContain("env=\"production\"")
+        rendered.shouldContain("store=\"custom_store\"")
+        rendered.shouldNotContain("env=\"staging\"")
+    }
+
+    "prometheus sink resource attributes are included as labels on all samples" {
+        val buffer = StringBuilder()
+        val sink = PrometheusSink(
+            delegate = AppendableStringSink(buffer),
+            resourceAttributes = mapOf("install_id" to "abc-123", "device_model" to "Pixel 9"),
+        )
+
+        sink.emit(snapshot)
+
+        val rendered = buffer.toString()
+        rendered.shouldContain("install_id=\"abc-123\"")
+        rendered.shouldContain("device_model=\"Pixel 9\"")
+    }
+
+    "prometheus sink resource attributes provider overrides static attributes and meta defaults" {
+        val buffer = StringBuilder()
+        val sink = PrometheusSink(
+            delegate = AppendableStringSink(buffer),
+            resourceAttributes = mapOf("env" to "staging"),
+            resourceAttributesProvider = { mapOf("env" to "production", "store" to "custom_store") },
+        )
+
+        sink.emit(snapshot)
+
+        val rendered = buffer.toString()
+        rendered.shouldContain("env=\"production\"")
+        rendered.shouldContain("store=\"custom_store\"")
+        rendered.shouldNotContain("env=\"staging\"")
+    }
 })
