@@ -698,8 +698,7 @@ public fun OpenMetricsSink(
     includeUnit: Boolean = true,
     includeTimestamp: Boolean = false,
     surfaceVersion: MetricsSchemaVersion? = null,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
 ): MetricsSink = MappingSink(delegate) {
     val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
     val snapshot = it.downgradeTo(surface.version)
@@ -721,8 +720,7 @@ public fun PrometheusSink(
     includeUnit: Boolean = false,
     includeTimestamp: Boolean = false,
     surfaceVersion: MetricsSchemaVersion? = null,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
 ): MetricsSink = MappingSink(delegate) {
     val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
     val snapshot = it.downgradeTo(surface.version)

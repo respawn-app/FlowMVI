@@ -26,7 +26,9 @@ class OtlpJsonSinkTest : FreeSpec({
 
     "resource attributes include store identity and extras" {
         val payload = snapshot.toOtlpPayload(
-            resourceAttributes = mapOf("service.name" to "demo-service"),
+            resourceAttributesProvider = {
+                mapOf("service.name" to "demo-service")
+            },
             scopeName = "flowmvi.metrics"
         )
 
@@ -281,7 +283,9 @@ class OtlpJsonSinkTest : FreeSpec({
 
     "resource attributes are sorted lexicographically after merge" {
         val payload = snapshot.toOtlpPayload(
-            resourceAttributes = mapOf("z-key" to "z", "a-key" to "a")
+            resourceAttributesProvider = {
+                mapOf("z-key" to "z", "a-key" to "a")
+            }
         )
         val keys = payload.resourceMetrics.single().resource!!.attributes.map { it.key }
 
