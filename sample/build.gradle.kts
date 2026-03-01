@@ -166,18 +166,20 @@ android {
                 outputFileName = "${Config.Sample.namespace}.apk"
             }
     }
-    val props by localProperties()
-    val passwd = props["keystore.password"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
-    val keystore = File(rootDir, "certificates/keystore.jks")
-    val signed = passwd != null && keystore.exists()
-    if (signed) signingConfigs {
-        create("release") {
+    val passwd by lazy {
+        val props by localProperties()
+        props["keystore.password"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
+    }
+    val keystore by lazy { File(rootDir, "certificates/keystore.jks") }
+    val signed by lazy { passwd != null && keystore.exists() }
+    signingConfigs {
+        if (signed) create("release") {
             keyAlias = "key"
             keyPassword = passwd
             storeFile = keystore
             storePassword = passwd
         }
-    } else println("w: skipping signing because keystore.password property is not present or keystore is missing")
+    }
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
