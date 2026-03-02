@@ -26,7 +26,9 @@ class OtlpJsonSinkTest : FreeSpec({
 
     "resource attributes include store identity and extras" {
         val payload = snapshot.toOtlpPayload(
-            resourceAttributes = mapOf("service.name" to "demo-service"),
+            resourceAttributesProvider = {
+                mapOf("service.name" to "demo-service")
+            },
             scopeName = "flowmvi.metrics"
         )
 
@@ -107,6 +109,8 @@ class OtlpJsonSinkTest : FreeSpec({
             "flowmvi_actions_plugin_overhead_seconds_median",
             "flowmvi_state_transitions_total",
             "flowmvi_state_transitions_vetoed_total",
+            "flowmvi_state_started_in_initial_state",
+            "flowmvi_state_time_to_first_state_seconds",
             "flowmvi_state_update_seconds_avg",
             "flowmvi_state_update_seconds",
             "flowmvi_state_ops_per_second",
@@ -161,7 +165,7 @@ class OtlpJsonSinkTest : FreeSpec({
             .metrics
             .first { it.name == "flowmvi_config_schema_version" }
 
-        metric.gauge!!.dataPoints.single().asDouble shouldBe 1.0
+        metric.gauge!!.dataPoints.single().asDouble shouldBe MetricsSchemaVersion.CURRENT.toDouble()
     }
 
     "sink serializes NaN values when present" {
@@ -279,7 +283,9 @@ class OtlpJsonSinkTest : FreeSpec({
 
     "resource attributes are sorted lexicographically after merge" {
         val payload = snapshot.toOtlpPayload(
-            resourceAttributes = mapOf("z-key" to "z", "a-key" to "a")
+            resourceAttributesProvider = {
+                mapOf("z-key" to "z", "a-key" to "a")
+            }
         )
         val keys = payload.resourceMetrics.single().resource!!.attributes.map { it.key }
 

@@ -34,8 +34,7 @@ private val DefaultJson: Json = Json {
 /** Maps a [MetricsSnapshot] to an OTLP JSON payload ready for serialization. */
 public fun MetricsSnapshot.toOtlpPayload(
     namespace: String = DEFAULT_NAMESPACE,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
     scopeName: String = DEFAULT_SCOPE,
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
@@ -71,8 +70,7 @@ public fun OtlpJsonMetricsSink(
     delegate: Sink<String>,
     namespace: String = DEFAULT_NAMESPACE,
     scopeName: String = DEFAULT_SCOPE,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
     surfaceVersion: MetricsSchemaVersion? = null,
@@ -80,7 +78,6 @@ public fun OtlpJsonMetricsSink(
 ): MetricsSink = MappingSink(delegate) { snapshot ->
     val payload = snapshot.toOtlpPayload(
         namespace = namespace,
-        resourceAttributes = resourceAttributes,
         resourceAttributesProvider = resourceAttributesProvider,
         scopeName = scopeName,
         temporality = temporality,
@@ -129,7 +126,8 @@ private fun metrics(
     addAll(configMetrics(snapshot, context))
     addAll(intentMetrics(snapshot.intents, context))
     addAll(actionMetrics(snapshot.actions, context))
-    addAll(stateMetrics(snapshot.state, context))
+    val includeV11 = snapshot.meta.schemaVersion >= MetricsSchemaVersion.V1_1
+    addAll(stateMetrics(snapshot.state, context, includeV11))
     addAll(subscriptionMetrics(snapshot.subscriptions, context))
     addAll(lifecycleMetrics(snapshot.lifecycle, context))
     addAll(exceptionMetrics(snapshot.exceptions, context))
@@ -328,36 +326,66 @@ private fun actionMetrics(
 private fun stateMetrics(
     state: StateMetrics,
     context: MetricContext,
-): List<OtlpMetric> = listOf(
-    context.counter(
-        name = "state_transitions_total",
-        description = "State transitions",
-        value = state.transitions,
-    ),
-    context.counter(
-        name = "state_transitions_vetoed_total",
-        description = "Vetoed state transitions",
-        value = state.transitionsVetoed,
-    ),
-    context.gauge(
-        name = "state_update_seconds_avg",
-        description = "Average state update",
-        value = state.updateAvg.seconds(),
-        unit = SECONDS_UNIT
-    ),
-    context.quantileGauge(
-        name = "state_update_seconds",
-        description = "State update quantiles",
-        quantiles = STATE_QUANTILES,
-        source = state,
-        unit = SECONDS_UNIT
-    ),
-    context.gauge(
-        name = "state_ops_per_second",
-        description = "State transition throughput",
-        value = state.opsPerSecond,
-    ),
-)
+    includeV11: Boolean,
+): List<OtlpMetric> = buildList {
+    add(
+        context.counter(
+            name = "state_transitions_total",
+            description = "State transitions",
+            value = state.transitions,
+        )
+    )
+    add(
+        context.counter(
+            name = "state_transitions_vetoed_total",
+            description = "Vetoed state transitions",
+            value = state.transitionsVetoed,
+        )
+    )
+    if (includeV11) {
+        add(
+            context.gauge(
+                name = "state_started_in_initial_state",
+                description = "Whether run started in initial state",
+                value = if (state.startedInInitialState) 1.0 else 0.0,
+            )
+        )
+        val _ = state.timeToFirstState?.let { duration ->
+            add(
+                context.gauge(
+                    name = "state_time_to_first_state_seconds",
+                    description = "Time to first non-initial state",
+                    value = duration.seconds(),
+                    unit = SECONDS_UNIT
+                )
+            )
+        }
+    }
+    add(
+        context.gauge(
+            name = "state_update_seconds_avg",
+            description = "Average state update",
+            value = state.updateAvg.seconds(),
+            unit = SECONDS_UNIT
+        )
+    )
+    add(
+        context.quantileGauge(
+            name = "state_update_seconds",
+            description = "State update quantiles",
+            quantiles = STATE_QUANTILES,
+            source = state,
+            unit = SECONDS_UNIT
+        )
+    )
+    add(
+        context.gauge(
+            name = "state_ops_per_second",
+            description = "State transition throughput",
+            value = state.opsPerSecond,
+        )
+    )
+}
 
 private fun subscriptionMetrics(
     subscriptions: SubscriptionMetrics,

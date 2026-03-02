@@ -1,4 +1,4 @@
-@file:MustUseReturnValues
+@file:pro.respawn.flowmvi.annotation.MustUseReturnValues
 
 package pro.respawn.flowmvi.essenty.compose
 

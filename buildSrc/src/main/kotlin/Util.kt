@@ -52,10 +52,7 @@ fun String.toBase64() = Base64.getEncoder().encodeToString(toByteArray())
 fun Project.localProperties() = lazy {
     Properties().apply {
         val file = File(rootProject.rootDir.absolutePath, "local.properties")
-        if (!file.exists()) {
-            println("w: Local.properties file does not exist. You may be missing some publishing keys")
-            return@apply
-        }
+        if (!file.exists()) return@apply
         load(FileInputStream(file))
     }
 }

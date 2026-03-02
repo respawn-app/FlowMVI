@@ -64,3 +64,4 @@ Examples: `feat: add state recovery`, `fix: resolve lifecycle conflict`, `feat!:
 - Main branch: `master`. Master = prod.
 - Ignore warnings about experimental or unsupported features - they are informational
 - Put native platform code in nativeMain, or if using Apple APIs, in appleMain. Native includes all Apple platforms.
+- Keep the ./skills/flowmvi skill up to date, same way you keep docs up to date. Always update api signatures and docs there when you change public APIs.

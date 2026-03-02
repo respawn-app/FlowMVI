@@ -57,6 +57,8 @@ flowmvi-compose = { module = "pro.respawn.flowmvi:compose", version.ref = "flowm
 flowmvi-android = { module = "pro.respawn.flowmvi:android", version.ref = "flowmvi" }
 # Multiplatform state preservation
 flowmvi-savedstate = { module = "pro.respawn.flowmvi:savedstate", version.ref = "flowmvi" }
+# Performance metrics collection
+flowmvi-metrics = { module = "pro.respawn.flowmvi:metrics", version.ref = "flowmvi" }
 # Remote debugging client
 flowmvi-debugger = { module = "pro.respawn.flowmvi:debugger-plugin", version.ref = "flowmvi" }
 # Essenty (Decompose) integration
@@ -76,6 +78,8 @@ dependencies {
     commonMainImplementation("pro.respawn.flowmvi:compose:$flowmvi")
     // saving and restoring state
     commonMainImplementation("pro.respawn.flowmvi:savedstate:$flowmvi")
+    // metrics collection & export
+    commonMainImplementation("pro.respawn.flowmvi:metrics:$flowmvi")
     // essenty integration
     commonMainImplementation("pro.respawn.flowmvi:essenty:$flowmvi")
     commonMainImplementation("pro.respawn.flowmvi:essenty-compose:$flowmvi")
@@ -457,7 +461,7 @@ Continue learning by reading these articles:
 1. Learn how to [install](/plugins/prebuilt.md) and [create](/plugins/custom.md) Plugins
 2. Learn how to [manage](/state/statemanagement.md) and [persist](/state/savedstate.md) application State.
 3. Learn how to use FlowMVI with [compose](/integrations/compose.md)
-4. Set up [remote debugging](/misc/debugging.md) and [Dependency Injection](/integrations/di.md)
+4. Set up [remote debugging](/plugins/debugging.md) and [Dependency Injection](/integrations/di.md)
 5. Learn how to use FlowMVI on [Android](/integrations/android.md)
 6. Get answers to common [questions](/misc/FAQ.md)
 7. Explore the [Resources](/misc/resources.md) for code examples, articles, videos & more.

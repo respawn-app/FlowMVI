@@ -34,6 +34,40 @@ class StateMetricsCollectorTest : FreeSpec({
         }
     }
 
+    "State.timeToFirstState captures first non-initial transition" {
+        testCollectorWithTime { collector, _, ts ->
+            onStart()
+            ts.advanceBy(12.milliseconds)
+            onState(TestState(0), TestState(1))
+            collector.snapshot().state.timeToFirstState shouldBe 12.milliseconds
+        }
+    }
+
+    "State.startedInInitialState reflects initial state at start" {
+        testCollectorWithTime { collector, _, _ ->
+            onStart()
+            collector.snapshot().state.startedInInitialState shouldBe true
+        }
+    }
+
+    "State.timeToFirstState is null when no transition occurs" {
+        testCollectorWithTime { collector, _, _ ->
+            onStart()
+            collector.snapshot().state.timeToFirstState shouldBe null
+        }
+    }
+
+    "State.timeToFirstState is null when run starts with non-initial state" {
+        testCollectorWithTime { collector, _, _ ->
+            onStart()
+            updateState { TestState(1) }
+            onStop(null)
+            onStart()
+            collector.snapshot().state.startedInInitialState shouldBe false
+            collector.snapshot().state.timeToFirstState shouldBe null
+        }
+    }
+
     "State.transitions is 0 when no updates" {
         testCollectorWithTime { collector, _, _ ->
             onStart()

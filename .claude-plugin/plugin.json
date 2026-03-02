@@ -1,0 +1,6 @@
+{
+  "name": "flowmvi",
+  "description": "FlowMVI skill for Kotlin Multiplatform MVI framework",
+  "version": "3.3.0-alpha03",
+  "repository": "https://github.com/respawn-app/FlowMVI"
+}

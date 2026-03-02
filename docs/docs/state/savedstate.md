@@ -23,7 +23,7 @@ The artifact depends on:
 -   `androidx-lifecycle-savedstate` on Android to parcelize the state.
 
 The artifact depends on quite a few things, so it would be best to avoid adding it to all of your modules.
-Instead, you can inject the plugin or savers using DI in [this guide](/misc/debugging.md).
+Instead, you can inject the plugin or savers using DI in [this guide](/plugins/debugging.md).
 
 ## 2. Defining `Saver`s
 

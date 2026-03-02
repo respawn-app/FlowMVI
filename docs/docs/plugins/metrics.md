@@ -24,13 +24,13 @@ Each snapshot contains:
   inter-arrival times, bursts, buffer occupancy, plugin overhead.
 - **Actions** – sent/delivered/undelivered counts, ops/sec, delivery latency quantiles, queue time, buffer metrics,
   plugin overhead.
-- **State** – transition counts, vetoed transitions, reducer latency quantiles, throughput.
+- **State** – transition counts, vetoed transitions, started-in-initial-state, time-to-first state, reducer latency quantiles, throughput.
 - **Subscriptions** – subscribe/unsubscribe events, current/peak subscribers, average/median lifetimes, sampled counts.
 - **Lifecycle** – start/stop counters, total uptime, current/average/median lifetimes, bootstrap latency.
 - **Exceptions** – total/handled counts, recovery latency (average/median).
 - **Meta** – schema version, window length, EMA alpha, generated-at timestamp, start time, store name/id, run id.
 
-Total: 66+ numeric metrics per snapshot.
+Total: 67+ numeric metrics per snapshot.
 
 ## Usage guide
 
@@ -135,6 +135,6 @@ intents per second on a single hot path**
 
 ## Visualizing Metrics in the Debugger
 
-FlowMVI's [Remote Debugger](/misc/debugging.md) can display metrics collected from your stores in real-time.
+FlowMVI's [Remote Debugger](/plugins/debugging.md) can display metrics collected from your stores in real-time.
 This allows you to monitor store performance directly in the IDE plugin or desktop app without setting up
 external monitoring infrastructure.

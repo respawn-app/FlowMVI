@@ -109,8 +109,9 @@ Here's a full list:
 - **Reset State Plugin** - reset the state of the store when it is stopped.
 - **Saved State Plugin** - Save state somewhere else when it changes, and restore when the store starts.
   See [saved state](/state/savedstate.md) for details.
-- **Remote Debugging Plugin** - connect to a remote debugger IDE Plugin / desktop app shipped with FlowMVI. See
-  the [documentation](/misc/debugging.md) to learn how to set up the environment.
+- **Remote Debugging Plugin** - connect to the IDE Plugin / desktop app shipped with FlowMVI. See
+  the [documentation](/plugins/debugging.md) to learn how to set up the environment.
+- **Metrics Plugin** - collect performance & usage metrics. See [docs](/plugins/metrics.md) for details.
 - **Child Store Plugin** - attach other stores to the lifecycle of a parent. Learn more in
   the [dedicated doc](/plugins/delegates.md)
 - **Store Delegate Plugin** - delegate State and Actions of your store to another one. More
