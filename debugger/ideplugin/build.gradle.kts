@@ -10,7 +10,20 @@ plugins {
     alias(libs.plugins.intellij.ide)
 }
 
-val props by localProperties()
+val pluginPrivateKey by lazy {
+    val props by localProperties()
+    props["plugin.publishing.privatekey"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
+}
+
+val pluginSigningPassword by lazy {
+    val props by localProperties()
+    props["signing.password"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
+}
+
+val pluginPublishingToken by lazy {
+    val props by localProperties()
+    props["plugin.publishing.token"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
+}
 
 repositories {
     google {
@@ -30,13 +43,15 @@ intellijPlatform {
     projectName = Config.name
     // needed when plugin provides custom settings exposed to the UI
     buildSearchableOptions = false
-    signing {
-        certificateChainFile = rootProject.rootDir.resolve(Config.Plugin.certPath)
-        privateKey = props["plugin.publishing.privatekey"]?.toString()
-        password = props["signing.password"]?.toString()
+    if (pluginPrivateKey != null && pluginSigningPassword != null) {
+        signing {
+            certificateChainFile = rootProject.rootDir.resolve(Config.Plugin.certPath)
+            privateKey = pluginPrivateKey
+            password = pluginSigningPassword
+        }
     }
     publishing {
-        token = props["plugin.publishing.token"]?.toString()
+        token = pluginPublishingToken
         hidden = true
     }
     pluginVerification {
