@@ -34,8 +34,7 @@ private val DefaultJson: Json = Json {
 /** Maps a [MetricsSnapshot] to an OTLP JSON payload ready for serialization. */
 public fun MetricsSnapshot.toOtlpPayload(
     namespace: String = DEFAULT_NAMESPACE,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
     scopeName: String = DEFAULT_SCOPE,
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
@@ -71,8 +70,7 @@ public fun OtlpJsonMetricsSink(
     delegate: Sink<String>,
     namespace: String = DEFAULT_NAMESPACE,
     scopeName: String = DEFAULT_SCOPE,
-    resourceAttributes: Map<String, String> = emptyMap(),
-    resourceAttributesProvider: (Meta) -> Map<String, String> = { resourceAttributes },
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
     temporality: AggregationTemporality = AggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
     fixedTimestamp: Instant? = null,
     surfaceVersion: MetricsSchemaVersion? = null,
@@ -80,7 +78,6 @@ public fun OtlpJsonMetricsSink(
 ): MetricsSink = MappingSink(delegate) { snapshot ->
     val payload = snapshot.toOtlpPayload(
         namespace = namespace,
-        resourceAttributes = resourceAttributes,
         resourceAttributesProvider = resourceAttributesProvider,
         scopeName = scopeName,
         temporality = temporality,

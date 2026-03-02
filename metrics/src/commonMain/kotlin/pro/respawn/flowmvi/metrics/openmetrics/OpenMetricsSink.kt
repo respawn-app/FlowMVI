@@ -5,6 +5,7 @@ import pro.respawn.flowmvi.metrics.MetricsSink
 import pro.respawn.flowmvi.metrics.Quantile
 import pro.respawn.flowmvi.metrics.api.ActionMetrics
 import pro.respawn.flowmvi.metrics.api.IntentMetrics
+import pro.respawn.flowmvi.metrics.api.Meta
 import pro.respawn.flowmvi.metrics.api.MetricSurface
 import pro.respawn.flowmvi.metrics.api.MetricsSchemaVersion
 import pro.respawn.flowmvi.metrics.api.MetricsSnapshot
@@ -38,11 +39,12 @@ private class OpenMetricsRenderer(
     private val includeUnit: Boolean,
     private val includeTimestamp: Boolean,
     private val trailingEof: Boolean,
+    private val resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
 ) {
 
     fun render(snapshot: MetricsSnapshot): String {
         val builder = StringBuilder()
-        val base = baseLabels(snapshot)
+        val base = baseLabels(snapshot, resourceAttributesProvider(snapshot.meta))
         val timestamp = snapshot.meta.generatedAt.toEpochMilliseconds().takeIf { includeTimestamp }
         metrics(snapshot, base, timestamp).forEach { metric -> appendMetric(builder, metric) }
         if (trailingEof) builder.append(EOF_LINE)
@@ -672,11 +674,15 @@ private fun <T> quantileGauge(
     },
 )
 
-private fun baseLabels(snapshot: MetricsSnapshot): Map<String, String> = buildMap {
+private fun baseLabels(
+    snapshot: MetricsSnapshot,
+    extras: Map<String, String> = emptyMap(),
+): Map<String, String> = buildMap {
     put("schema_version", snapshot.meta.schemaVersion.value)
     val _ = snapshot.meta.storeName?.let { put("store", it) }
     val _ = snapshot.meta.storeId?.let { put("store_id", it.toString()) }
     val _ = snapshot.meta.runId?.let { put("run_id", it) }
+    putAll(extras)
 }
 
 private fun Duration.seconds(): Double = when {
@@ -692,6 +698,7 @@ public fun OpenMetricsSink(
     includeUnit: Boolean = true,
     includeTimestamp: Boolean = false,
     surfaceVersion: MetricsSchemaVersion? = null,
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
 ): MetricsSink = MappingSink(delegate) {
     val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
     val snapshot = it.downgradeTo(surface.version)
@@ -700,7 +707,8 @@ public fun OpenMetricsSink(
         includeHelp = includeHelp,
         includeUnit = includeUnit,
         includeTimestamp = includeTimestamp,
-        trailingEof = true
+        trailingEof = true,
+        resourceAttributesProvider = resourceAttributesProvider,
     ).render(snapshot)
 }
 
@@ -712,6 +720,7 @@ public fun PrometheusSink(
     includeUnit: Boolean = false,
     includeTimestamp: Boolean = false,
     surfaceVersion: MetricsSchemaVersion? = null,
+    resourceAttributesProvider: (Meta) -> Map<String, String> = { emptyMap() },
 ): MetricsSink = MappingSink(delegate) {
     val surface = MetricSurface.fromVersion(surfaceVersion ?: it.meta.schemaVersion)
     val snapshot = it.downgradeTo(surface.version)
@@ -720,6 +729,7 @@ public fun PrometheusSink(
         includeHelp = includeHelp,
         includeUnit = includeUnit,
         includeTimestamp = includeTimestamp,
-        trailingEof = false
+        trailingEof = false,
+        resourceAttributesProvider = resourceAttributesProvider,
     ).render(snapshot)
 }
