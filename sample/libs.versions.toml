@@ -1,9 +1,9 @@
 [versions]
-apiresult = "2.1.0"
+apiresult = "2.2.0"
 codehighlights = "1.1.0"
-decompose = "3.4.0"
+decompose = "3.5.0-beta01"
 kmputils = "1.7.0"
-kodein = "7.30.0"
+kodein = "7.31.0"
 koin = "4.1.1"
 material = "1.13.0"
 mvikotlin = "4.3.0"
