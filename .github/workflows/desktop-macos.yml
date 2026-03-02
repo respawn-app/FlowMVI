@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload debugger
         id: upload-debugger
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: Debugger_MacOS
           path: ./debugger/app/build/compose/binaries/main/dmg/*
@@ -67,7 +67,7 @@ jobs:
 
       - name: Upload sample
         id: upload-sample
-        uses: actions/upload-artifact@v5.0.0
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: Sample_MacOS
           path: ./sample/build/compose/binaries/main/dmg/*
