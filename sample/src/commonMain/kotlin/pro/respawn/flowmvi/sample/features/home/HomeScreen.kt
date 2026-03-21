@@ -41,7 +41,10 @@ import pro.respawn.flowmvi.sample.features.home.HomeFeature.Logging
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Progressive
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.SST
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.SavedState
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.ScopedCompose
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.Simple
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.TopLevelCompose
+import pro.respawn.flowmvi.sample.features.home.HomeFeature.Transitions
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.UndoRedo
 import pro.respawn.flowmvi.sample.features.home.HomeFeature.XmlViews
 import pro.respawn.flowmvi.sample.features.home.HomeIntent.ClickedFeature
@@ -54,11 +57,16 @@ import pro.respawn.flowmvi.sample.navigation.util.backNavigator
 import pro.respawn.flowmvi.sample.platform_feature_unavailable_label
 import pro.respawn.flowmvi.sample.progressive_feature_title
 import pro.respawn.flowmvi.sample.savedstate_feature_title
+import pro.respawn.flowmvi.sample.scoped_compose_feature_title
 import pro.respawn.flowmvi.sample.simple_feature_title
 import pro.respawn.flowmvi.sample.sst_feature_title
+import pro.respawn.flowmvi.sample.toplevel_compose_feature_title
+import pro.respawn.flowmvi.sample.transitions_feature_title
 import pro.respawn.flowmvi.sample.ui.icons.AccountTree
 import pro.respawn.flowmvi.sample.ui.icons.Code
+import pro.respawn.flowmvi.sample.ui.icons.Dashboard
 import pro.respawn.flowmvi.sample.ui.icons.Download
+import pro.respawn.flowmvi.sample.ui.icons.FilterList
 import pro.respawn.flowmvi.sample.ui.icons.Help
 import pro.respawn.flowmvi.sample.ui.icons.Icons
 import pro.respawn.flowmvi.sample.ui.icons.Info
@@ -66,6 +74,7 @@ import pro.respawn.flowmvi.sample.ui.icons.Layers
 import pro.respawn.flowmvi.sample.ui.icons.Refresh
 import pro.respawn.flowmvi.sample.ui.icons.Save
 import pro.respawn.flowmvi.sample.ui.icons.Subject
+import pro.respawn.flowmvi.sample.ui.icons.SwapHoriz
 import pro.respawn.flowmvi.sample.ui.icons.SyncLock
 import pro.respawn.flowmvi.sample.ui.icons.Undo
 import pro.respawn.flowmvi.sample.ui.theme.rainbow
@@ -99,6 +108,9 @@ fun HomeScreen(
                 Decompose -> navigator.decomposeFeature()
                 Progressive -> navigator.progressiveFeature()
                 SST -> navigator.stateTransactionsFeature()
+                Transitions -> navigator.transitionsFeature()
+                ScopedCompose -> navigator.scopedComposeFeature()
+                TopLevelCompose -> navigator.topLevelComposeFeature()
             }
         }
     }
@@ -173,6 +185,9 @@ private val HomeFeature.title
         Decompose -> Res.string.decompose_feature_title
         Progressive -> Res.string.progressive_feature_title
         SST -> Res.string.sst_feature_title
+        Transitions -> Res.string.transitions_feature_title
+        ScopedCompose -> Res.string.scoped_compose_feature_title
+        TopLevelCompose -> Res.string.toplevel_compose_feature_title
     }
 
 private val HomeFeature.icon
@@ -187,6 +202,9 @@ private val HomeFeature.icon
         Decompose -> Icons.AccountTree
         Progressive -> Icons.Layers
         SST -> Icons.SyncLock
+        Transitions -> Icons.SwapHoriz
+        ScopedCompose -> Icons.FilterList
+        TopLevelCompose -> Icons.Dashboard
     }
 
 private val HomeFeature.enabled get() = platform == null || BuildFlags.platform == platform

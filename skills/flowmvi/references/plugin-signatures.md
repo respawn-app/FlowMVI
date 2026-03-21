@@ -31,6 +31,78 @@ public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> reducePlugin(
 ): StorePlugin<S, I, A>
 ```
 
+### Transitions (FSM)
+
+Finite state machine plugin — full replacement for `reduce {}`. Handles intents based on the current state type. Handlers receive `TransitionScope` which extends `PipelineContext` with typed `state` and convenience `transitionTo()`.
+
+Intents not matched by any FSM handler pass through to downstream plugins. Supports `compose()` for child store composition.
+
+```kotlin
+package pro.respawn.flowmvi.plugins
+
+public const val TransitionsPluginName: String = "TransitionsPlugin"
+
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> StoreBuilder<S, I, A>.transitions(
+    name: String = TransitionsPluginName,
+    @BuilderInference block: TransitionsBuilder<S, I, A>.() -> Unit,
+): Unit
+
+@FlowMVIDSL
+public inline fun <S : MVIState, I : MVIIntent, A : MVIAction> transitionsPlugin(
+    name: String = TransitionsPluginName,
+    @BuilderInference block: TransitionsBuilder<S, I, A>.() -> Unit,
+): StorePlugin<S, I, A>
+```
+
+#### TransitionsBuilder DSL
+
+```kotlin
+package pro.respawn.flowmvi.dsl
+
+@FlowMVIDSL
+public class TransitionsBuilder<S : MVIState, I : MVIIntent, A : MVIAction> {
+    public inline fun <reified T : S> state(
+        @BuilderInference block: StateTransitionsBuilder<T, S, I, A>.() -> Unit,
+    )
+    
+    @FlowMVIDSL
+    public fun <CS : MVIState, CI : MVIIntent, CA : MVIAction> compose(
+        store: Store<CS, CI, CA>,
+        merge: S.(childState: CS) -> S,
+        consume: (suspend PipelineContext<S, I, A>.(CA) -> Unit)? = null,
+    )
+}
+
+@FlowMVIDSL
+public class StateTransitionsBuilder<T : S, S : MVIState, I : MVIIntent, A : MVIAction> {
+    public inline fun <reified E : I> on(
+        noinline block: suspend TransitionScope<T, S, I, A>.(E) -> Unit,
+    )
+    
+    @FlowMVIDSL
+    public fun <CS : MVIState, CI : MVIIntent, CA : MVIAction> compose(
+        store: Store<CS, CI, CA>,
+        merge: T.(childState: CS) -> S,
+        consume: (suspend PipelineContext<S, I, A>.(CA) -> Unit)? = null,
+    )
+}
+```
+
+#### TransitionScope
+
+```kotlin
+package pro.respawn.flowmvi.dsl
+
+@FlowMVIDSL
+public interface TransitionScope<out T : S, S : MVIState, I : MVIIntent, A : MVIAction> :
+    PipelineContext<S, I, A> {
+    public val state: T
+    public suspend fun transitionTo(target: S)
+    public suspend fun transitionTo(target: S, sideEffect: A)
+}
+```
+
 ### Init
 
 Runs work at store start. Use for startup work that must run before the store processes intents.

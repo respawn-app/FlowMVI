@@ -16,4 +16,7 @@ interface AppNavigator : Navigator {
     fun decomposeFeature()
     fun info()
     fun stateTransactionsFeature()
+    fun transitionsFeature()
+    fun scopedComposeFeature()
+    fun topLevelComposeFeature()
 }

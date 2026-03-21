@@ -22,6 +22,9 @@ enum class Destination(
     UndoRedo("undoredo", "undo"),
     Decompose("decompose"),
     StateTransactions("statetransactions"),
+    Transitions("transitions"),
+    ScopedCompose("scopedcompose"),
+    TopLevelCompose("toplevelcompose"),
     Info;
 
     companion object {
