@@ -1,10 +1,15 @@
 package pro.respawn.flowmvi.plugins
 
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.launch
+import pro.respawn.flowmvi.annotation.InternalFlowMVIAPI
 import pro.respawn.flowmvi.api.MVIAction
 import pro.respawn.flowmvi.api.MVIIntent
 import pro.respawn.flowmvi.api.MVIState
 import pro.respawn.flowmvi.api.PipelineContext
 import pro.respawn.flowmvi.api.Store
+import pro.respawn.flowmvi.dsl.collect
 import kotlin.reflect.KClass
 
 /**
@@ -58,4 +63,28 @@ internal class ComposeDefinition<
     /** If non-null, composition is active only while parent is in this state type.
      *  If null, always active (top-level). */
     val scopedToState: KClass<out S>?,
-)
+) {
+
+    @OptIn(InternalFlowMVIAPI::class)
+    @Suppress("UNCHECKED_CAST")
+    internal fun launchIn(ctx: PipelineContext<S, I, A>): Job = with(ctx) {
+        launch {
+            store.collect {
+                launch {
+                    states.collect { childState ->
+                        updateState { (merge as S.(Any?) -> S)(childState) }
+                    }
+                }
+                consume?.let { consumeFn ->
+                    launch {
+                        actions.collect { childAction ->
+                            (consumeFn as suspend PipelineContext<S, I, A>.(Any?) -> Unit)
+                                .invoke(ctx, childAction)
+                        }
+                    }
+                }
+                awaitCancellation()
+            }
+        }
+    }
+}
