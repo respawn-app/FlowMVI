@@ -14,14 +14,19 @@ import pro.respawn.flowmvi.sample.features.logging.LoggingContainer
 import pro.respawn.flowmvi.sample.features.progressive.ProgressiveContainer
 import pro.respawn.flowmvi.sample.features.progressive.ProgressiveRepository
 import pro.respawn.flowmvi.sample.features.savedstate.SavedStateContainer
+import pro.respawn.flowmvi.sample.features.scopedcompose.ScopedComposeContainer
 import pro.respawn.flowmvi.sample.features.sst.PurchaseRepository
 import pro.respawn.flowmvi.sample.features.sst.SSTContainer
+import pro.respawn.flowmvi.sample.features.toplevelcompose.TopLevelComposeContainer
+import pro.respawn.flowmvi.sample.features.transitions.AuthRepository
+import pro.respawn.flowmvi.sample.features.transitions.TransitionsContainer
 import pro.respawn.flowmvi.sample.features.undoredo.UndoRedoContainer
 
 val featureModule = module {
     singleOf(::LCERepository)
     singleOf(::ProgressiveRepository)
     singleOf(::PurchaseRepository) // for SST example
+    singleOf(::AuthRepository)
 
     container { new(::HomeContainer) }
     container { new(::ProgressiveContainer) }
@@ -31,6 +36,9 @@ val featureModule = module {
     container { new(::LoggingContainer) }
     container { new(::UndoRedoContainer) }
     container { new(::SSTContainer) }
+    container { new(::TransitionsContainer) }
+    container { new(::ScopedComposeContainer) }
+    container { new(::TopLevelComposeContainer) }
 
     // decompose doesn't need to use scoped dsl
     factoryOf(::PagesContainer)
