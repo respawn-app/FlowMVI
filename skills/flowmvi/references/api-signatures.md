@@ -358,3 +358,15 @@ public interface Container<S : MVIState, I : MVIIntent, A : MVIAction> : Immutab
     override val store: Store<S, I, A>
 }
 ```
+
+## TransitionScope (FSM handler context)
+
+```kotlin
+@FlowMVIDSL
+public interface TransitionScope<out T : S, S : MVIState, I : MVIIntent, A : MVIAction> :
+    PipelineContext<S, I, A> {
+    public val state: T
+    public suspend fun transitionTo(target: S)
+    public suspend fun transitionTo(target: S, sideEffect: A)
+}
+```

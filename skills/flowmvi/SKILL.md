@@ -23,6 +23,12 @@ Use `rg` over `references/*signatures*.md` for discovery and open URLs from `ref
 - Install **Decorators**: wrap the entire plugin chain and can short-circuit it.
 - **Subscribers** render state and handle actions.
 
+### FSM Transitions
+
+Use `transitions {}` instead of `reduce {}` for type-safe state machine patterns.
+Define handlers per state type with `state<T> { on<Intent> { transitionTo(NewState) } }`.
+Supports child store composition via `compose()`. See `references/plugin-signatures.md` for exact API.
+
 ## Contract and state design
 
 ### State
