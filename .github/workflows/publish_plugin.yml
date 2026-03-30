@@ -27,7 +27,7 @@ jobs:
           cache: 'gradle'
 
       - name: Validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v5
+        uses: gradle/actions/wrapper-validation@v6
 
       - name: Create local properties
         env:
