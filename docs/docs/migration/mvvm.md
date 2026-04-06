@@ -3,9 +3,6 @@ sidebar_position: 1
 sidebar_label: From MVVM
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
 # Migrating from MVVM to FlowMVI
 
 This guide is for Android and Kotlin Multiplatform developers who use the traditional MVVM pattern
@@ -16,20 +13,20 @@ If you're starting a new project, you may prefer the [quickstart](../quickstart.
 
 | MVVM | FlowMVI | Notes |
 |------|---------|-------|
-| `ViewModel` | `Container` / `ViewModel` implementing `ImmutableContainer` | You can keep your ViewModels on Android |
+| `ViewModel` | `Container` / `ViewModel` implementing `ImmutableContainer` | You can keep ViewModels or use `ContainerViewModel`  |
 | `MutableStateFlow` / `LiveData` | `MVIState` + `updateState {}` | Immutable, copy-based state |
-| `StateFlow.value` | `withState {}` | Thread-safe read access |
-| Exposed `StateFlow` | `store.subscribe()` / Compose `subscribe {}` | Lifecycle-aware |
+| No direct analog for `StateFlow.value` | `withState {}` | Reads are always inside a transaction, no race-prone direct property access |
+| `collectAsStateWithLifecycle` | `store.subscribe()` / Compose `subscribe {}` | `subscribe()` |
 | Public ViewModel functions | `MVIIntent` sealed classes or `store.intent {}` lambdas | Choose one style per project |
-| `SharedFlow` / `Channel` events | `MVIAction` side effects | Guaranteed delivery with `Distribute()` |
+| `SharedFlow` / `Channel` events | `action()` side effects | Send with `action()`, consume in `subscribe { consume { } }` |
 | `init {}` block | `init` plugin | Runs each time the store starts |
-| `viewModelScope.launch {}` | Logic in `reduce {}`, `init {}`, `whileSubscribed {}` | Structured pipeline |
+| `viewModelScope.launch {}` | `PipelineContext.launch {}` | Structured pipeline |
 | `combine()` / `collect()` on flows | `whileSubscribed {}` plugin | Auto-cancels with subscriber lifecycle |
 | `try/catch` | `recover {}` plugin | Centralized, composable error handling |
 
 ## Before and After: User Profile Feature
 
-Let's migrate a realistic feature that loads a user profile, handles errors, supports refresh, and shows a toast on save.
+Let's migrate a realistic feature that observes a user profile, handles errors, and shows a toast on save.
 
 ### Before: Traditional MVVM
 
@@ -38,24 +35,13 @@ class ProfileViewModel(
     private val repo: ProfileRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<ProfileState>(ProfileState.Loading)
-    val state: StateFlow<ProfileState> = _state.asStateFlow()
-
-    private val _events = Channel<ProfileEvent>(Channel.BUFFERED)
-    val events: Flow<ProfileEvent> = _events.receiveAsFlow()
+    private val _state = MutableStateFlow(ProfileUiState())
+    val state: StateFlow<ProfileUiState> = _state.asStateFlow()
 
     init {
-        loadProfile()
-    }
-
-    fun loadProfile() {
         viewModelScope.launch {
-            _state.value = ProfileState.Loading
-            try {
-                val profile = repo.getProfile()
-                _state.value = ProfileState.DisplayingProfile(profile)
-            } catch (e: Exception) {
-                _state.value = ProfileState.Error(e.message ?: "Unknown error")
+            repo.observeProfile().collect { profile ->
+                _state.update { it.copy(profile = profile, isLoading = false) }
             }
         }
     }
@@ -64,53 +50,47 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 repo.saveProfile(name)
-                _events.send(ProfileEvent.ShowToast("Profile saved"))
+                _state.update { it.copy(userMessage = "Profile saved") }
             } catch (e: Exception) {
-                _events.send(ProfileEvent.ShowToast("Save failed: ${e.message}"))
+                _state.update { it.copy(userMessage = "Save failed: ${e.message}") }
             }
         }
     }
+
+    // UI must call this after showing the message
+    fun userMessageShown() {
+        _state.update { it.copy(userMessage = null) }
+    }
 }
 
-sealed interface ProfileState {
-    data object Loading : ProfileState
-    data class Error(val message: String) : ProfileState
-    data class DisplayingProfile(val profile: Profile) : ProfileState
-}
-
-sealed interface ProfileEvent {
-    data class ShowToast(val message: String) : ProfileEvent
-}
+data class ProfileUiState(
+    val profile: Profile? = null,
+    val isLoading: Boolean = true,
+    val userMessage: String? = null, // One-off event reduced to state
+)
 ```
 
 ### After: FlowMVI
 
-<Tabs>
-  <TabItem value="mvi" label="MVI Style" default>
-
 ```kotlin
-// Contract
 sealed interface ProfileState : MVIState {
     data object Loading : ProfileState
     data class Error(val message: String) : ProfileState
     data class DisplayingProfile(val profile: Profile) : ProfileState
 }
 
-sealed interface ProfileIntent : MVIIntent {
-    data object ClickedLoad : ProfileIntent
-    data class ClickedSave(val name: String) : ProfileIntent
-}
-
 sealed interface ProfileAction : MVIAction {
     data class ShowToast(val message: String) : ProfileAction
 }
 
-// Container
-class ProfileContainer(
+class ProfileViewModel(
     private val repo: ProfileRepository,
-) : Container<ProfileState, ProfileIntent, ProfileAction> {
+) : ViewModel(), ImmutableContainer<ProfileState, LambdaIntent<ProfileState, ProfileAction>, ProfileAction> {
 
-    override val store = store(initial = ProfileState.Loading) {
+    override val store by lazyStore(
+        initial = ProfileState.Loading,
+        scope = viewModelScope,
+    ) {
         configure {
             debuggable = BuildFlags.debuggable
             name = "ProfileStore"
@@ -121,82 +101,13 @@ class ProfileContainer(
             null
         }
 
-        init {
-            loadProfile()
-        }
-
-        reduce { intent ->
-            when (intent) {
-                is ClickedLoad -> loadProfile()
-                is ClickedSave -> saveProfile(intent.name)
+        whileSubscribed {
+            repo.observeProfile().collect { profile ->
+                updateState { ProfileState.DisplayingProfile(profile) }
             }
-        }
-    }
-
-    private suspend fun PipelineContext<ProfileState, ProfileIntent, ProfileAction>.loadProfile() {
-        updateState { ProfileState.Loading }
-        val profile = repo.getProfile()  // errors caught by recover {}
-        updateState { ProfileState.DisplayingProfile(profile) }
-    }
-
-    private suspend fun PipelineContext<ProfileState, ProfileIntent, ProfileAction>.saveProfile(name: String) {
-        repo.saveProfile(name)  // errors caught by recover {}
-        action(ProfileAction.ShowToast("Profile saved"))
-    }
-}
-```
-
-:::info[What is PipelineContext?]
-
-`PipelineContext` is the receiver that gives your functions access to `updateState`, `action`, `intent`,
-and the store's `CoroutineScope`. Using it as a receiver (instead of injecting the store) keeps your
-business logic decoupled from any specific store instance.
-
-:::
-
-  </TabItem>
-  <TabItem value="mvvmplus" label="MVVM+ Style">
-
-```kotlin
-// Contract (same states and actions, but no intent classes needed)
-sealed interface ProfileState : MVIState {
-    data object Loading : ProfileState
-    data class Error(val message: String) : ProfileState
-    data class DisplayingProfile(val profile: Profile) : ProfileState
-}
-
-sealed interface ProfileAction : MVIAction {
-    data class ShowToast(val message: String) : ProfileAction
-}
-
-// Container using lambda intents
-class ProfileContainer(
-    private val repo: ProfileRepository,
-) : ImmutableContainer<ProfileState, LambdaIntent<ProfileState, ProfileAction>, ProfileAction> {
-
-    override val store = store(initial = ProfileState.Loading) {
-        configure {
-            debuggable = BuildFlags.debuggable
-            name = "ProfileStore"
-        }
-
-        recover { e ->
-            updateState { ProfileState.Error(e.message ?: "Unknown error") }
-            null
-        }
-
-        init {
-            val profile = repo.getProfile()
-            updateState { ProfileState.DisplayingProfile(profile) }
         }
 
         reduceLambdas()
-    }
-
-    fun loadProfile() = store.intent {
-        updateState { ProfileState.Loading }
-        val profile = repo.getProfile()
-        updateState { ProfileState.DisplayingProfile(profile) }
     }
 
     fun saveProfile(name: String) = store.intent {
@@ -206,41 +117,29 @@ class ProfileContainer(
 }
 ```
 
-  </TabItem>
-</Tabs>
-
-:::tip[What changed?]
-
-- **Error handling** moved from `try/catch` in every function to a single `recover {}` plugin
-- **Events** changed from a manually managed `Channel` to type-safe `MVIAction`s with guaranteed delivery
-- **Coroutine management** moved from manual `viewModelScope.launch {}` to the store's structured pipeline
-- **State updates** are thread-safe by default — no need to worry about concurrent writes
-
-:::
-
 ## UI Layer Migration
 
 ### Compose
 
-**Before** — collecting state and events manually:
+**Before** — collecting state and consuming events-as-state manually:
 
 ```kotlin
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) {
-    val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.events.collect { event ->
-            when (event) {
-                is ShowToast -> { /* show snackbar */ }
-            }
+    state.userMessage?.let { message ->
+        LaunchedEffect(message) {
+            snackbarHostState.showSnackbar(message)
+            viewModel.userMessageShown()
         }
     }
 
-    when (state) {
-        is Loading -> CircularProgressIndicator()
-        is Error -> ErrorContent(state.message, onRetry = viewModel::loadProfile)
-        is DisplayingProfile -> ProfileContent(state.profile, onSave = viewModel::saveProfile)
+    if (state.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        state.profile?.let { ProfileContent(it, onSave = viewModel::saveProfile) }
     }
 }
 ```
@@ -249,7 +148,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) {
 
 ```kotlin
 @Composable
-fun ProfileScreen(container: ProfileContainer) = with(container.store) {
+fun ProfileScreen(viewModel: ProfileViewModel = viewModel()) = with(viewModel.store) {
     val state by subscribe { action ->
         when (action) {
             is ShowToast -> { /* show snackbar */ }
@@ -258,8 +157,8 @@ fun ProfileScreen(container: ProfileContainer) = with(container.store) {
 
     when (state) {
         is Loading -> CircularProgressIndicator()
-        is Error -> ErrorContent(state.message, onRetry = { intent(ClickedLoad) })
-        is DisplayingProfile -> ProfileContent(state.profile, onSave = { intent(ClickedSave(it)) })
+        is DisplayingProfile -> ProfileContent(state.profile, onSave = viewModel::saveProfile)
+        is Error -> ErrorContent(state.message)
     }
 }
 ```
@@ -270,39 +169,12 @@ the composition lifecycle — no `LaunchedEffect` needed.
 For best practices on extracting pure content composables, Compose compiler stability, and previews,
 see the [Compose guide](../integrations/compose.md).
 
-<details>
-<summary>Compose Multiplatform (KMP)</summary>
+:::tip[Compose Multiplatform]
 
-The `subscribe` API works identically on all Compose Multiplatform targets — Android, iOS, Desktop, and Web.
-Your Container is defined in `commonMain`, and the same composable works everywhere:
-
-```kotlin
-// commonMain — this composable runs on all platforms
-@Composable
-fun ProfileScreen(container: ProfileContainer) = with(container.store) {
-    val state by subscribe { action ->
-        when (action) {
-            is ShowToast -> { /* platform-specific snackbar */ }
-        }
-    }
-
-    when (state) {
-        is Loading -> CircularProgressIndicator()
-        is Error -> ErrorContent(state.message, onRetry = { intent(ClickedLoad) })
-        is DisplayingProfile -> ProfileContent(state.profile, onSave = { intent(ClickedSave(it)) })
-    }
-}
-```
-
-:::tip
-
-For iOS targets, Compose Multiplatform is the recommended UI integration path — FlowMVI does not
-provide a native SwiftUI bridge. The Container and store logic are fully multiplatform; only platform
-entry points differ. See the [Compose guide](../integrations/compose.md) for stability configuration.
+The `subscribe` API and ViewModel logic work identically on all Compose Multiplatform targets —
+Android, iOS, Desktop, and Web. The code above runs on all platforms without changes.
 
 :::
-
-</details>
 
 <details>
 <summary>Android Views</summary>
@@ -330,12 +202,12 @@ class ProfileFragment : Fragment() {
 
 ```kotlin
 class ProfileFragment : Fragment() {
-    private val container: ProfileContainer by container()
+    private val viewModel: ProfileViewModel by viewModels()
     private val binding by viewBinding<ProfileFragmentBinding>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        subscribe(container, ::consume, ::render)
+        subscribe(viewModel.store, ::consume, ::render)
     }
 
     private fun render(state: ProfileState) { /* update all views */ }
@@ -357,76 +229,40 @@ You don't have to migrate everything at once. Here's a practical path:
 Pick a simple, self-contained screen with clear state transitions. A settings page or a detail screen
 works well. Avoid complex screens with pagination or deep navigation for the first migration.
 
-### 2. Keep your ViewModels
+### 2. Use MVVM+ with your existing ViewModels
 
-You can use FlowMVI inside existing Android ViewModels. Implement `ImmutableContainer` and delegate to a store:
+The example above already shows this — implement `ImmutableContainer` on your ViewModel,
+delegate to a `lazyStore`, and expose functions via `store.intent {}`. Your DI, navigation, and
+lifecycle integration stay unchanged. The only UI change is calling `subscribe` instead of
+`collectAsStateWithLifecycle`.
 
-```kotlin
-class ProfileViewModel(
-    repo: ProfileRepository,
-) : ViewModel(), ImmutableContainer<ProfileState, ProfileIntent, ProfileAction> {
+See the [Android guide](../integrations/android.md) for the full pattern and
+the [DI guide](../integrations/di.md) for Koin and Kodein setup.
 
-    override val store by lazyStore(
-        initial = ProfileState.Loading,
-        scope = viewModelScope,
-    ) {
-        configure { debuggable = BuildConfig.DEBUG }
-        reduceLambdas()
-    }
+### 3. Graduate to sealed intents when needed
 
-    fun loadProfile() = store.intent { /* ... */ }
-}
-```
+MVVM+ (lambda intents) works well for simple screens. Consider switching to sealed class intents when:
 
-This approach keeps your DI, navigation, and lifecycle integration unchanged.
-See the [Android guide](../integrations/android.md) for the full pattern.
+- You need exhaustive `when` handling (compiler-checked)
+- Multiple UI surfaces dispatch the same intents
+- You want full logging/debugging visibility — lambda intents log as `LambdaIntent`, not descriptive names
+- You are using Compose — MVVM-style `viewModel.doThis()` function references capture state and
+  are inherently unstable for the Compose compiler, causing unnecessary recompositions
+
+### 4. Add plugins incrementally
+
+Start with `recover`, `whileSubscribed`, and `reduceLambdas` — then layer in more as needed:
+
+- `whileSubscribed` for reactive data streams — use this from day one
+- `enableLogging()` — set this up once in your shared DI configuration, not per-store
+- `saveState` / `parcelizeState` for [state persistence](../state/savedstate.md)
 
 :::tip
 
-Containers and Stores are regular dependencies — they work with any DI framework.
-For Koin and Kodein setup with `ContainerViewModel`, see the [DI guide](../integrations/di.md).
-
-:::
-
-### 3. Adopt MVVM+ style first
-
-If your team is used to calling ViewModel functions from the UI, the MVVM+ (lambda intent) style is the
-smallest conceptual shift. Your UI code barely changes — just swap `viewModel.doThing()` for
-`container.doThing()`.
-
-**Use MVVM+ (lambda intents) when:**
-- Migrating incrementally and you want minimal UI changes
-- The feature has simple, linear intent flow
-- Your team prefers calling functions over dispatching sealed classes
-
-**Graduate to MVI style when:**
-- You need exhaustive `when` handling for intents (compiler-checked)
-- Multiple UI surfaces dispatch the same intents
-- You want full logging/debugging visibility — lambda intents log as `LambdaIntent`, not descriptive names
-- You are using Compose — lambda intents are unstable for the Compose compiler
-
-:::warning
-
-`LambdaIntent` is a value class wrapping a lambda, which makes it inherently unstable for the Compose
-compiler. If you are using Compose, prefer the MVI style with sealed class intents for better
-recomposition performance. See the [Compose guide](../integrations/compose.md) for details.
-
-:::
-
-### 4. Extract Containers gradually
-
-Once comfortable, move store logic out of ViewModels into standalone `Container` classes. Use
-`StoreViewModel` delegation to keep the ViewModel as a thin Android lifecycle wrapper.
+Once comfortable, you can extract store logic out of ViewModels into standalone `Container` classes.
 See the [Android guide](../integrations/android.md) for `StoreViewModel` examples.
 
-### 5. Add plugins incrementally
-
-Start with the essentials — `reduce`, `recover`, `init` — then layer in more as needed:
-
-- `enableLogging()` for debug visibility
-- `saveState` / `parcelizeState` for [state persistence](../state/savedstate.md)
-- `whileSubscribed` for reactive data streams
-- `collectMetrics()` for performance tracking
+:::
 
 ## Common Challenges
 
@@ -466,50 +302,27 @@ See the [saved state guide](../state/savedstate.md) for details.
 
 ### Testing
 
-**Problem:** Manually constructing ViewModels, injecting mocks, and collecting state with Turbine.
+**Problem:** FlowMVI stores have their own lifecycle and concurrency constraints, which require
+specific setup in tests.
 
-**Before** — MVVM test with manual setup:
+**Solution:** Create a store with your test dependencies, then use `subscribeAndTest` — it handles
+start, subscription, and cleanup:
 
 ```kotlin
-@Test
-fun `loads profile on init`() = runTest {
-    val repo = FakeProfileRepository(expectedProfile)
-    val viewModel = ProfileViewModel(repo)
+val store = store(ProfileState.Loading) {
+    recover { e -> updateState { ProfileState.Error(e.message ?: "Unknown") }; null }
+    // configure plugins under test
+}
 
-    viewModel.state.test {
+store.subscribeAndTest {
+    states.test {
         awaitItem() shouldBe Loading
         awaitItem() shouldBe DisplayingProfile(expectedProfile)
     }
 }
 ```
 
-**After** — FlowMVI's `subscribeAndTest` handles store start, subscription, and cleanup:
-
-```kotlin
-@Test
-fun `loads profile on init`() = runTest {
-    store.subscribeAndTest {
-        states.test {
-            awaitItem() shouldBe Loading
-            awaitItem() shouldBe DisplayingProfile(expectedProfile)
-        }
-    }
-}
-```
-
-No manual lifecycle management — `subscribeAndTest` starts the store, subscribes, runs your
-assertions, then stops and cleans up. You can also send intents and assert on actions:
-
-```kotlin
-store.subscribeAndTest {
-    intent(ClickedSave("New Name"))
-    actions.test {
-        awaitItem() shouldBe ShowToast("Profile saved")
-    }
-}
-```
-
-See the [test harness guide](../integrations/testing.md) for the full API.
+See the [testing guide](../integrations/testing.md) for the full API and assertion patterns.
 
 ### Store lifecycle and scoping
 
@@ -518,16 +331,6 @@ See the [test harness guide](../integrations/testing.md) for the full API.
 **Solution:** The store lifecycle matches whatever `CoroutineScope` you provide. When using
 `viewModelScope`, the store lives as long as the ViewModel — identical behavior to what you already have.
 You can also start/stop stores manually for finer control.
-
-## What You Gain
-
-- **Centralized error handling** — one `recover {}` replaces scattered `try/catch` blocks
-- **Built-in logging and debugging** — `enableLogging()` plus the [remote debugger](../plugins/debugging.md)
-- **KMP readiness** — Containers are multiplatform; only the ViewModel wrapper is Android-specific
-- **Structured testability** — `subscribeAndTest {}` with no manual lifecycle management
-- **One-line state persistence** — `parcelizeState()` or `serializeState()` replaces manual `SavedStateHandle` code
-- **Compose performance** — stable state types with proper `subscribe` integration
-- **Plugin composability** — add logging, metrics, undo/redo, and more without changing business logic
 
 ## Next Steps
 
