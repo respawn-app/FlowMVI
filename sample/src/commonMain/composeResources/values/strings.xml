@@ -28,4 +28,28 @@
     <string name="sst_charged_snackbar">Payment succeeded</string>
     <string name="sst_expired_snackbar">Invoice expired</string>
     <string name="sst_start_over">Start over</string>
+    <!-- Transitions feature -->
+    <string name="transitions_feature_title">FSM Transitions</string>
+    <string name="transitions_login_button">Log In</string>
+    <string name="transitions_logout_button">Log Out</string>
+    <string name="transitions_retry_button">Retry</string>
+    <string name="transitions_username_label">Username</string>
+    <string name="transitions_password_label">Password</string>
+    <string name="transitions_authenticating_label">Authenticating…</string>
+    <string name="transitions_welcome_label">Welcome, %1$s!</string>
+    <string name="transitions_error_snackbar">Authentication failed: %1$s</string>
+    <!-- Scoped Compose feature -->
+    <string name="scoped_compose_feature_title">Scoped Compose</string>
+    <string name="scoped_compose_loading_label">Loading dashboard…</string>
+    <string name="scoped_compose_feed_title">Feed</string>
+    <string name="scoped_compose_notifications_title">Notifications</string>
+    <string name="scoped_compose_retry_button">Retry</string>
+    <string name="scoped_compose_refresh_button">Refresh</string>
+    <string name="scoped_compose_error_label">Something went wrong: %1$s</string>
+    <!-- Top-Level Compose feature -->
+    <string name="toplevel_compose_feature_title">Top-Level Compose</string>
+    <string name="toplevel_compose_weather_title">Weather</string>
+    <string name="toplevel_compose_clock_title">Clock</string>
+    <string name="toplevel_compose_refresh_button">Refresh Weather</string>
+    <string name="toplevel_compose_loading_label">Loading…</string>
 </resources>

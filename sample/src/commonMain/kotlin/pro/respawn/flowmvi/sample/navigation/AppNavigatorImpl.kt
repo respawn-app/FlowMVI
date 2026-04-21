@@ -47,6 +47,9 @@ private class AppNavigatorImpl(
     override fun undoRedoFeature() = navigate(Destination.UndoRedo)
     override fun progressiveFeature() = navigate(Destination.Progressive)
     override fun stateTransactionsFeature() = navigate(Destination.StateTransactions)
+    override fun transitionsFeature() = navigate(Destination.Transitions)
+    override fun scopedComposeFeature() = navigate(Destination.ScopedCompose)
+    override fun topLevelComposeFeature() = navigate(Destination.TopLevelCompose)
     override fun decomposeFeature() = navigate(Destination.Decompose)
 
     @Composable
